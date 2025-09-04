@@ -9,7 +9,7 @@ This document outlines the ideal project structure, designed for scalability, cl
 ├── .github/              # GitHub settings (Actions, PR templates, etc.)
 ├── .husky/               # Husky configuration for Git hooks
 ├── .vscode/              # VS Code project settings (settings.json)
-├── _hygen/               # Templates for the Hygen code generator
+├── _templates/           # Templates for the Hygen code generator
 ├── content/              # The "database" for the Git-as-CMS strategy
 ├── public/               # Static assets (favicon, images, fonts)
 ├── src/                  # Main application source code
@@ -18,8 +18,10 @@ This document outlines the ideal project structure, designed for scalability, cl
 ├── .lintstagedrc.js      # lint-staged configuration
 ├── .prettierrc.js        # Prettier configuration
 ├── bun.lockb             # Bun lockfile
+├── components.json       # shadcn/ui configuration
 ├── next-env.d.ts
 ├── next.config.mjs       # Next.js configuration
+├── next-sitemap.config.js # next-sitemap configuration
 ├── package.json
 ├── postcss.config.js     # PostCSS configuration (for Tailwind)
 ├── tailwind.config.ts    # Tailwind CSS configuration
@@ -56,8 +58,10 @@ src
 │   │   ├── auth/
 │   │   │   └── [...nextauth]/
 │   │   │       └── route.ts # Handler for NextAuth.js
-│   │   └── revalidate/
-│   │       └── route.ts     # Route for on-demand cache revalidation
+│   │   ├── revalidate/
+│   │   │   └── route.ts     # Route for on-demand cache revalidation
+│   │   └── rss/
+│   │       └── route.ts      # RSS feed endpoint
 │   │
 │   ├── globals.css         # Global styles and Tailwind directives
 │   └── layout.tsx          # Root layout (<html>, <body> tags)
@@ -67,8 +71,11 @@ src
 │   │   ├── blog/           # e.g., PostCard, PostList
 │   │   │   ├── PostCard.tsx
 │   │   │   └── PostList.tsx
-│   │   └── search/         # Search component with Fuse.js integration
-│   │       └── GlobalSearch.tsx
+│   │   ├── search/         # Search component with Fuse.js integration
+│   │   │   └── GlobalSearch.tsx
+│   │   └── cms/            # CMS components
+│   │       ├── TipTapEditor.tsx
+│   │       └── PostForm.tsx
 │   │
 │   ├── layout/           # Components for page structure
 │   │   ├── Header.tsx
@@ -77,7 +84,9 @@ src
 │   │
 │   ├── providers/        # Context providers and wrappers
 │   │   ├── ThemeProvider.tsx # For next-themes
-│   │   └── SessionProvider.tsx # For NextAuth.js
+│   │   ├── SessionProvider.tsx # For NextAuth.js
+│   │   ├── IntlProvider.tsx # For next-intl
+│   │   └── Providers.tsx # Combined providers
 │   │
 │   ├── shared/           # General, atomic components (not from shadcn)
 │   │   ├── Icon.tsx        # Component for Lucide icons
@@ -95,13 +104,16 @@ src
 │   ├── mdx.ts            # Logic for parsing and rendering MDX (next-mdx-remote)
 │   ├── search.ts         # Logic for Fuse.js (content indexing)
 │   ├── sharp.ts          # Functions for image processing with Sharp
+│   ├── rss.ts            # RSS feed generation
 │   ├── utils.ts          # General utilities (e.g., `cn` for Tailwind, date formatting)
 │   └── validators/       # Zod validation schemas
 │       ├── content.schema.ts # Schema for MDX file frontmatter
-│       └── form.schema.ts    # Schemas for React Hook Form
+│       ├── form.schema.ts    # Schemas for React Hook Form
+│       ├── content.schema.test.ts # Tests for content schema
+│       └── form.schema.test.ts    # Tests for form schema
 │
 ├── repositories/         # Implementation of the Repository Pattern
-│   ├── base.repository.ts  # (Optional) Base interface or class
+│   ├── base.repository.ts  # Base interface or class
 │   └── post.repository.ts  # Repository for working with content (posts)
 │
 ├── stores/               # Global state managers (Zustand)
@@ -143,7 +155,8 @@ content
 └── pages/                # Standalone pages (e.g., About, Contact)
     └── about.mdx
 ```
-### Key Architectural Decisions
+
+## Key Architectural Decisions
 
 1.  **`src/` Directory**: Using a `src` directory separates application code from root-level configuration files, resulting in a cleaner project structure.
 
@@ -168,3 +181,5 @@ content
 8.  **`content/`**: Structuring content by type (e.g., `blog`, `authors`) allows for easy extension of data models. Using a dedicated folder for each post (`my-first-post/index.mdx`) is a convenient pattern for co-locating images with their corresponding content.
 
 9.  **Testing**: Test files (`*.test.ts`, `*.test.tsx`) should be co-located with the source files they are testing (e.g., `src/lib/utils.test.ts` or `src/components/features/blog/PostCard.test.tsx`).
+
+10. **CMS Integration**: The CMS section includes TipTap editor for content creation and Tremor dashboard for analytics, providing a complete content management experience.

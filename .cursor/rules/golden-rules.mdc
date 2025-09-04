@@ -18,5 +18,5 @@ alwaysApply: true
     - All styling MUST be achieved using **Tailwind CSS 4** utility classes and pre-built **Shadcn/ui** components.
 
 5.  **Documentation Policy**
-    - Code should be self-documenting. AVOID creating excessive documentation (e.g., long JSDoc blocks for simple functions).
+    - Code should be self-documenting. AVOID creating excessive documentation (e.g., long TSDoc blocks for simple functions).
     - Adhere strictly to the existing project folder structure for organization. Do not create new top-level directories without explicit permission.

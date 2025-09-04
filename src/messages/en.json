@@ -1,6 +1,10 @@
 {
+  "Index": {
+    "title": "Welcome to Jambo",
+    "description": "A modern Git-as-CMS powered website"
+  },
   "common": {
-    "hello": "Hello",
-    "welcome": "Welcome"
+    "welcome": "Welcome",
+    "hello": "Hello World"
   }
 }

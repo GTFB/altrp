@@ -1,11 +1,17 @@
-import createMiddleware from 'next-intl/middleware';
-import { i18nConfig } from '@/config/i18n';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-export default createMiddleware({
-  locales: [...i18nConfig.locales],
-  defaultLocale: i18nConfig.defaultLocale,
-});
+export function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+  
+  // Redirect root to default locale
+  if (pathname === '/') {
+    return NextResponse.redirect(new URL('/en', request.url));
+  }
+  
+  return NextResponse.next();
+}
 
 export const config = {
-  matcher: ['/((?!api|_next|.*\..*).*)'],
+  matcher: ['/', '/(ru|en)/:path*']
 };

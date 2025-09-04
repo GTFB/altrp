@@ -24,6 +24,7 @@ Technology Stack
 *   **Content Format:** MDX (Markdown with JSX)
 *   **MDX Rendering:** next-mdx-remote
 *   **MDX Styling:** @tailwindcss/typography
+*   **Code syntax:** Shiki / Rehype Pretty Code
 *   **Schema Definition & Validation:** Zod
 *   **Client-Side Search:** Fuse.js
 *   **Content Editor:** TipTap

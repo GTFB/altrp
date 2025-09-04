@@ -1,52 +1,71 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
-import { Repository } from './base.repository';
+import { frontmatterSchema, type Frontmatter } from '@/lib/validators/content.schema';
 
-export type Post = {
+export interface Post {
   slug: string;
   title: string;
+  description?: string;
   date?: string;
   tags?: string[];
   excerpt?: string;
-};
+  content?: string;
+}
 
-const CONTENT_DIR = path.join(process.cwd(), 'content', 'blog');
+export class PostRepository {
+  private contentDir = path.join(process.cwd(), 'content', 'blog');
 
-export class PostRepository implements Repository<Post> {
   async findAll(): Promise<Post[]> {
-    const entries = await fs.readdir(CONTENT_DIR, { withFileTypes: true });
-    const posts: Post[] = [];
-    for (const entry of entries) {
-      if (!entry.isDirectory()) continue;
-      const slug = entry.name;
-      const filePath = path.join(CONTENT_DIR, slug, 'index.mdx');
-      const raw = await fs.readFile(filePath, 'utf8');
-      const { data } = matter(raw);
-      posts.push({
-        slug,
-        title: data.title ?? slug,
-        date: data.date,
-        tags: data.tags ?? [],
-        excerpt: data.excerpt ?? '',
+    try {
+      const entries = await fs.readdir(this.contentDir, { withFileTypes: true });
+      const posts: Post[] = [];
+
+      for (const entry of entries) {
+        if (entry.isDirectory()) {
+          const slug = entry.name;
+          const post = await this.findBySlug(slug);
+          if (post) {
+            posts.push(post);
+          }
+        }
+      }
+
+      return posts.sort((a, b) => {
+        if (!a.date || !b.date) return 0;
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
       });
+    } catch (error) {
+      console.error('Error reading posts:', error);
+      return [];
     }
-    return posts.sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''));
   }
 
   async findBySlug(slug: string): Promise<Post | null> {
-    const filePath = path.join(CONTENT_DIR, slug, 'index.mdx');
     try {
+      const filePath = path.join(this.contentDir, slug, 'index.mdx');
       const raw = await fs.readFile(filePath, 'utf8');
-      const { data } = matter(raw);
+      const { data, content } = matter(raw);
+      
+      // Convert date to string if it's a Date object
+      const processedData = {
+        ...data,
+        date: data.date instanceof Date ? data.date.toISOString() : data.date,
+      };
+
+      const validatedData = frontmatterSchema.parse(processedData);
+      
       return {
         slug,
-        title: data.title ?? slug,
-        date: data.date,
-        tags: data.tags ?? [],
-        excerpt: data.excerpt ?? '',
+        title: validatedData.title,
+        description: validatedData.description,
+        date: validatedData.date,
+        tags: validatedData.tags,
+        excerpt: content.slice(0, 200) + '...',
+        content,
       };
-    } catch {
+    } catch (error) {
+      console.error(`Error reading post ${slug}:`, error);
       return null;
     }
   }
