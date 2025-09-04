@@ -47,7 +47,8 @@ html, body {
   height: 100%;
 }
 
-@theme inline {
+@theme {
+  --spacing: 0.25rem 0.5rem 0.75rem 1rem 1.25rem 1.5rem 1.75rem 2rem 2.25rem 2.5rem 2.75rem 3rem 3.5rem 4rem 5rem 6rem 7rem 8rem 9rem 10rem 11rem 12rem 13rem 14rem 15rem 16rem 20rem 24rem 28rem 32rem 36rem 40rem 44rem 48rem 52rem 56rem 60rem 64rem 72rem 80rem 96rem;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -125,5 +126,23 @@ html, body {
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* shadcn/ui стили */
+@layer base {
+  :root {
+    --font-sans: var(--font-inter);
+    --font-heading: var(--font-inter-tight);
+  }
+}
+
+@layer components {
+  .font-heading {
+    font-family: var(--font-inter-tight), system-ui, sans-serif;
+  }
+  
+  .font-sans {
+    font-family: var(--font-inter), system-ui, sans-serif;
   }
 }

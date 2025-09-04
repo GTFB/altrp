@@ -4,9 +4,9 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   
-  // Redirect root to default locale
+  // Allow root page to show language selection
   if (pathname === '/') {
-    return NextResponse.redirect(new URL('/en', request.url));
+    return NextResponse.next();
   }
   
   return NextResponse.next();
