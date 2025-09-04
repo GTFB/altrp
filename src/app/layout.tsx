@@ -1,8 +1,8 @@
 import { SeoDefault } from '@/components/SeoDefault/SeoDefault';
 import { Providers } from '@/components/providers/Providers';
-import { Header } from '@/components/Header/Header';
-import { Footer } from '@/components/Footer/Footer';
-import { Sidebar } from '@/components/Sidebar/Sidebar';
+import { Header } from '@/components/layout/Header/Header';
+import { Footer } from '@/components/layout/Footer/Footer';
+import { Sidebar } from '@/components/layout/Sidebar/Sidebar';
 
 export const metadata = {
   title: 'Jambo',

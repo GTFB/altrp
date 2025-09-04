@@ -1,5 +1,5 @@
 import { PostRepository } from '@/repositories/post.repository';
-import { PostCard } from '@/components/PostCard/PostCard';
+import { PostCard } from '@/components/features/blog/PostCard/PostCard';
 
 export async function PostList() {
   const postRepo = new PostRepository();
