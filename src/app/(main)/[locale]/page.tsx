@@ -1,17 +1,19 @@
 import { notFound } from 'next/navigation';
-import { getTranslations } from 'next-intl/server';
 
 interface LocalizedHomeProps {
   params: { locale: string };
 }
 
 export default async function LocalizedHome({ params }: LocalizedHomeProps) {
-  const t = await getTranslations({ locale: params.locale, namespace: 'Index' });
-
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold mb-4">{t('title')}</h1>
-      <p className="text-xl text-muted-foreground">{t('description')}</p>
+      <h1 className="text-4xl font-bold mb-4">Welcome to Jambo</h1>
+      <p className="text-xl text-muted-foreground">
+        A modern Git-as-CMS powered website
+      </p>
+      <p className="mt-4 text-sm text-muted-foreground">
+        Current locale: {params.locale}
+      </p>
     </div>
   );
 }
