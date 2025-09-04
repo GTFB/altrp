@@ -1,4 +1,5 @@
 import { SeoDefault } from '@/components/SeoDefault/SeoDefault';
+import { Providers } from '@/components/providers/Providers';
 
 export const metadata = {
   title: 'Jambo',
@@ -14,7 +15,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen bg-background antialiased">
         <SeoDefault />
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
