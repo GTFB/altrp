@@ -1,3 +1,20 @@
+import './globals.css';
+import { Inter, Inter_Tight } from 'next/font/google';
+import { Header } from '@/components/layout/Header/Header';
+import { Footer } from '@/components/layout/Footer/Footer';
+
+const inter = Inter({
+  subsets: ['latin', 'cyrillic'],
+  variable: '--font-inter',
+  display: 'swap',
+});
+
+const interTight = Inter_Tight({
+  subsets: ['latin', 'cyrillic'],
+  variable: '--font-inter-tight',
+  display: 'swap',
+});
+
 export const metadata = {
   title: 'Jambo',
   description: 'Git-as-CMS powered site',
@@ -9,22 +26,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="min-h-screen bg-background antialiased">
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${interTight.variable}`}>
+      <body className="min-h-screen bg-background antialiased font-sans">
         <div className="flex flex-col min-h-screen">
-          <header className="border-b bg-card">
-            <div className="container mx-auto px-4 py-4">
-              <h1 className="text-xl font-bold">Jambo</h1>
-            </div>
-          </header>
+          <Header />
           <main className="flex-1">{children}</main>
-          <footer className="border-t bg-card">
-            <div className="container mx-auto px-4 py-8">
-              <p className="text-sm text-muted-foreground">
-                © 2024 Jambo. All rights reserved.
-              </p>
-            </div>
-          </footer>
+          <Footer />
         </div>
       </body>
     </html>
