@@ -1,6 +1,8 @@
 import { PostRepository } from '@/repositories/post.repository';
 import { PostCard } from '@/components/features/blog/PostCard/PostCard';
 
+export const dynamic = 'force-dynamic';
+
 export async function PostList() {
   const postRepo = new PostRepository();
   const posts = await postRepo.findAll();

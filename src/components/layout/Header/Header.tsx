@@ -1,11 +1,9 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
 import { useUiStore } from '@/stores/ui.store';
 import { Menu, Search } from 'lucide-react';
 
 export function Header() {
-  const t = useTranslations('common');
   const { toggleSidebar } = useUiStore();
 
   return (
@@ -18,7 +16,7 @@ export function Header() {
           >
             <Menu className="h-5 w-5" />
           </button>
-          <h1 className="text-xl font-bold">{t('welcome')}</h1>
+          <h1 className="text-xl font-bold">Jambo</h1>
         </div>
         
         <div className="flex items-center gap-4">

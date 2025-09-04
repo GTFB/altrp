@@ -2,6 +2,8 @@ import { PostRepository } from '@/repositories/post.repository';
 import { RenderMdx } from '@/lib/mdx';
 import { notFound } from 'next/navigation';
 
+export const dynamic = 'force-dynamic';
+
 interface BlogPostPageProps {
   params: { slug: string };
 }

@@ -4,6 +4,8 @@ import matter from 'gray-matter';
 import { RenderMdx } from '@/lib/mdx';
 import { notFound } from 'next/navigation';
 
+export const dynamic = 'force-dynamic';
+
 interface PageProps {
   params: { slug: string };
 }

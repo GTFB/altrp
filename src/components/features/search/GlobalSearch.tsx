@@ -1,25 +1,59 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useDebounce } from '@/hooks/use-debounce';
 import { createSearchIndex, type SearchRecord } from '@/lib/search';
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 
-interface GlobalSearchProps {
-  items: SearchRecord[];
-  onResultSelect?: (item: SearchRecord) => void;
-}
-
-export function GlobalSearch({ items, onResultSelect }: GlobalSearchProps) {
+export function GlobalSearch() {
   const [query, setQuery] = useState('');
+  const [results, setResults] = useState<SearchRecord[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchItems, setSearchItems] = useState<SearchRecord[]>([]);
   const debouncedQuery = useDebounce(query, 300);
-  
-  const searchIndex = useMemo(() => createSearchIndex(items), [items]);
-  const results = useMemo(() => {
-    if (!debouncedQuery.trim()) return [];
-    return searchIndex.search(debouncedQuery).slice(0, 5);
-  }, [searchIndex, debouncedQuery]);
-  
+
+  useEffect(() => {
+    // In a real application, data loading would happen here
+    setSearchItems([
+      { id: '1', title: 'Sample Post', content: 'Sample content', tags: ['sample'] },
+    ]);
+  }, []);
+
+  const handleSearch = (searchQuery: string) => {
+    if (!searchQuery.trim()) {
+      setResults([]);
+      return;
+    }
+
+    try {
+      const searchIndex = createSearchIndex(searchItems);
+      const searchResults = searchIndex.search(searchQuery, { limit: 5 });
+      setResults(searchResults.map(result => result.item));
+    } catch (error) {
+      console.error('Search error:', error);
+      setResults([]);
+    }
+  };
+
+  useEffect(() => {
+    handleSearch(debouncedQuery);
+  }, [debouncedQuery, searchItems]);
+
+  const handleInputChange = (value: string) => {
+    setQuery(value);
+    if (value.trim()) {
+      setIsOpen(true);
+    } else {
+      setIsOpen(false);
+    }
+  };
+
+  const handleResultClick = (result: SearchRecord) => {
+    window.location.href = `/blog/${result.id}`;
+    setIsOpen(false);
+    setQuery('');
+  };
+
   return (
     <div className="relative">
       <div className="relative">
@@ -28,23 +62,34 @@ export function GlobalSearch({ items, onResultSelect }: GlobalSearchProps) {
           type="text"
           placeholder="Search..."
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 border rounded-md bg-background"
+          onChange={(e) => handleInputChange(e.target.value)}
+          className="pl-10 pr-10 py-2 w-full border rounded-md bg-background"
         />
+        {query && (
+          <button
+            onClick={() => {
+              setQuery('');
+              setIsOpen(false);
+            }}
+            className="absolute right-3 top-1/2 -translate-y-1/2"
+          >
+            <X className="h-4 w-4 text-muted-foreground" />
+          </button>
+        )}
       </div>
-      
-      {results.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-background border rounded-md shadow-lg z-50">
+
+      {isOpen && results.length > 0 && (
+        <div className="absolute top-full left-0 right-0 mt-1 bg-card border rounded-md shadow-lg z-50">
           {results.map((result) => (
             <button
-              key={result.item.id}
-              onClick={() => onResultSelect?.(result.item)}
-              className="w-full text-left px-4 py-2 hover:bg-muted focus:bg-muted focus:outline-none"
+              key={result.id}
+              onClick={() => handleResultClick(result)}
+              className="w-full text-left p-3 hover:bg-muted border-b last:border-b-0"
             >
-              <div className="font-medium">{result.item.title}</div>
-              {result.item.excerpt && (
+              <div className="font-medium">{result.title}</div>
+              {result.content && (
                 <div className="text-sm text-muted-foreground truncate">
-                  {result.item.excerpt}
+                  {result.content}
                 </div>
               )}
             </button>
