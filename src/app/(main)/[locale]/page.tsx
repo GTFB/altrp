@@ -1,12 +1,17 @@
-import { useTranslations } from 'next-intl';
+import { notFound } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 
-export default function LocalizedHome() {
-  const t = useTranslations('common');
-  
+interface LocalizedHomeProps {
+  params: { locale: string };
+}
+
+export default async function LocalizedHome({ params }: LocalizedHomeProps) {
+  const t = await getTranslations({ locale: params.locale, namespace: 'Index' });
+
   return (
-    <main className="container mx-auto px-4 py-10">
-      <h1 className="text-3xl font-bold">{t('welcome')}</h1>
-      <p className="text-muted-foreground mt-2">{t('hello')}</p>
-    </main>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-4xl font-bold mb-4">{t('title')}</h1>
+      <p className="text-xl text-muted-foreground">{t('description')}</p>
+    </div>
   );
 }
