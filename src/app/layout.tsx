@@ -1,5 +1,3 @@
-import { SeoDefault } from '@/components/SeoDefault/SeoDefault';
-
 export const metadata = {
   title: 'Jambo',
   description: 'Git-as-CMS powered site',
@@ -13,7 +11,6 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen bg-background antialiased">
-        <SeoDefault />
         <div className="flex flex-col min-h-screen">
           <header className="border-b bg-card">
             <div className="container mx-auto px-4 py-4">

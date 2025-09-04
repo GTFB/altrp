@@ -1,19 +1,18 @@
 'use client';
 
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
 
 interface IntlProviderProps {
   children: React.ReactNode;
   locale: string;
+  messages: any;
 }
 
-export async function IntlProvider({
+export function IntlProvider({
   children,
   locale,
+  messages,
 }: IntlProviderProps) {
-  const messages = await getMessages({ locale });
-
   return (
     <NextIntlClientProvider messages={messages} locale={locale}>
       {children}
