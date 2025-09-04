@@ -1,0 +1,107 @@
+name: Branch Protection
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  language-validation:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate Push Language
+        run: |
+          echo "Validating push to protected branch..."
+          
+          # Get commit messages from push
+          COMMITS=$(git log --pretty=format:"%s" ${{ github.event.before }}..${{ github.event.after }})
+          
+          if [ -z "$COMMITS" ]; then
+            echo "No commits to validate"
+            exit 0
+          fi
+          
+          while IFS= read -r commit_msg; do
+            echo "Checking commit: $commit_msg"
+            
+            # Check for Cyrillic characters (Russian)
+            if echo "$commit_msg" | grep -q '[а-яё]'; then
+              echo "❌ Error: Commit message contains Russian characters: $commit_msg"
+              echo "Please use English only in commit messages"
+              echo "Protected branch push rejected"
+              exit 1
+            fi
+            
+            # Check for Cyrillic characters (case insensitive)
+            if echo "$commit_msg" | grep -qi '[а-яё]'; then
+              echo "❌ Error: Commit message contains Russian characters: $commit_msg"
+              echo "Please use English only in commit messages"
+              echo "Protected branch push rejected"
+              exit 1
+            fi
+          done <<< "$COMMITS"
+          
+          echo "✅ Push language validation passed"
+
+  pr-validation:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate PR for Protected Branch
+        run: |
+          echo "Validating PR targeting protected branch..."
+          
+          # Get PR title
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          echo "PR Title: $PR_TITLE"
+          
+          # Check for Cyrillic characters (Russian)
+          if echo "$PR_TITLE" | grep -q '[а-яё]'; then
+            echo "❌ Error: PR title contains Russian characters"
+            echo "Please use English only in PR titles"
+            echo "PR to protected branch rejected"
+            exit 1
+          fi
+          
+          # Get PR body
+          PR_BODY="${{ github.event.pull_request.body }}"
+          if [ -n "$PR_BODY" ]; then
+            echo "Checking PR body..."
+            if echo "$PR_BODY" | grep -q '[а-яё]'; then
+              echo "❌ Error: PR body contains Russian characters"
+              echo "Please use English only in PR descriptions"
+              echo "PR to protected branch rejected"
+              exit 1
+            fi
+          fi
+          
+          # Get commit messages from PR
+          COMMITS=$(git log --pretty=format:"%s" ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }})
+          
+          while IFS= read -r commit_msg; do
+            echo "Checking commit: $commit_msg"
+            
+            # Check for Cyrillic characters (Russian)
+            if echo "$commit_msg" | grep -q '[а-яё]'; then
+              echo "❌ Error: Commit message contains Russian characters: $commit_msg"
+              echo "Please use English only in commit messages"
+              echo "PR to protected branch rejected"
+              exit 1
+            fi
+          done <<< "$COMMITS"
+          
+          echo "✅ PR language validation passed"

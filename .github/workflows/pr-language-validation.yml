@@ -1,0 +1,300 @@
+name: GitHub Language Validation
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+  push:
+    branches: [main, develop]
+  issue_comment:
+    types: [created, edited]
+  issues:
+    types: [opened, edited]
+
+jobs:
+  validate-language:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          npm install -g @commitlint/cli @commitlint/config-conventional
+          npm install -g conventional-changelog-cli
+
+      - name: Validate PR/Issue Title Language
+        run: |
+          echo "Validating title language..."
+          
+          # Get title based on event type
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            TITLE="${{ github.event.pull_request.title }}"
+            TYPE="PR"
+          elif [ "${{ github.event_name }}" = "issues" ]; then
+            TITLE="${{ github.event.issue.title }}"
+            TYPE="Issue"
+          else
+            echo "Skipping title validation for event: ${{ github.event_name }}"
+            exit 0
+          fi
+          
+          echo "$TYPE Title: $TITLE"
+          
+          # Check for Cyrillic characters (Russian)
+          if echo "$TITLE" | grep -q '[а-яё]'; then
+            echo "❌ Error: $TYPE title contains Russian characters"
+            echo "Please use English only in $TYPE titles"
+            exit 1
+          fi
+          
+          # Check for Cyrillic characters (case insensitive)
+          if echo "$TITLE" | grep -qi '[а-яё]'; then
+            echo "❌ Error: $TYPE title contains Russian characters"
+            echo "Please use English only in $TYPE titles"
+            exit 1
+          fi
+          
+          echo "✅ $TYPE title language validation passed"
+
+      - name: Validate Commit Messages Language
+        run: |
+          echo "Validating commit messages language..."
+          
+          # Get commit messages based on event type
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            COMMITS=$(git log --pretty=format:"%s" ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }})
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            COMMITS=$(git log --pretty=format:"%s" ${{ github.event.before }}..${{ github.event.after }})
+          else
+            echo "Skipping commit validation for event: ${{ github.event_name }}"
+            exit 0
+          fi
+          
+          if [ -z "$COMMITS" ]; then
+            echo "No commits to validate"
+            exit 0
+          fi
+          
+          while IFS= read -r commit_msg; do
+            echo "Checking commit: $commit_msg"
+            
+            # Check for Cyrillic characters (Russian)
+            if echo "$commit_msg" | grep -q '[а-яё]'; then
+              echo "❌ Error: Commit message contains Russian characters: $commit_msg"
+              echo "Please use English only in commit messages"
+              exit 1
+            fi
+            
+            # Check for Cyrillic characters (case insensitive)
+            if echo "$commit_msg" | grep -qi '[а-яё]'; then
+              echo "❌ Error: Commit message contains Russian characters: $commit_msg"
+              echo "Please use English only in commit messages"
+              exit 1
+            fi
+          done <<< "$COMMITS"
+          
+          echo "✅ Commit messages language validation passed"
+
+      - name: Validate Issue/PR Comments Language
+        run: |
+          echo "Validating comments language..."
+          
+          # Get comment body based on event type
+          if [ "${{ github.event_name }}" = "issue_comment" ]; then
+            COMMENT_BODY="${{ github.event.comment.body }}"
+            echo "Checking comment: $COMMENT_BODY"
+            
+            # Check for Cyrillic characters (Russian)
+            if echo "$COMMENT_BODY" | grep -q '[а-яё]'; then
+              echo "❌ Error: Comment contains Russian characters"
+              echo "Please use English only in comments"
+              exit 1
+            fi
+            
+            # Check for Cyrillic characters (case insensitive)
+            if echo "$COMMENT_BODY" | grep -qi '[а-яё]'; then
+              echo "❌ Error: Comment contains Russian characters"
+              echo "Please use English only in comments"
+              exit 1
+            fi
+            
+            echo "✅ Comment language validation passed"
+          elif [ "${{ github.event_name }}" = "issues" ]; then
+            ISSUE_BODY="${{ github.event.issue.body }}"
+            if [ -n "$ISSUE_BODY" ]; then
+              echo "Checking issue body: $ISSUE_BODY"
+              
+              # Check for Cyrillic characters (Russian)
+              if echo "$ISSUE_BODY" | grep -q '[а-яё]'; then
+                echo "❌ Error: Issue body contains Russian characters"
+                echo "Please use English only in issue descriptions"
+                exit 1
+              fi
+              
+              # Check for Cyrillic characters (case insensitive)
+              if echo "$ISSUE_BODY" | grep -qi '[а-яё]'; then
+                echo "❌ Error: Issue body contains Russian characters"
+                echo "Please use English only in issue descriptions"
+                exit 1
+              fi
+              
+              echo "✅ Issue body language validation passed"
+            fi
+          elif [ "${{ github.event_name }}" = "pull_request" ]; then
+            PR_BODY="${{ github.event.pull_request.body }}"
+            if [ -n "$PR_BODY" ]; then
+              echo "Checking PR body: $PR_BODY"
+              
+              # Check for Cyrillic characters (Russian)
+              if echo "$PR_BODY" | grep -q '[а-яё]'; then
+                echo "❌ Error: PR body contains Russian characters"
+                echo "Please use English only in PR descriptions"
+                exit 1
+              fi
+              
+              # Check for Cyrillic characters (case insensitive)
+              if echo "$PR_BODY" | grep -qi '[а-яё]'; then
+                echo "❌ Error: PR body contains Russian characters"
+                echo "Please use English only in PR descriptions"
+                exit 1
+              fi
+              
+              echo "✅ PR body language validation passed"
+            fi
+          else
+            echo "Skipping comment validation for event: ${{ github.event_name }}"
+          fi
+
+      - name: Validate Code Comments Language
+        run: |
+          echo "Validating code comments language..."
+          
+          # Find all TypeScript, JavaScript, and Markdown files
+          FILES=$(find . -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" -o -name "*.md" \) -not -path "./node_modules/*" -not -path "./.next/*" -not -path "./.git/*")
+          
+          RUSSIAN_FOUND=false
+          
+          for file in $FILES; do
+            # Check for Russian characters in comments and strings
+            if grep -q '[а-яё]' "$file"; then
+              echo "❌ Error: File $file contains Russian characters"
+              echo "Lines with Russian text:"
+              grep -n '[а-яё]' "$file" | head -5
+              RUSSIAN_FOUND=true
+            fi
+          done
+          
+          if [ "$RUSSIAN_FOUND" = true ]; then
+            echo "Please use English only in code comments and documentation"
+            exit 1
+          fi
+          
+          echo "✅ Code comments language validation passed"
+
+      - name: Comment with validation results
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const eventName = '${{ github.event_name }}';
+            const status = '${{ job.status }}';
+            const emoji = status === 'success' ? '✅' : '❌';
+            
+            let issueNumber;
+            let validatedItems = [];
+            let message;
+            
+            // Determine issue number and validation items based on event type
+            if (eventName === 'pull_request') {
+              issueNumber = context.payload.pull_request.number;
+              validatedItems = [
+                'PR Title',
+                'PR Description', 
+                'Commit Messages',
+                'Code Comments'
+              ];
+              message = status === 'success' 
+                ? 'All language validations passed! PR is ready for review.'
+                : 'Language validation failed. Please fix the issues above.';
+            } else if (eventName === 'issues') {
+              issueNumber = context.payload.issue.number;
+              validatedItems = [
+                'Issue Title',
+                'Issue Description'
+              ];
+              message = status === 'success' 
+                ? 'All language validations passed! Issue is ready for review.'
+                : 'Language validation failed. Please fix the issues above.';
+            } else if (eventName === 'issue_comment') {
+              issueNumber = context.payload.issue.number;
+              validatedItems = [
+                'Comment Content'
+              ];
+              message = status === 'success' 
+                ? 'Comment language validation passed!'
+                : 'Language validation failed. Please fix the comment above.';
+            } else if (eventName === 'push') {
+              // For push events, we don't comment on issues
+              console.log('Push event - no comment needed');
+              return;
+            }
+            
+            if (!issueNumber) {
+              console.log('No issue number found for event:', eventName);
+              return;
+            }
+            
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('Language Validation')
+            );
+            
+            const validationList = validatedItems.map(item => 
+              `- ${item}: ${status === 'success' ? '✅' : '❌'}`
+            ).join('\n');
+            
+            const body = `${emoji} **Language Validation Results**
+
+${message}
+
+**Validated:**
+${validationList}
+
+**Rules:**
+- Use English only in all GitHub interactions
+- Use English only in code comments and documentation
+- No Russian/Cyrillic characters allowed
+- Applies to: PRs, Issues, Comments, Commits, Code
+
+---
+*This check ensures code quality and maintainability.*`;
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                body: body
+              });
+            }
