@@ -1,7 +1,7 @@
 # Use POSIX shell for portability
 SHELL := /bin/sh
 
-.PHONY: help init install dev build lint format prepare tailwind shadcn hygen test clean branch commit
+.PHONY: help init install dev build lint format prepare tailwind shadcn hygen test clean branch commit component
 
 help:
 	@echo "Available targets:"
@@ -15,6 +15,7 @@ help:
 	@echo "  tailwind  - Generate Tailwind config and globals.css directives"
 	@echo "  shadcn    - Initialize shadcn/ui"
 	@echo "  hygen     - Initialize Hygen scaffolding"
+	@echo "  component - Generate component: make component NAME=ComponentName"
 	@echo "  test      - Run unit tests with Bun"
 	@echo "  branch    - Create/switch branch: make branch BR=name"
 	@echo "  commit    - Git add & commit: make commit MSG=\"message\""
@@ -54,6 +55,10 @@ hygen:
 	@[ -d _hygen/new ] || mkdir -p _hygen/new
 	@[ -d _hygen/component ] || mkdir -p _hygen/component
 	@[ -f _hygen/component/new.ejs.t ] || printf "---\nto: src/components/<%= Name %>/<%= Name %>.tsx\n---\nimport React from 'react'\n\nexport function <%= Name %>() {\n  return (\n    <div><%= Name %></div>\n  )\n}\n" > _hygen/component/new.ejs.t
+
+component:
+	@test -n "$(NAME)" || (echo "NAME is required, e.g., make component NAME=Header" && exit 1)
+	bun hygen component new --name $(NAME)
 
 # One-shot initializer for configs only (does not run create-next-app)
 init: install prepare tailwind shadcn hygen
