@@ -14,22 +14,26 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@octokit/rest": "20.1.1",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "fuse.js": "7.0.0",
+    "lucide-react": "^0.542.0",
     "next": "14.2.5",
+    "next-auth": "5.0.0-beta.25",
+    "next-intl": "3.18.0",
+    "next-mdx-remote": "5.0.0",
+    "next-seo": "6.5.0",
+    "next-themes": "0.3.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "next-themes": "0.3.0",
-    "zustand": "4.5.2",
-    "lucide-react": "0.441.0",
-    "sonner": "1.5.0",
-    "next-seo": "6.5.0",
-    "next-intl": "3.18.0",
-    "next-mdx-remote": "5.4.0",
-    "zod": "3.23.8",
-    "fuse.js": "7.0.0",
     "rss": "1.2.2",
     "sharp": "0.33.4",
-    "next-auth": "5.0.0-beta.25",
-    "@octokit/rest": "20.1.1"
+    "sonner": "1.5.0",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "3.23.8",
+    "zustand": "4.5.2"
   },
   "devDependencies": {
     "typescript": "5.5.4",
@@ -43,7 +47,8 @@
     "husky": "9.1.4",
     "postcss": "8.4.41",
     "autoprefixer": "10.4.20",
-    "tailwindcss": "4.0.0-alpha.15"
+    "tailwindcss": "4.0.0-alpha.15",
+    "@tailwindcss/typography": "0.5.15"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx,json,md,mdx,css,scss}": [
