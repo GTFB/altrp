@@ -1,5 +1,8 @@
 import { SeoDefault } from '@/components/SeoDefault/SeoDefault';
 import { Providers } from '@/components/providers/Providers';
+import { Header } from '@/components/Header/Header';
+import { Footer } from '@/components/Footer/Footer';
+import { Sidebar } from '@/components/Sidebar/Sidebar';
 
 export const metadata = {
   title: 'Jambo',
@@ -15,7 +18,14 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen bg-background antialiased">
         <SeoDefault />
-        <Providers>{children}</Providers>
+        <Providers>
+          <div className="flex flex-col min-h-screen">
+            <Header />
+            <Sidebar />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
+        </Providers>
       </body>
     </html>
   );
