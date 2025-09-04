@@ -1,4 +1,5 @@
 import { DynamicHtml } from '@/components/DynamicHtml';
+import './globals.css';
 
 export const metadata = {
   title: {
