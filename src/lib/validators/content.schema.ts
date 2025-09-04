@@ -5,6 +5,7 @@ export const frontmatterSchema = z.object({
   description: z.string().optional(),
   date: z.string().optional(),
   tags: z.array(z.string()).optional(),
+  excerpt: z.string().optional(),
 });
 
 export type Frontmatter = z.infer<typeof frontmatterSchema>;

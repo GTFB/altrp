@@ -1,23 +1,40 @@
+import { DynamicHtml } from '@/components/DynamicHtml';
 import './globals.css';
-import { Inter, Inter_Tight } from 'next/font/google';
-import { Header } from '@/components/layout/Header/Header';
-import { Footer } from '@/components/layout/Footer/Footer';
-
-const inter = Inter({
-  subsets: ['latin', 'cyrillic'],
-  variable: '--font-inter',
-  display: 'swap',
-});
-
-const interTight = Inter_Tight({
-  subsets: ['latin', 'cyrillic'],
-  variable: '--font-inter-tight',
-  display: 'swap',
-});
 
 export const metadata = {
-  title: 'Jambo',
-  description: 'Git-as-CMS powered site',
+  title: {
+    default: 'Jambo - Git-as-CMS powered site',
+    template: '%s | Jambo',
+  },
+  description: 'A modern Git-as-CMS powered website built with Next.js, featuring a blog, internationalization, and beautiful UI components.',
+  keywords: ['blog', 'cms', 'nextjs', 'react', 'typescript', 'tailwind'],
+  authors: [{ name: 'Jambo Team' }],
+  creator: 'Jambo Team',
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://jambo.example.com',
+    siteName: 'Jambo',
+    title: 'Jambo - Git-as-CMS powered site',
+    description: 'A modern Git-as-CMS powered website built with Next.js',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Jambo - Git-as-CMS powered site',
+    description: 'A modern Git-as-CMS powered website built with Next.js',
+    creator: '@jambo',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 };
 
 export default function RootLayout({
@@ -26,14 +43,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${interTight.variable}`}>
-      <body className="min-h-screen bg-background antialiased font-sans">
+    <DynamicHtml>
+      <body className="min-h-screen 
         <div className="flex flex-col min-h-screen">
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />
         </div>
       </body>
-    </html>
+    </DynamicHtml>
   );
 }

@@ -1,23 +1,32 @@
+'use client';
+
 import { type Post } from '@/repositories/post.repository';
+import Link from 'next/link';
+import { useLocale } from '@/hooks/use-locale';
+import { PostTags } from '@/components/features/blog/PostTags';
+import { PostMeta } from '@/components/features/blog/PostMeta';
 
 interface PostCardProps {
   post: Post;
 }
 
 export function PostCard({ post }: PostCardProps) {
+  const locale = useLocale();
+
   return (
     <article className="border rounded-lg p-6 hover:shadow-md transition-shadow">
       <header className="mb-4">
         <h2 className="text-xl font-semibold mb-2">
-          <a href={`/blog/${post.slug}`} className="hover:text-primary">
+          <Link href={`/${locale}/blog/${post.slug}`} className="hover:text-primary">
             {post.title}
-          </a>
+          </Link>
         </h2>
-        {post.date && (
-          <time className="text-sm text-muted-foreground">
-            {new Date(post.date).toLocaleDateString()}
-          </time>
-        )}
+        <PostMeta 
+          date={post.date}
+          author={post.author}
+          category={post.category}
+          className="mb-2"
+        />
       </header>
       
       {post.excerpt && (
@@ -26,18 +35,7 @@ export function PostCard({ post }: PostCardProps) {
         </p>
       )}
       
-      {post.tags && post.tags.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {post.tags.map((tag) => (
-            <span
-              key={tag}
-              className="px-2 py-1 text-xs bg-muted rounded-md"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-      )}
+      <PostTags tags={post.tags || []} />
     </article>
   );
 }
