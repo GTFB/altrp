@@ -11,7 +11,8 @@
     "start": "next start",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "hygen": "hygen"
   },
   "dependencies": {
     "@octokit/rest": "20.1.1",
@@ -48,7 +49,8 @@
     "postcss": "8.4.41",
     "autoprefixer": "10.4.20",
     "tailwindcss": "4.0.0-alpha.15",
-    "@tailwindcss/typography": "0.5.15"
+    "@tailwindcss/typography": "0.5.15",
+    "hygen": "6.2.11"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx,json,md,mdx,css,scss}": [
