@@ -1,0 +1,39 @@
+<svg width="120" height="40" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="20" cy="20" r="18" fill="#3b82f6" opacity="0.1"/>
+  
+  <!-- Main icon - stylized "J" -->
+  <g transform="translate(2, 2)">
+    <!-- J shape -->
+    <path d="M8 4 L8 24 Q8 28 12 28 L16 28 Q20 28 20 24 L20 20" 
+          stroke="#3b82f6" 
+          stroke-width="3" 
+          fill="none" 
+          stroke-linecap="round" 
+          stroke-linejoin="round"/>
+    
+    <!-- Dot above J -->
+    <circle cx="20" cy="8" r="2" fill="#3b82f6"/>
+  </g>
+  
+  <!-- Text "JAMBO" -->
+  <text x="45" y="16" 
+        font-family="Arial, sans-serif" 
+        font-size="14" 
+        font-weight="700" 
+        fill="#1f2937">
+    JAMBO
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="45" y="28" 
+        font-family="Arial, sans-serif" 
+        font-size="8" 
+        font-weight="400" 
+        fill="#6b7280">
+    BLOG PLATFORM
+  </text>
+  
+  <!-- Decorative line -->
+  <line x1="45" y1="30" x2="115" y2="30" stroke="#e5e7eb" stroke-width="1"/>
+</svg>

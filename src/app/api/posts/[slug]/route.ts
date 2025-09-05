@@ -6,7 +6,7 @@ export async function GET(
   { params }: { params: { slug: string } }
 ) {
   try {
-    const postRepo = new PostRepository();
+    const postRepo = PostRepository.getInstance();
     const post = await postRepo.findBySlug(params.slug);
 
     if (!post) {

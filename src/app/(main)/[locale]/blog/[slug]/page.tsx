@@ -11,7 +11,7 @@ interface BlogPostPageProps {
 }
 
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
-  const postRepo = new PostRepository();
+  const postRepo = PostRepository.getInstance();
   const post = await postRepo.findBySlug(params.slug);
 
   if (!post) {
@@ -52,7 +52,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
-  const postRepo = new PostRepository();
+  const postRepo = PostRepository.getInstance();
   const post = await postRepo.findBySlug(params.slug);
 
   if (!post) {

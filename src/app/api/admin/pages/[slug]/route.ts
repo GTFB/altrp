@@ -8,7 +8,7 @@ export async function GET(
 ) {
   try {
     const { slug } = params;
-    const pageRepository = new PageRepository();
+    const pageRepository = PageRepository.getInstance();
     const page = await pageRepository.findBySlug(slug);
 
     if (!page) {
@@ -54,7 +54,7 @@ export async function PUT(
       );
     }
 
-    const pageRepository = new PageRepository();
+    const pageRepository = PageRepository.getInstance();
     
     // If slug is being updated, validate new slug format
     if (body.slug && body.slug !== oldSlug) {
@@ -84,6 +84,7 @@ export async function PUT(
     if (body.description !== undefined) updateData.description = body.description;
     if (body.excerpt !== undefined) updateData.excerpt = body.excerpt;
     if (body.tags !== undefined) updateData.tags = body.tags;
+    if (body.media !== undefined) updateData.media = body.media;
     if (body.content) {
       // Convert HTML content to Markdown
       updateData.content = htmlToMarkdown(body.content);

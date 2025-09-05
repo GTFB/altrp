@@ -12,6 +12,7 @@ export interface Page {
   tags?: string[];
   excerpt?: string;
   content?: string;
+  media?: string;
 }
 
 export interface PageFilters {
@@ -25,14 +26,22 @@ export interface PageSortOptions {
 }
 
 export class PageRepository {
+  private static instance: PageRepository | null = null;
   private contentDir = path.join(process.cwd(), 'content', 'pages');
 
-  constructor() {
+  private constructor() {
     // Configure marked options
     marked.setOptions({
       gfm: true, // GitHub Flavored Markdown
       breaks: true, // Convert \n to <br>
     });
+  }
+
+  public static getInstance(): PageRepository {
+    if (!PageRepository.instance) {
+      PageRepository.instance = new PageRepository();
+    }
+    return PageRepository.instance;
   }
 
   async findAll(): Promise<Page[]> {
@@ -161,6 +170,7 @@ export class PageRepository {
         tags: validatedData.tags,
         excerpt: validatedData.excerpt || '',
         content: parsedContent,
+        media: validatedData.media,
       };
     } catch (error) {
       console.error(`Error reading page ${slug}:`, error);
@@ -218,6 +228,7 @@ export class PageRepository {
         date: frontmatterData.date || new Date().toISOString().split('T')[0],
         tags: frontmatterData.tags || [],
         excerpt: frontmatterData.excerpt,
+        media: frontmatterData.media,
       };
 
       // Validate frontmatter
@@ -263,6 +274,7 @@ export class PageRepository {
         date: updatedPage.date,
         tags: updatedPage.tags || [],
         excerpt: updatedPage.excerpt,
+        media: updatedPage.media,
       };
 
       // Validate frontmatter

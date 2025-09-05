@@ -3,7 +3,7 @@ import { PostRepository } from '@/repositories/post.repository';
 
 export async function GET() {
   try {
-    const postRepo = new PostRepository();
+    const postRepo = PostRepository.getInstance();
     const authors = await postRepo.findAllAuthors();
 
     return NextResponse.json({ authors });

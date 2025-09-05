@@ -3,7 +3,7 @@ import { AuthorRepository } from '@/repositories/author.repository';
 
 export async function GET() {
   try {
-    const authorRepo = new AuthorRepository();
+    const authorRepo = AuthorRepository.getInstance();
     const authors = await authorRepo.findAll();
 
     return NextResponse.json({ authors });

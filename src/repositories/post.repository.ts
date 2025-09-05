@@ -29,14 +29,22 @@ export interface PostSortOptions {
 }
 
 export class PostRepository {
+  private static instance: PostRepository | null = null;
   private contentDir = path.join(process.cwd(), 'content', 'blog');
 
-  constructor() {
+  private constructor() {
     // Configure marked options
     marked.setOptions({
       gfm: true, // GitHub Flavored Markdown
       breaks: true, // Convert \n to <br>
     });
+  }
+
+  public static getInstance(): PostRepository {
+    if (!PostRepository.instance) {
+      PostRepository.instance = new PostRepository();
+    }
+    return PostRepository.instance;
   }
 
   async findAll(): Promise<Post[]> {

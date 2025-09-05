@@ -10,6 +10,7 @@ interface CreatePageRequest {
   excerpt?: string;
   content: string;
   slug: string;
+  media?: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const pageRepository = new PageRepository();
+    const pageRepository = PageRepository.getInstance();
     
     // Convert HTML content to Markdown
     const markdownContent = htmlToMarkdown(body.content);
@@ -46,6 +47,7 @@ export async function POST(request: NextRequest) {
       tags: body.tags || [],
       excerpt: body.excerpt,
       content: markdownContent,
+      media: body.media,
     };
 
     const createdPage = await pageRepository.createPage(pageData);
@@ -84,7 +86,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const pageRepository = new PageRepository();
+    const pageRepository = PageRepository.getInstance();
     const success = await pageRepository.deletePage(slug);
 
     if (!success) {
@@ -110,7 +112,7 @@ export async function DELETE(request: NextRequest) {
 
 export async function GET() {
   try {
-    const pageRepository = new PageRepository();
+    const pageRepository = PageRepository.getInstance();
     const pages = await pageRepository.findAll();
 
     // Return only basic info for the list view
@@ -121,6 +123,7 @@ export async function GET() {
       date: page.date,
       tags: page.tags || [],
       excerpt: page.excerpt,
+      media: page.media,
     }));
 
     return NextResponse.json({

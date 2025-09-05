@@ -65,7 +65,7 @@ export default async function MainLayout({
                 
                 {/* Admin link */}
                 <Button variant="outline" size="sm" asChild>
-                  <Link href="/admin" target="_blank" rel="noopener noreferrer">
+                  <Link href="/admin/dashboard" target="_blank" rel="noopener noreferrer">
                     <Settings className="h-4 w-4 mr-2" />
                     Admin
                   </Link>

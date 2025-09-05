@@ -19,14 +19,22 @@ export interface Author {
 }
 
 export class AuthorRepository {
+  private static instance: AuthorRepository | null = null;
   private contentDir = path.join(process.cwd(), 'content', 'authors');
 
-  constructor() {
+  private constructor() {
     // Configure marked options
     marked.setOptions({
       gfm: true, // GitHub Flavored Markdown
       breaks: true, // Convert \n to <br>
     });
+  }
+
+  public static getInstance(): AuthorRepository {
+    if (!AuthorRepository.instance) {
+      AuthorRepository.instance = new AuthorRepository();
+    }
+    return AuthorRepository.instance;
   }
 
   async findAll(): Promise<Author[]> {

@@ -13,7 +13,7 @@ interface CategoryPageProps {
 }
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
-  const categoryRepo = new CategoryRepository();
+  const categoryRepo = CategoryRepository.getInstance();
   const category = await categoryRepo.findBySlug(params.slug);
 
   if (!category) {
@@ -50,14 +50,14 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
-  const categoryRepo = new CategoryRepository();
+  const categoryRepo = CategoryRepository.getInstance();
   const category = await categoryRepo.findBySlug(params.slug);
 
   if (!category) {
     notFound();
   }
 
-  const postRepo = new PostRepository();
+  const postRepo = PostRepository.getInstance();
   const posts = await postRepo.findByCategory(category.slug);
 
   return (

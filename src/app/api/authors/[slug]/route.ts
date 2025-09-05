@@ -6,7 +6,7 @@ export async function GET(
   { params }: { params: { slug: string } }
 ) {
   try {
-    const authorRepo = new AuthorRepository();
+    const authorRepo = AuthorRepository.getInstance();
     const author = await authorRepo.findBySlug(params.slug);
 
     if (!author) {

@@ -21,14 +21,22 @@ export interface Category {
 }
 
 export class CategoryRepository {
+  private static instance: CategoryRepository | null = null;
   private contentDir = path.join(process.cwd(), 'content', 'categories');
 
-  constructor() {
+  private constructor() {
     // Configure marked options
     marked.setOptions({
       gfm: true, // GitHub Flavored Markdown
       breaks: true, // Convert \n to <br>
     });
+  }
+
+  public static getInstance(): CategoryRepository {
+    if (!CategoryRepository.instance) {
+      CategoryRepository.instance = new CategoryRepository();
+    }
+    return CategoryRepository.instance;
   }
 
   async findAll(): Promise<Category[]> {

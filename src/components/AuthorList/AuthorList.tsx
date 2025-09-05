@@ -4,7 +4,7 @@ import { AuthorCard } from '@/components/AuthorCard/AuthorCard';
 export const dynamic = 'force-dynamic';
 
 export async function AuthorList() {
-  const authorRepo = new AuthorRepository();
+  const authorRepo = AuthorRepository.getInstance();
   const authors = await authorRepo.findAll();
 
   if (authors.length === 0) {

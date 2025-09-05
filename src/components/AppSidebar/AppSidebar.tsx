@@ -33,10 +33,19 @@ export function AppSidebar({ items,  onToggle }: AppSidebarProps) {
   return (
     <Sidebar className="hidden lg:block transition-transform duration-300 ease-in-out theme-transition">
       <SidebarHeader className="border-b px-6 h-25 flex items-center justify-between sidebar-header-nowrap" style={{ height: 'calc(6.25rem + 1px)' }}>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <div className="flex-shrink-0">
+            <img 
+              src="/images/logo.svg" 
+              alt="Jambo Logo" 
+              className="w-8 h-8"
+              width="32"
+              height="32"
+            />
+          </div>
           <div>
             <h2 className="text-lg font-semibold">Jambo</h2>
-            <p className="text-xs text-muted-foreground">Sidebar</p>
+            <p className="text-xs text-muted-foreground">Admin Panel</p>
           </div>
         </div>
         {onToggle && (

@@ -4,7 +4,7 @@ import { PostCard } from '@/components/features/blog/PostCard/PostCard';
 export const dynamic = 'force-dynamic';
 
 export async function PostList() {
-  const postRepo = new PostRepository();
+  const postRepo = PostRepository.getInstance();
   const posts = await postRepo.findAll();
 
   if (posts.length === 0) {

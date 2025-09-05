@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const sortBy = (searchParams.get('sortBy') as 'date' | 'title' | 'created') || 'date';
     const sortOrder = (searchParams.get('sortOrder') as 'asc' | 'desc') || 'desc';
 
-    const postRepo = new PostRepository();
+    const postRepo = PostRepository.getInstance();
     
     // Use new filtering and sorting methods
     const posts = await postRepo.findWithFilters(

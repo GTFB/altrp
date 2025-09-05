@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const pageRepository = new PageRepository();
+    const pageRepository = PageRepository.getInstance();
     
     // If we're editing and the slug hasn't changed, it's available
     if (currentSlug && slug === currentSlug) {

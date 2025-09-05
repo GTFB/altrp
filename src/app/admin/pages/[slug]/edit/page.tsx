@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { TipTapEditor } from '@/components/features/cms/TipTapEditor';
+import { MediaUpload } from '@/components/features/cms/MediaUpload';
 import { ArrowLeft, Save, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
@@ -23,6 +24,7 @@ interface Page {
   tags?: string[];
   excerpt?: string;
   content?: string;
+  media?: string;
 }
 
 export default function EditPagePage() {
@@ -42,6 +44,7 @@ export default function EditPagePage() {
     excerpt: '',
     content: '',
     tags: '',
+    media: '',
   });
 
   const { isValid: isSlugValid, error: slugError, isChecking: isCheckingSlug, checkSlug, resetValidation } = useSlugValidation({
@@ -68,6 +71,7 @@ export default function EditPagePage() {
           excerpt: data.page.excerpt || '',
           content: data.page.content || '',
           tags: data.page.tags ? data.page.tags.join(', ') : '',
+          media: data.page.media || '',
         });
       } else {
         setError(data.error || 'Failed to fetch page');
@@ -222,47 +226,55 @@ export default function EditPagePage() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="title">Title *</Label>
-                <Input
-                  id="title"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleInputChange}
-                  onBlur={handleTitleBlur}
-                  placeholder="Enter page title"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="slug">Slug *</Label>
-                <div className="relative">
+              <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+                <div className="space-y-2">
+                  <Label htmlFor="title">Title *</Label>
                   <Input
-                    id="slug"
-                    name="slug"
-                    value={formData.slug}
+                    id="title"
+                    name="title"
+                    value={formData.title}
                     onChange={handleInputChange}
-                    onBlur={handleSlugBlur}
-                    placeholder="page-url-slug"
+                    onBlur={handleTitleBlur}
+                    placeholder="Enter page title"
                     required
-                    className={!isSlugValid && formData.slug !== slug ? 'border-red-500 focus:border-red-500' : ''}
                   />
-                  {isCheckingSlug && (
-                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="slug">Slug *</Label>
+                  <div className="relative">
+                    <Input
+                      id="slug"
+                      name="slug"
+                      value={formData.slug}
+                      onChange={handleInputChange}
+                      onBlur={handleSlugBlur}
+                      placeholder="page-url-slug"
+                      required
+                      className={!isSlugValid && formData.slug !== slug ? 'border-red-500 focus:border-red-500' : ''}
+                    />
+                    {isCheckingSlug && (
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
+                      </div>
+                    )}
+                  </div>
+                  {!isSlugValid && formData.slug !== slug && slugError && (
+                    <div className="flex items-center gap-2 text-sm text-red-600">
+                      <AlertCircle className="w-4 h-4" />
+                      {slugError}
                     </div>
                   )}
+                  <p className="text-sm text-muted-foreground">
+                    URL: /{formData.slug}
+                  </p>
                 </div>
-                {!isSlugValid && formData.slug !== slug && slugError && (
-                  <div className="flex items-center gap-2 text-sm text-red-600">
-                    <AlertCircle className="w-4 h-4" />
-                    {slugError}
-                  </div>
-                )}
-                <p className="text-sm text-muted-foreground">
-                  URL: /{formData.slug}
-                </p>
+              </div>
+              <div className="space-y-2">
+                <MediaUpload
+                  value={formData.media}
+                  onChange={(value) => setFormData(prev => ({ ...prev, media: value }))}
+                />
               </div>
             </div>
 
@@ -302,6 +314,7 @@ export default function EditPagePage() {
                 Separate tags with commas
               </p>
             </div>
+
 
             <div className="space-y-2">
               <Label htmlFor="content">Content *</Label>

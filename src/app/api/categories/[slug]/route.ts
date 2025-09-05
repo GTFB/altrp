@@ -6,7 +6,7 @@ export async function GET(
   { params }: { params: { slug: string } }
 ) {
   try {
-    const categoryRepo = new CategoryRepository();
+    const categoryRepo = CategoryRepository.getInstance();
     const category = await categoryRepo.findBySlug(params.slug);
 
     if (!category) {

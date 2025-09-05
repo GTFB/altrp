@@ -14,7 +14,7 @@ interface AuthorPageProps {
 }
 
 export async function generateMetadata({ params }: AuthorPageProps): Promise<Metadata> {
-  const authorRepo = new AuthorRepository();
+  const authorRepo = AuthorRepository.getInstance();
   const author = await authorRepo.findBySlug(params.slug);
 
   if (!author) {
@@ -51,14 +51,14 @@ export async function generateMetadata({ params }: AuthorPageProps): Promise<Met
 }
 
 export default async function AuthorPage({ params }: AuthorPageProps) {
-  const authorRepo = new AuthorRepository();
+  const authorRepo = AuthorRepository.getInstance();
   const author = await authorRepo.findBySlug(params.slug);
 
   if (!author) {
     notFound();
   }
 
-  const postRepo = new PostRepository();
+  const postRepo = PostRepository.getInstance();
   const posts = await postRepo.findByAuthor(author.slug);
 
   return (

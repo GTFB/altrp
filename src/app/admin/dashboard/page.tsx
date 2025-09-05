@@ -2,7 +2,7 @@ import { Card, Title, BarChart, DonutChart } from '@tremor/react';
 import { PostRepository } from '@/repositories/post.repository';
 
 export default async function DashboardPage() {
-  const postRepo = new PostRepository();
+  const postRepo = PostRepository.getInstance();
   const posts = await postRepo.findAll();
   
   const postsByMonth = posts.reduce((acc, post) => {

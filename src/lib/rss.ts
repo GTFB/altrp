@@ -2,7 +2,7 @@ import { PostRepository } from '@/repositories/post.repository';
 import { siteConfig } from '@/config/site';
 
 export async function generateRssFeed() {
-  const postRepo = new PostRepository();
+  const postRepo = PostRepository.getInstance();
   const posts = await postRepo.findAll();
   
   const rssItems = posts.map((post) => ({

@@ -4,7 +4,7 @@ import { CategoryCard } from '@/components/CategoryCard/CategoryCard';
 export const dynamic = 'force-dynamic';
 
 export async function CategoryList() {
-  const categoryRepo = new CategoryRepository();
+  const categoryRepo = CategoryRepository.getInstance();
   const categories = await categoryRepo.findAll();
 
   if (categories.length === 0) {

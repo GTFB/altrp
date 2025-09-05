@@ -23,10 +23,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Plus, Edit, Trash2, Eye, Check, X } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, Check, X, Image as ImageIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useNotifications } from '@/hooks/use-notifications';
 import { NotificationContainer } from '@/components/ui/notification-container';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import Image from 'next/image';
 
 interface Page {
   slug: string;
@@ -35,19 +37,40 @@ interface Page {
   date?: string;
   tags?: string[];
   excerpt?: string;
+  media?: string;
+}
+
+interface Media {
+  slug: string;
+  title: string;
+  description?: string;
+  url: string;
+  alt?: string;
+  type?: 'image' | 'video' | 'document' | 'audio';
 }
 
 export default function PagesPage() {
   const [pages, setPages] = useState<Page[]>([]);
+  const [mediaData, setMediaData] = useState<Record<string, Media>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editingCell, setEditingCell] = useState<{ pageSlug: string; field: 'title' | 'slug' } | null>(null);
   const [editValue, setEditValue] = useState('');
   const { notifications, showSuccess, showError, removeNotification } = useNotifications();
-
+  const [hoveredRowSlug, setHoveredRowSlug] = useState<string | null>(null);
+  const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
+console.log(mediaData);
   useEffect(() => {
     fetchPages();
   }, []);
+
+  useEffect(() => {
+    return () => {
+      if (hoverTimeout) {
+        clearTimeout(hoverTimeout);
+      }
+    };
+  }, [hoverTimeout]);
 
   const fetchPages = async () => {
     try {
@@ -57,6 +80,8 @@ export default function PagesPage() {
       
       if (data.success) {
         setPages(data.pages);
+        // Load media data for pages that have media
+        await loadMediaData(data.pages);
       } else {
         setError(data.error || 'Failed to fetch pages');
       }
@@ -66,6 +91,50 @@ export default function PagesPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const loadMediaData = async (pages: Page[]) => {
+    const mediaPromises = pages
+      .filter(page => page.media)
+      .map(async (page) => {
+        try {
+          const response = await fetch(`/api/admin/media/${page.media}`);
+          const data = await response.json();
+          return data;
+          
+        } catch (error) {
+          console.error(`Error loading media for ${page.media}:`, error);
+        }
+        return null;
+      });
+
+    const mediaResults = await Promise.all(mediaPromises);
+    const mediaMap: Record<string, Media> = {};
+    mediaResults.forEach(result => {
+      if (result) {
+        mediaMap[result.slug] = result;
+      }
+    });
+    
+    setMediaData(mediaMap);
+  };
+
+  const handleMouseEnter = (pageSlug: string) => {
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+    }
+    const timeout = setTimeout(() => {
+      setHoveredRowSlug(pageSlug);
+    }, 300); // 300ms delay
+    setHoverTimeout(timeout);
+  };
+
+  const handleMouseLeave = () => {
+    if (hoverTimeout) {
+      clearTimeout(hoverTimeout);
+      setHoverTimeout(null);
+    }
+    setHoveredRowSlug(null);
   };
 
   const handleDeletePage = async (slug: string) => {
@@ -201,6 +270,7 @@ export default function PagesPage() {
               <TableHead>Title</TableHead>
               <TableHead>Slug</TableHead>
               <TableHead>Description</TableHead>
+              <TableHead>Media</TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Tags</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -209,13 +279,18 @@ export default function PagesPage() {
           <TableBody>
             {pages.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                   No pages found
                 </TableCell>
               </TableRow>
             ) : (
               pages.map((page) => (
-                <TableRow key={page.slug}>
+                <TableRow 
+                  key={page.slug}
+                  onMouseEnter={() => handleMouseEnter(page.slug)}
+                  onMouseLeave={handleMouseLeave}
+                  className={hoveredRowSlug === page.slug ? "bg-muted/50" : ""}
+                >
                   <TableCell className="font-medium">
                     {editingCell?.pageSlug === page.slug && editingCell?.field === 'title' ? (
                       <div className="flex items-center gap-2">
@@ -296,6 +371,32 @@ export default function PagesPage() {
                     <div className="max-w-xs truncate">
                       {page.description || page.excerpt || '—'}
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    {page.media && mediaData[page.media] ? (
+                      <Popover open={hoveredRowSlug === page.slug} >
+                        <PopoverTrigger asChild>
+                          <div className="flex items-center gap-2">
+                            <ImageIcon className="w-4 h-4 text-muted-foreground" />
+                            <span className="text-sm text-muted-foreground">Preview</span>
+                          </div>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80 p-0" align="center">
+                          <div className="p-4">
+                            <div className="relative w-full h-48 mb-3">
+                              <Image
+                                src={mediaData[page.media].url}
+                                alt={mediaData[page.media].alt || mediaData[page.media].title}
+                                fill
+                                className="object-cover rounded"
+                              />
+                            </div>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    ) : (
+                      <span className="text-muted-foreground text-sm">—</span>
+                    )}
                   </TableCell>
                   <TableCell>{formatDate(page.date)}</TableCell>
                   <TableCell>
