@@ -1,0 +1,108 @@
+---
+title: Advanced React Patterns for Modern Applications
+date: 2024-01-15
+tags: [react, patterns, hooks, performance]
+excerpt: Explore advanced React patterns that can help you build more maintainable and performant applications.
+category: main-category
+author: jane-smith
+---
+
+# Advanced React Patterns for Modern Applications
+
+React has evolved significantly over the years, and with it, the patterns we use to build applications. In this article, we'll explore some advanced patterns that can help you write more maintainable, performant, and scalable React applications.
+
+## Custom Hooks for Logic Reuse
+
+Custom hooks are one of the most powerful features in React. They allow you to extract component logic into reusable functions.
+
+```javascript
+function useLocalStorage(key, initialValue) {
+  const [storedValue, setStoredValue] = useState(() => {
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch (error) {
+      console.log(error);
+      return initialValue;
+    }
+  });
+
+  const setValue = (value) => {
+    try {
+      setStoredValue(value);
+      window.localStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  return [storedValue, setValue];
+}
+```
+
+## Compound Components Pattern
+
+The compound components pattern allows you to create components that work together while maintaining a clean API.
+
+```javascript
+const Tabs = ({ children, defaultTab }) => {
+  const [activeTab, setActiveTab] = useState(defaultTab);
+  
+  return (
+    <TabsContext.Provider value={{ activeTab, setActiveTab }}>
+      {children}
+    </TabsContext.Provider>
+  );
+};
+
+const TabList = ({ children }) => (
+  <div className="tab-list">{children}</div>
+);
+
+const Tab = ({ id, children }) => {
+  const { activeTab, setActiveTab } = useContext(TabsContext);
+  return (
+    <button
+      className={activeTab === id ? 'active' : ''}
+      onClick={() => setActiveTab(id)}
+    >
+      {children}
+    </button>
+  );
+};
+```
+
+## Render Props and Higher-Order Components
+
+Both render props and HOCs are powerful patterns for sharing logic between components.
+
+### Render Props
+
+```javascript
+function DataFetcher({ url, render }) {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        setData(data);
+        setLoading(false);
+      })
+      .catch(error => {
+        setError(error);
+        setLoading(false);
+      });
+  }, [url]);
+
+  return render({ data, loading, error });
+}
+```
+
+## Conclusion
+
+These patterns represent just a few of the many ways you can structure your React applications for better maintainability and performance. The key is to choose the right pattern for your specific use case and team needs.
+
+Remember, the best pattern is the one that makes your code more readable, maintainable, and performant for your specific situation.

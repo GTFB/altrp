@@ -1,4 +1,4 @@
-'use client'; 
+'use client';
 
 import { AuthorRepository } from '@/repositories/author.repository';
 import { AuthorCard } from '@/components/AuthorCard/AuthorCard';
@@ -15,7 +15,7 @@ interface AuthorSectionProps {
   description?: string;
 }
 
-export function AuthorSection({ 
+export function AuthorPostsSection({ 
   limit = 6, 
   showViewAll = true,
   title = "Our Authors",

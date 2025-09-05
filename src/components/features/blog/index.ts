@@ -2,6 +2,7 @@
 export { BlogSection } from './BlogSection';
 export { CategorySection } from './CategorySection';
 export { AuthorSection } from './AuthorSection';
+export { AuthorPostsSection } from './AuthorPostsSection';
 export { TagSection } from './TagSection';
 
 // Post components

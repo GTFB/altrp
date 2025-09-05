@@ -1,4 +1,4 @@
-import { BlogSection, CategorySection, AuthorSection, TagSection } from '@/components/features/blog';
+import { BlogSection, CategorySection, AuthorSection, AuthorPostsSection, TagSection } from '@/components/features/blog';
 
 export default function LocalizedHome({ params }: { params: { locale: string } }) {
   return (
@@ -38,8 +38,16 @@ export default function LocalizedHome({ params }: { params: { locale: string } }
         description="Articles from the main category"
       />
 
-      {/* Example usage of AuthorSection */}
+      {/* Example usage of AuthorSection - shows list of authors */}
       <AuthorSection 
+        limit={3}
+        showViewAll={true}
+        title="Our Authors"
+        description="Meet the talented writers behind our content"
+      />
+
+      {/* Example usage of AuthorPostsSection - shows posts by specific author */}
+      <AuthorPostsSection 
         author="john-doe"
         limit={3}
         showViewAll={true}

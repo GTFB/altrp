@@ -44,11 +44,28 @@ export default function RootLayout({
 }) {
   return (
     <DynamicHtml>
-      <body className="min-h-screen 
+      <body className="min-h-screen bg-background antialiased">
         <div className="flex flex-col min-h-screen">
-          <Header />
+          <header className="border-b bg-card">
+            <div className="container mx-auto px-4 py-4">
+              <div className="flex items-center justify-between">
+                <h1 className="text-xl font-bold">Jambo</h1>
+                <nav className="flex items-center space-x-6">
+                  <a href="/en" className="text-sm hover:text-primary">Home</a>
+                  <a href="/en/blog" className="text-sm hover:text-primary">Blog</a>
+                  <a href="/en/authors" className="text-sm hover:text-primary">Authors</a>
+                </nav>
+              </div>
+            </div>
+          </header>
           <main className="flex-1">{children}</main>
-          <Footer />
+          <footer className="border-t bg-card">
+            <div className="container mx-auto px-4 py-8">
+              <p className="text-sm text-muted-foreground">
+                © 2024 Jambo. All rights reserved.
+              </p>
+            </div>
+          </footer>
         </div>
       </body>
     </DynamicHtml>
