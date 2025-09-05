@@ -53,6 +53,7 @@ export default function RootLayout({
                 <nav className="flex items-center space-x-6">
                   <a href="/en" className="text-sm hover:text-primary">Home</a>
                   <a href="/en/blog" className="text-sm hover:text-primary">Blog</a>
+                  <a href="/en/categories" className="text-sm hover:text-primary">Categories</a>
                   <a href="/en/authors" className="text-sm hover:text-primary">Authors</a>
                 </nav>
               </div>
