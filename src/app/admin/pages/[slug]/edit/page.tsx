@@ -1,0 +1,333 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { TipTapEditor } from '@/components/features/cms/TipTapEditor';
+import { ArrowLeft, Save, AlertCircle } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter, useParams } from 'next/navigation';
+import { useSlugValidation } from '@/hooks/use-slug-validation';
+import { textToSlug } from '@/lib/transliteration';
+import { useNotifications } from '@/hooks/use-notifications';
+import { NotificationContainer } from '@/components/ui/notification-container';
+
+interface Page {
+  slug: string;
+  title: string;
+  description?: string;
+  date?: string;
+  tags?: string[];
+  excerpt?: string;
+  content?: string;
+}
+
+export default function EditPagePage() {
+  const router = useRouter();
+  const params = useParams();
+  const slug = params.slug as string;
+  
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [page, setPage] = useState<Page | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  
+  const [formData, setFormData] = useState({
+    title: '',
+    slug: '',
+    description: '',
+    excerpt: '',
+    content: '',
+    tags: '',
+  });
+
+  const { isValid: isSlugValid, error: slugError, isChecking: isCheckingSlug, checkSlug, resetValidation } = useSlugValidation({
+    currentSlug: slug
+  });
+  const { notifications, showSuccess, showError, removeNotification } = useNotifications();
+
+  useEffect(() => {
+    fetchPage();
+  }, [slug]);
+
+  const fetchPage = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/admin/pages/${slug}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setPage(data.page);
+        setFormData({
+          title: data.page.title,
+          slug: data.page.slug,
+          description: data.page.description || '',
+          excerpt: data.page.excerpt || '',
+          content: data.page.content || '',
+          tags: data.page.tags ? data.page.tags.join(', ') : '',
+        });
+      } else {
+        setError(data.error || 'Failed to fetch page');
+      }
+    } catch (err) {
+      setError('Failed to fetch page');
+      console.error('Error fetching page:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+
+    // Reset validation when user starts typing
+    resetValidation();
+
+    // Auto-generate slug from title with transliteration
+    if (name === 'title') {
+      const newSlug = textToSlug(value);
+      setFormData(prev => ({
+        ...prev,
+        slug: newSlug
+      }));
+    }
+    
+    // Also transliterate slug field if user types in Cyrillic
+    if (name === 'slug') {
+      const transliteratedSlug = textToSlug(value);
+      setFormData(prev => ({
+        ...prev,
+        slug: transliteratedSlug
+      }));
+    }
+  };
+
+  const handleSlugBlur = () => {
+    if (formData.slug && formData.slug !== slug) {
+      checkSlug(formData.slug);
+    }
+  };
+
+  const handleTitleBlur = () => {
+    // Check slug if it was auto-generated from title and is different from current
+    if (formData.slug && formData.slug !== slug) {
+      checkSlug(formData.slug);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Don't submit if slug is invalid and has changed
+    if (formData.slug !== slug && !isSlugValid) {
+      return;
+    }
+    
+    setSaving(true);
+
+    try {
+      const tagsArray = formData.tags
+        .split(',')
+        .map(tag => tag.trim())
+        .filter(tag => tag.length > 0);
+
+      const response = await fetch(`/api/admin/pages/${slug}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          tags: tagsArray,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        showSuccess('Success!', 'Page updated successfully');
+        setTimeout(() => {
+          router.push('/admin/pages');
+        }, 1000);
+      } else {
+        showError('Error', data.error || 'Failed to update page');
+      }
+    } catch (error) {
+      console.error('Error updating page:', error);
+      showError('Error', 'Failed to update page');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-muted-foreground">Loading page...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-destructive">Error: {error}</div>
+      </div>
+    );
+  }
+
+  if (!page) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-muted-foreground">Page not found</div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <NotificationContainer 
+        notifications={notifications} 
+        onRemove={removeNotification} 
+      />
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+        <Button variant="ghost" size="icon" asChild>
+          <Link href="/admin/pages">
+            <ArrowLeft className="w-4 h-4" />
+          </Link>
+        </Button>
+        <div>
+          <h1 className="text-2xl font-bold">Edit Page</h1>
+          <p className="text-muted-foreground">
+            Update the page "{page.title}"
+          </p>
+        </div>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Page Details</CardTitle>
+          <CardDescription>
+            Update the information for this page
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="title">Title *</Label>
+                <Input
+                  id="title"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleInputChange}
+                  onBlur={handleTitleBlur}
+                  placeholder="Enter page title"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="slug">Slug *</Label>
+                <div className="relative">
+                  <Input
+                    id="slug"
+                    name="slug"
+                    value={formData.slug}
+                    onChange={handleInputChange}
+                    onBlur={handleSlugBlur}
+                    placeholder="page-url-slug"
+                    required
+                    className={!isSlugValid && formData.slug !== slug ? 'border-red-500 focus:border-red-500' : ''}
+                  />
+                  {isCheckingSlug && (
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
+                    </div>
+                  )}
+                </div>
+                {!isSlugValid && formData.slug !== slug && slugError && (
+                  <div className="flex items-center gap-2 text-sm text-red-600">
+                    <AlertCircle className="w-4 h-4" />
+                    {slugError}
+                  </div>
+                )}
+                <p className="text-sm text-muted-foreground">
+                  URL: /{formData.slug}
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Input
+                id="description"
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                placeholder="Brief description of the page"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="excerpt">Excerpt</Label>
+              <Textarea
+                id="excerpt"
+                name="excerpt"
+                value={formData.excerpt}
+                onChange={handleInputChange}
+                placeholder="Short excerpt for the page"
+                rows={3}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="tags">Tags</Label>
+              <Input
+                id="tags"
+                name="tags"
+                value={formData.tags}
+                onChange={handleInputChange}
+                placeholder="tag1, tag2, tag3"
+              />
+              <p className="text-sm text-muted-foreground">
+                Separate tags with commas
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="content">Content *</Label>
+              <TipTapEditor
+                content={formData.content}
+                onChange={(content) => setFormData(prev => ({ ...prev, content }))}
+                placeholder="Write your page content..."
+              />
+              <p className="text-sm text-muted-foreground">
+                Rich text editor with Markdown support
+              </p>
+            </div>
+
+            <div className="flex justify-end gap-4">
+              <Button type="button" variant="outline" asChild>
+                <Link href="/admin/pages">Cancel</Link>
+              </Button>
+              <Button type="submit" disabled={saving || (formData.slug !== slug && (!isSlugValid || isCheckingSlug))}>
+                <Save className="w-4 h-4 mr-2" />
+                {saving ? 'Saving...' : 'Save Changes'}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+      </div>
+    </>
+  );
+}

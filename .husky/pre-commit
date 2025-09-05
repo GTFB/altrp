@@ -12,7 +12,7 @@ if [ -n "$FILES" ]; then
     
     for file in $FILES; do
         # Skip node_modules and other build directories and localization files
-        if [[ "$file" == *"node_modules"* ]] || [[ "$file" == *".next"* ]] || [[ "$file" == *"dist"* ]] || [[ "$file" == *".husky"* ]] || [[ "$file" == *"src/messages/"* ]]; then
+        if [[ "$file" == *"node_modules"* ]] || [[ "$file" == *".next"* ]] || [[ "$file" == *"dist"* ]] || [[ "$file" == *".husky"* ]] || [[ "$file" == *"src/messages/"* ]] || [[ "$file" == "src/lib/transliteration.ts" ]] || [[ "$file" == content/* ]]; then
             continue
         fi
         
@@ -49,7 +49,7 @@ fi
 echo "⚠️  Checking comments and strings for Russian text (warnings only)..."
 
 for file in $FILES; do
-    if [[ "$file" == *"node_modules"* ]] || [[ "$file" == *".next"* ]] || [[ "$file" == *"dist"* ]] || [[ "$file" == *".husky"* ]] || [[ "$file" == *"src/messages/"* ]]; then
+    if [[ "$file" == *"node_modules"* ]] || [[ "$file" == *".next"* ]] || [[ "$file" == *"dist"* ]] || [[ "$file" == *".husky"* ]] || [[ "$file" == *"src/messages/"* ]] || [[ "$file" == "src/lib/transliteration.ts" ]] || [[ "$file" == content/* ]]; then
         continue
     fi
     
