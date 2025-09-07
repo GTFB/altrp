@@ -2,14 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
-import { marked } from 'marked';
 import { frontmatterSchema } from '@/lib/validators/content.schema';
+import { PostRepository } from '@/repositories/post.repository';
 
-// Configure marked options
-marked.setOptions({
-  gfm: true,
-  breaks: true,
-});
 
 interface UpdatePostRequest {
   title: string;
@@ -20,6 +15,10 @@ interface UpdatePostRequest {
   content: string;
   category?: string;
   author?: string;
+  media?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string;
   newSlug?: string; // If provided, will rename the folder
 }
 
@@ -30,7 +29,7 @@ export async function PUT(
   try {
     const body: UpdatePostRequest = await request.json();
     const { slug } = params;
-    
+
     // Validate required fields
     if (!body.title || !body.content) {
       return NextResponse.json(
@@ -56,7 +55,7 @@ export async function PUT(
     // If newSlug is provided and different from current slug, check uniqueness
     if (body.newSlug && body.newSlug !== slug) {
       const newPostPath = path.join(contentDir, body.newSlug);
-      
+
       try {
         await fs.access(newPostPath);
         return NextResponse.json(
@@ -77,6 +76,10 @@ export async function PUT(
       excerpt: body.excerpt,
       category: body.category,
       author: body.author,
+      media: body.media,
+      seoTitle: body.seoTitle,
+      seoDescription: body.seoDescription,
+      seoKeywords: body.seoKeywords,
     };
 
     // Validate frontmatter
@@ -96,16 +99,16 @@ export async function PUT(
     // If slug is changing, rename the folder
     if (body.newSlug && body.newSlug !== slug) {
       const newPostPath = path.join(contentDir, body.newSlug);
-      
+
       // Create new directory
       await fs.mkdir(newPostPath, { recursive: true });
-      
+
       // Write new file
       await fs.writeFile(path.join(newPostPath, 'index.mdx'), mdxContent, 'utf8');
-      
+
       // Remove old directory
       await fs.rmdir(currentPostPath, { recursive: true });
-      
+
       return NextResponse.json({
         success: true,
         message: 'Post updated and renamed successfully',
@@ -115,7 +118,7 @@ export async function PUT(
     } else {
       // Just update the content
       await fs.writeFile(currentIndexPath, mdxContent, 'utf8');
-      
+
       return NextResponse.json({
         success: true,
         message: 'Post updated successfully',
@@ -141,33 +144,20 @@ export async function GET(
     const contentDir = path.join(process.cwd(), 'content', 'blog');
     const postPath = path.join(contentDir, slug, 'index.mdx');
 
+
+    const post = await PostRepository.getInstance().findBySlug(slug);
     // Check if post exists
-    try {
-      await fs.access(postPath);
-    } catch {
+    if (!post) {
       return NextResponse.json(
         { error: 'Post not found' },
         { status: 404 }
       );
     }
 
-    // Read the post file
-    const raw = await fs.readFile(postPath, 'utf8');
-    const { data, content } = matter(raw);
 
     return NextResponse.json({
       success: true,
-      post: {
-        slug,
-        title: data.title,
-        description: data.description,
-        date: data.date,
-        tags: data.tags || [],
-        excerpt: data.excerpt,
-        content: content,
-        category: data.category,
-        author: data.author,
-      }
+      post
     });
 
   } catch (error) {

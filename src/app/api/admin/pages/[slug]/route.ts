@@ -18,14 +18,11 @@ export async function GET(
       );
     }
 
-    // Convert Markdown content to HTML for TipTapEditor
-    const htmlContent = markdownToHtml(page.content || '');
 
     return NextResponse.json({
       success: true,
       page: {
         ...page,
-        content: htmlContent,
       }
     });
 
@@ -85,6 +82,9 @@ export async function PUT(
     if (body.excerpt !== undefined) updateData.excerpt = body.excerpt;
     if (body.tags !== undefined) updateData.tags = body.tags;
     if (body.media !== undefined) updateData.media = body.media;
+    if (body.seoTitle !== undefined) updateData.seoTitle = body.seoTitle;
+    if (body.seoDescription !== undefined) updateData.seoDescription = body.seoDescription;
+    if (body.seoKeywords !== undefined) updateData.seoKeywords = body.seoKeywords;
     if (body.content) {
       // Convert HTML content to Markdown
       updateData.content = htmlToMarkdown(body.content);

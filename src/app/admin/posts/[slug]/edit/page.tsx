@@ -7,7 +7,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TipTapEditor } from '@/components/features/cms/TipTapEditor';
+import { MediaUpload } from '@/components/features/cms/MediaUpload';
 import { ArrowLeft, Save, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
@@ -26,6 +28,10 @@ interface Post {
   content?: string;
   category?: string;
   author?: string;
+  media?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string;
 }
 
 interface Author {
@@ -64,6 +70,10 @@ export default function EditPostPage() {
     tags: '',
     category: '',
     author: '',
+    media: '',
+    seoTitle: '',
+    seoDescription: '',
+    seoKeywords: '',
   });
 
   const { isValid: isSlugValid, error: slugError, isChecking: isCheckingSlug, checkSlug, resetValidation } = useSlugValidation({
@@ -93,6 +103,10 @@ export default function EditPostPage() {
           tags: data.post.tags ? data.post.tags.join(', ') : '',
           category: data.post.category || '',
           author: data.post.author || '',
+          media: data.post.media || '',
+          seoTitle: data.post.seoTitle || '',
+          seoDescription: data.post.seoDescription || '',
+          seoKeywords: data.post.seoKeywords || '',
         });
       } else {
         setError(data.error || 'Failed to fetch post');
@@ -275,135 +289,196 @@ export default function EditPostPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="title">Title *</Label>
-                  <Input
-                    id="title"
-                    name="title"
-                    value={formData.title}
-                    onChange={handleInputChange}
-                    onBlur={handleTitleBlur}
-                    placeholder="Enter post title"
-                    required
-                  />
+            <Tabs defaultValue="content" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="content">Post Details</TabsTrigger>
+                <TabsTrigger value="seo">SEO Settings</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="content" className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="title">Title *</Label>
+                      <Input
+                        id="title"
+                        name="title"
+                        value={formData.title}
+                        onChange={handleInputChange}
+                        onBlur={handleTitleBlur}
+                        placeholder="Enter post title"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="slug">Slug *</Label>
+                      <div className="relative">
+                        <Input
+                          id="slug"
+                          name="slug"
+                          value={formData.slug}
+                          onChange={handleInputChange}
+                          onBlur={handleSlugBlur}
+                          placeholder="post-url-slug"
+                          required
+                          className={!isSlugValid && formData.slug !== slug ? 'border-red-500 focus:border-red-500' : ''}
+                        />
+                        {isCheckingSlug && (
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
+                          </div>
+                        )}
+                      </div>
+                      {!isSlugValid && formData.slug !== slug && slugError && (
+                        <div className="flex items-center gap-2 text-sm text-red-600">
+                          <AlertCircle className="w-4 h-4" />
+                          {slugError}
+                        </div>
+                      )}
+                      <p className="text-sm text-muted-foreground">
+                        URL: /blog/{formData.slug}
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="author">Author</Label>
+                      <Select value={formData.author} onValueChange={(value) => handleSelectChange('author', value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select an author" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {authors.map((author) => (
+                            <SelectItem key={author.slug} value={author.slug}>
+                              {author.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="category">Category</Label>
+                      <Select value={formData.category} onValueChange={(value) => handleSelectChange('category', value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {categories.map((category) => (
+                            <SelectItem key={category.slug} value={category.slug}>
+                              {category.title}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="description">Description</Label>
+                      <Input
+                        id="description"
+                        name="description"
+                        value={formData.description}
+                        onChange={handleInputChange}
+                        placeholder="Brief description of the post"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="excerpt">Excerpt</Label>
+                      <Textarea
+                        id="excerpt"
+                        name="excerpt"
+                        value={formData.excerpt}
+                        onChange={handleInputChange}
+                        placeholder="Short excerpt for the post"
+                        rows={3}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="tags">Tags</Label>
+                      <Input
+                        id="tags"
+                        name="tags"
+                        value={formData.tags}
+                        onChange={handleInputChange}
+                        placeholder="tag1, tag2, tag3"
+                      />
+                      <p className="text-sm text-muted-foreground">
+                        Separate tags with commas
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <MediaUpload
+                        value={formData.media}
+                        onChange={(value) => setFormData(prev => ({ ...prev, media: value }))}
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="slug">Slug *</Label>
-                  <div className="relative">
-                    <Input
-                      id="slug"
-                      name="slug"
-                      value={formData.slug}
-                      onChange={handleInputChange}
-                      onBlur={handleSlugBlur}
-                      placeholder="post-url-slug"
-                      required
-                      className={!isSlugValid && formData.slug !== slug ? 'border-red-500 focus:border-red-500' : ''}
-                    />
-                    {isCheckingSlug && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
-                      </div>
-                    )}
-                  </div>
-                  {!isSlugValid && formData.slug !== slug && slugError && (
-                    <div className="flex items-center gap-2 text-sm text-red-600">
-                      <AlertCircle className="w-4 h-4" />
-                      {slugError}
-                    </div>
-                  )}
+                  <Label htmlFor="content">Content *</Label>
+                  <TipTapEditor
+                    content={formData.content}
+                    onChange={(content) => setFormData(prev => ({ ...prev, content }))}
+                    placeholder="Write your post content..."
+                  />
                   <p className="text-sm text-muted-foreground">
-                    URL: /blog/{formData.slug}
+                    Rich text editor with Markdown support
+                  </p>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="seo" className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="seoTitle">SEO Title</Label>
+                  <Input
+                    id="seoTitle"
+                    name="seoTitle"
+                    value={formData.seoTitle}
+                    onChange={handleInputChange}
+                    placeholder="Custom title for search engines"
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    If empty, the post title will be used
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="author">Author</Label>
-                  <Select value={formData.author} onValueChange={(value) => handleSelectChange('author', value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select an author" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {authors.map((author) => (
-                        <SelectItem key={author.slug} value={author.slug}>
-                          {author.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="category">Category</Label>
-                  <Select value={formData.category} onValueChange={(value) => handleSelectChange('category', value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category.slug} value={category.slug}>
-                          {category.title}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="description">Description</Label>
-                  <Input
-                    id="description"
-                    name="description"
-                    value={formData.description}
-                    onChange={handleInputChange}
-                    placeholder="Brief description of the post"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="excerpt">Excerpt</Label>
+                  <Label htmlFor="seoDescription">SEO Description</Label>
                   <Textarea
-                    id="excerpt"
-                    name="excerpt"
-                    value={formData.excerpt}
+                    id="seoDescription"
+                    name="seoDescription"
+                    value={formData.seoDescription}
                     onChange={handleInputChange}
-                    placeholder="Short excerpt for the post"
+                    placeholder="Meta description for search engines"
                     rows={3}
                   />
+                  <p className="text-sm text-muted-foreground">
+                    If empty, the post description will be used
+                  </p>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="tags">Tags</Label>
+                  <Label htmlFor="seoKeywords">SEO Keywords</Label>
                   <Input
-                    id="tags"
-                    name="tags"
-                    value={formData.tags}
+                    id="seoKeywords"
+                    name="seoKeywords"
+                    value={formData.seoKeywords}
                     onChange={handleInputChange}
-                    placeholder="tag1, tag2, tag3"
+                    placeholder="keyword1, keyword2, keyword3"
                   />
                   <p className="text-sm text-muted-foreground">
-                    Separate tags with commas
+                    Comma-separated keywords for SEO
                   </p>
                 </div>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="content">Content *</Label>
-              <TipTapEditor
-                content={formData.content}
-                onChange={(content) => setFormData(prev => ({ ...prev, content }))}
-                placeholder="Write your post content..."
-              />
-              <p className="text-sm text-muted-foreground">
-                Rich text editor with Markdown support
-              </p>
-            </div>
+              </TabsContent>
+            </Tabs>
 
             <div className="flex justify-end gap-4">
               <Button type="button" variant="outline" asChild>

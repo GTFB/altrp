@@ -14,6 +14,10 @@ export interface Post {
   content?: string;
   category?: string;
   author?: string;
+  media?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string;
 }
 
 export interface PostFilters {
@@ -174,7 +178,7 @@ export class PostRepository {
         console.warn(`Warning: Could not parse markdown for post ${slug}:`, markdownError);
         // Fallback to raw content if markdown parsing fails
       }
-      
+      console.log(parsedContent);
       return {
         slug,
         title: validatedData.title,

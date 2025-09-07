@@ -2,6 +2,7 @@
 
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import Image from '@tiptap/extension-image';
 import { Button } from '@/components/ui/button';
 import { useEffect } from 'react';
 import { 
@@ -15,8 +16,10 @@ import {
   ListOrdered,
   Quote,
   Undo,
-  Redo
+  Redo,
+  Image as ImageIcon
 } from 'lucide-react';
+import { MediaSelectorPopover } from './MediaSelectorPopover';
 
 interface TipTapEditorProps {
   content?: string;
@@ -26,7 +29,14 @@ interface TipTapEditorProps {
 
 export function TipTapEditor({ content = '', onChange, placeholder }: TipTapEditorProps) {
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [
+      StarterKit,
+      Image.configure({
+        HTMLAttributes: {
+          class: 'max-w-full h-auto rounded-lg',
+        },
+      }),
+    ],
     content,
     editorProps: {
       attributes: {
@@ -149,6 +159,16 @@ export function TipTapEditor({ content = '', onChange, placeholder }: TipTapEdit
         background-color: #374151 !important;
         color: #f9fafb !important;
       }
+      
+      .tiptap-editor img,
+      .ProseMirror img,
+      .prose img {
+        max-width: 100% !important;
+        height: auto !important;
+        border-radius: 0.375rem !important;
+        margin: 1rem 0 !important;
+        display: block !important;
+      }
     `;
     
     document.head.appendChild(style);
@@ -166,6 +186,51 @@ export function TipTapEditor({ content = '', onChange, placeholder }: TipTapEdit
     e.preventDefault();
     e.stopPropagation();
     action();
+  };
+
+  const addImage = (imageSlug: string) => {
+    if (editor && imageSlug) {
+      // Convert slug to full URL
+      const imageUrl = `/images/${imageSlug}`;
+      console.log('Adding image to editor:', imageUrl);
+      editor.chain().focus().setImage({ src: imageUrl }).run();
+    }
+  };
+
+  const handleImageUpload = async (file: File) => {
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('title', file.name.replace(/\.[^/.]+$/, ''));
+      formData.append('alt', file.name.replace(/\.[^/.]+$/, ''));
+
+      const response = await fetch('/api/admin/media/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('File upload error');
+      }
+
+      const result = await response.json();
+      const fullFileName = result.fullFileName;
+      
+      if (fullFileName) {
+        addImage(`/images/${fullFileName}`);
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      alert('File upload error');
+    }
   };
 
   if (!editor) {
@@ -278,6 +343,24 @@ export function TipTapEditor({ content = '', onChange, placeholder }: TipTapEdit
         >
           <Quote className="w-4 h-4" />
         </Button>
+
+        <div className="w-px h-6 bg-border mx-1" />
+
+        <MediaSelectorPopover
+          value={undefined}
+          onChange={addImage}
+          onUpload={handleImageUpload}
+          trigger={
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              title="Add Image"
+            >
+              <ImageIcon className="w-4 h-4" />
+            </Button>
+          }
+        />
 
         <div className="w-px h-6 bg-border mx-1" />
 

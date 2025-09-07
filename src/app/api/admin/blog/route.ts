@@ -13,6 +13,10 @@ interface CreatePostRequest {
   content: string;
   category?: string;
   author?: string;
+  media?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string;
   slug: string;
 }
 
@@ -60,6 +64,10 @@ export async function POST(request: NextRequest) {
       excerpt: body.excerpt,
       category: body.category,
       author: body.author,
+      media: body.media,
+      seoTitle: body.seoTitle,
+      seoDescription: body.seoDescription,
+      seoKeywords: body.seoKeywords,
     };
 
     // Validate frontmatter

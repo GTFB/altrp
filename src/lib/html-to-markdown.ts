@@ -13,7 +13,7 @@ const turndownService = new TurndownService({
 
 // Add custom rules for better Markdown conversion
 turndownService.addRule('strikethrough', {
-  filter: ['del', 's', 'strike'],
+  filter: ['del', 's',],
   replacement: (content) => `~~${content}~~`
 });
 

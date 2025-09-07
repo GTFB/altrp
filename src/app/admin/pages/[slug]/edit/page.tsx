@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TipTapEditor } from '@/components/features/cms/TipTapEditor';
 import { MediaUpload } from '@/components/features/cms/MediaUpload';
 import { ArrowLeft, Save, AlertCircle } from 'lucide-react';
@@ -25,6 +26,9 @@ interface Page {
   excerpt?: string;
   content?: string;
   media?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string;
 }
 
 export default function EditPagePage() {
@@ -45,6 +49,9 @@ export default function EditPagePage() {
     content: '',
     tags: '',
     media: '',
+    seoTitle: '',
+    seoDescription: '',
+    seoKeywords: '',
   });
 
   const { isValid: isSlugValid, error: slugError, isChecking: isCheckingSlug, checkSlug, resetValidation } = useSlugValidation({
@@ -72,6 +79,9 @@ export default function EditPagePage() {
           content: data.page.content || '',
           tags: data.page.tags ? data.page.tags.join(', ') : '',
           media: data.page.media || '',
+          seoTitle: data.page.seoTitle || '',
+          seoDescription: data.page.seoDescription || '',
+          seoKeywords: data.page.seoKeywords || '',
         });
       } else {
         setError(data.error || 'Failed to fetch page');
@@ -225,108 +235,161 @@ export default function EditPagePage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+            <Tabs defaultValue="content" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="content">Page Details</TabsTrigger>
+                <TabsTrigger value="seo">SEO Settings</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="content" className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="title">Title *</Label>
+                      <Input
+                        id="title"
+                        name="title"
+                        value={formData.title}
+                        onChange={handleInputChange}
+                        onBlur={handleTitleBlur}
+                        placeholder="Enter page title"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="slug">Slug *</Label>
+                      <div className="relative">
+                        <Input
+                          id="slug"
+                          name="slug"
+                          value={formData.slug}
+                          onChange={handleInputChange}
+                          onBlur={handleSlugBlur}
+                          placeholder="page-url-slug"
+                          required
+                          className={!isSlugValid && formData.slug !== slug ? 'border-red-500 focus:border-red-500' : ''}
+                        />
+                        {isCheckingSlug && (
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
+                          </div>
+                        )}
+                      </div>
+                      {!isSlugValid && formData.slug !== slug && slugError && (
+                        <div className="flex items-center gap-2 text-sm text-red-600">
+                          <AlertCircle className="w-4 h-4" />
+                          {slugError}
+                        </div>
+                      )}
+                      <p className="text-sm text-muted-foreground">
+                        URL: /{formData.slug}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <MediaUpload
+                      value={formData.media}
+                      onChange={(value) => setFormData(prev => ({ ...prev, media: value }))}
+                    />
+                  </div>
+                </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="title">Title *</Label>
+                  <Label htmlFor="description">Description</Label>
                   <Input
-                    id="title"
-                    name="title"
-                    value={formData.title}
+                    id="description"
+                    name="description"
+                    value={formData.description}
                     onChange={handleInputChange}
-                    onBlur={handleTitleBlur}
-                    placeholder="Enter page title"
-                    required
+                    placeholder="Brief description of the page"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="slug">Slug *</Label>
-                  <div className="relative">
-                    <Input
-                      id="slug"
-                      name="slug"
-                      value={formData.slug}
-                      onChange={handleInputChange}
-                      onBlur={handleSlugBlur}
-                      placeholder="page-url-slug"
-                      required
-                      className={!isSlugValid && formData.slug !== slug ? 'border-red-500 focus:border-red-500' : ''}
-                    />
-                    {isCheckingSlug && (
-                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
-                      </div>
-                    )}
-                  </div>
-                  {!isSlugValid && formData.slug !== slug && slugError && (
-                    <div className="flex items-center gap-2 text-sm text-red-600">
-                      <AlertCircle className="w-4 h-4" />
-                      {slugError}
-                    </div>
-                  )}
+                  <Label htmlFor="excerpt">Excerpt</Label>
+                  <Textarea
+                    id="excerpt"
+                    name="excerpt"
+                    value={formData.excerpt}
+                    onChange={handleInputChange}
+                    placeholder="Short excerpt for the page"
+                    rows={3}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="tags">Tags</Label>
+                  <Input
+                    id="tags"
+                    name="tags"
+                    value={formData.tags}
+                    onChange={handleInputChange}
+                    placeholder="tag1, tag2, tag3"
+                  />
                   <p className="text-sm text-muted-foreground">
-                    URL: /{formData.slug}
+                    Separate tags with commas
                   </p>
                 </div>
-              </div>
-              <div className="space-y-2">
-                <MediaUpload
-                  value={formData.media}
-                  onChange={(value) => setFormData(prev => ({ ...prev, media: value }))}
-                />
-              </div>
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Input
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                placeholder="Brief description of the page"
-              />
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="content">Content *</Label>
+                  <TipTapEditor
+                    content={formData.content}
+                    onChange={(content) => setFormData(prev => ({ ...prev, content }))}
+                    placeholder="Write your page content..."
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    Rich text editor with Markdown support
+                  </p>
+                </div>
+              </TabsContent>
 
-            <div className="space-y-2">
-              <Label htmlFor="excerpt">Excerpt</Label>
-              <Textarea
-                id="excerpt"
-                name="excerpt"
-                value={formData.excerpt}
-                onChange={handleInputChange}
-                placeholder="Short excerpt for the page"
-                rows={3}
-              />
-            </div>
+              <TabsContent value="seo" className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="seoTitle">SEO Title</Label>
+                  <Input
+                    id="seoTitle"
+                    name="seoTitle"
+                    value={formData.seoTitle}
+                    onChange={handleInputChange}
+                    placeholder="Custom title for search engines"
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    If empty, the page title will be used
+                  </p>
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="tags">Tags</Label>
-              <Input
-                id="tags"
-                name="tags"
-                value={formData.tags}
-                onChange={handleInputChange}
-                placeholder="tag1, tag2, tag3"
-              />
-              <p className="text-sm text-muted-foreground">
-                Separate tags with commas
-              </p>
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="seoDescription">SEO Description</Label>
+                  <Textarea
+                    id="seoDescription"
+                    name="seoDescription"
+                    value={formData.seoDescription}
+                    onChange={handleInputChange}
+                    placeholder="Meta description for search engines"
+                    rows={3}
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    If empty, the page description will be used
+                  </p>
+                </div>
 
-
-            <div className="space-y-2">
-              <Label htmlFor="content">Content *</Label>
-              <TipTapEditor
-                content={formData.content}
-                onChange={(content) => setFormData(prev => ({ ...prev, content }))}
-                placeholder="Write your page content..."
-              />
-              <p className="text-sm text-muted-foreground">
-                Rich text editor with Markdown support
-              </p>
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="seoKeywords">SEO Keywords</Label>
+                  <Input
+                    id="seoKeywords"
+                    name="seoKeywords"
+                    value={formData.seoKeywords}
+                    onChange={handleInputChange}
+                    placeholder="keyword1, keyword2, keyword3"
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    Comma-separated keywords for SEO
+                  </p>
+                </div>
+              </TabsContent>
+            </Tabs>
 
             <div className="flex justify-end gap-4">
               <Button type="button" variant="outline" asChild>

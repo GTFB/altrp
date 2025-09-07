@@ -13,6 +13,9 @@ export interface Page {
   excerpt?: string;
   content?: string;
   media?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string;
 }
 
 export interface PageFilters {

@@ -1,4 +1,5 @@
 import { PostRepository } from '@/repositories/post.repository';
+import { MediaRepository } from '@/repositories/media.repository';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { PostTags } from '@/components/features/blog/PostTags';
@@ -21,8 +22,18 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
     };
   }
 
+  // Load media data if post has media field
+  let mediaData = null;
+  if (post.media) {
+    const mediaRepository = MediaRepository.getInstance();
+    mediaData = await mediaRepository.findBySlug(post.media);
+  }
+
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://jambo.example.com';
   const postUrl = `${baseUrl}/${params.locale}/blog/${params.slug}`;
+  
+  // Build image URL if media exists
+  const imageUrl = mediaData ? `${baseUrl}${mediaData.url}` : undefined;
 
   return {
     title: `${post.title} | Jambo Blog`,
@@ -39,11 +50,24 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       publishedTime: post.date,
       authors: ['Jambo Team'],
       tags: post.tags,
+      ...(imageUrl && {
+        images: [
+          {
+            url: imageUrl,
+            width: 1200,
+            height: 630,
+            alt: mediaData?.alt || post.title,
+          },
+        ],
+      }),
     },
     twitter: {
       card: 'summary_large_image',
       title: post.title,
       description: post.excerpt || post.description,
+      ...(imageUrl && {
+        images: [imageUrl],
+      }),
     },
     alternates: {
       canonical: postUrl,

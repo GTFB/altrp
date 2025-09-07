@@ -11,6 +11,9 @@ interface CreatePageRequest {
   content: string;
   slug: string;
   media?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -48,6 +51,9 @@ export async function POST(request: NextRequest) {
       excerpt: body.excerpt,
       content: markdownContent,
       media: body.media,
+      seoTitle: body.seoTitle,
+      seoDescription: body.seoDescription,
+      seoKeywords: body.seoKeywords,
     };
 
     const createdPage = await pageRepository.createPage(pageData);
