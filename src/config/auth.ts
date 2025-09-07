@@ -2,27 +2,39 @@ import Google from 'next-auth/providers/google';
 import { promises as fs } from 'fs';
 import path from 'path';
 
-const usersFilePath = path.join(process.cwd(), 'users.json');
+const dbFilePath = path.join(process.cwd(), 'db.json');
 
-async function ensureUsersFileExists(): Promise<void> {
+async function ensureDbFileExists(): Promise<void> {
   try {
-    await fs.access(usersFilePath);
+    await fs.access(dbFilePath);
   } catch {
-    await fs.writeFile(usersFilePath, JSON.stringify([] , null, 2), 'utf8');
+    const initialData = { users: [] };
+    await fs.writeFile(dbFilePath, JSON.stringify(initialData, null, 2), 'utf8');
   }
 }
 
 async function upsertUser(user: { id?: string | null; name?: string | null; email?: string | null; image?: string | null }): Promise<void> {
-  await ensureUsersFileExists();
-  const content = await fs.readFile(usersFilePath, 'utf8');
-  const list: Array<{ id?: string | null; name?: string | null; email?: string | null; image?: string | null }> = content ? JSON.parse(content) : [];
-  const existingIdx = list.findIndex((u) => u.email && u.email === user.email);
-  if (existingIdx >= 0) {
-    list[existingIdx] = { ...list[existingIdx], ...user };
-  } else {
-    list.push(user);
+  await ensureDbFileExists();
+  const content = await fs.readFile(dbFilePath, 'utf8');
+  const data = content ? JSON.parse(content) : { users: [] };
+  
+  if (!Array.isArray(data.users)) {
+    data.users = [];
   }
-  await fs.writeFile(usersFilePath, JSON.stringify(list, null, 2), 'utf8');
+  
+  const existingIdx = data.users.findIndex((u: any) => u.email === user.email);
+  if (existingIdx >= 0) {
+    data.users[existingIdx] = { ...data.users[existingIdx], ...user };
+  } else {
+    data.users.push({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      image: user.image
+    });
+  }
+  
+  await fs.writeFile(dbFilePath, JSON.stringify(data, null, 2), 'utf8');
 }
 
 export const authOptions = {
@@ -37,8 +49,9 @@ export const authOptions = {
       try {
         await upsertUser(user);
       } catch (e) {
-        console.error('Failed to persist user to users.json', e);
+        console.error('Failed to persist user to db.json', e);
       }
     },
   },
 } as const;
+
