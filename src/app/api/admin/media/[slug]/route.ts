@@ -16,7 +16,20 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(media);
+    // Transform media to match frontend interface
+    const transformedMedia = {
+      id: media.slug,
+      url: media.url,
+      alt: media.alt,
+      title: media.title,
+      description: media.description,
+      filename: media.slug,
+      size: media.size || 0,
+      mimeType: `image/${media.slug.split('.').pop()}`,
+      createdAt: media.date || new Date().toISOString()
+    };
+
+    return NextResponse.json(transformedMedia);
   } catch (error) {
     console.error('Error fetching media:', error);
     return NextResponse.json(
@@ -43,7 +56,20 @@ export async function PUT(
       );
     }
 
-    return NextResponse.json(updatedMedia);
+    // Transform media to match frontend interface
+    const transformedMedia = {
+      id: updatedMedia.slug,
+      url: updatedMedia.url,
+      alt: updatedMedia.alt,
+      title: updatedMedia.title,
+      description: updatedMedia.description,
+      filename: updatedMedia.slug,
+      size: updatedMedia.size || 0,
+      mimeType: `image/${updatedMedia.slug.split('.').pop()}`,
+      createdAt: updatedMedia.date || new Date().toISOString()
+    };
+
+    return NextResponse.json(transformedMedia);
   } catch (error) {
     console.error('Error updating media:', error);
     return NextResponse.json(
