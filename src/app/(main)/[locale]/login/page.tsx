@@ -11,9 +11,14 @@ export default function LoginPage() {
           <p className="text-center text-muted-foreground">
             Login page placeholder
           </p>
-          <Button className="w-full" onClick={() => signIn('google')}>
-            Sign in with Google
-          </Button>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Button className="w-full" onClick={() => signIn('google')}>
+              Sign in with Google
+            </Button>
+            <Button variant="secondary" className="w-full" onClick={() => signIn('github')}>
+              Sign in with GitHub
+            </Button>
+          </div>
         </div>
       </div>
     </div>
