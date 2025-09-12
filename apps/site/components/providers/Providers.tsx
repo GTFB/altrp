@@ -1,7 +1,7 @@
 'use client';
 
-import { SessionProvider } from '@/components/SessionProvider/SessionProvider';
-import { ThemeProvider } from '@/components/ThemeProvider/ThemeProvider';
+import { SessionProvider } from '@/components/providers/SessionProvider';
+import { ThemeProvider } from '@/components/providers/ThemeProvider';
 import { Toaster } from 'sonner';
 
 export function Providers({ children }: { children: React.ReactNode }) {

@@ -16,9 +16,8 @@
         "lint:site": "bun run --filter=jambo-site lint"
     },
     "devDependencies": {
-        "@changesets/cli": "^2.27.1",
-        "turbo": "^1.13.3"
-    },
+        "@changesets/cli": "^2.27.1"
+        },
     "dependencies": {
         "marked": "^16.2.1"
     }

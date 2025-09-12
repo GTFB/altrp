@@ -27,7 +27,8 @@
         "../../shared/*"
       ],
       "@/lib/*": [
-        "../../shared/lib/*"
+        "../../shared/lib/*",
+        "./lib/*"
       ],
       "@/hooks/*": [
         "../../shared/hooks/*"

@@ -124,21 +124,38 @@ bun install
 
 ### 3. Configure Environment Variables
 
-Copy the `.env.example` file to `.env.local` and fill in the required values.
+#### Option 1: Using Make Command (Recommended)
+Generate the `.env` file automatically with a pre-generated `NEXTAUTH_SECRET`:
 
 ```bash
-cp .env.example .env.local
+make env
 ```
 
-You will need credentials for NextAuth.js (e.g., for GitHub authentication):
+This command will:
+- Copy `apps/site/example.env` to `apps/site/.env`
+- Automatically generate a secure `NEXTAUTH_SECRET` using OpenSSL
+- Backup existing `.env` file if it exists
+
+#### Option 2: Manual Setup
+If you prefer to set up manually:
+
+```bash
+cp apps/site/example.env apps/site/.env
+```
+
+Then fill in the required values in `apps/site/.env`:
 
 ```env
-# .env.local
-GITHUB_ID=...
-GITHUB_SECRET=...
-NEXTAUTH_SECRET=... # Generate a secret key (openssl rand -base64 32)
+# apps/site/.env
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+GITHUB_CLIENT_ID=your_github_client_id
+GITHUB_CLIENT_SECRET=your_github_client_secret
+NEXTAUTH_SECRET=your_generated_secret # Generate with: openssl rand -base64 32
 NEXTAUTH_URL=http://localhost:3000
 ```
+
+**Note**: You'll need to obtain OAuth credentials from your chosen providers (Google, GitHub, etc.) and add them to the `.env` file.
 
 ### 4. Run the Development Server
 
@@ -156,6 +173,64 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 *   `bun lint`: Lints the codebase with ESLint.
 *   `bun format`: Formats the code with Prettier.
 *   `bun test`: Runs unit tests.
+
+### Available Make Commands
+
+*   `make env`: Generate `.env` file from `example.env` with auto-generated `NEXTAUTH_SECRET`
+*   `make component NAME=ComponentName`: Generate a new React component
+*   `make init`: Initialize all project configurations
+*   `make dev`: Run the development server
+*   `make build`: Build the project for production
+
+## 🔐 Access & Permissions
+
+### Getting Admin Access
+
+To access the admin panel and manage content:
+
+1. **Authentication Setup**: Configure your authentication provider in `.env.local`
+2. **Admin Role**: Currently, admin access is hardcoded for testing (see `AdminGuard.tsx`)
+3. **Access Admin Panel**: Navigate to `/admin` after authentication
+
+### API Endpoints
+
+The project provides several API endpoints for content management:
+
+#### Content Management
+- `GET /api/admin/blog` - Get all blog posts with pagination
+- `POST /api/admin/blog` - Create a new blog post
+- `PUT /api/admin/blog/[slug]` - Update a blog post
+- `DELETE /api/admin/blog/[slug]` - Delete a blog post
+
+#### Authors & Categories
+- `GET /api/authors` - Get all authors
+- `GET /api/categories` - Get all categories
+
+#### Public Content
+- `GET /api/posts` - Get published posts
+- `GET /api/rss` - RSS feed for blog posts
+
+### Content Creation
+
+#### Creating New Components
+Use the built-in code generator to create new React components:
+
+```bash
+bun hygen component new --name ComponentName
+```
+
+#### Adding New Content
+1. **Blog Posts**: Add MDX files to `content/blog/[slug]/index.mdx`
+2. **Pages**: Add MDX files to `content/pages/[slug].mdx`
+3. **Authors**: Add MDX files to `content/authors/[slug].mdx`
+4. **Categories**: Add MDX files to `content/categories/[slug].mdx`
+
+### Development Workflow
+
+1. **Start Development**: `bun dev`
+2. **Access Admin**: Go to `http://localhost:3000/admin`
+3. **Create Content**: Use the admin interface or add MDX files directly
+4. **Preview Changes**: Content updates automatically in development mode
 
 ---
 

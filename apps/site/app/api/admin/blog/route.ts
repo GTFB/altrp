@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PostRepository } from '@/repositories/post.repository';
 import { htmlToMarkdown } from '@/lib/html-to-markdown';
-
 interface CreatePostRequest {
   title: string;
   description?: string;
@@ -138,3 +137,6 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+// Export protected handlers
+

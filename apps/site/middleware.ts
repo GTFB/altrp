@@ -1,17 +1,31 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { withAuth } from "next-auth/middleware";
 
-export function middleware(request: NextRequest) {
-  const pathname = request.nextUrl.pathname;
-  
-  // Allow root page to show language selection
-  if (pathname === '/') {
-    return NextResponse.next();
+export default withAuth(
+  function middleware(req) {
+  },
+  {
+    callbacks: {
+      authorized: async ({ token, req }) => {
+        const email = token?.email;
+
+        if (!email) {
+          return false;
+        }
+
+        if (req.nextUrl.pathname.startsWith("/admin")) {
+          return token?.role === "admin"; 
+        }
+        return !!token;
+      },
+    },
   }
-  
-  return NextResponse.next();
-}
+);
 
+// See "Matching Paths" below to learn more
 export const config = {
-  matcher: ['/', '/(ru|en)/:path*']
+  matcher: [ 
+    "/admin/:path*", 
+    "/api/admin/:path*", 
+    
+  ],
 };

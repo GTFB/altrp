@@ -1,0 +1,18 @@
+{
+  "users": [
+    {
+      "id": "192196751",
+      "name": "plaltrporg",
+      "email": "pl@altrp.org",
+      "image": "https://avatars.githubusercontent.com/u/192196751?v=4"
+    }
+  ],
+  "admins": [
+    {
+      "id": "192196751",
+      "name": "plaltrporg",
+      "email": "pl@altrp.org",
+      "image": "https://avatars.githubusercontent.com/u/192196751?v=4"
+    }
+  ]
+}

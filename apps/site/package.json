@@ -12,7 +12,6 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "prepare": "husky install",
-    "hygen": "hygen",
     "test": "bun test"
   },
   "dependencies": {
@@ -60,7 +59,7 @@
     "lucide-react": "^0.542.0",
     "marked": "^16.2.1",
     "next": "14.2.5",
-    "next-auth": "5.0.0-beta.25",
+    "next-auth": "^4.24.11",
     "next-intl": "3.18.0",
     "next-mdx-remote": "5.0.0",
     "next-seo": "6.5.0",
@@ -91,7 +90,6 @@
     "eslint": "9.9.0",
     "eslint-config-next": "14.2.5",
     "husky": "9.1.4",
-    "hygen": "6.2.11",
     "lint-staged": "15.2.9",
     "next-sitemap": "4.2.3",
     "postcss": "8.4.41",

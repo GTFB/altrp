@@ -1,7 +1,7 @@
 # Use POSIX shell for portability
 SHELL := /bin/sh
 
-.PHONY: help init install dev build lint format prepare tailwind shadcn hygen test clean branch commit component
+.PHONY: help init install dev build lint format prepare tailwind shadcn hygen test clean branch commit component kill-node env
 
 help:
 	@echo "Available targets:"
@@ -16,7 +16,9 @@ help:
 	@echo "  shadcn    - Initialize shadcn/ui"
 	@echo "  hygen     - Initialize Hygen scaffolding (_templates)"
 	@echo "  component - Generate component: make component NAME=ComponentName"
+	@echo "  env       - Generate .env file from example.env with auto-generated NEXTAUTH_SECRET"
 	@echo "  test      - Run unit tests with Bun"
+	@echo "  kill-node - Kill all Node.js processes"
 	@echo "  branch    - Create/switch branch: make branch BR=name"
 	@echo "  commit    - Git add & commit: make commit MSG=\"message\""
 
@@ -24,7 +26,7 @@ install:
 	bun install
 
 dev:
-	bun run dev
+	bun run dev:site
 
 build:
 	bun run build
@@ -77,3 +79,27 @@ commit:
 # Run tests
 test:
 	bun test
+
+# Kill all Node.js processes
+kill-node:
+	taskkill /F /IM node.exe
+
+# Generate .env file from example.env with auto-generated NEXTAUTH_SECRET
+env:
+	@echo "Generating .env file from example.env..."
+	@if [ -f apps/site/.env ]; then \
+		echo "Warning: .env file already exists. Backing up to .env.backup"; \
+		cp apps/site/.env apps/site/.env.backup; \
+	fi
+	@cp apps/site/example.env apps/site/.env
+	@echo "Generating NEXTAUTH_SECRET..."
+	@if command -v openssl >/dev/null 2>&1; then \
+		SECRET=$$(openssl rand -base64 32); \
+		sed -i.bak "s/NEXTAUTH_SECRET=.*/NEXTAUTH_SECRET=$$SECRET/" apps/site/.env; \
+		rm apps/site/.env.bak; \
+		echo "NEXTAUTH_SECRET generated and added to .env"; \
+	else \
+		echo "Warning: openssl not found. Please manually set NEXTAUTH_SECRET in .env"; \
+		echo "You can generate one at: https://generate-secret.vercel.app/32"; \
+	fi
+	@echo ".env file generated successfully!"
