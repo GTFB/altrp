@@ -15,9 +15,21 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { useSidebar } from "@/components/ui/sidebar"
 import { useBreadcrumbs } from "@/hooks/use-breadcrumbs"
+import { useCallback,useEffect } from "react"
+import { useLeftSidebar } from "@/components/providers/LeftSidebarProvider"
 
 export function SiteHeader() {
   const { toggleSidebar } = useSidebar()
+  const {leftSidebarOpen, setLeftSidebarOpen} = useLeftSidebar()
+
+  useEffect(() => { 
+    toggleSidebar();
+  }, [leftSidebarOpen]);
+
+  const _toggleSidebar = useCallback(() => {
+    setLeftSidebarOpen(!leftSidebarOpen);
+  }, [toggleSidebar, leftSidebarOpen]);
+
   const breadcrumbs = useBreadcrumbs()
 
   return (
@@ -27,7 +39,7 @@ export function SiteHeader() {
           className="h-8 w-8"
           variant="ghost"
           size="icon"
-          onClick={toggleSidebar}
+          onClick={_toggleSidebar}
         >
           <SidebarIcon />
         </Button>

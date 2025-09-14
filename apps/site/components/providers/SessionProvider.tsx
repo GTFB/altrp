@@ -1,12 +1,33 @@
+import { createContext, useCallback, useContext, useState } from "react";
 
-'use client';
+const SessionContext = createContext<
+  {
+    sessionState: any | null,
+    setSessionState: (session: any) => void,
+    setToSessionClient: (key: string, value: any) => void
+  } | null>(null);
 
-import { SessionProvider as NextAuthSessionProvider } from 'next-auth/react';
+export const useSession = () => {
+  return useContext(SessionContext);
+}
 
-export function SessionProvider({ children }: { children: React.ReactNode }) {
+export function SessionProvider({ children, session }: { children: React.ReactNode, session: any }) {
+
+  const [sessionState, setSessionState] = useState<any | null>(session);
+
+  const setToSessionClient = useCallback((key: string, value: any) => {
+    setSessionState((prev: any) => ({ ...prev, [key]: value }));
+    fetch('/api/jambo-session', {
+      method: 'POST',
+      body: JSON.stringify({ key, value }),
+    }).catch((error) => {
+      console.error('Error setting session:', error);
+    });
+  }, [sessionState]);
+
   return (
-    <NextAuthSessionProvider>
+    <SessionContext.Provider value={{ sessionState, setSessionState, setToSessionClient }}>
       {children}
-    </NextAuthSessionProvider>
+    </SessionContext.Provider>
   );
 }

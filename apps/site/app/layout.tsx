@@ -1,6 +1,7 @@
 import { DynamicHtml } from '@/components/DynamicHtml';
 import { Providers } from '@/components/providers/Providers';
 import './globals.css'; 
+import { getSession } from '@/lib/cookie-session';
 
 export const metadata = {
   title: {
@@ -43,10 +44,12 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const session =  getSession();
+
   return (
     <DynamicHtml>
       <body className="min-h-screen bg-background antialiased">
-        <Providers>
+        <Providers session={session}>
             {children}
         </Providers>
       </body>
