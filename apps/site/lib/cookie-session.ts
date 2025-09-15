@@ -10,8 +10,7 @@ type Session = {
 export const getSession = (): Session | null => {
     const cookieStore = cookies();
     let session: any = cookieStore.get('jambo_session');
-    
-    return session ? JSON.parse(session) : null;
+    return session ? JSON.parse(session.value) : null;
 }
 
 export const setToSession = (key: string, value: any) => {

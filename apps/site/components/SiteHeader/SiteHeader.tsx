@@ -19,16 +19,16 @@ import { useCallback,useEffect } from "react"
 import { useLeftSidebar } from "@/components/providers/LeftSidebarProvider"
 
 export function SiteHeader() {
-  const { toggleSidebar } = useSidebar()
+  const { setOpen } = useSidebar()
   const {leftSidebarOpen, setLeftSidebarOpen} = useLeftSidebar()
-
+ console.log(leftSidebarOpen)
   useEffect(() => { 
-    toggleSidebar();
+    setOpen(leftSidebarOpen);
   }, [leftSidebarOpen]);
 
   const _toggleSidebar = useCallback(() => {
     setLeftSidebarOpen(!leftSidebarOpen);
-  }, [toggleSidebar, leftSidebarOpen]);
+  }, [leftSidebarOpen]);
 
   const breadcrumbs = useBreadcrumbs()
 
