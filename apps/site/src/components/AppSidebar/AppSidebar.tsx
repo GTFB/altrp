@@ -32,16 +32,11 @@ interface AppSidebarProps {
 
 export function AppSidebar({ items,  onToggle }: AppSidebarProps) {
   const{leftSidebarOpen, setLeftSidebarOpen} = useLeftSidebar()
+  console.log(leftSidebarOpen)
   return (
     <Sidebar 
-      className={`lg:block transition-transform ease-in-out theme-transition fixed left-0 top-0 z-50 ${
-        leftSidebarOpen 
-          ? 'translate-x-0' 
-          : '-translate-x-full'
-      }`}
-      style={{ 
-        transitionDuration: 'var(--sidebar-transition-duration, 300ms)'
-      }}
+      className={`lg:block transition-transform ease-in-out theme-transition fixed left-0 top-0 z-50 h-full`}
+      
     >
       <SidebarHeader className="border-b px-6 h-25 flex items-center justify-between sidebar-header-nowrap" style={{ height: 'calc(6.25rem + 1px)' }}>
         <div className="flex items-center gap-3">

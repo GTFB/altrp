@@ -1,8 +1,11 @@
 @import "tailwindcss";
 @plugin "tailwindcss-animate";
+@plugin "@tailwindcss/forms";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
+@source "../src/**/*.{ts,tsx,mdx}";
 @source "../../../../packages/**/*.{ts,tsx,mdx}";
 
 @theme inline {

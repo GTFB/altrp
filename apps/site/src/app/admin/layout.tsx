@@ -96,11 +96,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <SidebarProvider>
         <AppSidebar items={sidebarItems} />
         <div 
-          className="flex flex-col min-h-screen w-full transition-transform ease-in-out"
-          style={{ 
-            transform: leftSidebarOpen ? `translateX(${sidebarWidth}px)` : 'translateX(0px)',
-            transitionDuration: 'var(--sidebar-transition-duration, 300ms)'
-          }}
+          className="flex flex-col min-h-screen  w-[calc(100vw-var(--sidebar-width))] duration-200 transition-transform flex-1"
+          
         >
           <SiteHeader />
           <div className="flex-1 p-4 ">

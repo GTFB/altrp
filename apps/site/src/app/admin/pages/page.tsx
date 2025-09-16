@@ -59,7 +59,7 @@ export default function PagesPage() {
   const { notifications, showSuccess, showError, removeNotification } = useNotifications();
   const [hoveredRowSlug, setHoveredRowSlug] = useState<string | null>(null);
   const [hoverTimeout, setHoverTimeout] = useState<NodeJS.Timeout | null>(null);
-console.log(mediaData);
+
   useEffect(() => {
     fetchPages();
   }, []);
