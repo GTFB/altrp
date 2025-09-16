@@ -23,18 +23,18 @@
       "@/*": [
         "./src/*"
       ],
-      "@/shared/*": [
-        "../../shared/*"
+      "@/packages/*": [
+        "../../packages/*"
       ],
       "@/lib/*": [
-        "../../shared/lib/*",
+        "../../packages/lib/*",
         "./src/lib/*"
       ],
       "@/hooks/*": [
-        "../../shared/hooks/*"
+        "../../packages/hooks/*"
       ],
       "@/components/*": [
-        "../../shared/components/*",
+        "../../packages/components/*",
         "./src/components/*"
       ]
     },

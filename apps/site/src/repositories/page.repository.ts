@@ -34,7 +34,7 @@ export class PageRepository {
   private contentDir = getContentDir('pages');
 
   private constructor() {
-    // Markdown configuration is handled in shared/lib/markdown.ts
+    // Markdown configuration is handled in packages/lib/markdown.ts
   }
 
   public static getInstance(): PageRepository {

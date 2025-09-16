@@ -3,5 +3,5 @@ export interface Repository<T> {
   findBySlug(slug: string): Promise<T | null>;
 }
 
-// Re-export function from shared/lib/content-path.ts for convenience
+// Re-export function from packages/lib/content-path.ts for convenience
 export { getContentDir } from '@/lib/content-path';
