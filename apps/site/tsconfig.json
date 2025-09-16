@@ -21,21 +21,21 @@
     "baseUrl": ".",
     "paths": {
       "@/*": [
-        "./*"
+        "./src/*"
       ],
       "@/shared/*": [
         "../../shared/*"
       ],
       "@/lib/*": [
         "../../shared/lib/*",
-        "./lib/*"
+        "./src/lib/*"
       ],
       "@/hooks/*": [
         "../../shared/hooks/*"
       ],
       "@/components/*": [
         "../../shared/components/*",
-        "./components/*"
+        "./src/components/*"
       ]
     },
     "plugins": [

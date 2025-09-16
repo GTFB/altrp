@@ -4,4 +4,4 @@ export interface Repository<T> {
 }
 
 // Re-export function from shared/lib/content-path.ts for convenience
-export { getContentDir } from '../../../shared/lib/content-path';
+export { getContentDir } from '@/lib/content-path';

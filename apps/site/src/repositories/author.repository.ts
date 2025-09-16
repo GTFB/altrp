@@ -1,9 +1,9 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
-import { parseMarkdown } from '../../../shared/lib/markdown';
+import { parseMarkdown } from '@/lib/markdown';
 import { z } from 'zod';
-import { getContentDir } from '../../../shared/lib/content-path';
+import { getContentDir } from '@/lib/content-path';
 
 const authorSchema = z.object({
   name: z.string(),

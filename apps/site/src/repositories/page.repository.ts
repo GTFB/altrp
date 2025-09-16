@@ -1,9 +1,9 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
-import { parseMarkdown } from '../../../shared/lib/markdown';
+import { parseMarkdown } from '@/lib/markdown';
 import { frontmatterSchema, type Frontmatter } from '@/lib/validators/content.schema';
-import { getContentDir } from '../../../shared/lib/content-path';
+import { getContentDir } from '@/lib/content-path';
 
 export interface Page {
   slug: string;

@@ -133,3 +133,19 @@ html, body {
 button {
   @apply cursor-pointer;
 }
+
+
+/* prevent Scroll locked */
+
+body[data-scroll-locked][data-scroll-locked] {
+  --removed-body-scroll-bar-size: 0px;
+  overflow: auto !important;
+  overscroll-behavior: contain;
+  position: relative !important;
+  padding-left: 0px;
+  padding-top: 0px;
+  padding-right: 0px;
+  margin-left: 0;
+  margin-top: 0;
+  margin-right: 0 !important;
+}
