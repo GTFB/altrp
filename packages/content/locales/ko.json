@@ -1,0 +1,74 @@
+{
+  "common": {
+    "search": "검색",
+    "searchPlaceholder": "검색하려면 입력하세요...",
+    "loading": "로딩 중...",
+    "cancel": "취소",
+    "close": "닫기",
+    "open": "열기",
+    "save": "저장",
+    "delete": "삭제",
+    "edit": "편집",
+    "back": "뒤로",
+    "next": "다음",
+    "previous": "이전",
+    "goTo": "이동",
+    "relevance": "관련성",
+    "password": "비밀번호",
+    "enterPassword": "비밀번호 입력",
+    "unlockContent": "콘텐츠 잠금 해제",
+    "verifying": "확인 중...",
+    "theme": "테마",
+    "light": "라이트",
+    "dark": "다크",
+    "sectionOf": "섹션 {current} / {total}",
+    "tableOfContents": "목차",
+    "indexingContent": "콘텐츠 인덱싱 중...",
+    "forward": "앞으로",
+    "sectionNavigation": "섹션 네비게이션"
+  },
+  "navigation": {
+    "tableOfContents": "목차",
+    "search": "검색",
+    "overview": "개요",
+    "projects": "프로젝트",
+    "analytics": "분석",
+    "settings": "설정",
+    "demo": "데모",
+    "group1SectionA": "그룹 1 - 섹션 A",
+    "group2SectionD": "그룹 2 - 섹션 D"
+  },
+  "auth": {
+    "protectedContent": "보호된 콘텐츠",
+    "passwordProtected": "이 콘텐츠는 비밀번호로 보호됩니다. 계속하려면 비밀번호를 입력하세요.",
+    "accessGranted": "액세스가 허용되었습니다:",
+    "authenticationFailed": "인증에 실패했습니다",
+    "networkError": "네트워크 오류입니다. 다시 시도해 주세요."
+  },
+  "search": {
+    "nothingFound": "아무것도 찾을 수 없습니다",
+    "tryDifferentKeywords": "다른 키워드를 시도해 보세요",
+    "noHeadings": "제목이 없습니다"
+  },
+  "passwordGroups": {
+    "title": "비밀번호 그룹 구성",
+    "description": "각 섹션 ID는 아래 구성에 따라 자동으로 비밀번호 그룹에 할당됩니다.",
+    "password": "비밀번호:",
+    "sections": "섹션:",
+    "allOtherSections": "다른 모든 섹션",
+    "section": "섹션",
+    "coversAllSections": "이 그룹은 다른 그룹에 명시적으로 할당되지 않은 모든 섹션을 포함합니다",
+    "coversSpecifiedSections": "이 그룹은 지정된 섹션만 포함합니다"
+  },
+  "project": {
+    "name": "Probo",
+    "description": "상업적 제안 생성기"
+  },
+  "breadcrumb": {
+    "buildingApplication": "애플리케이션 구축",
+    "dataFetching": "데이터 가져오기"
+  },
+  "tariff": {
+    "popular": "인기"
+  }
+}

@@ -12,7 +12,8 @@ if [ -n "$FILES" ]; then
     
     for file in $FILES; do
         # Skip node_modules and other build directories and localization files
-        if [[ "$file" == *"node_modules"* ]] || [[ "$file" == *".next"* ]] || [[ "$file" == *"dist"* ]] || [[ "$file" == *".husky"* ]] || [[ "$file" == *"src/messages/"* ]] || [[ "$file" == "src/lib/transliteration.ts" ]] || [[ "$file" == content/* ]]; then
+        if [[ "$file" == *"node_modules"* ]] || [[ "$file" == *".next"* ]] || [[ "$file" == *"dist"* ]] || [[ "$file" == *".husky"* ]] || [[ "$file" == *"src/messages/"* ]] || [[ "$file" == "src/lib/transliteration.ts" ]] || 
+            [[ "$file" == packages/content/locales/* ]] || [[ "$file" == packages/components/shared/mdx-content.tsx ]] || [[ "$file" == settings.ts ]] ; then
             continue
         fi
         

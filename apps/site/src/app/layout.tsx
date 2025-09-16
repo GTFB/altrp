@@ -39,13 +39,12 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const session =  getSession();
-
   return (
     <DynamicHtml>
       <body className="min-h-screen bg-background antialiased">

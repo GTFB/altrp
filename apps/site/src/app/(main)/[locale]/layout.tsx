@@ -2,6 +2,7 @@ import { IntlProvider } from '@/components/providers/IntlProvider';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Home, Settings, Search } from 'lucide-react';
+import { getMessages } from 'next-intl/server';
 import Link from 'next/link';
 
 export default async function MainLayout({
@@ -11,8 +12,9 @@ export default async function MainLayout({
   children: React.ReactNode;
   params: { locale: string };
 }) {
+  const messages = await getMessages({ locale: params.locale });
   return (
-    <IntlProvider locale={params.locale}>
+    <IntlProvider locale={params.locale} messages={messages}>
       <div className="min-h-screen">
         {/* Header */}
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">

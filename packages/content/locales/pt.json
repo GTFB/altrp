@@ -1,0 +1,74 @@
+{
+  "common": {
+    "search": "Pesquisar",
+    "searchPlaceholder": "Digite para pesquisar...",
+    "loading": "Carregando...",
+    "cancel": "Cancelar",
+    "close": "Fechar",
+    "open": "Abrir",
+    "save": "Salvar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "back": "Voltar",
+    "next": "Próximo",
+    "previous": "Anterior",
+    "goTo": "Ir para",
+    "relevance": "Relevância",
+    "password": "Senha",
+    "enterPassword": "Digite a senha",
+    "unlockContent": "Desbloquear conteúdo",
+    "verifying": "Verificando...",
+    "theme": "Tema",
+    "light": "Claro",
+    "dark": "Escuro",
+    "sectionOf": "Seção {current} de {total}",
+    "tableOfContents": "Índice",
+    "indexingContent": "Indexando conteúdo...",
+    "forward": "Avançar",
+    "sectionNavigation": "Navegação de Seções"
+  },
+  "navigation": {
+    "tableOfContents": "Índice",
+    "search": "Pesquisar",
+    "overview": "Visão geral",
+    "projects": "Projetos",
+    "analytics": "Análises",
+    "settings": "Configurações",
+    "demo": "Demo",
+    "group1SectionA": "Grupo 1 - Seção A",
+    "group2SectionD": "Grupo 2 - Seção D"
+  },
+  "auth": {
+    "protectedContent": "Conteúdo protegido",
+    "passwordProtected": "Este conteúdo é protegido por senha. Digite a senha para continuar.",
+    "accessGranted": "Acesso concedido a:",
+    "authenticationFailed": "Falha na autenticação",
+    "networkError": "Erro de rede. Tente novamente."
+  },
+  "search": {
+    "nothingFound": "Nada encontrado",
+    "tryDifferentKeywords": "Tente palavras-chave diferentes",
+    "noHeadings": "Nenhum cabeçalho"
+  },
+  "passwordGroups": {
+    "title": "Configuração de grupos de senha",
+    "description": "Cada ID de seção é automaticamente atribuído a um grupo de senha com base na configuração abaixo.",
+    "password": "Senha:",
+    "sections": "Seções:",
+    "allOtherSections": "Todas as outras seções",
+    "section": "Seção",
+    "coversAllSections": "Este grupo cobre todas as seções não explicitamente atribuídas a outros grupos",
+    "coversSpecifiedSections": "Este grupo cobre apenas as seções especificadas"
+  },
+  "project": {
+    "name": "Probo",
+    "description": "Gerador de propostas comerciais"
+  },
+  "breadcrumb": {
+    "buildingApplication": "Construindo sua aplicação",
+    "dataFetching": "Busca de dados"
+  },
+  "tariff": {
+    "popular": "Popular"
+  }
+}

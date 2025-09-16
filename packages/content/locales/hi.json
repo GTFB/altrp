@@ -1,0 +1,74 @@
+{
+  "common": {
+    "search": "खोजें",
+    "searchPlaceholder": "खोजने के लिए टाइप करें...",
+    "loading": "लोड हो रहा है...",
+    "cancel": "रद्द करें",
+    "close": "बंद करें",
+    "open": "खोलें",
+    "save": "सहेजें",
+    "delete": "हटाएं",
+    "edit": "संपादित करें",
+    "back": "वापस",
+    "next": "अगला",
+    "previous": "पिछला",
+    "goTo": "पर जाएं",
+    "relevance": "प्रासंगिकता",
+    "password": "पासवर्ड",
+    "enterPassword": "पासवर्ड दर्ज करें",
+    "unlockContent": "सामग्री अनलॉक करें",
+    "verifying": "सत्यापन...",
+    "theme": "थीम",
+    "light": "हल्का",
+    "dark": "गहरा",
+    "sectionOf": "अनुभाग {current} / {total}",
+    "tableOfContents": "विषय सूची",
+    "indexingContent": "सामग्री अनुक्रमणिका बन रही है...",
+    "forward": "आगे",
+    "sectionNavigation": "अनुभाग नेविगेशन"
+  },
+  "navigation": {
+    "tableOfContents": "विषय सूची",
+    "search": "खोजें",
+    "overview": "अवलोकन",
+    "projects": "परियोजनाएं",
+    "analytics": "विश्लेषण",
+    "settings": "सेटिंग्स",
+    "demo": "डेमो",
+    "group1SectionA": "समूह 1 - अनुभाग A",
+    "group2SectionD": "समूह 2 - अनुभाग D"
+  },
+  "auth": {
+    "protectedContent": "सुरक्षित सामग्री",
+    "passwordProtected": "यह सामग्री पासवर्ड से सुरक्षित है। जारी रखने के लिए कृपया पासवर्ड दर्ज करें।",
+    "accessGranted": "पहुंच प्रदान की गई:",
+    "authenticationFailed": "प्रमाणीकरण विफल",
+    "networkError": "नेटवर्क त्रुटि। कृपया पुनः प्रयास करें।"
+  },
+  "search": {
+    "nothingFound": "कुछ नहीं मिला",
+    "tryDifferentKeywords": "अलग कीवर्ड आजमाएं",
+    "noHeadings": "कोई शीर्षक नहीं"
+  },
+  "passwordGroups": {
+    "title": "पासवर्ड समूह कॉन्फ़िगरेशन",
+    "description": "प्रत्येक अनुभाग ID नीचे दिए गए कॉन्फ़िगरेशन के आधार पर स्वचालित रूप से पासवर्ड समूह को सौंपा जाता है।",
+    "password": "पासवर्ड:",
+    "sections": "अनुभाग:",
+    "allOtherSections": "सभी अन्य अनुभाग",
+    "section": "अनुभाग",
+    "coversAllSections": "यह समूह उन सभी अनुभागों को कवर करता है जो स्पष्ट रूप से अन्य समूहों को नहीं सौंपे गए हैं",
+    "coversSpecifiedSections": "यह समूह केवल निर्दिष्ट अनुभागों को कवर करता है"
+  },
+  "project": {
+    "name": "Probo",
+    "description": "व्यावसायिक प्रस्ताव जेनरेटर"
+  },
+  "breadcrumb": {
+    "buildingApplication": "अपना एप्लिकेशन बनाना",
+    "dataFetching": "डेटा प्राप्त करना"
+  },
+  "tariff": {
+    "popular": "लोकप्रिय"
+  }
+}

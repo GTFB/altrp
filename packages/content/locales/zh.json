@@ -1,0 +1,74 @@
+{
+  "common": {
+    "search": "搜索",
+    "searchPlaceholder": "输入以搜索...",
+    "loading": "加载中...",
+    "cancel": "取消",
+    "close": "关闭",
+    "open": "打开",
+    "save": "保存",
+    "delete": "删除",
+    "edit": "编辑",
+    "back": "返回",
+    "next": "下一步",
+    "previous": "上一步",
+    "goTo": "转到",
+    "relevance": "相关性",
+    "password": "密码",
+    "enterPassword": "输入密码",
+    "unlockContent": "解锁内容",
+    "verifying": "验证中...",
+    "theme": "主题",
+    "light": "浅色",
+    "dark": "深色",
+    "sectionOf": "第 {current} 节，共 {total} 节",
+    "tableOfContents": "目录",
+    "indexingContent": "正在索引内容...",
+    "forward": "前进",
+    "sectionNavigation": "章节导航"
+  },
+  "navigation": {
+    "tableOfContents": "目录",
+    "search": "搜索",
+    "overview": "概览",
+    "projects": "项目",
+    "analytics": "分析",
+    "settings": "设置",
+    "demo": "演示",
+    "group1SectionA": "组1 - 部分A",
+    "group2SectionD": "组2 - 部分D"
+  },
+  "auth": {
+    "protectedContent": "受保护的内容",
+    "passwordProtected": "此内容受密码保护。请输入密码以继续。",
+    "accessGranted": "已授予访问权限：",
+    "authenticationFailed": "身份验证失败",
+    "networkError": "网络错误。请重试。"
+  },
+  "search": {
+    "nothingFound": "未找到任何内容",
+    "tryDifferentKeywords": "尝试不同的关键词",
+    "noHeadings": "无标题"
+  },
+  "passwordGroups": {
+    "title": "密码组配置",
+    "description": "每个部分ID根据以下配置自动分配给密码组。",
+    "password": "密码：",
+    "sections": "部分：",
+    "allOtherSections": "所有其他部分",
+    "section": "部分",
+    "coversAllSections": "此组涵盖未明确分配给其他组的所有部分",
+    "coversSpecifiedSections": "此组仅涵盖指定的部分"
+  },
+  "project": {
+    "name": "Probo",
+    "description": "商业提案生成器"
+  },
+  "breadcrumb": {
+    "buildingApplication": "构建您的应用程序",
+    "dataFetching": "数据获取"
+  },
+  "tariff": {
+    "popular": "热门"
+  }
+}

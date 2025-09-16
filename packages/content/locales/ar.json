@@ -1,0 +1,74 @@
+{
+  "common": {
+    "search": "بحث",
+    "searchPlaceholder": "اكتب للبحث...",
+    "loading": "جاري التحميل...",
+    "cancel": "إلغاء",
+    "close": "إغلاق",
+    "open": "فتح",
+    "save": "حفظ",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "goTo": "انتقل إلى",
+    "relevance": "الصلة",
+    "password": "كلمة المرور",
+    "enterPassword": "أدخل كلمة المرور",
+    "unlockContent": "إلغاء قفل المحتوى",
+    "verifying": "جاري التحقق...",
+    "theme": "المظهر",
+    "light": "فاتح",
+    "dark": "داكن",
+    "sectionOf": "القسم {current} من {total}",
+    "tableOfContents": "جدول المحتويات",
+    "indexingContent": "جاري فهرسة المحتوى...",
+    "forward": "إلى الأمام",
+    "sectionNavigation": "تنقل الأقسام"
+  },
+  "navigation": {
+    "tableOfContents": "جدول المحتويات",
+    "search": "بحث",
+    "overview": "نظرة عامة",
+    "projects": "المشاريع",
+    "analytics": "التحليلات",
+    "settings": "الإعدادات",
+    "demo": "عرض توضيحي",
+    "group1SectionA": "المجموعة 1 - القسم أ",
+    "group2SectionD": "المجموعة 2 - القسم د"
+  },
+  "auth": {
+    "protectedContent": "محتوى محمي",
+    "passwordProtected": "هذا المحتوى محمي بكلمة مرور. يرجى إدخال كلمة المرور للمتابعة.",
+    "accessGranted": "تم منح الوصول إلى:",
+    "authenticationFailed": "فشل في المصادقة",
+    "networkError": "خطأ في الشبكة. يرجى المحاولة مرة أخرى."
+  },
+  "search": {
+    "nothingFound": "لم يتم العثور على شيء",
+    "tryDifferentKeywords": "جرب كلمات مفتاحية مختلفة",
+    "noHeadings": "لا توجد عناوين"
+  },
+  "passwordGroups": {
+    "title": "تكوين مجموعات كلمات المرور",
+    "description": "يتم تعيين كل معرف قسم تلقائياً إلى مجموعة كلمات مرور بناءً على التكوين أدناه.",
+    "password": "كلمة المرور:",
+    "sections": "الأقسام:",
+    "allOtherSections": "جميع الأقسام الأخرى",
+    "section": "قسم",
+    "coversAllSections": "هذه المجموعة تغطي جميع الأقسام غير المعينة صراحة لمجموعات أخرى",
+    "coversSpecifiedSections": "هذه المجموعة تغطي الأقسام المحددة فقط"
+  },
+  "project": {
+    "name": "Probo",
+    "description": "مولد المقترحات التجارية"
+  },
+  "breadcrumb": {
+    "buildingApplication": "بناء تطبيقك",
+    "dataFetching": "جلب البيانات"
+  },
+  "tariff": {
+    "popular": "شائع"
+  }
+}

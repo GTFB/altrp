@@ -1,0 +1,11 @@
+export { default as CarouselDefaultDemo } from './carousel-default';
+export { default as CarouselMultipleSlidesDemo } from './carousel-multiple-slides';
+export { default as CarouselVerticalDemo } from './carousel-vertical';
+export { default as CarouselSlideStatusDemo } from './carousel-slide-status';
+export { default as CarouselSlideStatus2Demo } from './carousel-slide-status-2';
+export { default as CarouselPaginationDemo } from './carousel-pagination';
+export { default as CarouselFooterDemo } from './carousel-footer';
+export { default as CarouselProgressDemo } from './carousel-progress';
+export { default as CarouselThumbsDemo } from './carousel-thumbs';
+export { default as CarouselOpacityDemo } from './carousel-opacity';
+export { default as CarouselScaleDemo } from './carousel-scale';

@@ -1,0 +1,83 @@
+{
+  "project": {
+    "name": "Probo",
+    "description": "Générateur de propositions commerciales"
+  },
+  "common": {
+    "search": "Rechercher",
+    "searchPlaceholder": "Tapez pour rechercher...",
+    "loading": "Chargement...",
+    "loadingApplication": "Chargement de l'application",
+    "takingToMainPage": "Redirection vers la page principale",
+    "indexingContent": "Indexation du contenu...",
+    "preparingSearch": "Préparation de la recherche...",
+    "navigation": "Navigation",
+    "forward": "Suivant",
+    "sectionNavigation": "Navigation des sections",
+    "noHeadings": "Aucun titre",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "open": "Ouvrir",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "goTo": "Aller à",
+    "relevance": "Pertinence",
+    "password": "Mot de passe",
+    "enterPassword": "Entrez le mot de passe",
+    "unlockContent": "Déverrouiller le contenu",
+    "verifying": "Vérification...",
+    "theme": "Thème",
+    "light": "Clair",
+    "dark": "Sombre",
+    "sectionOf": "Section {current} sur {total}",
+    "tableOfContents": "Table des Matières"
+  },
+  "navigation": {
+    "tableOfContents": "Table des matières",
+    "search": "Rechercher",
+    "overview": "Aperçu",
+    "projects": "Projets",
+    "analytics": "Analytiques",
+    "settings": "Paramètres",
+    "demo": "Démo",
+    "group1SectionA": "Groupe 1 - Section A",
+    "group2SectionD": "Groupe 2 - Section D"
+  },
+  "auth": {
+    "protectedContent": "Contenu protégé",
+    "passwordProtected": "Ce contenu est protégé par mot de passe. Veuillez entrer le mot de passe pour continuer.",
+    "accessGranted": "Accès accordé à:",
+    "authenticationFailed": "Échec de l'authentification",
+    "networkError": "Erreur réseau. Veuillez réessayer."
+  },
+  "search": {
+    "nothingFound": "Rien trouvé",
+    "tryDifferentKeywords": "Essayez des mots-clés différents",
+    "noHeadings": "Aucun en-tête"
+  },
+  "passwordGroups": {
+    "title": "Configuration des groupes de mots de passe",
+    "description": "Chaque ID de section est automatiquement assigné à un groupe de mots de passe basé sur la configuration ci-dessous.",
+    "password": "Mot de passe:",
+    "sections": "Sections:",
+    "allOtherSections": "Toutes les autres sections",
+    "section": "Section",
+    "coversAllSections": "Ce groupe couvre toutes les sections non explicitement assignées à d'autres groupes",
+    "coversSpecifiedSections": "Ce groupe couvre uniquement les sections spécifiées"
+  },
+  "project": {
+    "name": "Probo",
+    "description": "Générateur de propositions commerciales"
+  },
+  "breadcrumb": {
+    "buildingApplication": "Construction de votre application",
+    "dataFetching": "Récupération de données"
+  },
+  "tariff": {
+    "popular": "Populaire"
+  }
+}

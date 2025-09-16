@@ -21,7 +21,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": [
-        "./src/*"
+        "./src/*",
+        "../../*"
       ],
       "@/packages/*": [
         "../../packages/*"
@@ -31,7 +32,8 @@
         "./src/lib/*"
       ],
       "@/hooks/*": [
-        "../../packages/hooks/*"
+        "../../packages/hooks/*",
+        "./src/hooks/*"
       ],
       "@/components/*": [
         "../../packages/components/*",
