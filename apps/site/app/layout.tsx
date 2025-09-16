@@ -49,7 +49,7 @@ export default function RootLayout({
   return (
     <DynamicHtml>
       <body className="min-h-screen bg-background antialiased">
-        <Providers session={session}>
+        <Providers session={session ?.data || {}}>
             {children}
         </Providers>
       </body>

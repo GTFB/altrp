@@ -15,7 +15,6 @@ export const useLeftSidebar = () => {
 export function LeftSidebarProvider({ children, open = true }: LeftSidebarProviderProps) {
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(open);
   const { setToSessionClient } = useSession() || {};
-  console.log(open, 'open')
   // Update state when open prop changes (from server-side session)
   useEffect(() => {
     setLeftSidebarOpen(open);

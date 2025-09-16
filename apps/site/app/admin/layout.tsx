@@ -1,6 +1,7 @@
 'use client';
 
 import { AppSidebar, type NavigationItem } from "@/components/AppSidebar/AppSidebar"
+import { useLeftSidebar } from "@/components/providers/LeftSidebarProvider";
 import { SiteHeader } from "@/components/SiteHeader/SiteHeader"
 import {
   SidebarInset,
@@ -58,6 +59,7 @@ const sidebarItems: NavigationItem[] = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarWidth, setSidebarWidth] = useState(320); // Default width (20rem = 320px)
+  const{leftSidebarOpen, setLeftSidebarOpen} = useLeftSidebar()
 
   useEffect(() => {
     // Get sidebar width from CSS variable or measure it
@@ -90,12 +92,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" style={{ '--sidebar-transition-duration': '300ms' } as React.CSSProperties}>
       <SidebarProvider>
         <AppSidebar items={sidebarItems} />
         <div 
-          className="flex flex-col min-h-screen w-full"
-          style={{ marginLeft: `${sidebarWidth}px` }}
+          className="flex flex-col min-h-screen w-full transition-transform ease-in-out"
+          style={{ 
+            transform: leftSidebarOpen ? `translateX(${sidebarWidth}px)` : 'translateX(0px)',
+            transitionDuration: 'var(--sidebar-transition-duration, 300ms)'
+          }}
         >
           <SiteHeader />
           <div className="flex-1 p-4 ">

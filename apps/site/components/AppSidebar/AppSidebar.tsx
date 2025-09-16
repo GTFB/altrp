@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { usePathname } from 'next/navigation'
 import Link from "next/link"
+import { useLeftSidebar } from "../providers/LeftSidebarProvider"
 
 export interface NavigationItem {
   id: string
@@ -30,8 +31,18 @@ interface AppSidebarProps {
 }
 
 export function AppSidebar({ items,  onToggle }: AppSidebarProps) {
+  const{leftSidebarOpen, setLeftSidebarOpen} = useLeftSidebar()
   return (
-    <Sidebar className="lg:block transition-transform duration-300 ease-in-out theme-transition">
+    <Sidebar 
+      className={`lg:block transition-transform ease-in-out theme-transition fixed left-0 top-0 z-50 ${
+        leftSidebarOpen 
+          ? 'translate-x-0' 
+          : '-translate-x-full'
+      }`}
+      style={{ 
+        transitionDuration: 'var(--sidebar-transition-duration, 300ms)'
+      }}
+    >
       <SidebarHeader className="border-b px-6 h-25 flex items-center justify-between sidebar-header-nowrap" style={{ height: 'calc(6.25rem + 1px)' }}>
         <div className="flex items-center gap-3">
           <div className="flex-shrink-0">
@@ -48,11 +59,14 @@ export function AppSidebar({ items,  onToggle }: AppSidebarProps) {
             <p className="text-xs text-muted-foreground">Admin Panel</p>
           </div>
         </div>
-        {onToggle && (
-          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 flex-shrink-0" onClick={onToggle}>
-            <PanelLeftClose className="h-3 w-3" />
-          </Button>
-        )}
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="h-6 w-6 p-0 flex-shrink-0" 
+          onClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
+        >
+          <PanelLeftClose className="h-3 w-3" />
+        </Button>
       </SidebarHeader>
       <SidebarContent className="px-3 py-2">
         <SidebarMenu>

@@ -21,7 +21,6 @@ import { useLeftSidebar } from "@/components/providers/LeftSidebarProvider"
 export function SiteHeader() {
   const { setOpen } = useSidebar()
   const {leftSidebarOpen, setLeftSidebarOpen} = useLeftSidebar()
- console.log(leftSidebarOpen)
   useEffect(() => { 
     setOpen(leftSidebarOpen);
   }, [leftSidebarOpen]);
