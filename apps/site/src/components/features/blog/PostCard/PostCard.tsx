@@ -11,7 +11,7 @@ interface PostCardProps {
 }
 
 export function PostCard({ post }: PostCardProps) {
-  const locale = useLocale();
+  const {locale} = useLocale();
 
   return (
     <article className="border rounded-lg p-6 hover:shadow-md transition-shadow">

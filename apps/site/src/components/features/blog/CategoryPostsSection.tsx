@@ -32,7 +32,7 @@ export function CategoryPostsSection({
   sortBy = 'date',
   sortOrder = 'desc'
 }: CategorySectionProps) {
-  const locale = useLocale();
+  const {locale} = useLocale();
   
   // Generate title and description if not provided
   const sectionTitle = title || `Posts in "${category}" category`;

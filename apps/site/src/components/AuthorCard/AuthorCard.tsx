@@ -12,7 +12,7 @@ interface AuthorCardProps {
 }
 
 export function AuthorCard({ author }: AuthorCardProps) {
-  const locale = useLocale();
+  const {locale} = useLocale();
 
   return (
     <Card className="hover:shadow-md transition-shadow">

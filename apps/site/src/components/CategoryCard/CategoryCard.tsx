@@ -12,7 +12,7 @@ interface CategoryCardProps {
 }
 
 export function CategoryCard({ category }: CategoryCardProps) {
-  const locale = useLocale();
+  const {locale} = useLocale();
 
   return (
     <Card className="hover:shadow-md transition-shadow">

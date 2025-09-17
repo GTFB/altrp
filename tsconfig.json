@@ -11,7 +11,21 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "paths": {
+      "@/lib/*": [
+        "./packages/lib/*"
+      ],
+      "@/hooks/*": [
+        "./packages/hooks/*"
+      ],
+      "@/components/*": [
+        "./packages/components/*"
+      ],
+      "@/repositories/*": [
+        "./packages/repositories/*"
+      ]
+    }
   },
   "include": [
     "apps/**/*",

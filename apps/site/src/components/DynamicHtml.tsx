@@ -7,7 +7,7 @@ interface DynamicHtmlProps {
 }
 
 export function DynamicHtml({ children }: DynamicHtmlProps) {
-  const locale = useLocale();
+  const {locale} = useLocale();
   
   return (
     <html lang={locale} suppressHydrationWarning>

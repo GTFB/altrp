@@ -79,5 +79,67 @@
   },
   "tariff": {
     "popular": "Beliebt"
+  },
+  "components": {
+    "title": "UI-Komponenten-Bibliothek",
+    "accordion": {
+      "title": "Accordion",
+      "description": "Ein vertikal gestapelter Satz interaktiver Überschriften, die jeweils einen Inhaltsbereich aufdecken."
+    },
+    "alert": {
+      "title": "Alert",
+      "description": "Alert-Komponenten zur Anzeige wichtiger Informationen für Benutzer mit verschiedenen Stilen und Varianten."
+    },
+    "alertDialog": {
+      "title": "Alert Dialog",
+      "description": "Modale Dialoge zur Aktionsbestätigung und Anzeige wichtiger Informationen mit verschiedenen Stilen und Varianten."
+    },
+    "badge": {
+      "title": "Badge-Komponenten",
+      "description": "Kleine Status-Deskriptoren für UI-Elemente mit verschiedenen Stilen und Konfigurationen."
+    },
+    "avatar": {
+      "title": "Avatar-Komponenten",
+      "description": "Ein Bildelement mit Fallback zur Darstellung des Benutzers mit verschiedenen Stilen und Konfigurationen."
+    },
+    "breadcrumb": {
+      "title": "Breadcrumb-Komponenten",
+      "description": "Navigationskomponenten, die die aktuelle Seitenposition innerhalb einer Site-Hierarchie anzeigen."
+    },
+    "button": {
+      "title": "Button-Komponenten",
+      "description": "Interaktive Elemente für Benutzeraktionen mit verschiedenen Stilen, Größen und Zuständen."
+    },
+    "card": {
+      "title": "Card-Komponenten",
+      "description": "Flexible Container zum Gruppieren verwandter Inhalte und Aktionen mit verschiedenen Layouts und Stilen."
+    },
+    "carousel": {
+      "title": "Carousel-Komponenten",
+      "description": "Interaktive Karussells zur Anzeige von Inhalten im Gleitformat mit verschiedenen Navigationsoptionen."
+    },
+    "checkbox": {
+      "title": "Checkbox-Komponenten",
+      "description": "Interaktive Checkboxen für Formulare, Auswahlen und Benutzereingaben mit verschiedenen Stilen und Zuständen."
+    },
+    "collapsible": {
+      "title": "Collapsible-Komponenten",
+      "description": "Erweiterbare und zusammenklappbare Inhaltsbereiche mit sanften Animationen und verschiedenen Auslöser-Stilen."
+    },
+    "dropdown": {
+      "title": "Dropdown-Komponenten",
+      "description": "Kontextmenüs und Dropdowns mit verschiedenen Inhaltstypen, Interaktionen und Styling-Optionen."
+    },
+    "layout": {
+      "title": "Layout & Dienstprogramme",
+      "description": "Layout-Komponenten, Code-Beispiele und Utility-Komponenten für Demonstrationen."
+    },
+    "count": "Komponenten",
+    "variants": "Varianten:",
+    "more": "mehr",
+    "howToUse": {
+      "title": "Verwendung",
+      "description": "Wählen Sie oben eine Komponentenkategorie aus, um alle verfügbaren Optionen, Code-Beispiele und interaktive Demonstrationen anzuzeigen. Jede Komponente enthält detaillierte Dokumentation und Verwendungsbeispiele."
+    }
   }
 }

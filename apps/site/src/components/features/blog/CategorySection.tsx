@@ -21,7 +21,7 @@ export function CategorySection({
   title = "Categories",
   description = "Explore our content organized by topics"
 }: CategorySectionProps) {
-  const locale = useLocale();
+  const {locale} = useLocale();
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

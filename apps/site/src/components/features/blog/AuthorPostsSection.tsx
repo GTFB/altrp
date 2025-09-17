@@ -21,7 +21,7 @@ export function AuthorPostsSection({
   title = "Our Authors",
   description = "Meet the talented writers behind our content"
 }: AuthorSectionProps) {
-  const locale = useLocale();
+  const {locale} = useLocale();
   const [authors, setAuthors] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

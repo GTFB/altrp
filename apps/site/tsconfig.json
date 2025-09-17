@@ -38,6 +38,10 @@
       "@/components/*": [
         "../../packages/components/*",
         "./src/components/*"
+      ],
+      "@/repositories/*": [
+        "../../packages/repositories/*",
+        "./src/repositories/*"
       ]
     },
     "plugins": [

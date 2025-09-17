@@ -32,7 +32,7 @@ export function TagSection({
   sortBy = 'date',
   sortOrder = 'desc'
 }: TagSectionProps) {
-  const locale = useLocale();
+  const {locale} = useLocale();
   
   // Generate title and description if not provided
   const tagsText = tags.join(', ');

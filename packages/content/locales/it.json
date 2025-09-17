@@ -70,5 +70,67 @@
   },
   "tariff": {
     "popular": "Popolare"
+  },
+  "components": {
+    "title": "Libreria Componenti UI",
+    "accordion": {
+      "title": "Accordion",
+      "description": "Un insieme di intestazioni interattive impilate verticalmente che rivelano ciascuna una sezione di contenuto."
+    },
+    "alert": {
+      "title": "Alert",
+      "description": "Componenti di avviso per visualizzare informazioni importanti agli utenti con vari stili e varianti."
+    },
+    "alertDialog": {
+      "title": "Alert Dialog",
+      "description": "Dialoghi modali per la conferma di azioni e la visualizzazione di informazioni importanti con vari stili e varianti."
+    },
+    "badge": {
+      "title": "Componenti Badge",
+      "description": "Piccoli descrittori di stato per elementi UI con vari stili e configurazioni."
+    },
+    "avatar": {
+      "title": "Componenti Avatar",
+      "description": "Un elemento immagine con fallback per rappresentare l'utente con vari stili e configurazioni."
+    },
+    "breadcrumb": {
+      "title": "Componenti Breadcrumb",
+      "description": "Componenti di navigazione che mostrano la posizione della pagina corrente all'interno di una gerarchia del sito."
+    },
+    "button": {
+      "title": "Componenti Button",
+      "description": "Elementi interattivi per azioni utente con vari stili, dimensioni e stati."
+    },
+    "card": {
+      "title": "Componenti Card",
+      "description": "Contenitori flessibili per raggruppare contenuti correlati e azioni con vari layout e stili."
+    },
+    "carousel": {
+      "title": "Componenti Carousel",
+      "description": "Caroselli interattivi per visualizzare contenuti in formato scorrevole con varie opzioni di navigazione."
+    },
+    "checkbox": {
+      "title": "Componenti Checkbox",
+      "description": "Checkbox interattive per moduli, selezioni e input utente con vari stili e stati."
+    },
+    "collapsible": {
+      "title": "Componenti Collapsible",
+      "description": "Aree di contenuto espandibili e richiudibili con animazioni fluide e vari stili di attivazione."
+    },
+    "dropdown": {
+      "title": "Componenti Dropdown",
+      "description": "Menu contestuali e dropdown con vari tipi di contenuto, interazioni e opzioni di stile."
+    },
+    "layout": {
+      "title": "Layout e Utilità",
+      "description": "Componenti di layout, esempi di codice e componenti di utilità per le dimostrazioni."
+    },
+    "count": "componenti",
+    "variants": "Varianti:",
+    "more": "altro",
+    "howToUse": {
+      "title": "Come usare",
+      "description": "Seleziona una categoria di componente sopra per vedere tutte le opzioni disponibili, esempi di codice e dimostrazioni interattive. Ogni componente include documentazione dettagliata ed esempi di utilizzo."
+    }
   }
 }

@@ -6,6 +6,15 @@ const nextIntlMiddleware = createMiddleware(i18nConfig);
 
 export default withAuth(
   async function middleware(req) {
+    const excludedPaths = ['/api', '/admin', '/images', '/.well-known'];
+    const pathname = req.nextUrl.pathname;
+    
+    const shouldExclude = excludedPaths.some(path => pathname.startsWith(path));
+    
+    if (shouldExclude) {
+      return;
+    }
+    
     return nextIntlMiddleware(req);
   },
   {
@@ -29,6 +38,6 @@ export default withAuth(
 // See "Matching Paths" below to learn more
 export const config = {
   matcher: [ 
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',    
+    '/((?!_next/static|_next/image|favicon.ico).*)',    
   ],
 };

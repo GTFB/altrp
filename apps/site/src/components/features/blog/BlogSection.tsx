@@ -32,7 +32,7 @@ export function BlogSection({
   sortBy = 'date',
   sortOrder = 'desc'
 }: BlogSectionProps) {
-  const locale = useLocale();
+  const {locale} = useLocale();
   
   const { 
     posts, 

@@ -70,5 +70,67 @@
   },
   "tariff": {
     "popular": "热门"
+  },
+  "components": {
+    "title": "UI组件库",
+    "accordion": {
+      "title": "手风琴",
+      "description": "垂直堆叠的交互式标题集合，每个标题都会显示一个内容部分。"
+    },
+    "alert": {
+      "title": "警告",
+      "description": "用于向用户显示重要信息的警告组件，具有各种样式和变体。"
+    },
+    "alertDialog": {
+      "title": "警告对话框",
+      "description": "用于动作确认和显示重要信息的模态对话框，具有各种样式和变体。"
+    },
+    "badge": {
+      "title": "徽章组件",
+      "description": "UI元素的小状态描述符，具有各种样式和配置。"
+    },
+    "avatar": {
+      "title": "头像组件",
+      "description": "带有回退功能的图像元素，用于表示用户，具有各种样式和配置。"
+    },
+    "breadcrumb": {
+      "title": "面包屑组件",
+      "description": "显示当前页面在网站层次结构中位置的导航组件。"
+    },
+    "button": {
+      "title": "按钮组件",
+      "description": "用于用户操作的交互式元素，具有各种样式、大小和状态。"
+    },
+    "card": {
+      "title": "卡片组件",
+      "description": "用于分组相关内容和操作的灵活容器，具有各种布局和样式。"
+    },
+    "carousel": {
+      "title": "轮播组件",
+      "description": "用于以滑动格式显示内容的交互式轮播，具有各种导航选项。"
+    },
+    "checkbox": {
+      "title": "复选框组件",
+      "description": "用于表单、选择和用户输入的交互式复选框，具有各种样式和状态。"
+    },
+    "collapsible": {
+      "title": "可折叠组件",
+      "description": "具有平滑动画和各种触发器样式的可展开和可折叠内容区域。"
+    },
+    "dropdown": {
+      "title": "下拉组件",
+      "description": "具有各种内容类型、交互和样式选项的上下文菜单和下拉菜单。"
+    },
+    "layout": {
+      "title": "布局和实用程序",
+      "description": "用于演示的布局组件、代码示例和实用程序组件。"
+    },
+    "count": "组件",
+    "variants": "变体：",
+    "more": "更多",
+    "howToUse": {
+      "title": "如何使用",
+      "description": "选择上面的组件类别以查看所有可用选项、代码示例和交互式演示。每个组件都包含详细的文档和使用示例。"
+    }
   }
 }
