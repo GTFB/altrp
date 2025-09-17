@@ -1,0 +1,63 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "jsxImportSource": "react",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*",
+        "../../*"
+      ],
+      "@/packages/*": [
+        "../../packages/*"
+      ],
+      "@/lib/*": [
+        "../../packages/lib/*",
+        "./src/lib/*"
+      ],
+      "@/hooks/*": [
+        "../../packages/hooks/*",
+        "./src/hooks/*"
+      ],
+      "@/components/*": [
+        "../../packages/components/*",
+        "./src/components/*"
+      ],
+      "@/repositories/*": [
+        "../../packages/repositories/*",
+        "./src/repositories/*"
+      ]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

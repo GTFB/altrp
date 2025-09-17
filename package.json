@@ -13,10 +13,16 @@
         "dev:site": "bun run --filter=jambo-site dev",
         "build:site": "bun run --filter=jambo-site build",
         "start:site": "bun run --filter=jambo-site start",
-        "lint:site": "bun run --filter=jambo-site lint"
+        "lint:site": "bun run --filter=jambo-site lint",
+        "dev:cms": "bun run --filter=jambo-cms dev",
+        "build:cms": "bun run --filter=jambo-cms build",
+        "start:cms": "bun run --filter=jambo-cms start",
+        "dev": "concurrently \"bun run dev:site\" \"bun run dev:cms\"",
+        "build": "bun run build:site && bun run build:cms"
     },
     "devDependencies": {
-        "@changesets/cli": "^2.27.1"
+        "@changesets/cli": "^2.27.1",
+        "concurrently": "^8.2.2"
         },
     "dependencies": {
         "marked": "^16.2.1"
