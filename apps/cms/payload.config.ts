@@ -1,23 +1,11 @@
-import { buildConfig } from 'payload/config'
-import { webpackBundler } from '@payloadcms/bundler-webpack'
-import { postgresAdapter } from '@payloadcms/db-postgres'
+import { buildConfig } from 'payload'
+import { sqliteAdapter } from '@payloadcms/db-sqlite'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
 
 export default buildConfig({
   admin: {
     user: 'users',
-    bundler: webpackBundler(),
-    webpack: (config) => ({
-      ...config,
-      resolve: {
-        ...config.resolve,
-        alias: {
-          ...config.resolve?.alias,
-          '@': path.resolve(__dirname, 'src'),
-        },
-      },
-    }),
   },
   collections: [
     {
@@ -218,10 +206,8 @@ export default buildConfig({
   graphQL: {
     schemaOutputFile: path.resolve(__dirname, 'generated-schema.graphql'),
   },
-  db: postgresAdapter({
-    pool: {
-      connectionString: process.env.DATABASE_URL || 'postgresql://localhost:5432/jambo_cms',
-    },
+  db: sqliteAdapter({
+    file: path.resolve(__dirname, process.env.DATABASE_URL || './database.sqlite'),
   }),
   plugins: [],
 })

@@ -22,6 +22,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   'Code': Code,
 }
 
+
 export interface NavigationItem {
   id: string
   title: string
@@ -32,11 +33,11 @@ export interface NavigationItem {
 
 
 export const PROJECT_SETTINGS = {
-  name: 'Probo',
+  name: 'Jambo',
   description: 'Commercial Proposal Generator',
   defaultLanguage: 'en',
-  defaultTheme: 'system',
-  supportedThemes: ['light', 'dark', 'system'],
+  defaultTheme: 'light',
+  supportedThemes: ['light', 'dark',],
   mobilePadding: 'px-4',
 } as const;
 
@@ -57,7 +58,7 @@ export const LANGUAGES = [
 ] as const;
 
 // Get supported language codes
-export const SUPPORTED_LANGUAGES = LANGUAGES.map(lang => lang.code);
+export const SUPPORTED_LANGUAGES: string[] = LANGUAGES.map(lang => lang.code);
 
 // Password groups configuration
 export const PASSWORD_GROUPS = {

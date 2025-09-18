@@ -16,8 +16,7 @@
   },
   "dependencies": {
     "payload": "^3.0.0",
-    "@payloadcms/bundler-webpack": "^3.0.0",
-    "@payloadcms/db-postgres": "^3.0.0",
+    "@payloadcms/db-sqlite": "^3.0.0",
     "@payloadcms/richtext-lexical": "^3.0.0",
     "@payloadcms/next": "^3.0.0",
     "next": "^14.2.5",
@@ -26,8 +25,7 @@
     "@tailwindcss/postcss": "4.1.11",
     "tailwindcss": "4.1.11",
     "dotenv": "^16.4.5",
-    "webpack": "^5.94.0",
-    "pg": "^8.11.3"
+    "webpack": "^5.94.0"
   },
   "devDependencies": {
     "@types/node": "^20.14.11",

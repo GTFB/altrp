@@ -2,11 +2,15 @@ import { i18nConfig } from "@/config/i18n";
 import { withAuth } from "next-auth/middleware";
 import createMiddleware from 'next-intl/middleware';
 
-const nextIntlMiddleware = createMiddleware(i18nConfig);
+const nextIntlMiddleware = createMiddleware({
+  ...i18nConfig,
+  localePrefix: 'as-needed'
+
+});
 
 export default withAuth(
-  async function middleware(req) {
-    const excludedPaths = ['/api', '/admin', '/images', '/.well-known'];
+  async function middleware(req,res) {
+    const excludedPaths = ['/api', '/admin', '/images', '/.well-known', '/login'];
     const pathname = req.nextUrl.pathname;
     
     const shouldExclude = excludedPaths.some(path => pathname.startsWith(path));
@@ -14,6 +18,9 @@ export default withAuth(
     if (shouldExclude) {
       return;
     }
+    const fragments = req.nextUrl.pathname.split('/');
+
+
     
     return nextIntlMiddleware(req);
   },
@@ -22,14 +29,13 @@ export default withAuth(
       authorized: async ({ token, req }) => {
         const email = token?.email;
 
-        if (!email) {
-          return false;
-        }
-
+        // if (!email) {
+        //   return false;
+        // }
         if (req.nextUrl.pathname.startsWith("/admin")) {
           return token?.role === "admin"; 
         }
-        return !!token;
+        return true;
       },
     },
   }

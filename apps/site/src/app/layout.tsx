@@ -1,7 +1,16 @@
 import { DynamicHtml } from '@/components/DynamicHtml';
+import { IntlProvider } from '@/components/providers/IntlProvider';
 import { Providers } from '@/components/providers/Providers';
-import './globals.css'; 
+import './globals.css';
 import { getSession } from '@/lib/cookie-session';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Search } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import { Settings } from 'lucide-react';
+import { getMessages } from 'next-intl/server';
+import { headers } from 'next/headers';
+import { i18nConfig } from '@/config/i18n';
 
 export const metadata = {
   title: {
@@ -44,14 +53,28 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session =  getSession();
+  const session = getSession();
+  const headersList = headers();
+  const pathname = headersList.get('x-pathname') || '';
+  const locale = pathname.split('/')[1] || i18nConfig.defaultLocale;
+  const currentLocale = i18nConfig.locales.includes(locale) ? locale : i18nConfig.defaultLocale;
+  const messages = await getMessages({ locale: currentLocale });
+
+
   return (
     <DynamicHtml>
-      <body className="min-h-screen bg-background antialiased">
-        <Providers session={session ?.data || {}}>
+      <head>
+        <link rel="icon" href="/favicon.ico" />
+      </head>
+      <IntlProvider locale={currentLocale} messages={messages}>
+
+        <body className="min-h-screen bg-background antialiased">
+
+          <Providers session={session?.data || {}}>
             {children}
-        </Providers>
-      </body>
+          </Providers>
+        </body>
+      </IntlProvider>
     </DynamicHtml>
   );
 }
