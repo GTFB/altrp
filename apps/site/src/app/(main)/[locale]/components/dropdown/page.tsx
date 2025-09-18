@@ -2,7 +2,7 @@ import { ComponentsHeader } from "@/components/shared/components-header";
 import { ToTopButton } from "@/components/shared/to-top-button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PROJECT_SETTINGS } from "@/settings";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { cardStyles } from "@/lib/button-styles";
 import {
   DropdownDefault,
@@ -17,7 +17,7 @@ import {
 
 export default function DropdownComponentsPage() {
   const t = useTranslations('demo.dropdown');
-
+  const locale = useLocale();
   const demoSections = [
     {
       title: t('variants.default.title'),
@@ -67,7 +67,7 @@ export default function DropdownComponentsPage() {
         title={t('title')}
         description=""
         showBackButton={true}
-        backHref="/components"
+        backHref={`/${locale}/components`}
         badges={[]}
       />
       

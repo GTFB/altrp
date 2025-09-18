@@ -17,7 +17,7 @@ import AlertWithActionsDemo from "@/components/widgets/alert/alert-with-actions"
 
 export default function AlertPage() {
   const t = useTranslations('alert');
-
+  const locale = useLocale();
   const demoSections = [
     {
       title: t('variants.primary.title'),
@@ -77,7 +77,7 @@ export default function AlertPage() {
         title={t('title')}
         description=""
         showBackButton={true}
-        backHref="/components"
+        backHref={`/${locale}/components`}    
         badges={[]}
       />
       

@@ -2,7 +2,7 @@ import { ComponentsHeader } from "@/components/shared/components-header";
 import { ToTopButton } from "@/components/shared/to-top-button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PROJECT_SETTINGS } from "@/settings";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { cardStyles } from "@/lib/button-styles";
 import {
   CardDefaultDemo,
@@ -17,7 +17,7 @@ import {
 
 export default function CardPage() {
   const t = useTranslations('demo.card');
-
+  const locale = useLocale();
   const demoSections = [
     {
       title: t('variants.default.title'),
@@ -66,7 +66,7 @@ export default function CardPage() {
       <ComponentsHeader
         title={t('title')}
         showBackButton={true}
-        backHref="/components"
+        backHref={`/${locale}/components`}
         badges={[]}
       />
       

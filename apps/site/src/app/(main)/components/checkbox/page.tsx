@@ -2,7 +2,7 @@ import { ComponentsHeader } from "@/components/shared/components-header";
 import { ToTopButton } from "@/components/shared/to-top-button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PROJECT_SETTINGS } from "@/settings";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { cardStyles } from "@/lib/button-styles";
 import {
   CheckboxWithText,
@@ -21,7 +21,7 @@ import {
 
 export default function CheckboxComponentsPage() {
   const t = useTranslations('demo.checkbox');
-
+  const locale = useLocale();
   const demoSections = [
     {
       title: t('variants.withText.title'),
@@ -91,7 +91,7 @@ export default function CheckboxComponentsPage() {
         title={t('title')}
         description=""
         showBackButton={true}
-        backHref="/components"
+        backHref={`/${locale}/components`}  
         badges={[]}
       />
       

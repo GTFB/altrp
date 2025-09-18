@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ComponentsHeader } from "@/components/shared/components-header";
 import { ToTopButton } from "@/components/shared/to-top-button";
 import { PROJECT_SETTINGS } from "@/settings";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { cardStyles } from "@/lib/button-styles";
 import { Code } from "lucide-react";
 import AccordionDemo from "@/components/widgets/accordion/accordion";
@@ -20,6 +20,7 @@ import AccordionDisabledDemo from "@/components/widgets/accordion/accordion-disa
 
 export default function AccordionPage() {
   const t = useTranslations('accordion');
+  const locale = useLocale();
 
   const demoSections = [
     {
@@ -90,7 +91,7 @@ export default function AccordionPage() {
         title={t('title')}
         description=""
         showBackButton={true}
-        backHref="/components"
+        backHref={`/${locale}/components`}
         badges={[]}
       />
       

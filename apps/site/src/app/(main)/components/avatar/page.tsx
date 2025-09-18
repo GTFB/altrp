@@ -2,7 +2,7 @@ import { ComponentsHeader } from "@/components/shared/components-header";
 import { ToTopButton } from "@/components/shared/to-top-button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PROJECT_SETTINGS } from "@/settings";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { cardStyles } from "@/lib/button-styles";
 import {
   AvatarDemo,
@@ -23,7 +23,7 @@ import {
 
 export default function AvatarPage() {
   const t = useTranslations('demo.avatar');
-
+  const locale = useLocale();
   const demoSections = [
     {
       title: t('variants.default.title'),
@@ -103,7 +103,7 @@ export default function AvatarPage() {
         title={t('title')}
         description=""
         showBackButton={true}
-        backHref="/components"
+        backHref={`/${locale}/components`}  
         badges={[]}
       />
       

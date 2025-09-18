@@ -6,13 +6,14 @@ import { Separator } from '@/components/ui/separator';
 import { Settings } from 'lucide-react';
 import { LanguageSwitcher } from '@/components/shared/language-switcher';
 import { ThemeToggle } from '@/components/shared/theme-toggle';
+import { useLocale } from 'next-intl';
 
 export default async function Layout({
   children,
 }: {
   children: React.ReactNode;
 }) {
- 
+  const locale = useLocale();
   
   return (
     <div className="min-h-screen">
@@ -22,7 +23,7 @@ export default async function Layout({
             <div className="flex h-16 items-center justify-between">
               {/* Logo */}
               <div className="flex items-center space-x-4">
-                <Link href="/" className="flex items-center space-x-2">
+                <Link href={`/${locale}`} className="flex items-center space-x-2">
                   <div className="h-8 w-8 rounded bg-primary"></div>
                   <span className="text-xl font-bold">Jambo</span>
                 </Link>
@@ -31,25 +32,25 @@ export default async function Layout({
               {/* Navigation */}
               <nav className="hidden md:flex items-center space-x-6">
                 <Link 
-                  href="/" 
+                  href={`/${locale}`} 
                   className="text-sm font-medium transition-colors hover:text-primary"
                 >
                   Home
                 </Link>
                 <Link 
-                  href="/blog" 
+                  href={`/${locale}/blog`} 
                   className="text-sm font-medium transition-colors hover:text-primary"
                 >
                   Blog
                 </Link>
                 <Link 
-                  href="/about" 
+                  href={`/${locale}/about`} 
                   className="text-sm font-medium transition-colors hover:text-primary"
                 >
                   About
                 </Link>
                 <Link 
-                  href="/contact" 
+                  href={`/${locale}/contact`} 
                   className="text-sm font-medium transition-colors hover:text-primary"
                 >
                   Contact

@@ -3,8 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Globe, Github, Twitter, Linkedin, Mail } from 'lucide-react';
+import { useLocale } from 'next-intl';
 
 export function Footer() {
+  const locale = useLocale();
   return (
     <footer className="border-t bg-background">
       <div className="container mx-auto px-4 py-12">
@@ -38,57 +40,57 @@ export function Footer() {
 
           {/* Product */}
           <div className="space-y-4">
-            <h3 className="font-heading font-semibold">Продукт</h3>
+            <h3 className="font-heading font-semibold">t('product')</h3>
             <div className="space-y-2">
-              <Link href="/features" className="block text-sm text-muted-foreground hover:text-foreground font-sans">
-                Возможности
+              <Link href={`/${locale}/features`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
+                t('features')
               </Link>
-              <Link href="/pricing" className="block text-sm text-muted-foreground hover:text-foreground font-sans">
-                Цены
+                  <Link href={`/${locale}/pricing`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
+                t('pricing')
               </Link>
-              <Link href="/integrations" className="block text-sm text-muted-foreground hover:text-foreground font-sans">
-                Интеграции
+              <Link href={`/${locale}/integrations`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
+                t('integrations')
               </Link>
-              <Link href="/changelog" className="block text-sm text-muted-foreground hover:text-foreground font-sans">
-                Обновления
+              <Link href={`/${locale}/changelog`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
+                t('changelog')
               </Link>
             </div>
           </div>
 
           {/* Resources */}
           <div className="space-y-4">
-            <h3 className="font-heading font-semibold">Ресурсы</h3>
+            <h3 className="font-heading font-semibold">t('resources')</h3>
             <div className="space-y-2">
-              <Link href="/docs" className="block text-sm text-muted-foreground hover:text-foreground font-sans">
-                Документация
+              <Link href={`/${locale}/docs`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
+                t('docs')
               </Link>
-              <Link href="/tutorials" className="block text-sm text-muted-foreground hover:text-foreground font-sans">
-                Уроки
+              <Link href={`/${locale}/tutorials`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
+                t('tutorials')
               </Link>
-              <Link href="/api" className="block text-sm text-muted-foreground hover:text-foreground font-sans">
-                API
+              <Link href={`/${locale}/api`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
+                t('api')
               </Link>
-              <Link href="/status" className="block text-sm text-muted-foreground hover:text-foreground font-sans">
-                Статус
+              <Link href={`/${locale}/status`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
+                t('status')
               </Link>
             </div>
           </div>
 
           {/* Company */}
           <div className="space-y-4">
-            <h3 className="font-heading font-semibold">Компания</h3>
+              <h3 className="font-heading font-semibold">t('company')</h3>
             <div className="space-y-2">
-              <Link href="/about" className="block text-sm text-muted-foreground hover:text-foreground font-sans">
-                О нас
+              <Link href={`/${locale}/about`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
+                t('about')
               </Link>
-              <Link href="/blog" className="block text-sm text-muted-foreground hover:text-foreground font-sans">
-                Блог
+              <Link href={`/${locale}/blog`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
+                t('blog')
               </Link>
-              <Link href="/careers" className="block text-sm text-muted-foreground hover:text-foreground font-sans">
-                Карьера
+              <Link href={`/${locale}/careers`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
+                t('careers')
               </Link>
-              <Link href="/contact" className="block text-sm text-muted-foreground hover:text-foreground font-sans">
-                Контакты
+              <Link href={`/${locale}/contact`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
+                t('contact')
               </Link>
             </div>
           </div>
@@ -99,20 +101,21 @@ export function Footer() {
         {/* Bottom */}
         <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
           <div className="flex items-center space-x-4 text-sm text-muted-foreground font-sans">
-            <span>© 2024 Jambo. Все права защищены.</span>
+            <span>© 2024 Jambo. t('all rights reserved')</span>
             <Badge variant="outline" className="text-xs">
               Beta v1.0.0
             </Badge>
           </div>
           <div className="flex items-center space-x-4 text-sm text-muted-foreground font-sans">
-            <Link href="/privacy" className="hover:text-foreground">
-              Конфиденциальность
+            <Link href={`/${locale}/privacy`} className="hover:text-foreground">
+              t('privacy')
             </Link>
-            <Link href="/terms" className="hover:text-foreground">
-              Условия
+            <Link href={`/${locale}/terms`} className="hover:text-foreground">
+              t('terms')
             </Link>
-            <Link href="/cookies" className="hover:text-foreground">
-              Cookies
+            <Link href={`/${locale}/cookies`}
+             className="hover:text-foreground">
+                t('cookies')
             </Link>
           </div>
         </div>

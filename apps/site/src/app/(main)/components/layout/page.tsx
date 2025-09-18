@@ -2,7 +2,7 @@ import { ComponentsHeader } from "@/components/shared/components-header";
 import { ToTopButton } from "@/components/shared/to-top-button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PROJECT_SETTINGS } from "@/settings";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { cardStyles } from "@/lib/button-styles";
 import ComponentLayoutDemo from "@/components/widgets/layout/component-layout-demo";
 import DemoGridDemo from "@/components/widgets/layout/demo-grid-demo";
@@ -12,7 +12,7 @@ import VariantDemoDemo from "@/components/widgets/layout/variant-demo-demo";
 
 export default function LayoutComponentsPage() {
   const t = useTranslations('layout');
-
+  const locale = useLocale();
   const demoSections = [
     {
       title: t('components.componentLayout.title'),
@@ -47,7 +47,7 @@ export default function LayoutComponentsPage() {
         title={t('title')}
         description=""
         showBackButton={true}
-        backHref="/components"
+        backHref={`/${locale}/components`}  
         badges={[]}
       />
       

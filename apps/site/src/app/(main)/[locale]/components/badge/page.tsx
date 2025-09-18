@@ -2,7 +2,7 @@ import { ComponentsHeader } from "@/components/shared/components-header";
 import { ToTopButton } from "@/components/shared/to-top-button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PROJECT_SETTINGS } from "@/settings";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { cardStyles } from "@/lib/button-styles";
 import {
   BadgeDemo,
@@ -19,6 +19,7 @@ import {
 
 export default function BadgePage() {
   const t = useTranslations('demo.badge');
+  const locale = useLocale();
 
   const demoSections = [
     {
@@ -79,7 +80,7 @@ export default function BadgePage() {
         title={t('title')}
         description=""
         showBackButton={true}
-        backHref="/components"
+        backHref={`/${locale}/components`}
         badges={[]}
       />
       

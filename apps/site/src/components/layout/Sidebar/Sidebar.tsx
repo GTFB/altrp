@@ -2,10 +2,11 @@
 
 import { useUiStore } from '@/stores/ui.store';
 import { X } from 'lucide-react';
+import { useLocale } from 'next-intl';
 
 export function Sidebar() {
   const { isSidebarOpen, toggleSidebar } = useUiStore();
-
+  const locale = useLocale();
   if (!isSidebarOpen) return null;
 
   return (
@@ -15,7 +16,7 @@ export function Sidebar() {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-lg font-semibold">Navigation</h2>
+          <h2 className="text-lg font-semibold">t('navigation')</h2>
           <button
             onClick={toggleSidebar}
             className="p-2 hover:bg-muted rounded-md"
@@ -28,29 +29,29 @@ export function Sidebar() {
           <ul className="space-y-2">
             <li>
               <a
-                href="/"
+                href={`/${locale}`}
                 className="block p-2 hover:bg-muted rounded-md"
                 onClick={toggleSidebar}
               >
-                Home
+                t('home')
               </a>
             </li>
             <li>
               <a
-                href="/blog"
+                href={`/${locale}/blog`}
                 className="block p-2 hover:bg-muted rounded-md"
                 onClick={toggleSidebar}
               >
-                Blog
+                t('blog')
               </a>
             </li>
             <li>
               <a
-                href="/about"
+                href={`/${locale}/about`}
                 className="block p-2 hover:bg-muted rounded-md"
                 onClick={toggleSidebar}
               >
-                About
+                t('about')
               </a>
             </li>
           </ul>

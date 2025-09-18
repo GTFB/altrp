@@ -32,7 +32,7 @@ interface AppSidebarProps {
 
 export function AppSidebar({ items,  onToggle }: AppSidebarProps) {
   const{leftSidebarOpen, setLeftSidebarOpen} = useLeftSidebar()
-  console.log(leftSidebarOpen)
+
   return (
     <Sidebar 
       className={`lg:block transition-transform ease-in-out theme-transition fixed left-0 top-0 z-50 h-full`}
@@ -41,6 +41,7 @@ export function AppSidebar({ items,  onToggle }: AppSidebarProps) {
       <SidebarHeader className="border-b px-6 h-25 flex items-center justify-between sidebar-header-nowrap" style={{ height: 'calc(6.25rem + 1px)' }}>
         <div className="flex items-center gap-3">
           <div className="flex-shrink-0">
+            <Link href={`/`} target="_blank">
             <img 
               src="/images/logo.svg" 
               alt="Jambo Logo" 
@@ -48,10 +49,13 @@ export function AppSidebar({ items,  onToggle }: AppSidebarProps) {
               width="32"
               height="32"
             />
+            </Link>
           </div>
           <div>
+            <Link href={`/`} target="_blank">
             <h2 className="text-lg font-semibold">Jambo</h2>
             <p className="text-xs text-muted-foreground">Admin Panel</p>
+            </Link>
           </div>
         </div>
         <Button 
