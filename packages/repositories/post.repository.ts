@@ -6,6 +6,7 @@ import { parseMarkdown } from '@/lib/markdown';
 import { frontmatterSchema, type Frontmatter } from '@/lib/validators/content.schema';
 import { getContentDir } from '@/lib/content-path';
 import { BaseSearchableRepository, SearchResult, SearchOptions } from './base.repository';
+import { i18nConfig } from '../../apps/site/src/config/i18n';
 
 export interface Post {
   slug: string;
@@ -83,7 +84,7 @@ export class PostRepository implements BaseSearchableRepository<Post> {
       for (const entry of entries) {
         if (entry.isDirectory()) {
           const slug = entry.name;
-          const post = await this.findBySlug(slug);
+          const post = await this.findBySlug(slug, i18nConfig.defaultLocale);
           if (post) {
             posts.push(post);
           }
@@ -113,7 +114,7 @@ export class PostRepository implements BaseSearchableRepository<Post> {
       for (const entry of entries) {
         if (entry.isDirectory()) {
           const slug = entry.name;
-          const post = await this.findBySlug(slug);
+          const post = await this.findBySlug(slug, i18nConfig.defaultLocale);
           if (post) {
             posts.push(post);
           }
@@ -232,9 +233,25 @@ export class PostRepository implements BaseSearchableRepository<Post> {
     });
   }
 
-  async findBySlug(slug: string): Promise<Post | null> {
+  async findBySlug(slug: string, locale: string = i18nConfig.defaultLocale): Promise<Post | null> {
     try {
-      const filePath = path.join(this.contentDir, slug, 'index.mdx');
+      let fileName = 'index.mdx';
+      
+      // If locale is not default locale, try to use locale-specific file
+      if (locale !== i18nConfig.defaultLocale) {
+        fileName = `${locale}.mdx`;
+        
+        // Check if locale-specific file exists
+        const localeFilePath = path.join(this.contentDir, slug, fileName);
+        try {
+          await fs.access(localeFilePath);
+        } catch {
+          // If locale-specific file doesn't exist, fallback to default
+          fileName = 'index.mdx';
+        }
+      }
+      
+      const filePath = path.join(this.contentDir, slug, fileName);
       const raw = await fs.readFile(filePath, 'utf8');
       let { data, content } = matter(raw);
 

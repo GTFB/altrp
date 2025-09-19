@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -23,10 +24,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Plus, Edit, Trash2, Eye, Check, X } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, Check, X, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useNotifications } from '@/hooks/use-notifications';
 import { NotificationContainer } from '@/components/ui/notification-container';
+import { CategoryFilter } from '@/components/admin/CategoryFilter';
 import {
   Pagination,
   PaginationContent,
@@ -59,7 +61,9 @@ interface PaginationInfo {
 export default function PostsPage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showSuccessIcon, setShowSuccessIcon] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const searchParams = useSearchParams();
   const [editingCell, setEditingCell] = useState<{ postSlug: string; field: 'title' | 'slug' } | null>(null);
   const [editValue, setEditValue] = useState('');
   const { notifications, showSuccess, showError, removeNotification } = useNotifications();
@@ -74,9 +78,10 @@ export default function PostsPage() {
     hasPrev: false,
   });
 
+  // Watch for search params changes and refetch posts
   useEffect(() => {
-    fetchPosts();
-  }, []);
+    fetchPosts(1); // Reset to page 1 when filters change
+  }, [searchParams]);
 
   useEffect(() => {
     return () => {
@@ -89,19 +94,40 @@ export default function PostsPage() {
   const fetchPosts = async (page: number = pagination.page) => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/admin/blog?page=${page}&limit=${pagination.limit}`);
+      
+      // Build query parameters
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: pagination.limit.toString()
+      });
+      
+      // Add category filter if present
+      const category = searchParams.get('category');
+      if (category) {
+        params.set('category', category);
+      }
+      
+      const response = await fetch(`/api/admin/blog?${params.toString()}`);
       const data = await response.json();
       
       if (data.success) {
         setPosts(data.posts);
         setPagination(data.pagination);
+        setError(null);
+        
+        // Show success icon for 0.5 seconds
+        setLoading(false);
+        setShowSuccessIcon(true);
+        setTimeout(() => {
+          setShowSuccessIcon(false);
+        }, 500);
       } else {
         setError(data.error || 'Failed to fetch posts');
+        setLoading(false);
       }
     } catch (err) {
       setError('Failed to fetch posts');
       console.error('Error fetching posts:', err);
-    } finally {
       setLoading(false);
     }
   };
@@ -250,14 +276,6 @@ export default function PostsPage() {
     return pages;
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-muted-foreground">Loading posts...</div>
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -288,21 +306,42 @@ export default function PostsPage() {
         </Button>
       </div>
 
+      {/* Category Filter */}
+      <CategoryFilter className="mb-4" />
+
       <div className="rounded-md border">
-        <Table>
+        <Table className="table-fixed w-full">
           <TableHeader>
             <TableRow>
-              <TableHead>Title</TableHead>
-              <TableHead>Slug</TableHead>
-              <TableHead>Author</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Tags</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="w-[300px]">Title</TableHead>
+              <TableHead className="w-[200px]">Slug</TableHead>
+              <TableHead className="w-[120px]">Author</TableHead>
+              <TableHead className="w-[120px]">Category</TableHead>
+              <TableHead className="w-[100px]">Date</TableHead>
+              <TableHead className="w-[180px]">Tags</TableHead>
+              <TableHead className="w-[120px] text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {posts.length === 0 ? (
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                  <div className="flex items-center justify-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Loading posts...
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : showSuccessIcon ? (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                  <div className="flex items-center justify-center gap-2">
+                    <Check className="h-4 w-4 text-green-600" />
+                    Posts loaded successfully
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : posts.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                   No posts found

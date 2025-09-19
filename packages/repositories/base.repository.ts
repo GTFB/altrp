@@ -1,6 +1,6 @@
 export interface Repository<T> {
   findAll(): Promise<T[]>;
-  findBySlug(slug: string): Promise<T | null>;
+  findBySlug(slug: string, locale?: string): Promise<T | null>;
 }
 
 export interface SearchResult<T> {

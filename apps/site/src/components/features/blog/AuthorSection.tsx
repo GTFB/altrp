@@ -114,7 +114,7 @@ export function AuthorSection({
       {showViewAll && (
         <div className="text-center">
           <Button asChild variant="outline" size="lg">
-            <Link href={`${localePath}/authors`}>
+            <Link href={(localePath + '/authors') as any}>
               View All Authors
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
