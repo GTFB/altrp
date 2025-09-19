@@ -43,7 +43,13 @@
     "contact": "Contatti",
     "admin": "Amministrazione",
     "tags": "Tag",
-    "categories": "Categorie"
+    "categories": "Categorie",
+    "privacy_policy": "Informativa sulla Privacy",
+    "terms_of_service": "Termini di Servizio",
+    "all_rights_reserved": "Tutti i diritti riservati",
+    "navigation": "Navigazione",
+    "page": "Pagina",
+    "discover_amazing_content_organized_by_tags_and_categories": "Scopri contenuti straordinari organizzati per tag e categorie"
   },
   "auth": {
     "protectedContent": "Contenuto protetto",

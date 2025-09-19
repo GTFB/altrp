@@ -2,7 +2,7 @@
 
 import { type Category } from '@/repositories/category.repository';
 import Link from 'next/link';
-import { useLocale } from '@/hooks/use-locale';
+import { useLocale } from 'next-intl';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tag } from 'lucide-react';
@@ -12,7 +12,8 @@ interface CategoryCardProps {
 }
 
 export function CategoryCard({ category }: CategoryCardProps) {
-  const {locale} = useLocale();
+    const locale = useLocale() === 'en' ? '' : useLocale();
+  const localePath = locale !== '' ? `/${locale}` : '';
 
   return (
     <Card className="hover:shadow-md transition-shadow">

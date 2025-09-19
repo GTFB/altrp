@@ -43,7 +43,13 @@
     "contact": "संपर्क",
     "admin": "प्रशासन",
     "tags": "टैग",
-    "categories": "श्रेणियां"
+    "categories": "श्रेणियां",
+    "privacy_policy": "गोपनीयता नीति",
+    "terms_of_service": "सेवा की शर्तें",
+    "all_rights_reserved": "सभी अधिकार सुरक्षित",
+    "navigation": "नेविगेशन",
+    "page": "पेज",
+    "discover_amazing_content_organized_by_tags_and_categories": "टैग और श्रेणियों द्वारा व्यवस्थित अद्भुत सामग्री खोजें"
   },
   "auth": {
     "protectedContent": "सुरक्षित सामग्री",

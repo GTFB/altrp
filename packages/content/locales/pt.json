@@ -43,7 +43,13 @@
     "contact": "Contato",
     "admin": "Administração",
     "tags": "Tags",
-    "categories": "Categorias"
+    "categories": "Categorias",
+    "privacy_policy": "Política de Privacidade",
+    "terms_of_service": "Termos de Serviço",
+    "all_rights_reserved": "Todos os direitos reservados",
+    "navigation": "Navegação",
+    "page": "Página",
+    "discover_amazing_content_organized_by_tags_and_categories": "Descubra conteúdo incrível organizado por tags e categorias"
   },
   "auth": {
     "protectedContent": "Conteúdo protegido",

@@ -43,7 +43,13 @@
     "contact": "연락처",
     "admin": "관리자",
     "tags": "태그",
-    "categories": "카테고리"
+    "categories": "카테고리",
+    "privacy_policy": "개인정보처리방침",
+    "terms_of_service": "서비스 약관",
+    "all_rights_reserved": "모든 권리 보유",
+    "navigation": "네비게이션",
+    "page": "페이지",
+    "discover_amazing_content_organized_by_tags_and_categories": "태그와 카테고리로 정리된 놀라운 콘텐츠를 발견하세요"
   },
   "auth": {
     "protectedContent": "보호된 콘텐츠",

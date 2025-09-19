@@ -9,6 +9,7 @@ import { LanguageSwitcher } from '@/components/shared/language-switcher';
 import { ThemeToggle } from '@/components/shared/theme-toggle';
 import { useLocale, useTranslations } from 'next-intl';
 import { DynamicBreadcrumbs } from '@/components/shared/dynamic-breadcrumbs';
+import { PopupSearch } from '@/components/features/search/PopupSearch';
 
 export default function Layout({
   children,
@@ -70,10 +71,7 @@ export default function Layout({
                 <ThemeToggle variant="minimal" size="sm" />
                 
                 {/* Search */}
-                <Button variant="ghost" size="icon">
-                  <Search className="h-4 w-4" />
-                </Button>
-                
+                <PopupSearch />
                 <Separator orientation="vertical" className="h-4" />
                 
                 {/* Admin link */}
@@ -106,13 +104,13 @@ export default function Layout({
                   <span className="text-xl font-bold">Jambo</span>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Discover amazing content organized by tags and categories.
+                  {t('discover_amazing_content_organized_by_tags_and_categories')}
                 </p>
               </div>
               
               {/* Navigation */}
               <div className="space-y-4">
-                <h3 className="text-sm font-semibold">Navigation</h3>
+                <h3 className="text-sm font-semibold">{t('navigation')}</h3>
                 <nav className="flex flex-col space-y-2">
                   <Link 
                     href={`${localePath}`} 
@@ -184,20 +182,20 @@ export default function Layout({
             <Separator className="my-6" />
             <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
               <p className="text-sm text-muted-foreground">
-                © {new Date().getFullYear()} Jambo. All rights reserved.
+                © {new Date().getFullYear()} Jambo. {t('all_rights_reserved')}
               </p>
               <div className="flex items-center space-x-6">
                 <Link 
                   href={`${localePath}/privacy`} 
                   className="text-sm text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Privacy Policy
+                  {t('privacy_policy')}
                 </Link>
                 <Link 
                   href={`${localePath}/terms`} 
                   className="text-sm text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Terms of Service
+                  {t('terms_of_service')}
                 </Link>
               </div>
             </div>

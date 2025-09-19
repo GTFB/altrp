@@ -43,7 +43,13 @@
     "contact": "اتصل بنا",
     "admin": "الإدارة",
     "tags": "العلامات",
-    "categories": "الفئات"
+    "categories": "الفئات",
+    "privacy_policy": "سياسة الخصوصية",
+    "terms_of_service": "شروط الخدمة",
+    "all_rights_reserved": "جميع الحقوق محفوظة",
+    "navigation": "التنقل",
+    "page": "صفحة",
+    "discover_amazing_content_organized_by_tags_and_categories": "اكتشف محتوى رائع منظم بواسطة العلامات والفئات"
   },
   "auth": {
     "protectedContent": "محتوى محمي",

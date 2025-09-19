@@ -53,7 +53,13 @@
     "tags": "Теги",
     "categories": "Категории",
     "platform": "Платформа",
-    "toggle": "Переключить"
+    "toggle": "Переключить",
+    "privacy_policy": "Политика конфиденциальности",
+    "terms_of_service": "Условия использования",
+    "all_rights_reserved": "Все права защищены",
+    "navigation": "Навигация",
+    "page": "Страница",
+    "discover_amazing_content_organized_by_tags_and_categories": "Откройте удивительный контент, организованный по тегам и категориям"
   },
   "header": {
     "logoTitle": "tweakcn",
@@ -212,7 +218,10 @@
   "search": {
     "nothingFound": "Ничего не найдено",
     "tryDifferentKeywords": "Попробуйте другие ключевые слова",
-    "noHeadings": "Нет заголовков"
+    "noHeadings": "Нет заголовков",
+    "popupSearch": "Поиск в диалоге",
+    "searchResults": "Результаты поиска",
+    "searchInContent": "Поиск в содержимом"
   },
   "passwordGroups": {
     "title": "Конфигурация групп паролей",

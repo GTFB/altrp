@@ -5,7 +5,7 @@ import { PostCard } from '@/components/features/blog/PostCard/PostCard';
 import { Button } from '@/components/ui/button';
 import { Loader2, ArrowRight, Tag } from 'lucide-react';
 import Link from 'next/link';
-import { useLocale } from '@/hooks/use-locale';
+import { useLocale } from 'next-intl';
 
 interface CategorySectionProps {
   category: string;
@@ -32,7 +32,8 @@ export function CategoryPostsSection({
   sortBy = 'date',
   sortOrder = 'desc'
 }: CategorySectionProps) {
-  const {locale} = useLocale();
+    const locale = useLocale() === 'en' ? '' : useLocale();
+  const localePath = locale !== '' ? `/${locale}` : '';
   
   // Generate title and description if not provided
   const sectionTitle = title || `Posts in "${category}" category`;

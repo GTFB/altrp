@@ -5,7 +5,7 @@ import { AuthorCard } from '@/components/AuthorCard/AuthorCard';
 import { Button } from '@/components/ui/button';
 import { Loader2, ArrowRight, Users } from 'lucide-react';
 import Link from 'next/link';
-import { useLocale } from '@/hooks/use-locale';
+import { useLocale } from 'next-intl';
 import { useEffect, useState } from 'react';
 
 interface AuthorSectionProps {
@@ -21,7 +21,8 @@ export function AuthorPostsSection({
   title = "Our Authors",
   description = "Meet the talented writers behind our content"
 }: AuthorSectionProps) {
-  const {locale} = useLocale();
+    const locale = useLocale() === 'en' ? '' : useLocale();
+  const localePath = locale !== '' ? `/${locale}` : '';
   const [authors, setAuthors] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

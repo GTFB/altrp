@@ -1,9 +1,11 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
+import Fuse from 'fuse.js';
 import { parseMarkdown } from '@/lib/markdown';
 import { frontmatterSchema, type Frontmatter } from '@/lib/validators/content.schema';
 import { getContentDir } from '@/lib/content-path';
+import { BaseSearchableRepository, SearchResult, SearchOptions } from './base.repository';
 
 export interface Post {
   slug: string;
@@ -50,7 +52,7 @@ export interface PaginatedResult<T> {
   };
 }
 
-export class PostRepository {
+export class PostRepository implements BaseSearchableRepository<Post> {
   private static instance: PostRepository | null = null;
   private contentDir = getContentDir('blog');
 
@@ -330,6 +332,39 @@ export class PostRepository {
         .sort((a, b) => b.count - a.count);
     } catch (error) {
       console.error('Error reading tags:', error);
+      return [];
+    }
+  }
+
+  async search(query: string, options: SearchOptions = {}): Promise<SearchResult<Post>[]> {
+    try {
+      const posts = await this.findAll();
+      
+      if (!query.trim()) {
+        return posts.map(post => ({ item: post, score: 1 }));
+      }
+
+      const fuse = new Fuse(posts, {
+        includeScore: true,
+        includeMatches: true,
+        threshold: options.threshold || 0.35,
+        keys: [
+          { name: 'title', weight: 0.4 },
+          { name: 'description', weight: 0.3 },
+          { name: 'excerpt', weight: 0.2 },
+          { name: 'tags', weight: 0.1 },
+        ],
+      });
+
+      const results = fuse.search(query, { limit: options.limit || 10 });
+
+      return results.map(result => ({
+        item: result.item,
+        score: result.score,
+        matches: result.matches?.map(match => match.value || '') || [],
+      }));
+    } catch (error) {
+      console.error('Error searching posts:', error);
       return [];
     }
   }

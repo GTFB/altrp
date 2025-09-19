@@ -5,7 +5,7 @@ import { CategoryCard } from '@/components/CategoryCard/CategoryCard';
 import { Button } from '@/components/ui/button';
 import { Loader2, ArrowRight, Tag } from 'lucide-react';
 import Link from 'next/link';
-import { useLocale } from '@/hooks/use-locale';
+import { useLocale } from 'next-intl';
 import { useEffect, useState } from 'react';
 
 interface CategorySectionProps {
@@ -21,7 +21,8 @@ export function CategorySection({
   title = "Categories",
   description = "Explore our content organized by topics"
 }: CategorySectionProps) {
-  const {locale} = useLocale();
+    const locale = useLocale() === 'en' ? '' : useLocale();
+  const localePath = locale !== '' ? `/${locale}` : '';
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

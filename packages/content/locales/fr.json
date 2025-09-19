@@ -52,7 +52,13 @@
     "contact": "Contact",
     "admin": "Administration",
     "tags": "Tags",
-    "categories": "Catégories"
+    "categories": "Catégories",
+    "privacy_policy": "Politique de Confidentialité",
+    "terms_of_service": "Conditions d'utilisation",
+    "all_rights_reserved": "Tous droits réservés",
+    "navigation": "Navigation",
+    "page": "Page",
+    "discover_amazing_content_organized_by_tags_and_categories": "Découvrez un contenu incroyable organisé par tags et catégories"
   },
   "auth": {
     "protectedContent": "Contenu protégé",

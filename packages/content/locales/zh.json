@@ -43,7 +43,13 @@
     "contact": "联系我们",
     "admin": "管理",
     "tags": "标签",
-    "categories": "分类"
+    "categories": "分类",
+    "privacy_policy": "隐私政策",
+    "terms_of_service": "服务条款",
+    "all_rights_reserved": "版权所有",
+    "navigation": "导航",
+    "page": "页面",
+    "discover_amazing_content_organized_by_tags_and_categories": "发现按标签和类别组织的精彩内容"
   },
   "auth": {
     "protectedContent": "受保护的内容",

@@ -27,7 +27,6 @@ export async function GET(request: NextRequest) {
         order: sortOrder,
       }
     );
-    console.log(posts);
 
     // Apply limit
     const limitedPosts = posts.slice(0, limit);

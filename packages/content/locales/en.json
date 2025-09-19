@@ -55,7 +55,13 @@
     "tags": "Tags",
     "categories": "Categories",
     "platform": "Platform",
-    "toggle": "Toggle"
+    "toggle": "Toggle",
+    "privacy_policy": "Privacy Policy",
+    "terms_of_service": "Terms of Service",
+    "all_rights_reserved": "All rights reserved",
+    "navigation": "Navigation",
+    "page": "Page",
+    "discover_amazing_content_organized_by_tags_and_categories": "Discover amazing content organized by tags and categories"
   },
   "header": {
     "logoTitle": "tweakcn",
@@ -214,7 +220,10 @@
   "search": {
     "nothingFound": "Nothing found",
     "tryDifferentKeywords": "Try different keywords",
-    "noHeadings": "No headings"
+    "noHeadings": "No headings",
+    "popupSearch": "Popup Search",
+    "searchResults": "Search Results",
+    "searchInContent": "Search in content"
   },
   "passwordGroups": {
     "title": "Password Groups Configuration",

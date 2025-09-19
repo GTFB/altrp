@@ -43,7 +43,13 @@
     "contact": "お問い合わせ",
     "admin": "管理",
     "tags": "タグ",
-    "categories": "カテゴリ"
+    "categories": "カテゴリ",
+    "privacy_policy": "プライバシーポリシー",
+    "terms_of_service": "利用規約",
+    "all_rights_reserved": "無断転載禁止",
+    "navigation": "ナビゲーション",
+    "page": "ページ",
+    "discover_amazing_content_organized_by_tags_and_categories": "タグとカテゴリーで整理された素晴らしいコンテンツを発見してください"
   },
   "auth": {
     "protectedContent": "保護されたコンテンツ",

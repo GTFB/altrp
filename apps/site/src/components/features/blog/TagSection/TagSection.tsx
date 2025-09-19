@@ -5,7 +5,7 @@ import { PostCard } from '@/components/features/blog/PostCard/PostCard';
 import { Button } from '@/components/ui/button';
 import { Loader2, ArrowRight, Hash } from 'lucide-react';
 import Link from 'next/link';
-import { useLocale } from '@/hooks/use-locale';
+import { useLocale } from 'next-intl';
 
 interface TagSectionProps {
   tags: string[];
@@ -32,7 +32,8 @@ export function TagSection({
   sortBy = 'date',
   sortOrder = 'desc'
 }: TagSectionProps) {
-  const {locale} = useLocale();
+    const locale = useLocale() === 'en' ? '' : useLocale();
+  const localePath = locale !== '' ? `/${locale}` : '';
   
   // Generate title and description if not provided
   const tagsText = tags.join(', ');
