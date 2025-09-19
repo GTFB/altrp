@@ -21,7 +21,9 @@ import {
 
 export default function CheckboxComponentsPage() {
   const t = useTranslations('demo.checkbox');
-  const locale = useLocale();
+  
+  const locale = useLocale() !== 'en' ? useLocale() : '';
+  const localePath = locale !== '' ? `/${locale}` : '';
   const demoSections = [
     {
       title: t('variants.withText.title'),
@@ -91,7 +93,7 @@ export default function CheckboxComponentsPage() {
         title={t('title')}
         description=""
         showBackButton={true}
-        backHref={`/${locale}/components`}
+        backHref={`${localePath}/components`}
         badges={[]}
       />
       

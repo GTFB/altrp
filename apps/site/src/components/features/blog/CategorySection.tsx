@@ -113,7 +113,7 @@ export function CategorySection({
       {showViewAll && (
         <div className="text-center">
           <Button asChild variant="outline" size="lg">
-            <Link href={`/${locale}/categories`}>
+            <Link href={`${localePath}/categories`}>
               View All Categories
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>

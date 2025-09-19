@@ -122,7 +122,7 @@ export function TagSection({
       {showViewAll && (
         <div className="text-center">
           <Button asChild variant="outline" size="lg">
-            <Link href={`/${locale}/blog?tags=${encodeURIComponent(tags.join(','))}`}>
+            <Link href={`${localePath}/blog?tags=${encodeURIComponent(tags.join(','))}`}>
               View All Posts with Tags
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>

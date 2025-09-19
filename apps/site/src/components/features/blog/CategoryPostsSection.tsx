@@ -121,7 +121,7 @@ export function CategoryPostsSection({
       {showViewAll && (
         <div className="text-center">
           <Button asChild variant="outline" size="lg">
-            <Link href={`/${locale}/blog?category=${encodeURIComponent(category)}`}>
+            <Link href={`${localePath}/blog?category=${encodeURIComponent(category)}`}>
               View All Posts in Category
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>

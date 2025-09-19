@@ -45,6 +45,13 @@
     "demo": "Демо",
     "group1SectionA": "Группа 1 - Раздел A",
     "group2SectionD": "Группа 2 - Раздел D",
+    "home": "Главная",
+    "blog": "Блог",
+    "about": "О нас",
+    "contact": "Контакты",
+    "admin": "Админ",
+    "tags": "Теги",
+    "categories": "Категории",
     "platform": "Платформа",
     "toggle": "Переключить"
   },
@@ -1169,5 +1176,42 @@
     "dark": "Темная",
     "sectionOf": "Раздел {current} из {total}",
     "home": "Главная"
+  },
+  "blog": {
+    "blog": "Блог",
+    "title": "Блог",
+    "description": "Последние статьи и обновления",
+    "readMore": "Читать далее",
+    "publishedOn": "Опубликовано",
+    "author": "Автор",
+    "tags": "Теги",
+    "noPostsFound": "Статьи не найдены",
+    "backToBlog": "Вернуться к блогу"
+  },
+  "tags": {
+    "title": "Теги",
+    "description": "Откройте наш контент, организованный по тегам и ключевым словам",
+    "noTagsFound": "Теги не найдены",
+    "articlesCount": "статей",
+    "articleCount": "статья",
+    "taggedWith": "Статьи с тегом",
+    "noPostsInTag": "В этом теге пока нет статей",
+    "tags": "Теги",
+    "discover_our_content_organized_by_tags_and_keywords": "Откройте наш контент, организованный по тегам и ключевым словам",
+    "tagged_with_this_keyword": "Статьи с этим ключевым словом",
+    "articles_tagged_with": "Статьи с тегом"
+  },
+  "categories": {
+    "title": "Категории",
+    "description": "Откройте наш контент, организованный по категориям",
+    "noCategoriesFound": "Категории не найдены",
+    "articlesCount": "статей",
+    "articleCount": "статья",
+    "categorizedIn": "Статьи в категории",
+    "noPostsInCategory": "В этой категории пока нет статей"
+  },
+  "category": {
+    "posts_in": "Посты в",
+    "no_posts_found_in_this_category_yet": "В этой категории пока нет постов"
   }
 }

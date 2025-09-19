@@ -20,7 +20,9 @@ import AccordionDisabledDemo from "@/components/widgets/accordion/accordion-disa
 
 export default function AccordionPage() {
   const t = useTranslations('accordion');
-  const locale = useLocale();
+  
+  const locale = useLocale() !== 'en' ? useLocale() : '';
+  const localePath = locale !== '' ? `/${locale}` : '';
   const demoSections = [
     {
       title: t('variants.default.title'),
@@ -90,7 +92,7 @@ export default function AccordionPage() {
         title={t('title')}
         description=""
         showBackButton={true}
-        backHref={`/${locale}/components`}  
+        backHref={`${localePath}/components`}  
         badges={[]}
       />
       

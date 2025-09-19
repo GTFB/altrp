@@ -12,7 +12,8 @@ export function useLocale() {
     const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}(\/|$)/, '/');
     const newPath = `/${newLocale}${pathWithoutLocale === '/' ? '' : pathWithoutLocale}`;
 
-    router.push(newPath);
+    //router.push(newPath);
+    window.location.href = newPath;
   }, [pathname, router]);
   
   return { locale, setLocale };

@@ -2,7 +2,7 @@
 
 import { type Post } from '@/repositories/post.repository';
 import Link from 'next/link';
-import { useLocale } from '@/hooks/use-locale';
+import { useLocale } from 'next-intl';
 import { PostTags } from '@/components/features/blog/PostTags';
 import { PostMeta } from '@/components/features/blog/PostMeta';
 
@@ -11,13 +11,14 @@ interface PostCardProps {
 }
 
 export function PostCard({ post }: PostCardProps) {
-  const {locale} = useLocale();
+  const locale = useLocale() !== 'en' ? useLocale() : '';
+  const localePath = locale !== '' ? `/${locale}` : '';
 
   return (
     <article className="border rounded-lg p-6 hover:shadow-md transition-shadow">
       <header className="mb-4">
         <h2 className="text-xl font-semibold mb-2">
-          <Link href={`/${locale}/blog/${post.slug}`} className="hover:text-primary">
+          <Link href={`${localePath}/blog/${post.slug}`} className="hover:text-primary">
             {post.title}
           </Link>
         </h2>

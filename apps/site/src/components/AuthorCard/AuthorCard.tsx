@@ -26,7 +26,7 @@ export function AuthorCard({ author }: AuthorCardProps) {
           </Avatar>
         </div>
         <CardTitle className="text-xl">
-          <Link href={`/${locale}/authors/${author.slug}`} className="hover:text-primary">
+          <Link href={`${localePath}/authors/${author.slug}`} className="hover:text-primary">
             {author.name}
           </Link>
         </CardTitle>
@@ -38,7 +38,7 @@ export function AuthorCard({ author }: AuthorCardProps) {
       </CardHeader>
       <CardContent className="text-center">
         <Link 
-          href={`/${locale}/authors/${author.slug}`}
+          href={`${localePath}/authors/${author.slug}`}
           className="text-sm text-muted-foreground hover:text-primary"
         >
           View posts by {author.name}

@@ -36,7 +36,14 @@
     "settings": "设置",
     "demo": "演示",
     "group1SectionA": "组1 - 部分A",
-    "group2SectionD": "组2 - 部分D"
+    "group2SectionD": "组2 - 部分D",
+    "home": "首页",
+    "blog": "博客",
+    "about": "关于",
+    "contact": "联系我们",
+    "admin": "管理",
+    "tags": "标签",
+    "categories": "分类"
   },
   "auth": {
     "protectedContent": "受保护的内容",
@@ -132,5 +139,42 @@
       "title": "如何使用",
       "description": "选择上面的组件类别以查看所有可用选项、代码示例和交互式演示。每个组件都包含详细的文档和使用示例。"
     }
+  },
+  "blog": {
+    "blog": "博客",
+    "title": "博客",
+    "description": "最新文章和更新",
+    "readMore": "阅读更多",
+    "publishedOn": "发布于",
+    "author": "作者",
+    "tags": "标签",
+    "noPostsFound": "未找到文章",
+    "backToBlog": "返回博客"
+  },
+  "tags": {
+    "title": "标签",
+    "description": "通过标签和关键词探索我们的内容",
+    "noTagsFound": "未找到标签",
+    "articlesCount": "篇文章",
+    "articleCount": "篇文章",
+    "taggedWith": "标记为",
+    "noPostsInTag": "此标签下暂无文章",
+    "tags": "标签",
+    "discover_our_content_organized_by_tags_and_keywords": "通过标签和关键词探索我们的内容",
+    "tagged_with_this_keyword": "标记为此关键词的文章",
+    "articles_tagged_with": "标记为"
+  },
+  "categories": {
+    "title": "分类",
+    "description": "通过分类探索我们的内容",
+    "noCategoriesFound": "未找到分类",
+    "articlesCount": "篇文章",
+    "articleCount": "篇文章",
+    "categorizedIn": "分类中的文章",
+    "noPostsInCategory": "此分类下暂无文章"
+  },
+  "category": {
+    "posts_in": "分类中的文章",
+    "no_posts_found_in_this_category_yet": "此分类下暂无文章"
   }
 }

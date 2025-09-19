@@ -19,7 +19,9 @@ import {
 
 export default function BadgePage() {
   const t = useTranslations('demo.badge');
-  const locale = useLocale();
+  
+  const locale = useLocale() !== 'en' ? useLocale() : '';
+  const localePath = locale !== '' ? `/${locale}` : '';
   const demoSections = [
     {
       title: t('variants.default.title'),
@@ -79,7 +81,7 @@ export default function BadgePage() {
         title={t('title')}
         description=""
         showBackButton={true}
-        backHref={`/${locale}/components`}  
+        backHref={`${localePath}/components`}  
         badges={[]}
       />
       

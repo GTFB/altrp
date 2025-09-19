@@ -36,7 +36,14 @@
     "settings": "الإعدادات",
     "demo": "عرض توضيحي",
     "group1SectionA": "المجموعة 1 - القسم أ",
-    "group2SectionD": "المجموعة 2 - القسم د"
+    "group2SectionD": "المجموعة 2 - القسم د",
+    "home": "الرئيسية",
+    "blog": "المدونة",
+    "about": "حول",
+    "contact": "اتصل بنا",
+    "admin": "الإدارة",
+    "tags": "العلامات",
+    "categories": "الفئات"
   },
   "auth": {
     "protectedContent": "محتوى محمي",
@@ -132,5 +139,42 @@
       "title": "كيفية الاستخدام",
       "description": "اختر فئة مكون أعلاه لعرض جميع الخيارات المتاحة وأمثلة الكود والعروض التفاعلية. يتضمن كل مكون توثيقاً مفصلاً وأمثلة استخدام."
     }
+  },
+  "blog": {
+    "blog": "المدونة",
+    "title": "المدونة",
+    "description": "أحدث المقالات والتحديثات",
+    "readMore": "اقرأ المزيد",
+    "publishedOn": "نُشر في",
+    "author": "المؤلف",
+    "tags": "العلامات",
+    "noPostsFound": "لم يتم العثور على مقالات",
+    "backToBlog": "العودة إلى المدونة"
+  },
+  "tags": {
+    "title": "العلامات",
+    "description": "اكتشف محتوانا المنظم حسب العلامات والكلمات المفتاحية",
+    "noTagsFound": "لم يتم العثور على علامات",
+    "articlesCount": "مقالات",
+    "articleCount": "مقال",
+    "taggedWith": "المقالات المميزة بـ",
+    "noPostsInTag": "لا توجد مقالات في هذه العلامة بعد",
+    "tags": "العلامات",
+    "discover_our_content_organized_by_tags_and_keywords": "اكتشف محتوانا المنظم حسب العلامات والكلمات المفتاحية",
+    "tagged_with_this_keyword": "المقالات المميزة بهذه الكلمة المفتاحية",
+    "articles_tagged_with": "المقالات المميزة بـ"
+  },
+  "categories": {
+    "title": "الفئات",
+    "description": "اكتشف محتوانا المنظم حسب الفئات",
+    "noCategoriesFound": "لم يتم العثور على فئات",
+    "articlesCount": "مقالات",
+    "articleCount": "مقال",
+    "categorizedIn": "المقالات في الفئة",
+    "noPostsInCategory": "لا توجد مقالات في هذه الفئة بعد"
+  },
+  "category": {
+    "posts_in": "المقالات في",
+    "no_posts_found_in_this_category_yet": "لا توجد مقالات في هذه الفئة بعد"
   }
 }

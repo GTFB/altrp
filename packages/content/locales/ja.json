@@ -36,7 +36,14 @@
     "settings": "設定",
     "demo": "デモ",
     "group1SectionA": "グループ1 - セクションA",
-    "group2SectionD": "グループ2 - セクションD"
+    "group2SectionD": "グループ2 - セクションD",
+    "home": "ホーム",
+    "blog": "ブログ",
+    "about": "私たちについて",
+    "contact": "お問い合わせ",
+    "admin": "管理",
+    "tags": "タグ",
+    "categories": "カテゴリ"
   },
   "auth": {
     "protectedContent": "保護されたコンテンツ",
@@ -132,5 +139,42 @@
       "title": "使い方",
       "description": "上記のコンポーネントカテゴリを選択して、利用可能なすべてのオプション、コード例、インタラクティブなデモンストレーションを表示してください。各コンポーネントには詳細なドキュメントと使用例が含まれています。"
     }
+  },
+  "blog": {
+    "blog": "ブログ",
+    "title": "ブログ",
+    "description": "最新の記事とアップデート",
+    "readMore": "続きを読む",
+    "publishedOn": "公開日",
+    "author": "著者",
+    "tags": "タグ",
+    "noPostsFound": "投稿が見つかりません",
+    "backToBlog": "ブログに戻る"
+  },
+  "tags": {
+    "title": "タグ",
+    "description": "タグとキーワードで整理されたコンテンツを発見",
+    "noTagsFound": "タグが見つかりません",
+    "articlesCount": "記事",
+    "articleCount": "記事",
+    "taggedWith": "タグ付けされた記事",
+    "noPostsInTag": "このタグにはまだ投稿がありません",
+    "tags": "タグ",
+    "discover_our_content_organized_by_tags_and_keywords": "タグとキーワードで整理されたコンテンツを発見",
+    "tagged_with_this_keyword": "このキーワードでタグ付けされた記事",
+    "articles_tagged_with": "タグ付けされた記事"
+  },
+  "categories": {
+    "title": "カテゴリ",
+    "description": "カテゴリで整理されたコンテンツを発見",
+    "noCategoriesFound": "カテゴリが見つかりません",
+    "articlesCount": "記事",
+    "articleCount": "記事",
+    "categorizedIn": "カテゴリの記事",
+    "noPostsInCategory": "このカテゴリにはまだ投稿がありません"
+  },
+  "category": {
+    "posts_in": "カテゴリの記事",
+    "no_posts_found_in_this_category_yet": "このカテゴリにはまだ投稿がありません"
   }
 }

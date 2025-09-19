@@ -20,7 +20,9 @@ import {
 
 export default function CarouselPage() {
   const t = useTranslations('demo.carousel');
-  const locale = useLocale();
+  
+  const locale = useLocale() !== 'en' ? useLocale() : '';
+  const localePath = locale !== '' ? `/${locale}` : '';
   const demoSections = [
     {
       title: t('variants.default.title'),
@@ -85,7 +87,7 @@ export default function CarouselPage() {
         title={t('title')}
         description={t('description')}
         showBackButton={true}
-        backHref={`/${locale}/components`}  
+        backHref={`${localePath}/components`}  
         badges={[]}
       />
       

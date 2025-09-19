@@ -45,7 +45,14 @@
     "settings": "Paramètres",
     "demo": "Démo",
     "group1SectionA": "Groupe 1 - Section A",
-    "group2SectionD": "Groupe 2 - Section D"
+    "group2SectionD": "Groupe 2 - Section D",
+    "home": "Accueil",
+    "blog": "Blog",
+    "about": "À propos",
+    "contact": "Contact",
+    "admin": "Administration",
+    "tags": "Tags",
+    "categories": "Catégories"
   },
   "auth": {
     "protectedContent": "Contenu protégé",
@@ -141,5 +148,42 @@
       "title": "Comment utiliser",
       "description": "Sélectionnez une catégorie de composant ci-dessus pour voir toutes les options disponibles, exemples de code et démonstrations interactives. Chaque composant inclut une documentation détaillée et des exemples d'utilisation."
     }
+  },
+  "blog": {
+    "blog": "Blog",
+    "title": "Blog",
+    "description": "Derniers articles et mises à jour",
+    "readMore": "Lire la suite",
+    "publishedOn": "Publié le",
+    "author": "Auteur",
+    "tags": "Tags",
+    "noPostsFound": "Aucun article trouvé",
+    "backToBlog": "Retour au blog"
+  },
+  "tags": {
+    "title": "Tags",
+    "description": "Découvrez notre contenu organisé par tags et mots-clés",
+    "noTagsFound": "Aucun tag trouvé",
+    "articlesCount": "articles",
+    "articleCount": "article",
+    "taggedWith": "Articles tagués avec",
+    "noPostsInTag": "Aucun article trouvé dans ce tag pour le moment",
+    "tags": "Tags",
+    "discover_our_content_organized_by_tags_and_keywords": "Découvrez notre contenu organisé par tags et mots-clés",
+    "tagged_with_this_keyword": "Articles tagués avec ce mot-clé",
+    "articles_tagged_with": "Articles tagués avec"
+  },
+  "categories": {
+    "title": "Catégories",
+    "description": "Découvrez notre contenu organisé par catégories",
+    "noCategoriesFound": "Aucune catégorie trouvée",
+    "articlesCount": "articles",
+    "articleCount": "article",
+    "categorizedIn": "Articles dans la catégorie",
+    "noPostsInCategory": "Aucun article trouvé dans cette catégorie pour le moment"
+  },
+  "category": {
+    "posts_in": "Articles dans",
+    "no_posts_found_in_this_category_yet": "Aucun article trouvé dans cette catégorie pour le moment"
   }
 }

@@ -2,9 +2,10 @@ import { CategoryRepository } from '@/repositories/category.repository';
 import { PostRepository } from '@/repositories/post.repository';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
-import { CategoryCard } from '@/components/CategoryCard/CategoryCard';
 import { Badge } from '@/components/ui/badge';
 import { Tag } from 'lucide-react';
+import { PostCard } from '@/components/features/blog/PostCard/PostCard';
+import { useTranslations } from 'next-intl';
 
 export const dynamic = 'force-dynamic';
 
@@ -52,7 +53,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const categoryRepo = CategoryRepository.getInstance();
   const category = await categoryRepo.findBySlug(params.slug);
-
+  const t = useTranslations('category');  
   if (!category) {
     notFound();
   }
@@ -95,49 +96,18 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       {/* Category's Posts */}
       <div className="mb-8">
         <h2 className="text-3xl font-bold mb-6 text-center">
-          Posts in {category.title}
+          {t('posts_in')} {category.title}
         </h2>
         {posts.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground">
-              No posts found in this category yet.
+              {t('no_posts_found_in_this_category_yet')}
             </p>
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {posts.map((post) => (
-              <div key={post.slug} className="border rounded-lg p-6 hover:shadow-md transition-shadow">
-                <header className="mb-4">
-                  <h3 className="text-xl font-semibold mb-2">
-                    <a href={`/${params.locale}/blog/${post.slug}`} className="hover:text-primary">
-                      {post.title}
-                    </a>
-                  </h3>
-                  <div className="text-sm text-muted-foreground mb-2">
-                    {post.date && new Date(post.date).toLocaleDateString()}
-                    {post.author && ` • by ${post.author}`}
-                  </div>
-                </header>
-                
-                {post.excerpt && (
-                  <p className="text-muted-foreground mb-4 line-clamp-3">
-                    {post.excerpt}
-                  </p>
-                )}
-                
-                {post.tags && post.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {post.tags.map((tag) => (
-                      <span 
-                        key={tag}
-                        className="px-2 py-1 bg-secondary text-secondary-foreground text-xs rounded"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <PostCard key={post.slug} post={post} />
             ))}
           </div>
         )}

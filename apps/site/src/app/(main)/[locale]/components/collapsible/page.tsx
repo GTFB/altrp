@@ -13,7 +13,9 @@ import {
 
 export default function CollapsibleComponentsPage() {
   const t = useTranslations('demo.collapsible');
-  const locale = useLocale();
+  
+  const locale = useLocale() !== 'en' ? useLocale() : '';
+  const localePath = locale !== '' ? `/${locale}` : '';
   const demoSections = [
     {
       title: t('variants.default.title'),
@@ -43,7 +45,7 @@ export default function CollapsibleComponentsPage() {
         title={t('title')}
         description=""
         showBackButton={true}
-        backHref={`/${locale}/components`}
+        backHref={`${localePath}/components`}
         badges={[]}
       />
       

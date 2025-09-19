@@ -308,6 +308,32 @@ export class PostRepository {
     return this.findWithFilters({ author });
   }
 
+  async findByTag(tag: string): Promise<Post[]> {
+    return this.findWithFilters({ tags: [tag] });
+  }
+
+  async findAllTags(): Promise<Array<{ tag: string; count: number }>> {
+    try {
+      const posts = await this.findAll();
+      const tagCounts = new Map<string, number>();
+      
+      posts.forEach(post => {
+        if (post.tags) {
+          post.tags.forEach(tag => {
+            tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
+          });
+        }
+      });
+      
+      return Array.from(tagCounts.entries())
+        .map(([tag, count]) => ({ tag, count }))
+        .sort((a, b) => b.count - a.count);
+    } catch (error) {
+      console.error('Error reading tags:', error);
+      return [];
+    }
+  }
+
   async createPost(postData: Omit<Post, 'slug'> & { slug: string }): Promise<Post | null> {
     try {
       const { slug, ...frontmatterData } = postData;

@@ -17,7 +17,9 @@ import AlertDialogAnimatedDemo from "@/components/widgets/alert-dialog/alert-dia
 
 export default function AlertDialogPage() {
   const t = useTranslations('alertDialog');
-  const locale = useLocale();
+  
+  const locale = useLocale() !== 'en' ? useLocale() : '';
+  const localePath = locale !== '' ? `/${locale}` : '';
   const demoSections = [
     {
       title: t('variants.default.title'),
@@ -77,7 +79,7 @@ export default function AlertDialogPage() {
         title={t('title')}
         description=""
         showBackButton={true}
-        backHref={`/${locale}/components`}  
+        backHref={`${localePath}/components`}  
         badges={[]}
       />
       

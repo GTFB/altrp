@@ -10,6 +10,15 @@ import {
   LucideIcon
 } from 'lucide-react'
 
+// Layout configuration
+export const LAYOUT_CONFIG = {
+  containerMaxWidth: '1440px',
+  containerWidthClass: 'max-w-7xl', // Tailwind equivalent
+  containerPadding: 'px-4',
+  mobilePadding: 'px-4',
+  desktopPadding: 'px-8',
+} as const;
+
 // Map of icon names to Lucide React components
 const ICON_MAP: Record<string, LucideIcon> = {
   'FileText': FileText,
@@ -38,7 +47,6 @@ export const PROJECT_SETTINGS = {
   defaultLanguage: 'en',
   defaultTheme: 'light',
   supportedThemes: ['light', 'dark',],
-  mobilePadding: 'px-4',
 } as const;
 
 // Language configuration (ordered by popularity)

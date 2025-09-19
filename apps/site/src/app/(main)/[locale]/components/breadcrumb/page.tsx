@@ -24,7 +24,9 @@ import {
 
 export default function BreadcrumbPage() {
   const t = useTranslations('demo.breadcrumb');
-  const locale = useLocale();
+  
+  const locale = useLocale() !== 'en' ? useLocale() : '';
+  const localePath = locale !== '' ? `/${locale}` : '';
   const demoSections = [
     {
       title: t('variants.default.title'),
@@ -109,7 +111,7 @@ export default function BreadcrumbPage() {
         title={t('title')}
         description={t('description')}
         showBackButton={true}
-        backHref={`/${locale}/components`}
+        backHref={`${localePath}/components`}
         badges={[]}
       />
       

@@ -11,7 +11,7 @@ import {
 import { Globe } from 'lucide-react'
 import { useLocale } from '@/hooks/use-locale'
 import { US, RU, ES, FR, DE, IT, PT, JP, KR, CN, SA, IN } from 'country-flag-icons/react/3x2'
-import { LANGUAGES } from '../../../settings'
+import { LANGUAGES } from '@/settings'
 
 // Map language codes to flag components
 const FLAG_MAP = {
@@ -60,6 +60,7 @@ export function LanguageSwitcher({
 
   const handleLanguageChange = (newLocale: string) => {
     setLocale(newLocale)
+   
   }
 
   const sizeClasses = {

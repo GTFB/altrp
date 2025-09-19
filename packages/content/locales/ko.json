@@ -36,7 +36,14 @@
     "settings": "설정",
     "demo": "데모",
     "group1SectionA": "그룹 1 - 섹션 A",
-    "group2SectionD": "그룹 2 - 섹션 D"
+    "group2SectionD": "그룹 2 - 섹션 D",
+    "home": "홈",
+    "blog": "블로그",
+    "about": "소개",
+    "contact": "연락처",
+    "admin": "관리자",
+    "tags": "태그",
+    "categories": "카테고리"
   },
   "auth": {
     "protectedContent": "보호된 콘텐츠",
@@ -132,5 +139,42 @@
       "title": "사용 방법",
       "description": "위의 컴포넌트 카테고리를 선택하여 사용 가능한 모든 옵션, 코드 예제, 상호작용 데모를 확인하세요. 각 컴포넌트에는 자세한 문서와 사용 예제가 포함되어 있습니다."
     }
+  },
+  "blog": {
+    "blog": "블로그",
+    "title": "블로그",
+    "description": "최신 기사 및 업데이트",
+    "readMore": "더 읽기",
+    "publishedOn": "게시일",
+    "author": "작성자",
+    "tags": "태그",
+    "noPostsFound": "게시물을 찾을 수 없습니다",
+    "backToBlog": "블로그로 돌아가기"
+  },
+  "tags": {
+    "title": "태그",
+    "description": "태그와 키워드로 구성된 콘텐츠 탐색",
+    "noTagsFound": "태그를 찾을 수 없습니다",
+    "articlesCount": "기사",
+    "articleCount": "기사",
+    "taggedWith": "태그된 기사",
+    "noPostsInTag": "이 태그에는 아직 게시물이 없습니다",
+    "tags": "태그",
+    "discover_our_content_organized_by_tags_and_keywords": "태그와 키워드로 구성된 콘텐츠 탐색",
+    "tagged_with_this_keyword": "이 키워드로 태그된 기사",
+    "articles_tagged_with": "태그된 기사"
+  },
+  "categories": {
+    "title": "카테고리",
+    "description": "카테고리로 구성된 콘텐츠 탐색",
+    "noCategoriesFound": "카테고리를 찾을 수 없습니다",
+    "articlesCount": "기사",
+    "articleCount": "기사",
+    "categorizedIn": "카테고리의 기사",
+    "noPostsInCategory": "이 카테고리에는 아직 게시물이 없습니다"
+  },
+  "category": {
+    "posts_in": "카테고리의 기사",
+    "no_posts_found_in_this_category_yet": "이 카테고리에는 아직 게시물이 없습니다"
   }
 }

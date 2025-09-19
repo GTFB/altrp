@@ -12,7 +12,7 @@ export default withAuth(
   async function middleware(req,res) {
     const excludedPaths = ['/api', '/admin', '/images', '/.well-known', '/login'];
     const pathname = req.nextUrl.pathname;
-    
+    req.headers.set('x-pathname', pathname);
     const shouldExclude = excludedPaths.some(path => pathname.startsWith(path));
     
     if (shouldExclude) {

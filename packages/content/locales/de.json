@@ -45,7 +45,14 @@
     "settings": "Einstellungen",
     "demo": "Demo",
     "group1SectionA": "Gruppe 1 - Abschnitt A",
-    "group2SectionD": "Gruppe 2 - Abschnitt D"
+    "group2SectionD": "Gruppe 2 - Abschnitt D",
+    "home": "Startseite",
+    "blog": "Blog",
+    "about": "Über uns",
+    "contact": "Kontakt",
+    "admin": "Administration",
+    "tags": "Tags",
+    "categories": "Kategorien"
   },
   "auth": {
     "protectedContent": "Geschützter Inhalt",
@@ -141,5 +148,42 @@
       "title": "Verwendung",
       "description": "Wählen Sie oben eine Komponentenkategorie aus, um alle verfügbaren Optionen, Code-Beispiele und interaktive Demonstrationen anzuzeigen. Jede Komponente enthält detaillierte Dokumentation und Verwendungsbeispiele."
     }
+  },
+  "blog": {
+    "blog": "Blog",
+    "title": "Blog",
+    "description": "Neueste Artikel und Updates",
+    "readMore": "Weiterlesen",
+    "publishedOn": "Veröffentlicht am",
+    "author": "Autor",
+    "tags": "Tags",
+    "noPostsFound": "Keine Beiträge gefunden",
+    "backToBlog": "Zurück zum Blog"
+  },
+  "tags": {
+    "title": "Tags",
+    "description": "Entdecken Sie unseren Inhalt organisiert nach Tags und Schlüsselwörtern",
+    "noTagsFound": "Keine Tags gefunden",
+    "articlesCount": "Artikel",
+    "articleCount": "Artikel",
+    "taggedWith": "Artikel markiert mit",
+    "noPostsInTag": "Noch keine Beiträge in diesem Tag gefunden",
+    "tags": "Tags",
+    "discover_our_content_organized_by_tags_and_keywords": "Entdecken Sie unseren Inhalt organisiert nach Tags und Schlüsselwörtern",
+    "tagged_with_this_keyword": "Artikel markiert mit diesem Schlüsselwort",
+    "articles_tagged_with": "Artikel markiert mit"
+  },
+  "categories": {
+    "title": "Kategorien",
+    "description": "Entdecken Sie unseren Inhalt organisiert nach Kategorien",
+    "noCategoriesFound": "Keine Kategorien gefunden",
+    "articlesCount": "Artikel",
+    "articleCount": "Artikel",
+    "categorizedIn": "Artikel in Kategorie",
+    "noPostsInCategory": "Noch keine Beiträge in dieser Kategorie gefunden"
+  },
+  "category": {
+    "posts_in": "Beiträge in",
+    "no_posts_found_in_this_category_yet": "Noch keine Beiträge in dieser Kategorie gefunden"
   }
 }

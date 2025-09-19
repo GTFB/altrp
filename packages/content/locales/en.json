@@ -47,6 +47,13 @@
     "demo": "Demo",
     "group1SectionA": "Group 1 - Section A",
     "group2SectionD": "Group 2 - Section D",
+    "home": "Home",
+    "blog": "Blog",
+    "about": "About",
+    "contact": "Contact",
+    "admin": "Admin",
+    "tags": "Tags",
+    "categories": "Categories",
     "platform": "Platform",
     "toggle": "Toggle"
   },
@@ -1137,5 +1144,42 @@
       "title": "Layout & Utilities",
       "description": "Layout components and utilities that help organize and structure your application interface. These components provide flexible and responsive layouts for various use cases."
     }
+  },
+  "blog": {
+    "blog": "Blog",
+    "title": "Blog",
+    "description": "Latest articles and updates",
+    "readMore": "Read more",
+    "publishedOn": "Published on",
+    "author": "Author",
+    "tags": "Tags",
+    "noPostsFound": "No posts found",
+    "backToBlog": "Back to blog"
+  },
+  "tags": {
+    "title": "Tags",
+    "description": "Discover our content organized by tags and keywords",
+    "noTagsFound": "No tags found",
+    "articlesCount": "articles",
+    "articleCount": "article",
+    "taggedWith": "Articles tagged with",
+    "noPostsInTag": "No posts found in this tag yet",
+    "tags": "Tags",
+    "discover_our_content_organized_by_tags_and_keywords": "Discover our content organized by tags and keywords",
+    "tagged_with_this_keyword": "Articles tagged with this keyword",
+    "articles_tagged_with": "Articles tagged with"
+  },
+  "categories": {
+    "title": "Categories",
+    "description": "Discover our content organized by categories",
+    "noCategoriesFound": "No categories found",
+    "articlesCount": "articles",
+    "articleCount": "article",
+    "categorizedIn": "Articles in category",
+    "noPostsInCategory": "No posts found in this category yet"
+  },
+  "category": {
+    "posts_in": "Posts in",
+    "no_posts_found_in_this_category_yet": "No posts found in this category yet"
   }
 }

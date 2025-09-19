@@ -12,7 +12,9 @@ import VariantDemoDemo from "@/components/widgets/layout/variant-demo-demo";
 
 export default function LayoutComponentsPage() {
   const t = useTranslations('layout');
-  const locale = useLocale();
+  
+  const locale = useLocale() !== 'en' ? useLocale() : '';
+  const localePath = locale !== '' ? `/${locale}` : '';
   const demoSections = [
     {
       title: t('components.componentLayout.title'),
@@ -47,7 +49,7 @@ export default function LayoutComponentsPage() {
         title={t('title')}
         description=""
         showBackButton={true}
-        backHref={`/${locale}/components`}  
+        backHref={`${localePath}/components`}  
         badges={[]}
       />
       

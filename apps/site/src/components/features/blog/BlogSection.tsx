@@ -105,7 +105,7 @@ export function BlogSection({
       {showViewAll && (
         <div className="text-center">
           <Button asChild variant="outline" size="lg">
-            <Link href={`/${locale}/blog`}>
+            <Link href={`${localePath}/blog`}>
               View All Posts
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>

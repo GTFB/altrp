@@ -32,7 +32,9 @@ import {
 
 export default function ButtonPage() {
   const t = useTranslations('demo.button');
-  const locale = useLocale();
+  
+  const locale = useLocale() !== 'en' ? useLocale() : '';
+  const localePath = locale !== '' ? `/${locale}` : '';
   const demoSections = [
     {
       title: t('variants.primary'),
@@ -157,7 +159,7 @@ export default function ButtonPage() {
         title={t('title')}
         description={t('description')}
         showBackButton={true}
-        backHref={`/${locale}/components`}  
+        backHref={`${localePath}/components`}  
         badges={[]}
       />
       

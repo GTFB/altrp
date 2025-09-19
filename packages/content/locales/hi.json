@@ -36,7 +36,14 @@
     "settings": "सेटिंग्स",
     "demo": "डेमो",
     "group1SectionA": "समूह 1 - अनुभाग A",
-    "group2SectionD": "समूह 2 - अनुभाग D"
+    "group2SectionD": "समूह 2 - अनुभाग D",
+    "home": "होम",
+    "blog": "ब्लॉग",
+    "about": "हमारे बारे में",
+    "contact": "संपर्क",
+    "admin": "प्रशासन",
+    "tags": "टैग",
+    "categories": "श्रेणियां"
   },
   "auth": {
     "protectedContent": "सुरक्षित सामग्री",
@@ -132,5 +139,42 @@
       "title": "कैसे उपयोग करें",
       "description": "सभी उपलब्ध विकल्प, कोड उदाहरण और इंटरैक्टिव प्रदर्शन देखने के लिए ऊपर एक कॉम्पोनेंट कैटेगरी चुनें। प्रत्येक कॉम्पोनेंट में विस्तृत दस्तावेज और उपयोग उदाहरण शामिल हैं।"
     }
+  },
+  "blog": {
+    "blog": "ब्लॉग",
+    "title": "ब्लॉग",
+    "description": "नवीनतम लेख और अपडेट",
+    "readMore": "और पढ़ें",
+    "publishedOn": "प्रकाशित",
+    "author": "लेखक",
+    "tags": "टैग",
+    "noPostsFound": "कोई पोस्ट नहीं मिला",
+    "backToBlog": "ब्लॉग पर वापस जाएं"
+  },
+  "tags": {
+    "title": "टैग",
+    "description": "टैग और कीवर्ड द्वारा व्यवस्थित हमारी सामग्री खोजें",
+    "noTagsFound": "कोई टैग नहीं मिला",
+    "articlesCount": "लेख",
+    "articleCount": "लेख",
+    "taggedWith": "इस टैग के साथ लेख",
+    "noPostsInTag": "इस टैग में अभी तक कोई पोस्ट नहीं है",
+    "tags": "टैग",
+    "discover_our_content_organized_by_tags_and_keywords": "टैग और कीवर्ड द्वारा व्यवस्थित हमारी सामग्री खोजें",
+    "tagged_with_this_keyword": "इस कीवर्ड के साथ टैग किए गए लेख",
+    "articles_tagged_with": "इस टैग के साथ लेख"
+  },
+  "categories": {
+    "title": "श्रेणियां",
+    "description": "श्रेणियों द्वारा व्यवस्थित हमारी सामग्री खोजें",
+    "noCategoriesFound": "कोई श्रेणी नहीं मिली",
+    "articlesCount": "लेख",
+    "articleCount": "लेख",
+    "categorizedIn": "इस श्रेणी में लेख",
+    "noPostsInCategory": "इस श्रेणी में अभी तक कोई पोस्ट नहीं है"
+  },
+  "category": {
+    "posts_in": "इसमें पोस्ट",
+    "no_posts_found_in_this_category_yet": "इस श्रेणी में अभी तक कोई पोस्ट नहीं है"
   }
 }

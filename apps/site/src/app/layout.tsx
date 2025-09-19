@@ -60,7 +60,6 @@ export default async function RootLayout({
   const currentLocale = i18nConfig.locales.includes(locale) ? locale : i18nConfig.defaultLocale;
   const messages = await getMessages({ locale: currentLocale });
 
-
   return (
     <DynamicHtml>
       <head>

@@ -6,7 +6,9 @@ import { useLocale } from 'next-intl';
 
 export function Sidebar() {
   const { isSidebarOpen, toggleSidebar } = useUiStore();
-  const locale = useLocale();
+  
+  const locale = useLocale() !== 'en' ? useLocale() : '';
+  const localePath = locale !== '' ? `/${locale}` : '';
   if (!isSidebarOpen) return null;
 
   return (
@@ -29,7 +31,7 @@ export function Sidebar() {
           <ul className="space-y-2">
             <li>
               <a
-                href={`/${locale}`}
+                href={`${localePath}`}
                 className="block p-2 hover:bg-muted rounded-md"
                 onClick={toggleSidebar}
               >
@@ -38,7 +40,7 @@ export function Sidebar() {
             </li>
             <li>
               <a
-                href={`/${locale}/blog`}
+                href={`${localePath}/blog`}
                 className="block p-2 hover:bg-muted rounded-md"
                 onClick={toggleSidebar}
               >
@@ -47,7 +49,7 @@ export function Sidebar() {
             </li>
             <li>
               <a
-                href={`/${locale}/about`}
+                href={`${localePath}/about`}
                 className="block p-2 hover:bg-muted rounded-md"
                 onClick={toggleSidebar}
               >

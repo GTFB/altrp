@@ -18,7 +18,7 @@ export function CategoryCard({ category }: CategoryCardProps) {
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader>
         <CardTitle className="text-xl">
-          <Link href={`/${locale}/categories/${category.slug}`} className="hover:text-primary">
+          <Link href={`${localePath}/categories/${category.slug}`} className="hover:text-primary">
             {category.title}
           </Link>
         </CardTitle>
@@ -37,7 +37,7 @@ export function CategoryCard({ category }: CategoryCardProps) {
           ))}
         </div>
         <Link 
-          href={`/${locale}/categories/${category.slug}`}
+          href={`${localePath}/categories/${category.slug}`}
           className="text-sm text-muted-foreground hover:text-primary flex items-center"
         >
           <Tag className="h-4 w-4 mr-1" />

@@ -45,7 +45,14 @@
     "settings": "Configuración",
     "demo": "Demostración",
     "group1SectionA": "Grupo 1 - Sección A",
-    "group2SectionD": "Grupo 2 - Sección D"
+    "group2SectionD": "Grupo 2 - Sección D",
+    "home": "Inicio",
+    "blog": "Blog",
+    "about": "Acerca de",
+    "contact": "Contacto",
+    "admin": "Administración",
+    "tags": "Etiquetas",
+    "categories": "Categorías"
   },
   "auth": {
     "protectedContent": "Contenido protegido",
@@ -141,5 +148,42 @@
       "title": "Cómo usar",
       "description": "Seleccione una categoría de componente arriba para ver todas las opciones disponibles, ejemplos de código y demostraciones interactivas. Cada componente incluye documentación detallada y ejemplos de uso."
     }
+  },
+  "blog": {
+    "blog": "Blog",
+    "title": "Blog",
+    "description": "Últimos artículos y actualizaciones",
+    "readMore": "Leer más",
+    "publishedOn": "Publicado el",
+    "author": "Autor",
+    "tags": "Etiquetas",
+    "noPostsFound": "No se encontraron publicaciones",
+    "backToBlog": "Volver al blog"
+  },
+  "tags": {
+    "title": "Etiquetas",
+    "description": "Descubre nuestro contenido organizado por etiquetas y palabras clave",
+    "noTagsFound": "No se encontraron etiquetas",
+    "articlesCount": "artículos",
+    "articleCount": "artículo",
+    "taggedWith": "Artículos etiquetados con",
+    "noPostsInTag": "Aún no hay publicaciones en esta etiqueta",
+    "tags": "Etiquetas",
+    "discover_our_content_organized_by_tags_and_keywords": "Descubre nuestro contenido organizado por etiquetas y palabras clave",
+    "tagged_with_this_keyword": "Artículos etiquetados con esta palabra clave",
+    "articles_tagged_with": "Artículos etiquetados con"
+  },
+  "categories": {
+    "title": "Categorías",
+    "description": "Descubre nuestro contenido organizado por categorías",
+    "noCategoriesFound": "No se encontraron categorías",
+    "articlesCount": "artículos",
+    "articleCount": "artículo",
+    "categorizedIn": "Artículos en categoría",
+    "noPostsInCategory": "Aún no hay publicaciones en esta categoría"
+  },
+  "category": {
+    "posts_in": "Publicaciones en",
+    "no_posts_found_in_this_category_yet": "Aún no hay publicaciones en esta categoría"
   }
 }

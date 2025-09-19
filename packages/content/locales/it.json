@@ -36,7 +36,14 @@
     "settings": "Impostazioni",
     "demo": "Demo",
     "group1SectionA": "Gruppo 1 - Sezione A",
-    "group2SectionD": "Gruppo 2 - Sezione D"
+    "group2SectionD": "Gruppo 2 - Sezione D",
+    "home": "Home",
+    "blog": "Blog",
+    "about": "Chi siamo",
+    "contact": "Contatti",
+    "admin": "Amministrazione",
+    "tags": "Tag",
+    "categories": "Categorie"
   },
   "auth": {
     "protectedContent": "Contenuto protetto",
@@ -132,5 +139,42 @@
       "title": "Come usare",
       "description": "Seleziona una categoria di componente sopra per vedere tutte le opzioni disponibili, esempi di codice e dimostrazioni interattive. Ogni componente include documentazione dettagliata ed esempi di utilizzo."
     }
+  },
+  "blog": {
+    "blog": "Blog",
+    "title": "Blog",
+    "description": "Ultimi articoli e aggiornamenti",
+    "readMore": "Leggi di più",
+    "publishedOn": "Pubblicato il",
+    "author": "Autore",
+    "tags": "Tag",
+    "noPostsFound": "Nessun post trovato",
+    "backToBlog": "Torna al blog"
+  },
+  "tags": {
+    "title": "Tag",
+    "description": "Scopri i nostri contenuti organizzati per tag e parole chiave",
+    "noTagsFound": "Nessun tag trovato",
+    "articlesCount": "articoli",
+    "articleCount": "articolo",
+    "taggedWith": "Articoli taggati con",
+    "noPostsInTag": "Nessun post trovato in questo tag ancora",
+    "tags": "Tag",
+    "discover_our_content_organized_by_tags_and_keywords": "Scopri i nostri contenuti organizzati per tag e parole chiave",
+    "tagged_with_this_keyword": "Articoli taggati con questa parola chiave",
+    "articles_tagged_with": "Articoli taggati con"
+  },
+  "categories": {
+    "title": "Categorie",
+    "description": "Scopri i nostri contenuti organizzati per categorie",
+    "noCategoriesFound": "Nessuna categoria trovata",
+    "articlesCount": "articoli",
+    "articleCount": "articolo",
+    "categorizedIn": "Articoli nella categoria",
+    "noPostsInCategory": "Nessun post trovato in questa categoria ancora"
+  },
+  "category": {
+    "posts_in": "Post in",
+    "no_posts_found_in_this_category_yet": "Nessun post trovato in questa categoria ancora"
   }
 }

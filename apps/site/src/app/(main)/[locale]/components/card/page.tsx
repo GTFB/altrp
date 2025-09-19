@@ -17,7 +17,9 @@ import {
 
 export default function CardPage() {
   const t = useTranslations('demo.card');
-  const locale = useLocale();
+  
+  const locale = useLocale() !== 'en' ? useLocale() : '';
+  const localePath = locale !== '' ? `/${locale}` : '';
   const demoSections = [
     {
       title: t('variants.default.title'),
@@ -66,7 +68,7 @@ export default function CardPage() {
       <ComponentsHeader
         title={t('title')}
         showBackButton={true}
-        backHref={`/${locale}/components`}
+        backHref={`${localePath}/components`}
         badges={[]}
       />
       

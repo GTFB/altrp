@@ -6,7 +6,9 @@ import { Globe, Github, Twitter, Linkedin, Mail } from 'lucide-react';
 import { useLocale } from 'next-intl';
 
 export function Footer() {
-  const locale = useLocale();
+  
+  const locale = useLocale() !== 'en' ? useLocale() : '';
+  const localePath = locale !== '' ? `/${locale}` : '';
   return (
     <footer className="border-t bg-background">
       <div className="container mx-auto px-4 py-12">
@@ -42,16 +44,16 @@ export function Footer() {
           <div className="space-y-4">
             <h3 className="font-heading font-semibold">t('product')</h3>
             <div className="space-y-2">
-              <Link href={`/${locale}/features`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
+              <Link href={`${localePath}/features`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
                 t('features')
               </Link>
-                  <Link href={`/${locale}/pricing`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
+                  <Link href={`${localePath}/pricing`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
                 t('pricing')
               </Link>
-              <Link href={`/${locale}/integrations`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
+              <Link href={`${localePath}/integrations`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
                 t('integrations')
               </Link>
-              <Link href={`/${locale}/changelog`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
+              <Link href={`${localePath}/changelog`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
                 t('changelog')
               </Link>
             </div>
@@ -61,16 +63,16 @@ export function Footer() {
           <div className="space-y-4">
             <h3 className="font-heading font-semibold">t('resources')</h3>
             <div className="space-y-2">
-              <Link href={`/${locale}/docs`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
+              <Link href={`${localePath}/docs`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
                 t('docs')
               </Link>
-              <Link href={`/${locale}/tutorials`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
+              <Link href={`${localePath}/tutorials`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
                 t('tutorials')
               </Link>
-              <Link href={`/${locale}/api`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
+              <Link href={`${localePath}/api`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
                 t('api')
               </Link>
-              <Link href={`/${locale}/status`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
+              <Link href={`${localePath}/status`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
                 t('status')
               </Link>
             </div>
@@ -80,16 +82,16 @@ export function Footer() {
           <div className="space-y-4">
               <h3 className="font-heading font-semibold">t('company')</h3>
             <div className="space-y-2">
-              <Link href={`/${locale}/about`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
+              <Link href={`${localePath}/about`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
                 t('about')
               </Link>
-              <Link href={`/${locale}/blog`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
+              <Link href={`${localePath}/blog`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
                 t('blog')
               </Link>
-              <Link href={`/${locale}/careers`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
+              <Link href={`${localePath}/careers`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
                 t('careers')
               </Link>
-              <Link href={`/${locale}/contact`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
+              <Link href={`${localePath}/contact`} className="block text-sm text-muted-foreground hover:text-foreground font-sans">
                 t('contact')
               </Link>
             </div>
@@ -107,13 +109,13 @@ export function Footer() {
             </Badge>
           </div>
           <div className="flex items-center space-x-4 text-sm text-muted-foreground font-sans">
-            <Link href={`/${locale}/privacy`} className="hover:text-foreground">
+            <Link href={`${localePath}/privacy`} className="hover:text-foreground">
               t('privacy')
             </Link>
-            <Link href={`/${locale}/terms`} className="hover:text-foreground">
+            <Link href={`${localePath}/terms`} className="hover:text-foreground">
               t('terms')
             </Link>
-            <Link href={`/${locale}/cookies`}
+            <Link href={`${localePath}/cookies`}
              className="hover:text-foreground">
                 t('cookies')
             </Link>
