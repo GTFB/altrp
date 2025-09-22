@@ -1,196 +1,201 @@
 {
-  "common": {
-    "search": "搜索",
-    "searchPlaceholder": "输入以搜索...",
-    "loading": "加载中...",
-    "cancel": "取消",
-    "close": "关闭",
-    "open": "打开",
-    "save": "保存",
-    "delete": "删除",
-    "edit": "编辑",
-    "back": "返回",
-    "next": "下一步",
-    "previous": "上一步",
-    "goTo": "转到",
-    "relevance": "相关性",
-    "password": "密码",
-    "enterPassword": "输入密码",
-    "unlockContent": "解锁内容",
-    "verifying": "验证中...",
-    "theme": "主题",
-    "light": "浅色",
-    "dark": "深色",
-    "sectionOf": "第 {current} 节，共 {total} 节",
-    "tableOfContents": "目录",
-    "indexingContent": "正在索引内容...",
-    "forward": "前进",
-    "sectionNavigation": "章节导航"
-  },
-  "navigation": {
-    "tableOfContents": "目录",
-    "search": "搜索",
-    "overview": "概览",
-    "projects": "项目",
-    "analytics": "分析",
-    "settings": "设置",
-    "demo": "演示",
-    "group1SectionA": "组1 - 部分A",
-    "group2SectionD": "组2 - 部分D",
-    "home": "首页",
-    "blog": "博客",
-    "about": "关于",
-    "contact": "联系我们",
-    "admin": "管理",
-    "tags": "标签",
-    "categories": "分类",
-    "privacy_policy": "隐私政策",
-    "terms_of_service": "服务条款",
-    "all_rights_reserved": "版权所有",
-    "navigation": "导航",
-    "page": "页面",
-    "discover_amazing_content_organized_by_tags_and_categories": "发现按标签和类别组织的精彩内容"
-  },
   "auth": {
-    "protectedContent": "受保护的内容",
-    "passwordProtected": "此内容受密码保护。请输入密码以继续。",
     "accessGranted": "已授予访问权限：",
     "authenticationFailed": "身份验证失败",
-    "networkError": "网络错误。请重试。"
+    "networkError": "网络错误。请重试。",
+    "passwordProtected": "此内容受密码保护。请输入密码以继续。",
+    "protectedContent": "受保护的内容"
   },
-  "search": {
-    "nothingFound": "未找到任何内容",
-    "tryDifferentKeywords": "尝试不同的关键词",
-    "noHeadings": "无标题"
-  },
-  "passwordGroups": {
-    "title": "密码组配置",
-    "description": "每个部分ID根据以下配置自动分配给密码组。",
-    "password": "密码：",
-    "sections": "部分：",
-    "allOtherSections": "所有其他部分",
-    "section": "部分",
-    "coversAllSections": "此组涵盖未明确分配给其他组的所有部分",
-    "coversSpecifiedSections": "此组仅涵盖指定的部分"
-  },
-  "project": {
-    "name": "Probo",
-    "description": "商业提案生成器"
+  "blog": {
+    "author": "作者",
+    "backToBlog": "返回博客",
+    "blog": "博客",
+    "description": "最新文章和更新",
+    "noPostsFound": "未找到文章",
+    "publishedOn": "发布于",
+    "readMore": "阅读更多",
+    "tags": "标签",
+    "title": "博客"
   },
   "breadcrumb": {
     "buildingApplication": "构建您的应用程序",
     "dataFetching": "数据获取"
   },
-  "tariff": {
-    "popular": "热门"
-  },
-  "components": {
-    "title": "UI组件库",
-    "accordion": {
-      "title": "手风琴",
-      "description": "垂直堆叠的交互式标题集合，每个标题都会显示一个内容部分。"
-    },
-    "alert": {
-      "title": "警告",
-      "description": "用于向用户显示重要信息的警告组件，具有各种样式和变体。"
-    },
-    "alertDialog": {
-      "title": "警告对话框",
-      "description": "用于动作确认和显示重要信息的模态对话框，具有各种样式和变体。"
-    },
-    "badge": {
-      "title": "徽章组件",
-      "description": "UI元素的小状态描述符，具有各种样式和配置。"
-    },
-    "avatar": {
-      "title": "头像组件",
-      "description": "带有回退功能的图像元素，用于表示用户，具有各种样式和配置。"
-    },
-    "breadcrumb": {
-      "title": "面包屑组件",
-      "description": "显示当前页面在网站层次结构中位置的导航组件。"
-    },
-    "button": {
-      "title": "按钮组件",
-      "description": "用于用户操作的交互式元素，具有各种样式、大小和状态。"
-    },
-    "card": {
-      "title": "卡片组件",
-      "description": "用于分组相关内容和操作的灵活容器，具有各种布局和样式。"
-    },
-    "carousel": {
-      "title": "轮播组件",
-      "description": "用于以滑动格式显示内容的交互式轮播，具有各种导航选项。"
-    },
-    "checkbox": {
-      "title": "复选框组件",
-      "description": "用于表单、选择和用户输入的交互式复选框，具有各种样式和状态。"
-    },
-    "collapsible": {
-      "title": "可折叠组件",
-      "description": "具有平滑动画和各种触发器样式的可展开和可折叠内容区域。"
-    },
-    "dropdown": {
-      "title": "下拉组件",
-      "description": "具有各种内容类型、交互和样式选项的上下文菜单和下拉菜单。"
-    },
-    "layout": {
-      "title": "布局和实用程序",
-      "description": "用于演示的布局组件、代码示例和实用程序组件。"
-    },
-    "count": "组件",
-    "variants": "变体：",
-    "more": "更多",
-    "howToUse": {
-      "title": "如何使用",
-      "description": "选择上面的组件类别以查看所有可用选项、代码示例和交互式演示。每个组件都包含详细的文档和使用示例。"
-    }
-  },
-  "blog": {
-    "blog": "博客",
-    "title": "博客",
-    "description": "最新文章和更新",
-    "readMore": "阅读更多",
-    "publishedOn": "发布于",
-    "author": "作者",
-    "tags": "标签",
-    "noPostsFound": "未找到文章",
-    "backToBlog": "返回博客"
-  },
-  "tags": {
-    "title": "标签",
-    "description": "通过标签和关键词探索我们的内容",
-    "noTagsFound": "未找到标签",
-    "articlesCount": "篇文章",
-    "articleCount": "篇文章",
-    "taggedWith": "标记为",
-    "noPostsInTag": "此标签下暂无文章",
-    "tags": "标签",
-    "discover_our_content_organized_by_tags_and_keywords": "通过标签和关键词探索我们的内容",
-    "tagged_with_this_keyword": "标记为此关键词的文章",
-    "articles_tagged_with": "标记为"
-  },
   "categories": {
-    "title": "分类",
+    "articleCount": "篇文章",
+    "articlesCount": "篇文章",
+    "categorizedIn": "分类中的文章",
     "description": "通过分类探索我们的内容",
     "noCategoriesFound": "未找到分类",
-    "articlesCount": "篇文章",
-    "articleCount": "篇文章",
-    "categorizedIn": "分类中的文章",
-    "noPostsInCategory": "此分类下暂无文章"
+    "noPostsInCategory": "此分类下暂无文章",
+    "title": "分类"
   },
   "category": {
-    "posts_in": "分类中的文章",
-    "no_posts_found_in_this_category_yet": "此分类下暂无文章"
+    "no_posts_found_in_this_category_yet": "此分类下暂无文章",
+    "posts_in": "分类中的文章"
+  },
+  "common": {
+    "back": "返回",
+    "cancel": "取消",
+    "close": "关闭",
+    "dark": "深色",
+    "delete": "删除",
+    "edit": "编辑",
+    "enterPassword": "输入密码",
+    "forward": "前进",
+    "goTo": "转到",
+    "indexingContent": "正在索引内容...",
+    "light": "浅色",
+    "loading": "加载中...",
+    "next": "下一步",
+    "open": "打开",
+    "password": "密码",
+    "previous": "上一步",
+    "relevance": "相关性",
+    "save": "保存",
+    "search": "搜索",
+    "searchPlaceholder": "输入以搜索...",
+    "sectionNavigation": "章节导航",
+    "sectionOf": "第 {current} 节，共 {total} 节",
+    "tableOfContents": "目录",
+    "theme": "主题",
+    "unlockContent": "解锁内容",
+    "verifying": "验证中..."
+  },
+  "components": {
+    "accordion": {
+      "description": "垂直堆叠的交互式标题集合，每个标题都会显示一个内容部分。",
+      "title": "手风琴"
+    },
+    "alert": {
+      "description": "用于向用户显示重要信息的警告组件，具有各种样式和变体。",
+      "title": "警告"
+    },
+    "alertDialog": {
+      "description": "用于动作确认和显示重要信息的模态对话框，具有各种样式和变体。",
+      "title": "警告对话框"
+    },
+    "avatar": {
+      "description": "带有回退功能的图像元素，用于表示用户，具有各种样式和配置。",
+      "title": "头像组件"
+    },
+    "badge": {
+      "description": "UI元素的小状态描述符，具有各种样式和配置。",
+      "title": "徽章组件"
+    },
+    "breadcrumb": {
+      "description": "显示当前页面在网站层次结构中位置的导航组件。",
+      "title": "面包屑组件"
+    },
+    "button": {
+      "description": "用于用户操作的交互式元素，具有各种样式、大小和状态。",
+      "title": "按钮组件"
+    },
+    "card": {
+      "description": "用于分组相关内容和操作的灵活容器，具有各种布局和样式。",
+      "title": "卡片组件"
+    },
+    "carousel": {
+      "description": "用于以滑动格式显示内容的交互式轮播，具有各种导航选项。",
+      "title": "轮播组件"
+    },
+    "checkbox": {
+      "description": "用于表单、选择和用户输入的交互式复选框，具有各种样式和状态。",
+      "title": "复选框组件"
+    },
+    "collapsible": {
+      "description": "具有平滑动画和各种触发器样式的可展开和可折叠内容区域。",
+      "title": "可折叠组件"
+    },
+    "count": "组件",
+    "dropdown": {
+      "description": "具有各种内容类型、交互和样式选项的上下文菜单和下拉菜单。",
+      "title": "下拉组件"
+    },
+    "howToUse": {
+      "description": "选择上面的组件类别以查看所有可用选项、代码示例和交互式演示。每个组件都包含详细的文档和使用示例。",
+      "title": "如何使用"
+    },
+    "layout": {
+      "description": "用于演示的布局组件、代码示例和实用程序组件。",
+      "title": "布局和实用程序"
+    },
+    "more": "更多",
+    "title": "UI组件库",
+    "variants": "变体："
   },
   "home": {
-    "latestPosts": "Latest posts",
-    "readOurLatestArticlesAndUpdates": "Read our latest articles and updates",
-    "categories": "Categories",
-    "exploreOurContentOrganizedByTopics": "Explore our content organized by topics",
-    "ourAuthors": "Our authors",
-    "meetTheTalentedWritersBehindOurContent": "Meet the talented writers behind our content",
-    "postsWithDemoAndHelloTags": "Posts with demo and hello tags",
-    "articlesWithPopularTags": "Articles with popular tags"
+    "all50ShadcnUiComponentsAreReadyToUse": "所有50个Shadcn UI组件都已准备就绪",
+    "aModernGitAsCmsPoweredWebsite": "一个由Git-as-CMS驱动的现代网站",
+    "articlesWithPopularTags": "带有热门标签的文章",
+    "availableComponents": "可用组件",
+    "categories": "分类",
+    "currentLocale": "当前语言环境",
+    "exploreOurContentOrganizedByTopics": "按主题浏览我们的内容",
+    "latestPosts": "最新文章",
+    "meetTheTalentedWritersBehindOurContent": "认识我们内容背后的才华横溢的作家",
+    "ourAuthors": "我们的作者",
+    "postsWithDemoAndHelloTags": "带有演示和问候标签的文章",
+    "readOurLatestArticlesAndUpdates": "阅读我们的最新文章和更新",
+    "welcomeToJambo": "欢迎使用 Jambo"
+  },
+  "navigation": {
+    "about": "关于",
+    "admin": "管理",
+    "all_rights_reserved": "版权所有",
+    "analytics": "分析",
+    "blog": "博客",
+    "categories": "分类",
+    "contact": "联系我们",
+    "demo": "演示",
+    "discover_amazing_content_organized_by_tags_and_categories": "发现按标签和类别组织的精彩内容",
+    "group1SectionA": "组1 - 部分A",
+    "group2SectionD": "组2 - 部分D",
+    "home": "首页",
+    "navigation": "导航",
+    "overview": "概览",
+    "page": "页面",
+    "privacy_policy": "隐私政策",
+    "projects": "项目",
+    "search": "搜索",
+    "settings": "设置",
+    "tableOfContents": "目录",
+    "tags": "标签",
+    "terms_of_service": "服务条款"
+  },
+  "passwordGroups": {
+    "allOtherSections": "所有其他部分",
+    "coversAllSections": "此组涵盖未明确分配给其他组的所有部分",
+    "coversSpecifiedSections": "此组仅涵盖指定的部分",
+    "description": "每个部分ID根据以下配置自动分配给密码组。",
+    "password": "密码：",
+    "section": "部分",
+    "sections": "部分：",
+    "title": "密码组配置"
+  },
+  "project": {
+    "description": "商业提案生成器",
+    "name": "Jambo"
+  },
+  "search": {
+    "noHeadings": "无标题",
+    "nothingFound": "未找到任何内容",
+    "tryDifferentKeywords": "尝试不同的关键词"
+  },
+  "tags": {
+    "articleCount": "篇文章",
+    "articles_tagged_with": "标记为",
+    "articlesCount": "篇文章",
+    "description": "通过标签和关键词探索我们的内容",
+    "discover_our_content_organized_by_tags_and_keywords": "通过标签和关键词探索我们的内容",
+    "noPostsInTag": "此标签下暂无文章",
+    "noTagsFound": "未找到标签",
+    "tagged_with_this_keyword": "标记为此关键词的文章",
+    "taggedWith": "标记为",
+    "tags": "标签",
+    "title": "标签"
+  },
+  "tariff": {
+    "popular": "热门"
   }
 }

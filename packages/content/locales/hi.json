@@ -1,196 +1,201 @@
 {
-  "common": {
-    "search": "खोजें",
-    "searchPlaceholder": "खोजने के लिए टाइप करें...",
-    "loading": "लोड हो रहा है...",
-    "cancel": "रद्द करें",
-    "close": "बंद करें",
-    "open": "खोलें",
-    "save": "सहेजें",
-    "delete": "हटाएं",
-    "edit": "संपादित करें",
-    "back": "वापस",
-    "next": "अगला",
-    "previous": "पिछला",
-    "goTo": "पर जाएं",
-    "relevance": "प्रासंगिकता",
-    "password": "पासवर्ड",
-    "enterPassword": "पासवर्ड दर्ज करें",
-    "unlockContent": "सामग्री अनलॉक करें",
-    "verifying": "सत्यापन...",
-    "theme": "थीम",
-    "light": "हल्का",
-    "dark": "गहरा",
-    "sectionOf": "अनुभाग {current} / {total}",
-    "tableOfContents": "विषय सूची",
-    "indexingContent": "सामग्री अनुक्रमणिका बन रही है...",
-    "forward": "आगे",
-    "sectionNavigation": "अनुभाग नेविगेशन"
-  },
-  "navigation": {
-    "tableOfContents": "विषय सूची",
-    "search": "खोजें",
-    "overview": "अवलोकन",
-    "projects": "परियोजनाएं",
-    "analytics": "विश्लेषण",
-    "settings": "सेटिंग्स",
-    "demo": "डेमो",
-    "group1SectionA": "समूह 1 - अनुभाग A",
-    "group2SectionD": "समूह 2 - अनुभाग D",
-    "home": "होम",
-    "blog": "ब्लॉग",
-    "about": "हमारे बारे में",
-    "contact": "संपर्क",
-    "admin": "प्रशासन",
-    "tags": "टैग",
-    "categories": "श्रेणियां",
-    "privacy_policy": "गोपनीयता नीति",
-    "terms_of_service": "सेवा की शर्तें",
-    "all_rights_reserved": "सभी अधिकार सुरक्षित",
-    "navigation": "नेविगेशन",
-    "page": "पेज",
-    "discover_amazing_content_organized_by_tags_and_categories": "टैग और श्रेणियों द्वारा व्यवस्थित अद्भुत सामग्री खोजें"
-  },
   "auth": {
-    "protectedContent": "सुरक्षित सामग्री",
-    "passwordProtected": "यह सामग्री पासवर्ड से सुरक्षित है। जारी रखने के लिए कृपया पासवर्ड दर्ज करें।",
     "accessGranted": "पहुंच प्रदान की गई:",
     "authenticationFailed": "प्रमाणीकरण विफल",
-    "networkError": "नेटवर्क त्रुटि। कृपया पुनः प्रयास करें।"
+    "networkError": "नेटवर्क त्रुटि। कृपया पुनः प्रयास करें।",
+    "passwordProtected": "यह सामग्री पासवर्ड से सुरक्षित है। जारी रखने के लिए कृपया पासवर्ड दर्ज करें।",
+    "protectedContent": "सुरक्षित सामग्री"
   },
-  "search": {
-    "nothingFound": "कुछ नहीं मिला",
-    "tryDifferentKeywords": "अलग कीवर्ड आजमाएं",
-    "noHeadings": "कोई शीर्षक नहीं"
-  },
-  "passwordGroups": {
-    "title": "पासवर्ड समूह कॉन्फ़िगरेशन",
-    "description": "प्रत्येक अनुभाग ID नीचे दिए गए कॉन्फ़िगरेशन के आधार पर स्वचालित रूप से पासवर्ड समूह को सौंपा जाता है।",
-    "password": "पासवर्ड:",
-    "sections": "अनुभाग:",
-    "allOtherSections": "सभी अन्य अनुभाग",
-    "section": "अनुभाग",
-    "coversAllSections": "यह समूह उन सभी अनुभागों को कवर करता है जो स्पष्ट रूप से अन्य समूहों को नहीं सौंपे गए हैं",
-    "coversSpecifiedSections": "यह समूह केवल निर्दिष्ट अनुभागों को कवर करता है"
-  },
-  "project": {
-    "name": "Probo",
-    "description": "व्यावसायिक प्रस्ताव जेनरेटर"
+  "blog": {
+    "author": "लेखक",
+    "backToBlog": "ब्लॉग पर वापस जाएं",
+    "blog": "ब्लॉग",
+    "description": "नवीनतम लेख और अपडेट",
+    "noPostsFound": "कोई पोस्ट नहीं मिला",
+    "publishedOn": "प्रकाशित",
+    "readMore": "और पढ़ें",
+    "tags": "टैग",
+    "title": "ब्लॉग"
   },
   "breadcrumb": {
     "buildingApplication": "अपना एप्लिकेशन बनाना",
     "dataFetching": "डेटा प्राप्त करना"
   },
-  "tariff": {
-    "popular": "लोकप्रिय"
-  },
-  "components": {
-    "title": "UI कॉम्पोनेंट लाइब्रेरी",
-    "accordion": {
-      "title": "अकॉर्डियन",
-      "description": "आवर्तित रूप से स्टैक किए गए इंटरैक्टिव हेडिंग का सेट जो कंटेंट के एक सेक्शन को प्रकट करता है।"
-    },
-    "alert": {
-      "title": "अलर्ट",
-      "description": "विभिन्न शैलियों और वेरिएंट के साथ उपयोगकर्ताओं को महत्वपूर्ण जानकारी दिखाने के लिए अलर्ट कॉम्पोनेंट।"
-    },
-    "alertDialog": {
-      "title": "अलर्ट डायलॉग",
-      "description": "एक्शन पुष्टिकरण और विभिन्न शैलियों और वेरिएंट के साथ महत्वपूर्ण जानकारी दिखाने के लिए मोडल डायलॉग।"
-    },
-    "badge": {
-      "title": "बैज कॉम्पोनेंट",
-      "description": "विभिन्न शैलियों और कॉन्फिगरेशन के साथ UI तत्वों के लिए छोटे स्टेटस वर्णनकर्ता।"
-    },
-    "avatar": {
-      "title": "अवतार कॉम्पोनेंट",
-      "description": "विभिन्न शैलियों और कॉन्फिगरेशन के साथ उपयोगकर्ता का प्रतिनिधित्व करने के लिए फॉलबैक के साथ इमेज एलिमेंट।"
-    },
-    "breadcrumb": {
-      "title": "ब्रेडक्रम कॉम्पोनेंट",
-      "description": "नेविगेशन कॉम्पोनेंट जो साइट की पदानुक्रम के भीतर वर्तमान पृष्ठ का स्थान दिखाते हैं।"
-    },
-    "button": {
-      "title": "बटन कॉम्पोनेंट",
-      "description": "विभिन्न शैलियों, आकार और राज्यों के साथ उपयोगकर्ता क्रियाओं के लिए इंटरैक्टिव तत्व।"
-    },
-    "card": {
-      "title": "कार्ड कॉम्पोनेंट",
-      "description": "विभिन्न लेआउट और शैलियों के साथ संबंधित कंटेंट और क्रियाओं को ग्रुप करने के लिए लचीले कंटेनर।"
-    },
-    "carousel": {
-      "title": "कैरोसेल कॉम्पोनेंट",
-      "description": "विभिन्न नेविगेशन विकल्पों के साथ स्लाइडिंग फॉर्मेट में कंटेंट दिखाने के लिए इंटरैक्टिव कैरोसेल।"
-    },
-    "checkbox": {
-      "title": "चेकबॉक्स कॉम्पोनेंट",
-      "description": "विभिन्न शैलियों और राज्यों के साथ फॉर्म, चयन और उपयोगकर्ता इनपुट के लिए इंटरैक्टिव चेकबॉक्स।"
-    },
-    "collapsible": {
-      "title": "कॉलैप्सिबल कॉम्पोनेंट",
-      "description": "समूथ एनिमेशन और विभिन्न ट्रिगर शैलियों के साथ विस्तारयोग्य और संकुचित कंटेंट क्षेत्र।"
-    },
-    "dropdown": {
-      "title": "ड्रॉपडाउन कॉम्पोनेंट",
-      "description": "विभिन्न कंटेंट प्रकार, इंटरैक्शन और स्टाइलिंग विकल्पों के साथ संदर्भित मेनू और ड्रॉपडाउन।"
-    },
-    "layout": {
-      "title": "लेआउट और यूटिलिटीज",
-      "description": "प्रदर्शन के लिए लेआउट कॉम्पोनेंट, कोड उदाहरण, और यूटिलिटी कॉम्पोनेंट।"
-    },
-    "count": "कॉम्पोनेंट",
-    "variants": "वेरिएंट:",
-    "more": "और",
-    "howToUse": {
-      "title": "कैसे उपयोग करें",
-      "description": "सभी उपलब्ध विकल्प, कोड उदाहरण और इंटरैक्टिव प्रदर्शन देखने के लिए ऊपर एक कॉम्पोनेंट कैटेगरी चुनें। प्रत्येक कॉम्पोनेंट में विस्तृत दस्तावेज और उपयोग उदाहरण शामिल हैं।"
-    }
-  },
-  "blog": {
-    "blog": "ब्लॉग",
-    "title": "ब्लॉग",
-    "description": "नवीनतम लेख और अपडेट",
-    "readMore": "और पढ़ें",
-    "publishedOn": "प्रकाशित",
-    "author": "लेखक",
-    "tags": "टैग",
-    "noPostsFound": "कोई पोस्ट नहीं मिला",
-    "backToBlog": "ब्लॉग पर वापस जाएं"
-  },
-  "tags": {
-    "title": "टैग",
-    "description": "टैग और कीवर्ड द्वारा व्यवस्थित हमारी सामग्री खोजें",
-    "noTagsFound": "कोई टैग नहीं मिला",
-    "articlesCount": "लेख",
-    "articleCount": "लेख",
-    "taggedWith": "इस टैग के साथ लेख",
-    "noPostsInTag": "इस टैग में अभी तक कोई पोस्ट नहीं है",
-    "tags": "टैग",
-    "discover_our_content_organized_by_tags_and_keywords": "टैग और कीवर्ड द्वारा व्यवस्थित हमारी सामग्री खोजें",
-    "tagged_with_this_keyword": "इस कीवर्ड के साथ टैग किए गए लेख",
-    "articles_tagged_with": "इस टैग के साथ लेख"
-  },
   "categories": {
-    "title": "श्रेणियां",
+    "articleCount": "लेख",
+    "articlesCount": "लेख",
+    "categorizedIn": "इस श्रेणी में लेख",
     "description": "श्रेणियों द्वारा व्यवस्थित हमारी सामग्री खोजें",
     "noCategoriesFound": "कोई श्रेणी नहीं मिली",
-    "articlesCount": "लेख",
-    "articleCount": "लेख",
-    "categorizedIn": "इस श्रेणी में लेख",
-    "noPostsInCategory": "इस श्रेणी में अभी तक कोई पोस्ट नहीं है"
+    "noPostsInCategory": "इस श्रेणी में अभी तक कोई पोस्ट नहीं है",
+    "title": "श्रेणियां"
   },
   "category": {
-    "posts_in": "इसमें पोस्ट",
-    "no_posts_found_in_this_category_yet": "इस श्रेणी में अभी तक कोई पोस्ट नहीं है"
+    "no_posts_found_in_this_category_yet": "इस श्रेणी में अभी तक कोई पोस्ट नहीं है",
+    "posts_in": "इसमें पोस्ट"
+  },
+  "common": {
+    "back": "वापस",
+    "cancel": "रद्द करें",
+    "close": "बंद करें",
+    "dark": "गहरा",
+    "delete": "हटाएं",
+    "edit": "संपादित करें",
+    "enterPassword": "पासवर्ड दर्ज करें",
+    "forward": "आगे",
+    "goTo": "पर जाएं",
+    "indexingContent": "सामग्री अनुक्रमणिका बन रही है...",
+    "light": "हल्का",
+    "loading": "लोड हो रहा है...",
+    "next": "अगला",
+    "open": "खोलें",
+    "password": "पासवर्ड",
+    "previous": "पिछला",
+    "relevance": "प्रासंगिकता",
+    "save": "सहेजें",
+    "search": "खोजें",
+    "searchPlaceholder": "खोजने के लिए टाइप करें...",
+    "sectionNavigation": "अनुभाग नेविगेशन",
+    "sectionOf": "अनुभाग {current} / {total}",
+    "tableOfContents": "विषय सूची",
+    "theme": "थीम",
+    "unlockContent": "सामग्री अनलॉक करें",
+    "verifying": "सत्यापन..."
+  },
+  "components": {
+    "accordion": {
+      "description": "आवर्तित रूप से स्टैक किए गए इंटरैक्टिव हेडिंग का सेट जो कंटेंट के एक सेक्शन को प्रकट करता है।",
+      "title": "अकॉर्डियन"
+    },
+    "alert": {
+      "description": "विभिन्न शैलियों और वेरिएंट के साथ उपयोगकर्ताओं को महत्वपूर्ण जानकारी दिखाने के लिए अलर्ट कॉम्पोनेंट।",
+      "title": "अलर्ट"
+    },
+    "alertDialog": {
+      "description": "एक्शन पुष्टिकरण और विभिन्न शैलियों और वेरिएंट के साथ महत्वपूर्ण जानकारी दिखाने के लिए मोडल डायलॉग।",
+      "title": "अलर्ट डायलॉग"
+    },
+    "avatar": {
+      "description": "विभिन्न शैलियों और कॉन्फिगरेशन के साथ उपयोगकर्ता का प्रतिनिधित्व करने के लिए फॉलबैक के साथ इमेज एलिमेंट।",
+      "title": "अवतार कॉम्पोनेंट"
+    },
+    "badge": {
+      "description": "विभिन्न शैलियों और कॉन्फिगरेशन के साथ UI तत्वों के लिए छोटे स्टेटस वर्णनकर्ता।",
+      "title": "बैज कॉम्पोनेंट"
+    },
+    "breadcrumb": {
+      "description": "नेविगेशन कॉम्पोनेंट जो साइट की पदानुक्रम के भीतर वर्तमान पृष्ठ का स्थान दिखाते हैं।",
+      "title": "ब्रेडक्रम कॉम्पोनेंट"
+    },
+    "button": {
+      "description": "विभिन्न शैलियों, आकार और राज्यों के साथ उपयोगकर्ता क्रियाओं के लिए इंटरैक्टिव तत्व।",
+      "title": "बटन कॉम्पोनेंट"
+    },
+    "card": {
+      "description": "विभिन्न लेआउट और शैलियों के साथ संबंधित कंटेंट और क्रियाओं को ग्रुप करने के लिए लचीले कंटेनर।",
+      "title": "कार्ड कॉम्पोनेंट"
+    },
+    "carousel": {
+      "description": "विभिन्न नेविगेशन विकल्पों के साथ स्लाइडिंग फॉर्मेट में कंटेंट दिखाने के लिए इंटरैक्टिव कैरोसेल।",
+      "title": "कैरोसेल कॉम्पोनेंट"
+    },
+    "checkbox": {
+      "description": "विभिन्न शैलियों और राज्यों के साथ फॉर्म, चयन और उपयोगकर्ता इनपुट के लिए इंटरैक्टिव चेकबॉक्स।",
+      "title": "चेकबॉक्स कॉम्पोनेंट"
+    },
+    "collapsible": {
+      "description": "समूथ एनिमेशन और विभिन्न ट्रिगर शैलियों के साथ विस्तारयोग्य और संकुचित कंटेंट क्षेत्र।",
+      "title": "कॉलैप्सिबल कॉम्पोनेंट"
+    },
+    "count": "कॉम्पोनेंट",
+    "dropdown": {
+      "description": "विभिन्न कंटेंट प्रकार, इंटरैक्शन और स्टाइलिंग विकल्पों के साथ संदर्भित मेनू और ड्रॉपडाउन।",
+      "title": "ड्रॉपडाउन कॉम्पोनेंट"
+    },
+    "howToUse": {
+      "description": "सभी उपलब्ध विकल्प, कोड उदाहरण और इंटरैक्टिव प्रदर्शन देखने के लिए ऊपर एक कॉम्पोनेंट कैटेगरी चुनें। प्रत्येक कॉम्पोनेंट में विस्तृत दस्तावेज और उपयोग उदाहरण शामिल हैं।",
+      "title": "कैसे उपयोग करें"
+    },
+    "layout": {
+      "description": "प्रदर्शन के लिए लेआउट कॉम्पोनेंट, कोड उदाहरण, और यूटिलिटी कॉम्पोनेंट।",
+      "title": "लेआउट और यूटिलिटीज"
+    },
+    "more": "और",
+    "title": "UI कॉम्पोनेंट लाइब्रेरी",
+    "variants": "वेरिएंट:"
   },
   "home": {
-    "latestPosts": "Latest posts",
-    "readOurLatestArticlesAndUpdates": "Read our latest articles and updates",
-    "categories": "Categories",
-    "exploreOurContentOrganizedByTopics": "Explore our content organized by topics",
-    "ourAuthors": "Our authors",
-    "meetTheTalentedWritersBehindOurContent": "Meet the talented writers behind our content",
-    "postsWithDemoAndHelloTags": "Posts with demo and hello tags",
-    "articlesWithPopularTags": "Articles with popular tags"
+    "all50ShadcnUiComponentsAreReadyToUse": "सभी 50 Shadcn UI कंपोनेंट उपयोग के लिए तैयार हैं",
+    "aModernGitAsCmsPoweredWebsite": "Git-as-CMS द्वारा संचालित एक आधुनिक वेबसाइट",
+    "articlesWithPopularTags": "लोकप्रिय टैग के साथ लेख",
+    "availableComponents": "उपलब्ध कंपोनेंट",
+    "categories": "श्रेणियां",
+    "currentLocale": "वर्तमान लोकेल",
+    "exploreOurContentOrganizedByTopics": "विषयों के अनुसार व्यवस्थित हमारी सामग्री का अन्वेषण करें",
+    "latestPosts": "नवीनतम पोस्ट",
+    "meetTheTalentedWritersBehindOurContent": "हमारी सामग्री के पीछे के प्रतिभाशाली लेखकों से मिलें",
+    "ourAuthors": "हमारे लेखक",
+    "postsWithDemoAndHelloTags": "डेमो और हेलो टैग के साथ पोस्ट",
+    "readOurLatestArticlesAndUpdates": "हमारे नवीनतम लेख और अपडेट पढ़ें",
+    "welcomeToJambo": "Jambo में आपका स्वागत है"
+  },
+  "navigation": {
+    "about": "हमारे बारे में",
+    "admin": "प्रशासन",
+    "all_rights_reserved": "सभी अधिकार सुरक्षित",
+    "analytics": "विश्लेषण",
+    "blog": "ब्लॉग",
+    "categories": "श्रेणियां",
+    "contact": "संपर्क",
+    "demo": "डेमो",
+    "discover_amazing_content_organized_by_tags_and_categories": "टैग और श्रेणियों द्वारा व्यवस्थित अद्भुत सामग्री खोजें",
+    "group1SectionA": "समूह 1 - अनुभाग A",
+    "group2SectionD": "समूह 2 - अनुभाग D",
+    "home": "होम",
+    "navigation": "नेविगेशन",
+    "overview": "अवलोकन",
+    "page": "पेज",
+    "privacy_policy": "गोपनीयता नीति",
+    "projects": "परियोजनाएं",
+    "search": "खोजें",
+    "settings": "सेटिंग्स",
+    "tableOfContents": "विषय सूची",
+    "tags": "टैग",
+    "terms_of_service": "सेवा की शर्तें"
+  },
+  "passwordGroups": {
+    "allOtherSections": "सभी अन्य अनुभाग",
+    "coversAllSections": "यह समूह उन सभी अनुभागों को कवर करता है जो स्पष्ट रूप से अन्य समूहों को नहीं सौंपे गए हैं",
+    "coversSpecifiedSections": "यह समूह केवल निर्दिष्ट अनुभागों को कवर करता है",
+    "description": "प्रत्येक अनुभाग ID नीचे दिए गए कॉन्फ़िगरेशन के आधार पर स्वचालित रूप से पासवर्ड समूह को सौंपा जाता है।",
+    "password": "पासवर्ड:",
+    "section": "अनुभाग",
+    "sections": "अनुभाग:",
+    "title": "पासवर्ड समूह कॉन्फ़िगरेशन"
+  },
+  "project": {
+    "description": "व्यावसायिक प्रस्ताव जेनरेटर",
+    "name": "Jambo"
+  },
+  "search": {
+    "noHeadings": "कोई शीर्षक नहीं",
+    "nothingFound": "कुछ नहीं मिला",
+    "tryDifferentKeywords": "अलग कीवर्ड आजमाएं"
+  },
+  "tags": {
+    "articleCount": "लेख",
+    "articles_tagged_with": "इस टैग के साथ लेख",
+    "articlesCount": "लेख",
+    "description": "टैग और कीवर्ड द्वारा व्यवस्थित हमारी सामग्री खोजें",
+    "discover_our_content_organized_by_tags_and_keywords": "टैग और कीवर्ड द्वारा व्यवस्थित हमारी सामग्री खोजें",
+    "noPostsInTag": "इस टैग में अभी तक कोई पोस्ट नहीं है",
+    "noTagsFound": "कोई टैग नहीं मिला",
+    "tagged_with_this_keyword": "इस कीवर्ड के साथ टैग किए गए लेख",
+    "taggedWith": "इस टैग के साथ लेख",
+    "tags": "टैग",
+    "title": "टैग"
+  },
+  "tariff": {
+    "popular": "लोकप्रिय"
   }
 }

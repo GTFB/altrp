@@ -1,196 +1,201 @@
 {
-  "common": {
-    "search": "검색",
-    "searchPlaceholder": "검색하려면 입력하세요...",
-    "loading": "로딩 중...",
-    "cancel": "취소",
-    "close": "닫기",
-    "open": "열기",
-    "save": "저장",
-    "delete": "삭제",
-    "edit": "편집",
-    "back": "뒤로",
-    "next": "다음",
-    "previous": "이전",
-    "goTo": "이동",
-    "relevance": "관련성",
-    "password": "비밀번호",
-    "enterPassword": "비밀번호 입력",
-    "unlockContent": "콘텐츠 잠금 해제",
-    "verifying": "확인 중...",
-    "theme": "테마",
-    "light": "라이트",
-    "dark": "다크",
-    "sectionOf": "섹션 {current} / {total}",
-    "tableOfContents": "목차",
-    "indexingContent": "콘텐츠 인덱싱 중...",
-    "forward": "앞으로",
-    "sectionNavigation": "섹션 네비게이션"
-  },
-  "navigation": {
-    "tableOfContents": "목차",
-    "search": "검색",
-    "overview": "개요",
-    "projects": "프로젝트",
-    "analytics": "분석",
-    "settings": "설정",
-    "demo": "데모",
-    "group1SectionA": "그룹 1 - 섹션 A",
-    "group2SectionD": "그룹 2 - 섹션 D",
-    "home": "홈",
-    "blog": "블로그",
-    "about": "소개",
-    "contact": "연락처",
-    "admin": "관리자",
-    "tags": "태그",
-    "categories": "카테고리",
-    "privacy_policy": "개인정보처리방침",
-    "terms_of_service": "서비스 약관",
-    "all_rights_reserved": "모든 권리 보유",
-    "navigation": "네비게이션",
-    "page": "페이지",
-    "discover_amazing_content_organized_by_tags_and_categories": "태그와 카테고리로 정리된 놀라운 콘텐츠를 발견하세요"
-  },
   "auth": {
-    "protectedContent": "보호된 콘텐츠",
-    "passwordProtected": "이 콘텐츠는 비밀번호로 보호됩니다. 계속하려면 비밀번호를 입력하세요.",
     "accessGranted": "액세스가 허용되었습니다:",
     "authenticationFailed": "인증에 실패했습니다",
-    "networkError": "네트워크 오류입니다. 다시 시도해 주세요."
+    "networkError": "네트워크 오류입니다. 다시 시도해 주세요.",
+    "passwordProtected": "이 콘텐츠는 비밀번호로 보호됩니다. 계속하려면 비밀번호를 입력하세요.",
+    "protectedContent": "보호된 콘텐츠"
   },
-  "search": {
-    "nothingFound": "아무것도 찾을 수 없습니다",
-    "tryDifferentKeywords": "다른 키워드를 시도해 보세요",
-    "noHeadings": "제목이 없습니다"
-  },
-  "passwordGroups": {
-    "title": "비밀번호 그룹 구성",
-    "description": "각 섹션 ID는 아래 구성에 따라 자동으로 비밀번호 그룹에 할당됩니다.",
-    "password": "비밀번호:",
-    "sections": "섹션:",
-    "allOtherSections": "다른 모든 섹션",
-    "section": "섹션",
-    "coversAllSections": "이 그룹은 다른 그룹에 명시적으로 할당되지 않은 모든 섹션을 포함합니다",
-    "coversSpecifiedSections": "이 그룹은 지정된 섹션만 포함합니다"
-  },
-  "project": {
-    "name": "Probo",
-    "description": "상업적 제안 생성기"
+  "blog": {
+    "author": "작성자",
+    "backToBlog": "블로그로 돌아가기",
+    "blog": "블로그",
+    "description": "최신 기사 및 업데이트",
+    "noPostsFound": "게시물을 찾을 수 없습니다",
+    "publishedOn": "게시일",
+    "readMore": "더 읽기",
+    "tags": "태그",
+    "title": "블로그"
   },
   "breadcrumb": {
     "buildingApplication": "애플리케이션 구축",
     "dataFetching": "데이터 가져오기"
   },
-  "tariff": {
-    "popular": "인기"
-  },
-  "components": {
-    "title": "UI 컴포넌트 라이브러리",
-    "accordion": {
-      "title": "아코디언",
-      "description": "각각 콘텐츠 섹션을 보여주는 수직으로 쌓인 상호작용 헤더 세트입니다."
-    },
-    "alert": {
-      "title": "알림",
-      "description": "다양한 스타일과 변형으로 사용자에게 중요한 정보를 표시하는 알림 컴포넌트입니다."
-    },
-    "alertDialog": {
-      "title": "알림 대화상자",
-      "description": "다양한 스타일과 변형으로 액션 확인 및 중요한 정보 표시를 위한 모달 대화상자입니다."
-    },
-    "badge": {
-      "title": "배지 컴포넌트",
-      "description": "다양한 스타일과 설정을 가진 UI 요소의 작은 상태 설명자입니다."
-    },
-    "avatar": {
-      "title": "아바타 컴포넌트",
-      "description": "다양한 스타일과 설정으로 사용자를 나타내기 위한 대체 이미지 요소입니다."
-    },
-    "breadcrumb": {
-      "title": "브레드크럼 컴포넌트",
-      "description": "사이트 계층 내에서 현재 페이지의 위치를 보여주는 네비게이션 컴포넌트입니다."
-    },
-    "button": {
-      "title": "버튼 컴포넌트",
-      "description": "다양한 스타일, 크기, 상태를 가진 사용자 액션을 위한 상호작용 요소입니다."
-    },
-    "card": {
-      "title": "카드 컴포넌트",
-      "description": "다양한 레이아웃과 스타일로 관련 콘텐츠와 액션을 그룹화하는 유연한 컨테이너입니다."
-    },
-    "carousel": {
-      "title": "캐러셀 컴포넌트",
-      "description": "다양한 네비게이션 옵션으로 슬라이딩 형식으로 콘텐츠를 표시하는 상호작용 캐러셀입니다."
-    },
-    "checkbox": {
-      "title": "체크박스 컴포넌트",
-      "description": "다양한 스타일과 상태를 가진 폼, 선택, 사용자 입력을 위한 상호작용 체크박스입니다."
-    },
-    "collapsible": {
-      "title": "접을 수 있는 컴포넌트",
-      "description": "부드러운 애니메이션과 다양한 트리거 스타일을 가진 확장 가능하고 접을 수 있는 콘텐츠 영역입니다."
-    },
-    "dropdown": {
-      "title": "드롭다운 컴포넌트",
-      "description": "다양한 콘텐츠 유형, 상호작용, 스타일링 옵션을 가진 컨텍스트 메뉴와 드롭다운입니다."
-    },
-    "layout": {
-      "title": "레이아웃 & 유틸리티",
-      "description": "데모를 위한 레이아웃 컴포넌트, 코드 예제, 유틸리티 컴포넌트입니다."
-    },
-    "count": "컴포넌트",
-    "variants": "변형:",
-    "more": "더보기",
-    "howToUse": {
-      "title": "사용 방법",
-      "description": "위의 컴포넌트 카테고리를 선택하여 사용 가능한 모든 옵션, 코드 예제, 상호작용 데모를 확인하세요. 각 컴포넌트에는 자세한 문서와 사용 예제가 포함되어 있습니다."
-    }
-  },
-  "blog": {
-    "blog": "블로그",
-    "title": "블로그",
-    "description": "최신 기사 및 업데이트",
-    "readMore": "더 읽기",
-    "publishedOn": "게시일",
-    "author": "작성자",
-    "tags": "태그",
-    "noPostsFound": "게시물을 찾을 수 없습니다",
-    "backToBlog": "블로그로 돌아가기"
-  },
-  "tags": {
-    "title": "태그",
-    "description": "태그와 키워드로 구성된 콘텐츠 탐색",
-    "noTagsFound": "태그를 찾을 수 없습니다",
-    "articlesCount": "기사",
-    "articleCount": "기사",
-    "taggedWith": "태그된 기사",
-    "noPostsInTag": "이 태그에는 아직 게시물이 없습니다",
-    "tags": "태그",
-    "discover_our_content_organized_by_tags_and_keywords": "태그와 키워드로 구성된 콘텐츠 탐색",
-    "tagged_with_this_keyword": "이 키워드로 태그된 기사",
-    "articles_tagged_with": "태그된 기사"
-  },
   "categories": {
-    "title": "카테고리",
+    "articleCount": "기사",
+    "articlesCount": "기사",
+    "categorizedIn": "카테고리의 기사",
     "description": "카테고리로 구성된 콘텐츠 탐색",
     "noCategoriesFound": "카테고리를 찾을 수 없습니다",
-    "articlesCount": "기사",
-    "articleCount": "기사",
-    "categorizedIn": "카테고리의 기사",
-    "noPostsInCategory": "이 카테고리에는 아직 게시물이 없습니다"
+    "noPostsInCategory": "이 카테고리에는 아직 게시물이 없습니다",
+    "title": "카테고리"
   },
   "category": {
-    "posts_in": "카테고리의 기사",
-    "no_posts_found_in_this_category_yet": "이 카테고리에는 아직 게시물이 없습니다"
+    "no_posts_found_in_this_category_yet": "이 카테고리에는 아직 게시물이 없습니다",
+    "posts_in": "카테고리의 기사"
+  },
+  "common": {
+    "back": "뒤로",
+    "cancel": "취소",
+    "close": "닫기",
+    "dark": "다크",
+    "delete": "삭제",
+    "edit": "편집",
+    "enterPassword": "비밀번호 입력",
+    "forward": "앞으로",
+    "goTo": "이동",
+    "indexingContent": "콘텐츠 인덱싱 중...",
+    "light": "라이트",
+    "loading": "로딩 중...",
+    "next": "다음",
+    "open": "열기",
+    "password": "비밀번호",
+    "previous": "이전",
+    "relevance": "관련성",
+    "save": "저장",
+    "search": "검색",
+    "searchPlaceholder": "검색하려면 입력하세요...",
+    "sectionNavigation": "섹션 네비게이션",
+    "sectionOf": "섹션 {current} / {total}",
+    "tableOfContents": "목차",
+    "theme": "테마",
+    "unlockContent": "콘텐츠 잠금 해제",
+    "verifying": "확인 중..."
+  },
+  "components": {
+    "accordion": {
+      "description": "각각 콘텐츠 섹션을 보여주는 수직으로 쌓인 상호작용 헤더 세트입니다.",
+      "title": "아코디언"
+    },
+    "alert": {
+      "description": "다양한 스타일과 변형으로 사용자에게 중요한 정보를 표시하는 알림 컴포넌트입니다.",
+      "title": "알림"
+    },
+    "alertDialog": {
+      "description": "다양한 스타일과 변형으로 액션 확인 및 중요한 정보 표시를 위한 모달 대화상자입니다.",
+      "title": "알림 대화상자"
+    },
+    "avatar": {
+      "description": "다양한 스타일과 설정으로 사용자를 나타내기 위한 대체 이미지 요소입니다.",
+      "title": "아바타 컴포넌트"
+    },
+    "badge": {
+      "description": "다양한 스타일과 설정을 가진 UI 요소의 작은 상태 설명자입니다.",
+      "title": "배지 컴포넌트"
+    },
+    "breadcrumb": {
+      "description": "사이트 계층 내에서 현재 페이지의 위치를 보여주는 네비게이션 컴포넌트입니다.",
+      "title": "브레드크럼 컴포넌트"
+    },
+    "button": {
+      "description": "다양한 스타일, 크기, 상태를 가진 사용자 액션을 위한 상호작용 요소입니다.",
+      "title": "버튼 컴포넌트"
+    },
+    "card": {
+      "description": "다양한 레이아웃과 스타일로 관련 콘텐츠와 액션을 그룹화하는 유연한 컨테이너입니다.",
+      "title": "카드 컴포넌트"
+    },
+    "carousel": {
+      "description": "다양한 네비게이션 옵션으로 슬라이딩 형식으로 콘텐츠를 표시하는 상호작용 캐러셀입니다.",
+      "title": "캐러셀 컴포넌트"
+    },
+    "checkbox": {
+      "description": "다양한 스타일과 상태를 가진 폼, 선택, 사용자 입력을 위한 상호작용 체크박스입니다.",
+      "title": "체크박스 컴포넌트"
+    },
+    "collapsible": {
+      "description": "부드러운 애니메이션과 다양한 트리거 스타일을 가진 확장 가능하고 접을 수 있는 콘텐츠 영역입니다.",
+      "title": "접을 수 있는 컴포넌트"
+    },
+    "count": "컴포넌트",
+    "dropdown": {
+      "description": "다양한 콘텐츠 유형, 상호작용, 스타일링 옵션을 가진 컨텍스트 메뉴와 드롭다운입니다.",
+      "title": "드롭다운 컴포넌트"
+    },
+    "howToUse": {
+      "description": "위의 컴포넌트 카테고리를 선택하여 사용 가능한 모든 옵션, 코드 예제, 상호작용 데모를 확인하세요. 각 컴포넌트에는 자세한 문서와 사용 예제가 포함되어 있습니다.",
+      "title": "사용 방법"
+    },
+    "layout": {
+      "description": "데모를 위한 레이아웃 컴포넌트, 코드 예제, 유틸리티 컴포넌트입니다.",
+      "title": "레이아웃 & 유틸리티"
+    },
+    "more": "더보기",
+    "title": "UI 컴포넌트 라이브러리",
+    "variants": "변형:"
   },
   "home": {
-    "latestPosts": "Latest posts",
-    "readOurLatestArticlesAndUpdates": "Read our latest articles and updates",
-    "categories": "Categories",
-    "exploreOurContentOrganizedByTopics": "Explore our content organized by topics",
-    "ourAuthors": "Our authors",
-    "meetTheTalentedWritersBehindOurContent": "Meet the talented writers behind our content",
-    "postsWithDemoAndHelloTags": "Posts with demo and hello tags",
-    "articlesWithPopularTags": "Articles with popular tags"
+    "all50ShadcnUiComponentsAreReadyToUse": "50개의 모든 Shadcn UI 컴포넌트가 사용 준비되었습니다",
+    "aModernGitAsCmsPoweredWebsite": "Git-as-CMS로 구동되는 현대적인 웹사이트",
+    "articlesWithPopularTags": "인기 태그가 있는 기사",
+    "availableComponents": "사용 가능한 컴포넌트",
+    "categories": "카테고리",
+    "currentLocale": "현재 로케일",
+    "exploreOurContentOrganizedByTopics": "주제별로 정리된 콘텐츠를 탐색하세요",
+    "latestPosts": "최신 게시물",
+    "meetTheTalentedWritersBehindOurContent": "우리 콘텐츠 뒤의 재능 있는 작가들을 만나보세요",
+    "ourAuthors": "저자들",
+    "postsWithDemoAndHelloTags": "데모와 헬로 태그가 있는 게시물",
+    "readOurLatestArticlesAndUpdates": "최신 기사와 업데이트를 읽어보세요",
+    "welcomeToJambo": "Jambo에 오신 것을 환영합니다"
+  },
+  "navigation": {
+    "about": "소개",
+    "admin": "관리자",
+    "all_rights_reserved": "모든 권리 보유",
+    "analytics": "분석",
+    "blog": "블로그",
+    "categories": "카테고리",
+    "contact": "연락처",
+    "demo": "데모",
+    "discover_amazing_content_organized_by_tags_and_categories": "태그와 카테고리로 정리된 놀라운 콘텐츠를 발견하세요",
+    "group1SectionA": "그룹 1 - 섹션 A",
+    "group2SectionD": "그룹 2 - 섹션 D",
+    "home": "홈",
+    "navigation": "네비게이션",
+    "overview": "개요",
+    "page": "페이지",
+    "privacy_policy": "개인정보처리방침",
+    "projects": "프로젝트",
+    "search": "검색",
+    "settings": "설정",
+    "tableOfContents": "목차",
+    "tags": "태그",
+    "terms_of_service": "서비스 약관"
+  },
+  "passwordGroups": {
+    "allOtherSections": "다른 모든 섹션",
+    "coversAllSections": "이 그룹은 다른 그룹에 명시적으로 할당되지 않은 모든 섹션을 포함합니다",
+    "coversSpecifiedSections": "이 그룹은 지정된 섹션만 포함합니다",
+    "description": "각 섹션 ID는 아래 구성에 따라 자동으로 비밀번호 그룹에 할당됩니다.",
+    "password": "비밀번호:",
+    "section": "섹션",
+    "sections": "섹션:",
+    "title": "비밀번호 그룹 구성"
+  },
+  "project": {
+    "description": "상업적 제안 생성기",
+    "name": "Jambo"
+  },
+  "search": {
+    "noHeadings": "제목이 없습니다",
+    "nothingFound": "아무것도 찾을 수 없습니다",
+    "tryDifferentKeywords": "다른 키워드를 시도해 보세요"
+  },
+  "tags": {
+    "articleCount": "기사",
+    "articles_tagged_with": "태그된 기사",
+    "articlesCount": "기사",
+    "description": "태그와 키워드로 구성된 콘텐츠 탐색",
+    "discover_our_content_organized_by_tags_and_keywords": "태그와 키워드로 구성된 콘텐츠 탐색",
+    "noPostsInTag": "이 태그에는 아직 게시물이 없습니다",
+    "noTagsFound": "태그를 찾을 수 없습니다",
+    "tagged_with_this_keyword": "이 키워드로 태그된 기사",
+    "taggedWith": "태그된 기사",
+    "tags": "태그",
+    "title": "태그"
+  },
+  "tariff": {
+    "popular": "인기"
   }
 }

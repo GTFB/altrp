@@ -1,196 +1,201 @@
 {
-  "common": {
-    "search": "بحث",
-    "searchPlaceholder": "اكتب للبحث...",
-    "loading": "جاري التحميل...",
-    "cancel": "إلغاء",
-    "close": "إغلاق",
-    "open": "فتح",
-    "save": "حفظ",
-    "delete": "حذف",
-    "edit": "تعديل",
-    "back": "رجوع",
-    "next": "التالي",
-    "previous": "السابق",
-    "goTo": "انتقل إلى",
-    "relevance": "الصلة",
-    "password": "كلمة المرور",
-    "enterPassword": "أدخل كلمة المرور",
-    "unlockContent": "إلغاء قفل المحتوى",
-    "verifying": "جاري التحقق...",
-    "theme": "المظهر",
-    "light": "فاتح",
-    "dark": "داكن",
-    "sectionOf": "القسم {current} من {total}",
-    "tableOfContents": "جدول المحتويات",
-    "indexingContent": "جاري فهرسة المحتوى...",
-    "forward": "إلى الأمام",
-    "sectionNavigation": "تنقل الأقسام"
-  },
-  "navigation": {
-    "tableOfContents": "جدول المحتويات",
-    "search": "بحث",
-    "overview": "نظرة عامة",
-    "projects": "المشاريع",
-    "analytics": "التحليلات",
-    "settings": "الإعدادات",
-    "demo": "عرض توضيحي",
-    "group1SectionA": "المجموعة 1 - القسم أ",
-    "group2SectionD": "المجموعة 2 - القسم د",
-    "home": "الرئيسية",
-    "blog": "المدونة",
-    "about": "حول",
-    "contact": "اتصل بنا",
-    "admin": "الإدارة",
-    "tags": "العلامات",
-    "categories": "الفئات",
-    "privacy_policy": "سياسة الخصوصية",
-    "terms_of_service": "شروط الخدمة",
-    "all_rights_reserved": "جميع الحقوق محفوظة",
-    "navigation": "التنقل",
-    "page": "صفحة",
-    "discover_amazing_content_organized_by_tags_and_categories": "اكتشف محتوى رائع منظم بواسطة العلامات والفئات"
-  },
   "auth": {
-    "protectedContent": "محتوى محمي",
-    "passwordProtected": "هذا المحتوى محمي بكلمة مرور. يرجى إدخال كلمة المرور للمتابعة.",
     "accessGranted": "تم منح الوصول إلى:",
     "authenticationFailed": "فشل في المصادقة",
-    "networkError": "خطأ في الشبكة. يرجى المحاولة مرة أخرى."
+    "networkError": "خطأ في الشبكة. يرجى المحاولة مرة أخرى.",
+    "passwordProtected": "هذا المحتوى محمي بكلمة مرور. يرجى إدخال كلمة المرور للمتابعة.",
+    "protectedContent": "محتوى محمي"
   },
-  "search": {
-    "nothingFound": "لم يتم العثور على شيء",
-    "tryDifferentKeywords": "جرب كلمات مفتاحية مختلفة",
-    "noHeadings": "لا توجد عناوين"
-  },
-  "passwordGroups": {
-    "title": "تكوين مجموعات كلمات المرور",
-    "description": "يتم تعيين كل معرف قسم تلقائياً إلى مجموعة كلمات مرور بناءً على التكوين أدناه.",
-    "password": "كلمة المرور:",
-    "sections": "الأقسام:",
-    "allOtherSections": "جميع الأقسام الأخرى",
-    "section": "قسم",
-    "coversAllSections": "هذه المجموعة تغطي جميع الأقسام غير المعينة صراحة لمجموعات أخرى",
-    "coversSpecifiedSections": "هذه المجموعة تغطي الأقسام المحددة فقط"
-  },
-  "project": {
-    "name": "Probo",
-    "description": "مولد المقترحات التجارية"
+  "blog": {
+    "author": "المؤلف",
+    "backToBlog": "العودة إلى المدونة",
+    "blog": "المدونة",
+    "description": "أحدث المقالات والتحديثات",
+    "noPostsFound": "لم يتم العثور على مقالات",
+    "publishedOn": "نُشر في",
+    "readMore": "اقرأ المزيد",
+    "tags": "العلامات",
+    "title": "المدونة"
   },
   "breadcrumb": {
     "buildingApplication": "بناء تطبيقك",
     "dataFetching": "جلب البيانات"
   },
-  "tariff": {
-    "popular": "شائع"
-  },
-  "components": {
-    "title": "مكتبة مكونات واجهة المستخدم",
-    "accordion": {
-      "title": "أكورديون",
-      "description": "مجموعة من العناوين التفاعلية المكدسة عمودياً والتي تكشف عن قسم محتوى."
-    },
-    "alert": {
-      "title": "تنبيه",
-      "description": "مكونات التنبيه لعرض معلومات مهمة للمستخدمين بأنماط ومتغيرات مختلفة."
-    },
-    "alertDialog": {
-      "title": "حوار التنبيه",
-      "description": "حوارات نمطية لتأكيد الإجراء وعرض معلومات مهمة بأنماط ومتغيرات مختلفة."
-    },
-    "badge": {
-      "title": "مكونات الشارة",
-      "description": "واصفات حالة صغيرة لعناصر واجهة المستخدم بأنماط وتكوينات مختلفة."
-    },
-    "avatar": {
-      "title": "مكونات الصورة الرمزية",
-      "description": "عنصر صورة مع بديل لتمثيل المستخدم بأنماط وتكوينات مختلفة."
-    },
-    "breadcrumb": {
-      "title": "مكونات مسار التنقل",
-      "description": "مكونات التنقل التي توضح موقع الصفحة الحالية داخل التسلسل الهرمي للموقع."
-    },
-    "button": {
-      "title": "مكونات الزر",
-      "description": "عناصر تفاعلية لإجراءات المستخدم بأنماط وأحجام وحالات مختلفة."
-    },
-    "card": {
-      "title": "مكونات البطاقة",
-      "description": "حاويات مرنة لتجميع المحتوى ذي الصلة والإجراءات بتخطيطات وأنماط مختلفة."
-    },
-    "carousel": {
-      "title": "مكونات الدوارة",
-      "description": "دوارات تفاعلية لعرض المحتوى بتنسيق منزلق مع خيارات تنقل مختلفة."
-    },
-    "checkbox": {
-      "title": "مكونات خانة الاختيار",
-      "description": "خانات اختيار تفاعلية للنماذج والاختيارات وإدخال المستخدم بأنماط وحالات مختلفة."
-    },
-    "collapsible": {
-      "title": "مكونات قابلة للطي",
-      "description": "مناطق محتوى قابلة للتوسيع والطي مع رسوم متحركة سلسة وأنماط مشغل مختلفة."
-    },
-    "dropdown": {
-      "title": "مكونات القائمة المنسدلة",
-      "description": "قوائم سياقية وقوائم منسدلة بأنواع محتوى وتفاعلات وخيارات تنسيق مختلفة."
-    },
-    "layout": {
-      "title": "التخطيط والمرافق",
-      "description": "مكونات التخطيط وأمثلة الكود ومكونات المرافق للعروض التوضيحية."
-    },
-    "count": "مكونات",
-    "variants": "المتغيرات:",
-    "more": "المزيد",
-    "howToUse": {
-      "title": "كيفية الاستخدام",
-      "description": "اختر فئة مكون أعلاه لعرض جميع الخيارات المتاحة وأمثلة الكود والعروض التفاعلية. يتضمن كل مكون توثيقاً مفصلاً وأمثلة استخدام."
-    }
-  },
-  "blog": {
-    "blog": "المدونة",
-    "title": "المدونة",
-    "description": "أحدث المقالات والتحديثات",
-    "readMore": "اقرأ المزيد",
-    "publishedOn": "نُشر في",
-    "author": "المؤلف",
-    "tags": "العلامات",
-    "noPostsFound": "لم يتم العثور على مقالات",
-    "backToBlog": "العودة إلى المدونة"
-  },
-  "tags": {
-    "title": "العلامات",
-    "description": "اكتشف محتوانا المنظم حسب العلامات والكلمات المفتاحية",
-    "noTagsFound": "لم يتم العثور على علامات",
-    "articlesCount": "مقالات",
-    "articleCount": "مقال",
-    "taggedWith": "المقالات المميزة بـ",
-    "noPostsInTag": "لا توجد مقالات في هذه العلامة بعد",
-    "tags": "العلامات",
-    "discover_our_content_organized_by_tags_and_keywords": "اكتشف محتوانا المنظم حسب العلامات والكلمات المفتاحية",
-    "tagged_with_this_keyword": "المقالات المميزة بهذه الكلمة المفتاحية",
-    "articles_tagged_with": "المقالات المميزة بـ"
-  },
   "categories": {
-    "title": "الفئات",
+    "articleCount": "مقال",
+    "articlesCount": "مقالات",
+    "categorizedIn": "المقالات في الفئة",
     "description": "اكتشف محتوانا المنظم حسب الفئات",
     "noCategoriesFound": "لم يتم العثور على فئات",
-    "articlesCount": "مقالات",
-    "articleCount": "مقال",
-    "categorizedIn": "المقالات في الفئة",
-    "noPostsInCategory": "لا توجد مقالات في هذه الفئة بعد"
+    "noPostsInCategory": "لا توجد مقالات في هذه الفئة بعد",
+    "title": "الفئات"
   },
   "category": {
-    "posts_in": "المقالات في",
-    "no_posts_found_in_this_category_yet": "لا توجد مقالات في هذه الفئة بعد"
+    "no_posts_found_in_this_category_yet": "لا توجد مقالات في هذه الفئة بعد",
+    "posts_in": "المقالات في"
+  },
+  "common": {
+    "back": "رجوع",
+    "cancel": "إلغاء",
+    "close": "إغلاق",
+    "dark": "داكن",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "enterPassword": "أدخل كلمة المرور",
+    "forward": "إلى الأمام",
+    "goTo": "انتقل إلى",
+    "indexingContent": "جاري فهرسة المحتوى...",
+    "light": "فاتح",
+    "loading": "جاري التحميل...",
+    "next": "التالي",
+    "open": "فتح",
+    "password": "كلمة المرور",
+    "previous": "السابق",
+    "relevance": "الصلة",
+    "save": "حفظ",
+    "search": "بحث",
+    "searchPlaceholder": "اكتب للبحث...",
+    "sectionNavigation": "تنقل الأقسام",
+    "sectionOf": "القسم {current} من {total}",
+    "tableOfContents": "جدول المحتويات",
+    "theme": "المظهر",
+    "unlockContent": "إلغاء قفل المحتوى",
+    "verifying": "جاري التحقق..."
+  },
+  "components": {
+    "accordion": {
+      "description": "مجموعة من العناوين التفاعلية المكدسة عمودياً والتي تكشف عن قسم محتوى.",
+      "title": "أكورديون"
+    },
+    "alert": {
+      "description": "مكونات التنبيه لعرض معلومات مهمة للمستخدمين بأنماط ومتغيرات مختلفة.",
+      "title": "تنبيه"
+    },
+    "alertDialog": {
+      "description": "حوارات نمطية لتأكيد الإجراء وعرض معلومات مهمة بأنماط ومتغيرات مختلفة.",
+      "title": "حوار التنبيه"
+    },
+    "avatar": {
+      "description": "عنصر صورة مع بديل لتمثيل المستخدم بأنماط وتكوينات مختلفة.",
+      "title": "مكونات الصورة الرمزية"
+    },
+    "badge": {
+      "description": "واصفات حالة صغيرة لعناصر واجهة المستخدم بأنماط وتكوينات مختلفة.",
+      "title": "مكونات الشارة"
+    },
+    "breadcrumb": {
+      "description": "مكونات التنقل التي توضح موقع الصفحة الحالية داخل التسلسل الهرمي للموقع.",
+      "title": "مكونات مسار التنقل"
+    },
+    "button": {
+      "description": "عناصر تفاعلية لإجراءات المستخدم بأنماط وأحجام وحالات مختلفة.",
+      "title": "مكونات الزر"
+    },
+    "card": {
+      "description": "حاويات مرنة لتجميع المحتوى ذي الصلة والإجراءات بتخطيطات وأنماط مختلفة.",
+      "title": "مكونات البطاقة"
+    },
+    "carousel": {
+      "description": "دوارات تفاعلية لعرض المحتوى بتنسيق منزلق مع خيارات تنقل مختلفة.",
+      "title": "مكونات الدوارة"
+    },
+    "checkbox": {
+      "description": "خانات اختيار تفاعلية للنماذج والاختيارات وإدخال المستخدم بأنماط وحالات مختلفة.",
+      "title": "مكونات خانة الاختيار"
+    },
+    "collapsible": {
+      "description": "مناطق محتوى قابلة للتوسيع والطي مع رسوم متحركة سلسة وأنماط مشغل مختلفة.",
+      "title": "مكونات قابلة للطي"
+    },
+    "count": "مكونات",
+    "dropdown": {
+      "description": "قوائم سياقية وقوائم منسدلة بأنواع محتوى وتفاعلات وخيارات تنسيق مختلفة.",
+      "title": "مكونات القائمة المنسدلة"
+    },
+    "howToUse": {
+      "description": "اختر فئة مكون أعلاه لعرض جميع الخيارات المتاحة وأمثلة الكود والعروض التفاعلية. يتضمن كل مكون توثيقاً مفصلاً وأمثلة استخدام.",
+      "title": "كيفية الاستخدام"
+    },
+    "layout": {
+      "description": "مكونات التخطيط وأمثلة الكود ومكونات المرافق للعروض التوضيحية.",
+      "title": "التخطيط والمرافق"
+    },
+    "more": "المزيد",
+    "title": "مكتبة مكونات واجهة المستخدم",
+    "variants": "المتغيرات:"
   },
   "home": {
-    "latestPosts": "Latest posts",
-    "readOurLatestArticlesAndUpdates": "Read our latest articles and updates",
-    "categories": "Categories",
-    "exploreOurContentOrganizedByTopics": "Explore our content organized by topics",
-    "ourAuthors": "Our authors",
-    "meetTheTalentedWritersBehindOurContent": "Meet the talented writers behind our content",
-    "postsWithDemoAndHelloTags": "Posts with demo and hello tags",
-    "articlesWithPopularTags": "Articles with popular tags"
+    "all50ShadcnUiComponentsAreReadyToUse": "جميع مكونات Shadcn UI الـ 50 جاهزة للاستخدام",
+    "aModernGitAsCmsPoweredWebsite": "موقع حديث مدعوم بـ Git-as-CMS",
+    "articlesWithPopularTags": "مقالات بعلامات شائعة",
+    "availableComponents": "المكونات المتاحة",
+    "categories": "الفئات",
+    "currentLocale": "اللغة الحالية",
+    "exploreOurContentOrganizedByTopics": "استكشف محتوانا المنظم حسب المواضيع",
+    "latestPosts": "أحدث المنشورات",
+    "meetTheTalentedWritersBehindOurContent": "تعرف على الكتاب الموهوبين وراء محتوانا",
+    "ourAuthors": "كتابنا",
+    "postsWithDemoAndHelloTags": "منشورات بعلامات demo و hello",
+    "readOurLatestArticlesAndUpdates": "اقرأ أحدث مقالاتنا وتحديثاتنا",
+    "welcomeToJambo": "مرحبًا بك في Jambo"
+  },
+  "navigation": {
+    "about": "حول",
+    "admin": "الإدارة",
+    "all_rights_reserved": "جميع الحقوق محفوظة",
+    "analytics": "التحليلات",
+    "blog": "المدونة",
+    "categories": "الفئات",
+    "contact": "اتصل بنا",
+    "demo": "عرض توضيحي",
+    "discover_amazing_content_organized_by_tags_and_categories": "اكتشف محتوى رائع منظم بواسطة العلامات والفئات",
+    "group1SectionA": "المجموعة 1 - القسم أ",
+    "group2SectionD": "المجموعة 2 - القسم د",
+    "home": "الرئيسية",
+    "navigation": "التنقل",
+    "overview": "نظرة عامة",
+    "page": "صفحة",
+    "privacy_policy": "سياسة الخصوصية",
+    "projects": "المشاريع",
+    "search": "بحث",
+    "settings": "الإعدادات",
+    "tableOfContents": "جدول المحتويات",
+    "tags": "العلامات",
+    "terms_of_service": "شروط الخدمة"
+  },
+  "passwordGroups": {
+    "allOtherSections": "جميع الأقسام الأخرى",
+    "coversAllSections": "هذه المجموعة تغطي جميع الأقسام غير المعينة صراحة لمجموعات أخرى",
+    "coversSpecifiedSections": "هذه المجموعة تغطي الأقسام المحددة فقط",
+    "description": "يتم تعيين كل معرف قسم تلقائياً إلى مجموعة كلمات مرور بناءً على التكوين أدناه.",
+    "password": "كلمة المرور:",
+    "section": "قسم",
+    "sections": "الأقسام:",
+    "title": "تكوين مجموعات كلمات المرور"
+  },
+  "project": {
+    "description": "مولد المقترحات التجارية",
+    "name": "Jambo"
+  },
+  "search": {
+    "noHeadings": "لا توجد عناوين",
+    "nothingFound": "لم يتم العثور على شيء",
+    "tryDifferentKeywords": "جرب كلمات مفتاحية مختلفة"
+  },
+  "tags": {
+    "articleCount": "مقال",
+    "articles_tagged_with": "المقالات المميزة بـ",
+    "articlesCount": "مقالات",
+    "description": "اكتشف محتوانا المنظم حسب العلامات والكلمات المفتاحية",
+    "discover_our_content_organized_by_tags_and_keywords": "اكتشف محتوانا المنظم حسب العلامات والكلمات المفتاحية",
+    "noPostsInTag": "لا توجد مقالات في هذه العلامة بعد",
+    "noTagsFound": "لم يتم العثور على علامات",
+    "tagged_with_this_keyword": "المقالات المميزة بهذه الكلمة المفتاحية",
+    "taggedWith": "المقالات المميزة بـ",
+    "tags": "العلامات",
+    "title": "العلامات"
+  },
+  "tariff": {
+    "popular": "شائع"
   }
 }

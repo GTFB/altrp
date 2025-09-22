@@ -1,205 +1,206 @@
 {
-  "project": {
-    "name": "Probo",
-    "description": "Generador de propuestas comerciales"
-  },
-  "common": {
-    "search": "Buscar",
-    "searchPlaceholder": "Escriba para buscar...",
-    "loading": "Cargando...",
-    "loadingApplication": "Cargando aplicación",
-    "takingToMainPage": "Redirigiendo a la página principal",
-    "indexingContent": "Indexando contenido...",
-    "preparingSearch": "Preparando búsqueda...",
-    "navigation": "Navegación",
-    "forward": "Adelante",
-    "sectionNavigation": "Navegación de secciones",
-    "noHeadings": "Sin encabezados",
-    "cancel": "Cancelar",
-    "close": "Cerrar",
-    "open": "Abrir",
-    "save": "Guardar",
-    "delete": "Eliminar",
-    "edit": "Editar",
-    "back": "Atrás",
-    "next": "Siguiente",
-    "previous": "Anterior",
-    "goTo": "Ir a",
-    "relevance": "Relevancia",
-    "password": "Contraseña",
-    "enterPassword": "Ingrese la contraseña",
-    "unlockContent": "Desbloquear contenido",
-    "verifying": "Verificando...",
-    "theme": "Tema",
-    "light": "Claro",
-    "dark": "Oscuro",
-    "sectionOf": "Sección {current} de {total}",
-    "tableOfContents": "Tabla de Contenidos"
-  },
-  "navigation": {
-    "tableOfContents": "Tabla de contenidos",
-    "search": "Buscar",
-    "overview": "Resumen",
-    "projects": "Proyectos",
-    "analytics": "Analíticas",
-    "settings": "Configuración",
-    "demo": "Demostración",
-    "group1SectionA": "Grupo 1 - Sección A",
-    "group2SectionD": "Grupo 2 - Sección D",
-    "home": "Inicio",
-    "blog": "Blog",
-    "about": "Acerca de",
-    "contact": "Contacto",
-    "admin": "Administración",
-    "tags": "Etiquetas",
-    "categories": "Categorías",
-    "privacy_policy": "Política de Privacidad",
-    "terms_of_service": "Términos de Servicio",
-    "all_rights_reserved": "Todos los derechos reservados",
-    "navigation": "Navegación",
-    "page": "Página",
-    "discover_amazing_content_organized_by_tags_and_categories": "Descubre contenido increíble organizado por etiquetas y categorías"
-  },
   "auth": {
-    "protectedContent": "Contenido protegido",
-    "passwordProtected": "Este contenido está protegido por contraseña. Por favor, ingrese la contraseña para continuar.",
     "accessGranted": "Acceso concedido a:",
     "authenticationFailed": "Error de autenticación",
-    "networkError": "Error de red. Por favor, intente de nuevo."
+    "networkError": "Error de red. Por favor, intente de nuevo.",
+    "passwordProtected": "Este contenido está protegido por contraseña. Por favor, ingrese la contraseña para continuar.",
+    "protectedContent": "Contenido protegido"
   },
-  "search": {
-    "nothingFound": "No se encontró nada",
-    "tryDifferentKeywords": "Pruebe con palabras clave diferentes",
-    "noHeadings": "Sin encabezados"
-  },
-  "passwordGroups": {
-    "title": "Configuración de grupos de contraseñas",
-    "description": "Cada ID de sección se asigna automáticamente a un grupo de contraseñas basado en la configuración a continuación.",
-    "password": "Contraseña:",
-    "sections": "Secciones:",
-    "allOtherSections": "Todas las demás secciones",
-    "section": "Sección",
-    "coversAllSections": "Este grupo cubre todas las secciones no asignadas explícitamente a otros grupos",
-    "coversSpecifiedSections": "Este grupo cubre solo las secciones especificadas"
-  },
-  "project": {
-    "name": "Probo",
-    "description": "Generador de propuestas comerciales"
+  "blog": {
+    "author": "Autor",
+    "backToBlog": "Volver al blog",
+    "blog": "Blog",
+    "description": "Últimos artículos y actualizaciones",
+    "noPostsFound": "No se encontraron publicaciones",
+    "publishedOn": "Publicado el",
+    "readMore": "Leer más",
+    "tags": "Etiquetas",
+    "title": "Blog"
   },
   "breadcrumb": {
     "buildingApplication": "Construyendo su aplicación",
     "dataFetching": "Obtención de datos"
   },
-  "tariff": {
-    "popular": "Popular"
-  },
-  "components": {
-    "title": "Biblioteca de Componentes UI",
-    "accordion": {
-      "title": "Accordion",
-      "description": "Un conjunto de encabezados interactivos apilados verticalmente que revelan una sección de contenido."
-    },
-    "alert": {
-      "title": "Alert",
-      "description": "Componentes de alerta para mostrar información importante a los usuarios con varios estilos y variantes."
-    },
-    "alertDialog": {
-      "title": "Alert Dialog",
-      "description": "Diálogos modales para confirmación de acciones y mostrar información importante con varios estilos y variantes."
-    },
-    "badge": {
-      "title": "Componentes Badge",
-      "description": "Pequeños descriptores de estado para elementos de UI con varios estilos y configuraciones."
-    },
-    "avatar": {
-      "title": "Componentes Avatar",
-      "description": "Un elemento de imagen con respaldo para representar al usuario con varios estilos y configuraciones."
-    },
-    "breadcrumb": {
-      "title": "Componentes Breadcrumb",
-      "description": "Componentes de navegación que muestran la ubicación de la página actual dentro de una jerarquía del sitio."
-    },
-    "button": {
-      "title": "Componentes Button",
-      "description": "Elementos interactivos para acciones del usuario con varios estilos, tamaños y estados."
-    },
-    "card": {
-      "title": "Componentes Card",
-      "description": "Contenedores flexibles para agrupar contenido relacionado y acciones con varios diseños y estilos."
-    },
-    "carousel": {
-      "title": "Componentes Carousel",
-      "description": "Carruseles interactivos para mostrar contenido en formato deslizante con várias opciones de navegación."
-    },
-    "checkbox": {
-      "title": "Componentes Checkbox",
-      "description": "Casillas de verificación interactivas para formularios, selecciones y entrada del usuario con varios estilos y estados."
-    },
-    "collapsible": {
-      "title": "Componentes Collapsible",
-      "description": "Áreas de contenido expandibles y plegables con animaciones suaves y varios estilos de activación."
-    },
-    "dropdown": {
-      "title": "Componentes Dropdown",
-      "description": "Menús contextuales y desplegables con varios tipos de contenido, interacciones y opciones de estilo."
-    },
-    "layout": {
-      "title": "Layout y Utilidades",
-      "description": "Componentes de diseño, ejemplos de código y componentes utilitarios para demostraciones."
-    },
-    "count": "componentes",
-    "variants": "Variantes:",
-    "more": "más",
-    "howToUse": {
-      "title": "Cómo usar",
-      "description": "Seleccione una categoría de componente arriba para ver todas las opciones disponibles, ejemplos de código y demostraciones interactivas. Cada componente incluye documentación detallada y ejemplos de uso."
-    }
-  },
-  "blog": {
-    "blog": "Blog",
-    "title": "Blog",
-    "description": "Últimos artículos y actualizaciones",
-    "readMore": "Leer más",
-    "publishedOn": "Publicado el",
-    "author": "Autor",
-    "tags": "Etiquetas",
-    "noPostsFound": "No se encontraron publicaciones",
-    "backToBlog": "Volver al blog"
-  },
-  "tags": {
-    "title": "Etiquetas",
-    "description": "Descubre nuestro contenido organizado por etiquetas y palabras clave",
-    "noTagsFound": "No se encontraron etiquetas",
-    "articlesCount": "artículos",
-    "articleCount": "artículo",
-    "taggedWith": "Artículos etiquetados con",
-    "noPostsInTag": "Aún no hay publicaciones en esta etiqueta",
-    "tags": "Etiquetas",
-    "discover_our_content_organized_by_tags_and_keywords": "Descubre nuestro contenido organizado por etiquetas y palabras clave",
-    "tagged_with_this_keyword": "Artículos etiquetados con esta palabra clave",
-    "articles_tagged_with": "Artículos etiquetados con"
-  },
   "categories": {
-    "title": "Categorías",
+    "articleCount": "artículo",
+    "articlesCount": "artículos",
+    "categorizedIn": "Artículos en categoría",
     "description": "Descubre nuestro contenido organizado por categorías",
     "noCategoriesFound": "No se encontraron categorías",
-    "articlesCount": "artículos",
-    "articleCount": "artículo",
-    "categorizedIn": "Artículos en categoría",
-    "noPostsInCategory": "Aún no hay publicaciones en esta categoría"
+    "noPostsInCategory": "Aún no hay publicaciones en esta categoría",
+    "title": "Categorías"
   },
   "category": {
-    "posts_in": "Publicaciones en",
-    "no_posts_found_in_this_category_yet": "Aún no hay publicaciones en esta categoría"
+    "no_posts_found_in_this_category_yet": "Aún no hay publicaciones en esta categoría",
+    "posts_in": "Publicaciones en"
+  },
+  "common": {
+    "back": "Atrás",
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "dark": "Oscuro",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "enterPassword": "Ingrese la contraseña",
+    "forward": "Adelante",
+    "goTo": "Ir a",
+    "indexingContent": "Indexando contenido...",
+    "light": "Claro",
+    "loading": "Cargando...",
+    "loadingApplication": "Cargando aplicación",
+    "navigation": "Navegación",
+    "next": "Siguiente",
+    "noHeadings": "Sin encabezados",
+    "open": "Abrir",
+    "password": "Contraseña",
+    "preparingSearch": "Preparando búsqueda...",
+    "previous": "Anterior",
+    "relevance": "Relevancia",
+    "save": "Guardar",
+    "search": "Buscar",
+    "searchPlaceholder": "Escriba para buscar...",
+    "sectionNavigation": "Navegación de secciones",
+    "sectionOf": "Sección {current} de {total}",
+    "tableOfContents": "Tabla de Contenidos",
+    "takingToMainPage": "Redirigiendo a la página principal",
+    "theme": "Tema",
+    "unlockContent": "Desbloquear contenido",
+    "verifying": "Verificando..."
+  },
+  "components": {
+    "accordion": {
+      "description": "Un conjunto de encabezados interactivos apilados verticalmente que revelan una sección de contenido.",
+      "title": "Accordion"
+    },
+    "alert": {
+      "description": "Componentes de alerta para mostrar información importante a los usuarios con varios estilos y variantes.",
+      "title": "Alert"
+    },
+    "alertDialog": {
+      "description": "Diálogos modales para confirmación de acciones y mostrar información importante con varios estilos y variantes.",
+      "title": "Alert Dialog"
+    },
+    "avatar": {
+      "description": "Un elemento de imagen con respaldo para representar al usuario con varios estilos y configuraciones.",
+      "title": "Componentes Avatar"
+    },
+    "badge": {
+      "description": "Pequeños descriptores de estado para elementos de UI con varios estilos y configuraciones.",
+      "title": "Componentes Badge"
+    },
+    "breadcrumb": {
+      "description": "Componentes de navegación que muestran la ubicación de la página actual dentro de una jerarquía del sitio.",
+      "title": "Componentes Breadcrumb"
+    },
+    "button": {
+      "description": "Elementos interactivos para acciones del usuario con varios estilos, tamaños y estados.",
+      "title": "Componentes Button"
+    },
+    "card": {
+      "description": "Contenedores flexibles para agrupar contenido relacionado y acciones con varios diseños y estilos.",
+      "title": "Componentes Card"
+    },
+    "carousel": {
+      "description": "Carruseles interactivos para mostrar contenido en formato deslizante con várias opciones de navegación.",
+      "title": "Componentes Carousel"
+    },
+    "checkbox": {
+      "description": "Casillas de verificación interactivas para formularios, selecciones y entrada del usuario con varios estilos y estados.",
+      "title": "Componentes Checkbox"
+    },
+    "collapsible": {
+      "description": "Áreas de contenido expandibles y plegables con animaciones suaves y varios estilos de activación.",
+      "title": "Componentes Collapsible"
+    },
+    "count": "componentes",
+    "dropdown": {
+      "description": "Menús contextuales y desplegables con varios tipos de contenido, interacciones y opciones de estilo.",
+      "title": "Componentes Dropdown"
+    },
+    "howToUse": {
+      "description": "Seleccione una categoría de componente arriba para ver todas las opciones disponibles, ejemplos de código y demostraciones interactivas. Cada componente incluye documentación detallada y ejemplos de uso.",
+      "title": "Cómo usar"
+    },
+    "layout": {
+      "description": "Componentes de diseño, ejemplos de código y componentes utilitarios para demostraciones.",
+      "title": "Layout y Utilidades"
+    },
+    "more": "más",
+    "title": "Biblioteca de Componentes UI",
+    "variants": "Variantes:"
   },
   "home": {
-    "latestPosts": "Latest posts",
-    "readOurLatestArticlesAndUpdates": "Read our latest articles and updates",
-    "categories": "Categories",
-    "exploreOurContentOrganizedByTopics": "Explore our content organized by topics",
-    "ourAuthors": "Our authors",
-    "meetTheTalentedWritersBehindOurContent": "Meet the talented writers behind our content",
-    "postsWithDemoAndHelloTags": "Posts with demo and hello tags",
-    "articlesWithPopularTags": "Articles with popular tags"
+    "all50ShadcnUiComponentsAreReadyToUse": "Todos los 50 componentes Shadcn UI están listos para usar",
+    "aModernGitAsCmsPoweredWebsite": "Un sitio web moderno impulsado por Git-as-CMS",
+    "articlesWithPopularTags": "Artículos con etiquetas populares",
+    "availableComponents": "Componentes Disponibles",
+    "categories": "Categorías",
+    "currentLocale": "Configuración regional actual",
+    "exploreOurContentOrganizedByTopics": "Explora nuestro contenido organizado por temas",
+    "latestPosts": "Últimos artículos",
+    "meetTheTalentedWritersBehindOurContent": "Conoce a los talentosos escritores detrás de nuestro contenido",
+    "ourAuthors": "Nuestros autores",
+    "postsWithDemoAndHelloTags": "Artículos con etiquetas demo y hello",
+    "readOurLatestArticlesAndUpdates": "Lee nuestros últimos artículos y actualizaciones",
+    "welcomeToJambo": "Bienvenido a Jambo"
+  },
+  "navigation": {
+    "about": "Acerca de",
+    "admin": "Administración",
+    "all_rights_reserved": "Todos los derechos reservados",
+    "analytics": "Analíticas",
+    "blog": "Blog",
+    "categories": "Categorías",
+    "contact": "Contacto",
+    "demo": "Demostración",
+    "discover_amazing_content_organized_by_tags_and_categories": "Descubre contenido increíble organizado por etiquetas y categorías",
+    "group1SectionA": "Grupo 1 - Sección A",
+    "group2SectionD": "Grupo 2 - Sección D",
+    "home": "Inicio",
+    "navigation": "Navegación",
+    "overview": "Resumen",
+    "page": "Página",
+    "privacy_policy": "Política de Privacidad",
+    "projects": "Proyectos",
+    "search": "Buscar",
+    "settings": "Configuración",
+    "tableOfContents": "Tabla de contenidos",
+    "tags": "Etiquetas",
+    "terms_of_service": "Términos de Servicio"
+  },
+  "passwordGroups": {
+    "allOtherSections": "Todas las demás secciones",
+    "coversAllSections": "Este grupo cubre todas las secciones no asignadas explícitamente a otros grupos",
+    "coversSpecifiedSections": "Este grupo cubre solo las secciones especificadas",
+    "description": "Cada ID de sección se asigna automáticamente a un grupo de contraseñas basado en la configuración a continuación.",
+    "password": "Contraseña:",
+    "section": "Sección",
+    "sections": "Secciones:",
+    "title": "Configuración de grupos de contraseñas"
+  },
+  "project": {
+    "description": "Generador de propuestas comerciales",
+    "name": "Jambo"
+  },
+  "search": {
+    "noHeadings": "Sin encabezados",
+    "nothingFound": "No se encontró nada",
+    "tryDifferentKeywords": "Pruebe con palabras clave diferentes"
+  },
+  "tags": {
+    "articleCount": "artículo",
+    "articles_tagged_with": "Artículos etiquetados con",
+    "articlesCount": "artículos",
+    "description": "Descubre nuestro contenido organizado por etiquetas y palabras clave",
+    "discover_our_content_organized_by_tags_and_keywords": "Descubre nuestro contenido organizado por etiquetas y palabras clave",
+    "noPostsInTag": "Aún no hay publicaciones en esta etiqueta",
+    "noTagsFound": "No se encontraron etiquetas",
+    "tagged_with_this_keyword": "Artículos etiquetados con esta palabra clave",
+    "taggedWith": "Artículos etiquetados con",
+    "tags": "Etiquetas",
+    "title": "Etiquetas"
+  },
+  "tariff": {
+    "popular": "Popular"
   }
 }

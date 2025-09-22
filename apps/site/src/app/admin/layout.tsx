@@ -14,6 +14,7 @@ import {
   BookImage,
   PenLine,
   LibraryBig,
+  Globe,
 } from "lucide-react"
 import { useEffect, useState } from "react"
 
@@ -53,6 +54,12 @@ const sidebarItems: NavigationItem[] = [
     title: "Authors",
     icon: <PenLine className="w-4 h-4" />,
     href: "/admin/authors",
+  },
+  {
+    id: "locales",
+    title: "Languages",
+    icon: <Globe className="w-4 h-4" />,
+    href: "/admin/locales",
   },
 
 ];

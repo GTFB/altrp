@@ -1,196 +1,201 @@
 {
-  "common": {
-    "search": "検索",
-    "searchPlaceholder": "検索するには入力してください...",
-    "loading": "読み込み中...",
-    "cancel": "キャンセル",
-    "close": "閉じる",
-    "open": "開く",
-    "save": "保存",
-    "delete": "削除",
-    "edit": "編集",
-    "back": "戻る",
-    "next": "次へ",
-    "previous": "前へ",
-    "goTo": "移動",
-    "relevance": "関連性",
-    "password": "パスワード",
-    "enterPassword": "パスワードを入力",
-    "unlockContent": "コンテンツをロック解除",
-    "verifying": "確認中...",
-    "theme": "テーマ",
-    "light": "ライト",
-    "dark": "ダーク",
-    "sectionOf": "セクション {current} / {total}",
-    "tableOfContents": "目次",
-    "indexingContent": "コンテンツをインデックス中...",
-    "forward": "進む",
-    "sectionNavigation": "セクションナビゲーション"
-  },
-  "navigation": {
-    "tableOfContents": "目次",
-    "search": "検索",
-    "overview": "概要",
-    "projects": "プロジェクト",
-    "analytics": "分析",
-    "settings": "設定",
-    "demo": "デモ",
-    "group1SectionA": "グループ1 - セクションA",
-    "group2SectionD": "グループ2 - セクションD",
-    "home": "ホーム",
-    "blog": "ブログ",
-    "about": "私たちについて",
-    "contact": "お問い合わせ",
-    "admin": "管理",
-    "tags": "タグ",
-    "categories": "カテゴリ",
-    "privacy_policy": "プライバシーポリシー",
-    "terms_of_service": "利用規約",
-    "all_rights_reserved": "無断転載禁止",
-    "navigation": "ナビゲーション",
-    "page": "ページ",
-    "discover_amazing_content_organized_by_tags_and_categories": "タグとカテゴリーで整理された素晴らしいコンテンツを発見してください"
-  },
   "auth": {
-    "protectedContent": "保護されたコンテンツ",
-    "passwordProtected": "このコンテンツはパスワードで保護されています。続行するにはパスワードを入力してください。",
     "accessGranted": "アクセスが許可されました:",
     "authenticationFailed": "認証に失敗しました",
-    "networkError": "ネットワークエラーです。もう一度お試しください。"
+    "networkError": "ネットワークエラーです。もう一度お試しください。",
+    "passwordProtected": "このコンテンツはパスワードで保護されています。続行するにはパスワードを入力してください。",
+    "protectedContent": "保護されたコンテンツ"
   },
-  "search": {
-    "nothingFound": "何も見つかりませんでした",
-    "tryDifferentKeywords": "別のキーワードを試してください",
-    "noHeadings": "見出しがありません"
-  },
-  "passwordGroups": {
-    "title": "パスワードグループ設定",
-    "description": "各セクションIDは、以下の設定に基づいて自動的にパスワードグループに割り当てられます。",
-    "password": "パスワード:",
-    "sections": "セクション:",
-    "allOtherSections": "その他のすべてのセクション",
-    "section": "セクション",
-    "coversAllSections": "このグループは、他のグループに明示的に割り当てられていないすべてのセクションをカバーします",
-    "coversSpecifiedSections": "このグループは指定されたセクションのみをカバーします"
-  },
-  "project": {
-    "name": "Probo",
-    "description": "商用提案ジェネレーター"
+  "blog": {
+    "author": "著者",
+    "backToBlog": "ブログに戻る",
+    "blog": "ブログ",
+    "description": "最新の記事とアップデート",
+    "noPostsFound": "投稿が見つかりません",
+    "publishedOn": "公開日",
+    "readMore": "続きを読む",
+    "tags": "タグ",
+    "title": "ブログ"
   },
   "breadcrumb": {
     "buildingApplication": "アプリケーションの構築",
     "dataFetching": "データ取得"
   },
-  "tariff": {
-    "popular": "人気"
-  },
-  "components": {
-    "title": "UIコンポーネントライブラリ",
-    "accordion": {
-      "title": "アコーディオン",
-      "description": "垂直に積み重ねられたインタラクティブなヘッダーのセットで、それぞれがコンテンツのセクションを表示します。"
-    },
-    "alert": {
-      "title": "アラート",
-      "description": "様々なスタイルとバリエーションでユーザーに重要な情報を表示するアラートコンポーネント。"
-    },
-    "alertDialog": {
-      "title": "アラートダイアログ",
-      "description": "アクションの確認と重要な情報の表示のためのモーダルダイアログ。様々なスタイルとバリエーション。"
-    },
-    "badge": {
-      "title": "バッジコンポーネント",
-      "description": "様々なスタイルと設定を持つUI要素の小さなステータス記述子。"
-    },
-    "avatar": {
-      "title": "アバターコンポーネント",
-      "description": "様々なスタイルと設定でユーザーを表現するためのフォールバック付き画像要素。"
-    },
-    "breadcrumb": {
-      "title": "ブレッドクラムコンポーネント",
-      "description": "サイト階層内の現在のページの場所を示すナビゲーションコンポーネント。"
-    },
-    "button": {
-      "title": "ボタンコンポーネント",
-      "description": "様々なスタイル、サイズ、状態を持つユーザーアクション用のインタラクティブ要素。"
-    },
-    "card": {
-      "title": "カードコンポーネント",
-      "description": "様々なレイアウトとスタイルで関連するコンテンツとアクションをグループ化するための柔軟なコンテナ。"
-    },
-    "carousel": {
-      "title": "カルーセルコンポーネント",
-      "description": "様々なナビゲーションオプションでスライド形式でコンテンツを表示するインタラクティブなカルーセル。"
-    },
-    "checkbox": {
-      "title": "チェックボックスコンポーネント",
-      "description": "様々なスタイルと状態を持つフォーム、選択、ユーザー入力用のインタラクティブなチェックボックス。"
-    },
-    "collapsible": {
-      "title": "折りたたみコンポーネント",
-      "description": "スムーズなアニメーションと様々なトリガースタイルを持つ拡張可能で折りたたみ可能なコンテンツエリア。"
-    },
-    "dropdown": {
-      "title": "ドロップダウンコンポーネント",
-      "description": "様々なコンテンツタイプ、インタラクション、スタイリングオプションを持つコンテキストメニューとドロップダウン。"
-    },
-    "layout": {
-      "title": "レイアウトとユーティリティ",
-      "description": "デモンストレーション用のレイアウトコンポーネント、コード例、ユーティリティコンポーネント。"
-    },
-    "count": "コンポーネント",
-    "variants": "バリエーション:",
-    "more": "もっと",
-    "howToUse": {
-      "title": "使い方",
-      "description": "上記のコンポーネントカテゴリを選択して、利用可能なすべてのオプション、コード例、インタラクティブなデモンストレーションを表示してください。各コンポーネントには詳細なドキュメントと使用例が含まれています。"
-    }
-  },
-  "blog": {
-    "blog": "ブログ",
-    "title": "ブログ",
-    "description": "最新の記事とアップデート",
-    "readMore": "続きを読む",
-    "publishedOn": "公開日",
-    "author": "著者",
-    "tags": "タグ",
-    "noPostsFound": "投稿が見つかりません",
-    "backToBlog": "ブログに戻る"
-  },
-  "tags": {
-    "title": "タグ",
-    "description": "タグとキーワードで整理されたコンテンツを発見",
-    "noTagsFound": "タグが見つかりません",
-    "articlesCount": "記事",
-    "articleCount": "記事",
-    "taggedWith": "タグ付けされた記事",
-    "noPostsInTag": "このタグにはまだ投稿がありません",
-    "tags": "タグ",
-    "discover_our_content_organized_by_tags_and_keywords": "タグとキーワードで整理されたコンテンツを発見",
-    "tagged_with_this_keyword": "このキーワードでタグ付けされた記事",
-    "articles_tagged_with": "タグ付けされた記事"
-  },
   "categories": {
-    "title": "カテゴリ",
+    "articleCount": "記事",
+    "articlesCount": "記事",
+    "categorizedIn": "カテゴリの記事",
     "description": "カテゴリで整理されたコンテンツを発見",
     "noCategoriesFound": "カテゴリが見つかりません",
-    "articlesCount": "記事",
-    "articleCount": "記事",
-    "categorizedIn": "カテゴリの記事",
-    "noPostsInCategory": "このカテゴリにはまだ投稿がありません"
+    "noPostsInCategory": "このカテゴリにはまだ投稿がありません",
+    "title": "カテゴリ"
   },
   "category": {
-    "posts_in": "カテゴリの記事",
-    "no_posts_found_in_this_category_yet": "このカテゴリにはまだ投稿がありません"
+    "no_posts_found_in_this_category_yet": "このカテゴリにはまだ投稿がありません",
+    "posts_in": "カテゴリの記事"
+  },
+  "common": {
+    "back": "戻る",
+    "cancel": "キャンセル",
+    "close": "閉じる",
+    "dark": "ダーク",
+    "delete": "削除",
+    "edit": "編集",
+    "enterPassword": "パスワードを入力",
+    "forward": "進む",
+    "goTo": "移動",
+    "indexingContent": "コンテンツをインデックス中...",
+    "light": "ライト",
+    "loading": "読み込み中...",
+    "next": "次へ",
+    "open": "開く",
+    "password": "パスワード",
+    "previous": "前へ",
+    "relevance": "関連性",
+    "save": "保存",
+    "search": "検索",
+    "searchPlaceholder": "検索するには入力してください...",
+    "sectionNavigation": "セクションナビゲーション",
+    "sectionOf": "セクション {current} / {total}",
+    "tableOfContents": "目次",
+    "theme": "テーマ",
+    "unlockContent": "コンテンツをロック解除",
+    "verifying": "確認中..."
+  },
+  "components": {
+    "accordion": {
+      "description": "垂直に積み重ねられたインタラクティブなヘッダーのセットで、それぞれがコンテンツのセクションを表示します。",
+      "title": "アコーディオン"
+    },
+    "alert": {
+      "description": "様々なスタイルとバリエーションでユーザーに重要な情報を表示するアラートコンポーネント。",
+      "title": "アラート"
+    },
+    "alertDialog": {
+      "description": "アクションの確認と重要な情報の表示のためのモーダルダイアログ。様々なスタイルとバリエーション。",
+      "title": "アラートダイアログ"
+    },
+    "avatar": {
+      "description": "様々なスタイルと設定でユーザーを表現するためのフォールバック付き画像要素。",
+      "title": "アバターコンポーネント"
+    },
+    "badge": {
+      "description": "様々なスタイルと設定を持つUI要素の小さなステータス記述子。",
+      "title": "バッジコンポーネント"
+    },
+    "breadcrumb": {
+      "description": "サイト階層内の現在のページの場所を示すナビゲーションコンポーネント。",
+      "title": "ブレッドクラムコンポーネント"
+    },
+    "button": {
+      "description": "様々なスタイル、サイズ、状態を持つユーザーアクション用のインタラクティブ要素。",
+      "title": "ボタンコンポーネント"
+    },
+    "card": {
+      "description": "様々なレイアウトとスタイルで関連するコンテンツとアクションをグループ化するための柔軟なコンテナ。",
+      "title": "カードコンポーネント"
+    },
+    "carousel": {
+      "description": "様々なナビゲーションオプションでスライド形式でコンテンツを表示するインタラクティブなカルーセル。",
+      "title": "カルーセルコンポーネント"
+    },
+    "checkbox": {
+      "description": "様々なスタイルと状態を持つフォーム、選択、ユーザー入力用のインタラクティブなチェックボックス。",
+      "title": "チェックボックスコンポーネント"
+    },
+    "collapsible": {
+      "description": "スムーズなアニメーションと様々なトリガースタイルを持つ拡張可能で折りたたみ可能なコンテンツエリア。",
+      "title": "折りたたみコンポーネント"
+    },
+    "count": "コンポーネント",
+    "dropdown": {
+      "description": "様々なコンテンツタイプ、インタラクション、スタイリングオプションを持つコンテキストメニューとドロップダウン。",
+      "title": "ドロップダウンコンポーネント"
+    },
+    "howToUse": {
+      "description": "上記のコンポーネントカテゴリを選択して、利用可能なすべてのオプション、コード例、インタラクティブなデモンストレーションを表示してください。各コンポーネントには詳細なドキュメントと使用例が含まれています。",
+      "title": "使い方"
+    },
+    "layout": {
+      "description": "デモンストレーション用のレイアウトコンポーネント、コード例、ユーティリティコンポーネント。",
+      "title": "レイアウトとユーティリティ"
+    },
+    "more": "もっと",
+    "title": "UIコンポーネントライブラリ",
+    "variants": "バリエーション:"
   },
   "home": {
-    "latestPosts": "Latest posts",
-    "readOurLatestArticlesAndUpdates": "Read our latest articles and updates",
-    "categories": "Categories",
-    "exploreOurContentOrganizedByTopics": "Explore our content organized by topics",
-    "ourAuthors": "Our authors",
-    "meetTheTalentedWritersBehindOurContent": "Meet the talented writers behind our content",
-    "postsWithDemoAndHelloTags": "Posts with demo and hello tags",
-    "articlesWithPopularTags": "Articles with popular tags"
+    "all50ShadcnUiComponentsAreReadyToUse": "50個すべてのShadcn UIコンポーネントが使用可能です",
+    "aModernGitAsCmsPoweredWebsite": "Git-as-CMSで構築されたモダンなウェブサイト",
+    "articlesWithPopularTags": "人気タグの記事",
+    "availableComponents": "利用可能なコンポーネント",
+    "categories": "カテゴリ",
+    "currentLocale": "現在のロケール",
+    "exploreOurContentOrganizedByTopics": "トピック別に整理されたコンテンツを探索する",
+    "latestPosts": "最新の記事",
+    "meetTheTalentedWritersBehindOurContent": "私たちのコンテンツの背後にいる才能ある作家たちに会いましょう",
+    "ourAuthors": "私たちの著者",
+    "postsWithDemoAndHelloTags": "デモとハロータグの記事",
+    "readOurLatestArticlesAndUpdates": "最新の記事とアップデートをお読みください",
+    "welcomeToJambo": "Jamboへようこそ"
+  },
+  "navigation": {
+    "about": "私たちについて",
+    "admin": "管理",
+    "all_rights_reserved": "無断転載禁止",
+    "analytics": "分析",
+    "blog": "ブログ",
+    "categories": "カテゴリ",
+    "contact": "お問い合わせ",
+    "demo": "デモ",
+    "discover_amazing_content_organized_by_tags_and_categories": "タグとカテゴリーで整理された素晴らしいコンテンツを発見してください",
+    "group1SectionA": "グループ1 - セクションA",
+    "group2SectionD": "グループ2 - セクションD",
+    "home": "ホーム",
+    "navigation": "ナビゲーション",
+    "overview": "概要",
+    "page": "ページ",
+    "privacy_policy": "プライバシーポリシー",
+    "projects": "プロジェクト",
+    "search": "検索",
+    "settings": "設定",
+    "tableOfContents": "目次",
+    "tags": "タグ",
+    "terms_of_service": "利用規約"
+  },
+  "passwordGroups": {
+    "allOtherSections": "その他のすべてのセクション",
+    "coversAllSections": "このグループは、他のグループに明示的に割り当てられていないすべてのセクションをカバーします",
+    "coversSpecifiedSections": "このグループは指定されたセクションのみをカバーします",
+    "description": "各セクションIDは、以下の設定に基づいて自動的にパスワードグループに割り当てられます。",
+    "password": "パスワード:",
+    "section": "セクション",
+    "sections": "セクション:",
+    "title": "パスワードグループ設定"
+  },
+  "project": {
+    "description": "商用提案ジェネレーター",
+    "name": "Jambo"
+  },
+  "search": {
+    "noHeadings": "見出しがありません",
+    "nothingFound": "何も見つかりませんでした",
+    "tryDifferentKeywords": "別のキーワードを試してください"
+  },
+  "tags": {
+    "articleCount": "記事",
+    "articles_tagged_with": "タグ付けされた記事",
+    "articlesCount": "記事",
+    "description": "タグとキーワードで整理されたコンテンツを発見",
+    "discover_our_content_organized_by_tags_and_keywords": "タグとキーワードで整理されたコンテンツを発見",
+    "noPostsInTag": "このタグにはまだ投稿がありません",
+    "noTagsFound": "タグが見つかりません",
+    "tagged_with_this_keyword": "このキーワードでタグ付けされた記事",
+    "taggedWith": "タグ付けされた記事",
+    "tags": "タグ",
+    "title": "タグ"
+  },
+  "tariff": {
+    "popular": "人気"
   }
 }
