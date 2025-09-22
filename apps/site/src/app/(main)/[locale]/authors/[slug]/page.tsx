@@ -2,11 +2,9 @@ import { AuthorRepository } from '@/repositories/author.repository';
 import { PostRepository } from '@/repositories/post.repository';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
-import { AuthorCard } from '@/components/AuthorCard/AuthorCard';
-import { PostList } from '@/components/features/blog/PostList/PostList';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { User } from 'lucide-react';
-
+import { Container } from '@/components/layout/Container';
 export const dynamic = 'force-dynamic';
 
 interface AuthorPageProps {
@@ -62,7 +60,7 @@ export default async function AuthorPage({ params }: AuthorPageProps) {
   const posts = await postRepo.findByAuthor(author.slug);
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <Container className="py-8">
       {/* Author Header */}
       <div className="text-center mb-12">
         <div className="flex justify-center mb-6">
@@ -136,6 +134,6 @@ export default async function AuthorPage({ params }: AuthorPageProps) {
           </div>
         )}
       </div>
-    </div>
+    </Container>
   );
 }

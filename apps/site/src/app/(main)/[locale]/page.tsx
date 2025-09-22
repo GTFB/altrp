@@ -1,8 +1,10 @@
 import { BlogSection, CategorySection, CategoryPostsSection, AuthorSection, AuthorPostsSection, TagSection } from '@/components/features/blog';
-
+import { Container } from '@/components/layout/Container';
+import { useTranslations } from 'next-intl';
 export default function LocalizedHome({ params }: { params: { locale: string } }) {
+  const t = useTranslations('home');
   return (
-    <div className="container mx-auto px-4 py-8">
+    <Container className="py-8">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-4">Welcome to Jambo</h1>
         <p className="text-xl text-muted-foreground">
@@ -23,8 +25,8 @@ export default function LocalizedHome({ params }: { params: { locale: string } }
       <BlogSection 
         limit={6}
         showViewAll={true}
-        title="Latest Posts"
-        description="Read our latest articles and updates"
+        title={t('latestPosts')}
+        description={t('readOurLatestArticlesAndUpdates')}
         sortBy="date"
         sortOrder="desc"
       />
@@ -33,8 +35,8 @@ export default function LocalizedHome({ params }: { params: { locale: string } }
       <CategorySection 
         limit={3}
         showViewAll={true}
-        title="Categories"
-        description="Explore our content organized by topics"
+        title={t('categories')}
+        description={t('exploreOurContentOrganizedByTopics')}
       />
 
 
@@ -42,17 +44,17 @@ export default function LocalizedHome({ params }: { params: { locale: string } }
       <AuthorSection 
         limit={3}
         showViewAll={true}
-        title="Our Authors"
-        description="Meet the talented writers behind our content"
+        title={t('ourAuthors')}
+        description={t('meetTheTalentedWritersBehindOurContent')}
       />
       {/* Example usage of TagSection */}
       <TagSection 
         tags={['demo', 'hello']}
         limit={3}
         showViewAll={true}
-        title="Posts with 'demo' and 'hello' tags"
-        description="Articles with popular tags"
+        title={t('postsWithDemoAndHelloTags')}
+        description={t('articlesWithPopularTags')}
       />
-    </div>
+    </Container>  
   );
 }

@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tag } from 'lucide-react';
 import { PostCard } from '@/components/features/blog/PostCard/PostCard';
 import { useTranslations } from 'next-intl';
-
+import { Container } from '@/components/layout/Container';
 export const dynamic = 'force-dynamic';
 
 interface CategoryPageProps {
@@ -62,7 +62,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const posts = await postRepo.findByCategory(category.slug);
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <Container className="py-8">
       {/* Category Header */}
       <div className="text-center mb-12">
         <div className="flex justify-center mb-6">
@@ -112,6 +112,6 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           </div>
         )}
       </div>
-    </div>
+    </Container>
   );
 }

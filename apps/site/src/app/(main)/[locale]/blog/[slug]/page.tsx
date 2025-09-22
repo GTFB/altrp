@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { PostTags } from '@/components/features/blog/PostTags';
 import { PostMeta } from '@/components/features/blog/PostMeta';
-
+import { Container } from '@/components/layout/Container';
 export const dynamic = 'force-dynamic';
 
 interface BlogPostPageProps {
@@ -84,7 +84,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   }
 
   return (
-    <article className="container mx-auto px-4 py-8 max-w-4xl">
+    <Container className="py-8 max-w-4xl">
         <header className="mb-8">
           <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
           <PostMeta 
@@ -99,6 +99,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         <div className="prose prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: post.content || '' }}>
           
         </div>
-      </article>
+      </Container>
   );
 }

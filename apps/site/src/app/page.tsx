@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Globe, Languages } from 'lucide-react';
+import {  Globe, Languages } from 'lucide-react';
 import { HeroBlock } from '@/components/features/HeroBlock/HeroBlock';
+import { Container } from '@/components/layout/Container';
 
 export default function HomePage() {
   return (
@@ -11,7 +12,7 @@ export default function HomePage() {
       
       {/* Language Selection Section */}
       <section className="py-20 bg-background">
-        <div className="container mx-auto px-4">
+        <Container >
           <div className="max-w-md mx-auto">
             <Card className="shadow-lg border-0">
               <CardHeader className="text-center">
@@ -44,7 +45,7 @@ export default function HomePage() {
               <p className="mt-1 text-xs">Inter для текста, Inter Tight для заголовков</p>
             </div>
           </div>
-        </div>
+        </Container>
       </section>
     </main>
   );

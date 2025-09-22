@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { signIn, signOut, useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
-
+import { Container } from '@/components/layout/Container';
 export default function LoginPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
@@ -17,17 +17,17 @@ export default function LoginPage() {
 
   if (status === 'loading') {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <Container className="py-8">
         <div className="max-w-md mx-auto">
           <div className="text-center">Loading...</div>
         </div>
-      </div>
+      </Container>
     )
   }
 
   if (status === 'authenticated' && session?.user) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <Container className="py-8">
         <div className="max-w-md mx-auto">
           <h1 className="text-2xl font-bold text-center mb-8">Welcome back!</h1>
           <div className="space-y-4">
@@ -48,12 +48,12 @@ export default function LoginPage() {
             </div>
           </div>
         </div>
-      </div>
+      </Container>
     )
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <Container className="py-8">
       <div className="max-w-md mx-auto">
         <h1 className="text-2xl font-bold text-center mb-8">Sign In</h1>
         <div className="space-y-4">
@@ -67,6 +67,6 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-    </div>
+    </Container>
   )
 }

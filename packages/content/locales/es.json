@@ -191,5 +191,15 @@
   "category": {
     "posts_in": "Publicaciones en",
     "no_posts_found_in_this_category_yet": "Aún no hay publicaciones en esta categoría"
+  },
+  "home": {
+    "latestPosts": "Latest posts",
+    "readOurLatestArticlesAndUpdates": "Read our latest articles and updates",
+    "categories": "Categories",
+    "exploreOurContentOrganizedByTopics": "Explore our content organized by topics",
+    "ourAuthors": "Our authors",
+    "meetTheTalentedWritersBehindOurContent": "Meet the talented writers behind our content",
+    "postsWithDemoAndHelloTags": "Posts with demo and hello tags",
+    "articlesWithPopularTags": "Articles with popular tags"
   }
 }

@@ -12,11 +12,7 @@ import {
 
 // Layout configuration
 export const LAYOUT_CONFIG = {
-  containerMaxWidth: '1440px',
-  containerWidthClass: 'max-w-7xl', // Tailwind equivalent
-  containerPadding: 'px-4',
-  mobilePadding: 'px-4',
-  desktopPadding: 'px-8',
+  containerWidth: '1440px',
 } as const;
 
 // Map of icon names to Lucide React components

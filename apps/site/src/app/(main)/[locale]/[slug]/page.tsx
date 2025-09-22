@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { PageRepository } from '@/repositories/page.repository';
 import { MediaRepository } from '@/repositories/media.repository';
 import { MediaDisplay } from '@/components/features/cms/MediaDisplay';
-
+import { Container } from '@/components/layout/Container';
 export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
 
@@ -92,7 +92,7 @@ export default async function Page({ params }: PageProps) {
   try {
 
     return (
-      <article className="container mx-auto px-4 py-8 max-w-4xl">
+      <Container className="py-8 max-w-4xl">
         <header className="mb-8">
           <h1 className="text-4xl font-bold mb-4">{page.title}</h1>
           {page.description && (
@@ -114,7 +114,7 @@ export default async function Page({ params }: PageProps) {
         
         <div className="prose prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: page.content || '' }}>
         </div>
-      </article>
+      </Container>
     );
   } catch {
     notFound();

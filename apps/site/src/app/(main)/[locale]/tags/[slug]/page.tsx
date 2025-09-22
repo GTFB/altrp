@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import { Tag } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { TagPostList } from '@/components/features/blog/TagPostList';
-
+import { Container } from '@/components/layout/Container';
 export const dynamic = 'force-dynamic';
 
 interface TagPageProps {
@@ -54,7 +54,7 @@ export default function TagPage({ params }: TagPageProps) {
   const tagName = params.slug;
   const t = useTranslations('tags');
   return (
-    <div className="container mx-auto px-4 py-8">
+    <Container className="py-8">
       {/* Tag Header */}
       <div className="text-center mb-12">
         <div className="flex justify-center mb-6">
@@ -77,6 +77,6 @@ export default function TagPage({ params }: TagPageProps) {
           <TagPostList slug={tagName}/>          
         </div>
       </div>
-    </div>
+    </Container>
   );
 }

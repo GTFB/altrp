@@ -1222,5 +1222,15 @@
   "category": {
     "posts_in": "Посты в",
     "no_posts_found_in_this_category_yet": "В этой категории пока нет постов"
+  },
+  "home": {
+    "latestPosts": "Последние статьи",
+    "readOurLatestArticlesAndUpdates": "Читайте наши последние статьи и обновления",
+    "categories": "Категории",
+    "exploreOurContentOrganizedByTopics": "Исследуйте наш контент, организованный по темам",
+    "ourAuthors": "Наши авторы",
+    "meetTheTalentedWritersBehindOurContent": "Познакомьтесь с талантливыми авторами нашего контента",
+    "postsWithDemoAndHelloTags": "Статьи с тегами demo и hello",
+    "articlesWithPopularTags": "Статьи с популярными тегами"
   }
 }

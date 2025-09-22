@@ -1,7 +1,7 @@
 import { TagList } from '@/components/TagList/TagList';
 import { Metadata } from 'next';
 import { useTranslations } from 'next-intl';
-
+import { Container } from '@/components/layout/Container';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function TagsPage() {
   const t = useTranslations('tags');
   return (
-    <div className="container mx-auto px-4 py-8">
+    <Container className="py-8">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-4">{t('tags')}</h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -20,6 +20,6 @@ export default function TagsPage() {
         </p>
       </div>
       <TagList />
-    </div>
+    </Container>
   );
 }

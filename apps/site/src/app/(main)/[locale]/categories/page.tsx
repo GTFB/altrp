@@ -1,6 +1,6 @@
 import { CategoryList } from '@/components/CategoryList/CategoryList';
 import { Metadata } from 'next';
-
+import { Container } from '@/components/layout/Container';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function CategoriesPage() {
   return (
-    <div className="container mx-auto px-4 py-8">
+    <Container className="py-8">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-4">Categories</h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -18,6 +18,6 @@ export default function CategoriesPage() {
         </p>
       </div>
       <CategoryList />
-    </div>
+    </Container>
   );
 }

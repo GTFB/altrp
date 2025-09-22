@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowRight, Play, Star, Zap, Shield, Globe } from 'lucide-react';
+import { Container } from '@/components/layout/Container';
 
 export function HeroBlock() {
   return (
@@ -10,7 +11,7 @@ export function HeroBlock() {
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-grid-black/[0.02] dark:bg-grid-white/[0.02]" />
       
-      <div className="container mx-auto px-4 relative">
+      <Container className="relative">
         <div className="max-w-4xl mx-auto text-center">
           {/* Badge */}
           <div className="flex justify-center mb-6">
@@ -114,7 +115,7 @@ export function HeroBlock() {
             </div>
           </div>
         </div>
-      </div>
+      </Container>
     </section>
   );
 }

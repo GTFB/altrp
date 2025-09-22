@@ -1,14 +1,14 @@
 import { PostList } from '@/components/features/blog/PostList/PostList';
 import { useTranslations } from 'next-intl';
-
+import { Container } from '@/components/layout/Container';
 export const dynamic = 'force-dynamic';
 
 export default function BlogPage() {
   const t = useTranslations('blog');
   return (
-    <div className="container mx-auto px-4 py-8">
+    <Container className="py-8">
       <h1 className="text-3xl font-bold mb-8">{t('blog')}</h1>
       <PostList />
-    </div>
+    </Container>
   );
 }
