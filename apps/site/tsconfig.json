@@ -42,6 +42,10 @@
       "@/repositories/*": [
         "../../packages/repositories/*",
         "./src/repositories/*"
+      ],
+      "@/types/*": [
+        "../../packages/types/*",
+        "./src/types/*"
       ]
     },
     "plugins": [
@@ -55,7 +59,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-  ],
+, "../../packages/types/page-editor.ts"  ],
   "exclude": [
     "node_modules"
   ]

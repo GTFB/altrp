@@ -32,7 +32,7 @@ export default withAuth(
         // if (!email) {
         //   return false;
         // }
-        if (req.nextUrl.pathname.startsWith("/admin")) {
+        if (req.nextUrl.pathname.startsWith("/admin") || req.nextUrl.pathname.startsWith("/api/admin")) {
           return token?.role === "admin"; 
         }
         return true;

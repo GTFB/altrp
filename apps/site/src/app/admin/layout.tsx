@@ -18,51 +18,66 @@ import {
 } from "lucide-react"
 import { useEffect, useState } from "react"
 
-const sidebarItems: NavigationItem[] = [
-  {
-    id: "dashboard",
-    title: "Dashboard",
-    icon: <LayoutDashboard className="w-4 h-4" />,
-    href: "/admin/dashboard",
-  },
-  {
-    id: "pages",
-    title: "Pages",
-    icon: <FolderKanban className="w-4 h-4" />,
-    href: "/admin/pages",
-  },
-  {
-    id: "posts",
-    title: "Posts",
-    icon: <BetweenHorizontalEnd className="w-4 h-4" />,
-    href: "/admin/posts",
-  },
-  {
-    id: "media",
-    title: "Media",
-    icon: <BookImage className="w-4 h-4" />,
-    href: "/admin/media",
-  },
-  {
-    id: "categories",
-    title: "Categories",
-    icon: <LibraryBig className="w-4 h-4" />,
-    href: "/admin/categories",
-  },
-  {
-    id: "authors",
-    title: "Authors",
-    icon: <PenLine className="w-4 h-4" />,
-    href: "/admin/authors",
-  },
-  {
-    id: "locales",
-    title: "Languages",
-    icon: <Globe className="w-4 h-4" />,
-    href: "/admin/locales",
-  },
+const getSidebarItems = (): NavigationItem[] => {
+  const baseItems: NavigationItem[] = [
+    {
+      id: "dashboard",
+      title: "Dashboard",
+      icon: <LayoutDashboard className="w-4 h-4" />,
+      href: "/admin/dashboard",
+    },
+    {
+      id: "pages",
+      title: "Pages",
+      icon: <FolderKanban className="w-4 h-4" />,
+      href: "/admin/pages",
+    },
+    {
+      id: "posts",
+      title: "Posts",
+      icon: <BetweenHorizontalEnd className="w-4 h-4" />,
+      href: "/admin/posts",
+    },
+    {
+      id: "media",
+      title: "Media",
+      icon: <BookImage className="w-4 h-4" />,
+      href: "/admin/media",
+    },
+    {
+      id: "categories",
+      title: "Categories",
+      icon: <LibraryBig className="w-4 h-4" />,
+      href: "/admin/categories",
+    },
+    {
+      id: "authors",
+      title: "Authors",
+      icon: <PenLine className="w-4 h-4" />,
+      href: "/admin/authors",
+    },
+    {
+      id: "locales",
+      title: "Languages",
+      icon: <Globe className="w-4 h-4" />,
+      href: "/admin/locales?locale=en",
+    },
+  ];
 
-];
+  // Add dev-only item if in development mode
+  if (process.env.NODE_ENV === 'development') {
+    baseItems.push({
+      id: "page-editor",
+      title: "Page Editor",
+      icon: <LayoutDashboard className="w-4 h-4" />,
+      href: "/admin/page-editor",
+    });
+  }
+
+  return baseItems;
+};
+
+const sidebarItems = getSidebarItems();
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarWidth, setSidebarWidth] = useState(320); // Default width (20rem = 320px)

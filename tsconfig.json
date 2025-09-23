@@ -24,12 +24,15 @@
       ],
       "@/repositories/*": [
         "./packages/repositories/*"
+      ],
+      "@/types/*": [
+        "./packages/types/*"
       ]
     }
   },
   "include": [
     "apps/**/*",
     "shared/**/*"
-  ],
+, "packages/types/page-editor.ts"  ],
   "exclude": ["node_modules"]
 }
