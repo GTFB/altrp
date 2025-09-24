@@ -12,7 +12,11 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "prepare": "husky install",
-    "test": "bun test"
+    "test": "bun test",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
@@ -84,6 +88,7 @@
     "zustand": "4.5.2"
   },
   "devDependencies": {
+    "@playwright/test": "^1.55.1",
     "@tailwindcss/postcss": "4.1.11",
     "@tailwindcss/typography": "^0.5.16",
     "@types/node": "20.14.11",
