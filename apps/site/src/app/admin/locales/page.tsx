@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { Plus, Save, RefreshCcw, Search } from 'lucide-react';
+import { Plus, Save, RefreshCcw, Search, List, ListTree, ChevronDown, ChevronRight } from 'lucide-react';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { usePathname, useSearchParams } from 'next/navigation';
 
@@ -46,6 +46,80 @@ function unflattenJson(flat: Record<string, JsonValue>): any {
   return result;
 }
 
+function renderJsonTree(
+  obj: any, 
+  onValueChange: (path: string, value: string) => void, 
+  filter: string = '',
+  path: string = '',
+  collapsedNodes: Set<string> = new Set(),
+  onToggleCollapse: (path: string) => void
+): JSX.Element[] {
+  const result: JSX.Element[] = [];
+  
+  if (!obj || typeof obj !== 'object') {
+    return result;
+  }
+
+  const entries = Object.entries(obj);
+  const filteredEntries = filter 
+    ? entries.filter(([key, value]) => 
+        key.toLowerCase().includes(filter.toLowerCase()) ||
+        String(value).toLowerCase().includes(filter.toLowerCase())
+      )
+    : entries;
+
+  filteredEntries.forEach(([key, value], index) => {
+    const currentPath = path ? `${path}.${key}` : key;
+    const isLast = index === filteredEntries.length - 1;
+    
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      // Object node
+      const isExpanded = collapsedNodes.has(currentPath); // Node is expanded only if explicitly stored in collapsedNodes
+      const hasChildren = Object.keys(value).length > 0;
+      
+      result.push(
+        <div key={currentPath} className="ml-4">
+          <div 
+            className="flex items-center gap-2 py-1 cursor-pointer hover:bg-muted/50 rounded px-1"
+            onClick={() => hasChildren && onToggleCollapse(currentPath)}
+          >
+            {hasChildren && (
+              isExpanded ? (
+                <ChevronDown className="w-4 h-4 text-muted-foreground" />
+              ) : (
+                <ChevronRight className="w-4 h-4 text-muted-foreground" />
+              )
+            )}
+            {!hasChildren && <div className="w-4 h-4" />}
+            <span className="text-sm font-medium text-blue-600">{key}</span>
+            <span className="text-xs text-muted-foreground">({Object.keys(value).length} keys)</span>
+          </div>
+          {isExpanded && (
+            <div className="border-l-2 border-muted ml-2 pl-2">
+              {renderJsonTree(value, onValueChange, filter, currentPath, collapsedNodes, onToggleCollapse)}
+            </div>
+          )}
+        </div>
+      );
+    } else {
+      // Leaf node
+      result.push(
+        <div key={currentPath} className="flex items-center gap-2 py-1 ml-4">
+          <div className="w-4 h-4" />
+          <div className="text-sm text-muted-foreground min-w-[30%] break-all">{key}</div>
+          <Input
+            value={String(value ?? '')}
+            onChange={(e) => onValueChange(currentPath, e.target.value)}
+            className="flex-1 h-8"
+          />
+        </div>
+      );
+    }
+  });
+
+  return result;
+}
+
 export default function LocalesAdminPage() {
   const [locales, setLocales] = useState<string[]>([]);
   const [supported, setSupported] = useState<string[]>([]);
@@ -59,6 +133,8 @@ export default function LocalesAdminPage() {
   const [isAddKeyOpen, setIsAddKeyOpen] = useState(false);
   const [newKeyPath, setNewKeyPath] = useState('');
   const [newKeyValue, setNewKeyValue] = useState('');
+  const [viewMode, setViewMode] = useState<'tree' | 'list'>('tree');
+  const [collapsedNodes, setCollapsedNodes] = useState<Set<string>>(new Set());
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -129,6 +205,27 @@ export default function LocalesAdminPage() {
   }, [raw, filter]);
 
   useEffect(() => {
+    // Load view mode from localStorage
+    const savedViewMode = localStorage.getItem('locales-view-mode') as 'tree' | 'list' | null;
+    if (savedViewMode && (savedViewMode === 'tree' || savedViewMode === 'list')) {
+      setViewMode(savedViewMode);
+    }
+    
+    // Load collapsed nodes from localStorage
+    const savedCollapsedNodes = localStorage.getItem('locales-collapsed-nodes');
+    if (savedCollapsedNodes) {
+      try {
+        const parsed = JSON.parse(savedCollapsedNodes);
+        setCollapsedNodes(new Set(parsed));
+      } catch (e) {
+        // If parsing fails, use empty set (all nodes collapsed by default)
+        setCollapsedNodes(new Set());
+      }
+    } else {
+      // By default, all nodes are collapsed
+      setCollapsedNodes(new Set());
+    }
+    
     void loadLocales();
   }, []);
 
@@ -189,6 +286,30 @@ export default function LocalesAdminPage() {
     if (typeof window !== 'undefined') {
       window.history.replaceState(null, '', url);
     }
+  }
+
+  function handleViewModeChange(mode: 'tree' | 'list') {
+    setViewMode(mode);
+    localStorage.setItem('locales-view-mode', mode);
+  }
+
+  function handleTreeValueChange(path: string, value: string) {
+    const flat = flattenJson(JSON.parse(raw || '{}'));
+    flat[path] = value;
+    setRaw(JSON.stringify(unflattenJson(flat), null, 2));
+  }
+
+  function toggleNodeCollapse(path: string) {
+    const newCollapsed = new Set(collapsedNodes);
+    if (newCollapsed.has(path)) {
+      // Node is currently expanded, collapse it (remove from set)
+      newCollapsed.delete(path);
+    } else {
+      // Node is currently collapsed, expand it (add to set)
+      newCollapsed.add(path);
+    }
+    setCollapsedNodes(newCollapsed);
+    localStorage.setItem('locales-collapsed-nodes', JSON.stringify([...newCollapsed]));
   }
 
   async function handleSaveFull() {
@@ -278,6 +399,24 @@ export default function LocalesAdminPage() {
             <Badge variant="outline">Supported: {supported.length}</Badge>
             </div>
             <div className="ml-auto flex items-center gap-2">
+              <div className="flex items-center gap-1 border rounded p-1">
+                <Button
+                  variant={viewMode === 'tree' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => handleViewModeChange('tree')}
+                  className="cursor-pointer"
+                >
+                  <ListTree className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant={viewMode === 'list' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => handleViewModeChange('list')}
+                  className="cursor-pointer"
+                >
+                  <List className="w-4 h-4" />
+                </Button>
+              </div>
               <div className="relative w-72">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input value={filter} onChange={(e) => setFilter(e.target.value)} placeholder="Search by keys/values" className="pl-8" />
@@ -291,20 +430,28 @@ export default function LocalesAdminPage() {
         </CardHeader>
         <Separator />
         <CardContent>
-          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
-            {filteredEntries.map(([k, v]) => (
-              <div key={k} className="flex items-center gap-2 border rounded p-2">
-                <div className="text-xs text-muted-foreground min-w-[40%] break-all">{k}</div>
-                <Input
-                  value={String(v ?? '')}
-                  onChange={(e) => {
-                    const flat = flattenJson(JSON.parse(raw || '{}'));
-                    flat[k] = e.target.value;
-                    setRaw(JSON.stringify(unflattenJson(flat), null, 2));
-                  }}
-                />
+          <div className="mt-4">
+            {viewMode === 'list' ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {filteredEntries.map(([k, v]) => (
+                  <div key={k} className="flex items-center gap-2 border rounded p-2">
+                    <div className="text-xs text-muted-foreground min-w-[40%] break-all">{k}</div>
+                    <Input
+                      value={String(v ?? '')}
+                      onChange={(e) => {
+                        const flat = flattenJson(JSON.parse(raw || '{}'));
+                        flat[k] = e.target.value;
+                        setRaw(JSON.stringify(unflattenJson(flat), null, 2));
+                      }}
+                    />
+                  </div>
+                ))}
               </div>
-            ))}
+            ) : (
+              <div className="space-y-2">
+                {renderJsonTree(JSON.parse(raw || '{}'), handleTreeValueChange, filter, '', collapsedNodes, toggleNodeCollapse)}
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
