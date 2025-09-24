@@ -10,7 +10,8 @@ import {
   MoreVertical,
   ChevronUp,
   ChevronDown,
-  Trash2
+  Trash2,
+  Edit
 } from 'lucide-react';
 import { 
   DropdownMenu,
@@ -29,6 +30,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { ComponentEditorDialog } from '@/components/admin';
 import {
   DragDropContext,
   Droppable,
@@ -74,6 +76,10 @@ function BlockComponent({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
+            <DropdownMenuItem onClick={() => onContextMenu('edit', block.id)}>
+              <Edit className="w-4 h-4 mr-2" />
+              Edit Component
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => onContextMenu('move-up', block.id)}>
               <ChevronUp className="w-4 h-4 mr-2" />
               Move Up
@@ -117,6 +123,10 @@ export default function PageEditor() {
   const [pagePath, setPagePath] = useState('');
   const [dialogMessage, setDialogMessage] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingBlock, setEditingBlock] = useState<Block | null>(null);
+  const [editorContent, setEditorContent] = useState('');
+  const [editorLoading, setEditorLoading] = useState(false);
   const orderedAvailableBlocks = useMemo(() => {
     const byGroup: Record<string, AvailableBlock[]> = {};
     availableBlocks.forEach((b) => {
@@ -136,7 +146,6 @@ export default function PageEditor() {
     if (savedBlocks) {
       try {
         const parsedBlocks = JSON.parse(savedBlocks);
-        console.log('Loading blocks from localStorage:', parsedBlocks);
         setBlocks(parsedBlocks);
         const maxId = Math.max(...parsedBlocks.map((b: Block) => parseInt(b.id)), 0);
         setNextId(maxId + 1);
@@ -160,14 +169,19 @@ export default function PageEditor() {
         const data: AvailableBlock[] = await res.json();
         setAvailableBlocks(Array.isArray(data) ? data : []);
       } catch (err) {
-        if ((err as any)?.name !== 'AbortError') {
+        const e = err as any;
+        const isAbortError =
+          e?.name === 'AbortError' ||
+          e?.code === 'ABORT_ERR' ||
+          typeof e?.message === 'string' && /aborted/i.test(e.message);
+        if (!isAbortError) {
           console.error('Failed to fetch available blocks', err);
           setAvailableBlocks([]);
         }
       }
     };
     loadAvailable();
-    return () => controller.abort();
+    return () => controller.abort('component-unmounted');
   }, []);
 
   // Load accordion open groups from localStorage
@@ -208,7 +222,6 @@ export default function PageEditor() {
   useEffect(() => {
     if (isLoaded && (blocks.length > 0 || localStorage.getItem('page-editor-blocks'))) {
       localStorage.setItem('page-editor-blocks', JSON.stringify(blocks));
-      console.log('Auto-saving blocks to localStorage:', blocks);
     }
   }, [blocks, isLoaded]);
 
@@ -228,7 +241,6 @@ export default function PageEditor() {
     
     // Save to localStorage immediately after adding block
     localStorage.setItem('page-editor-blocks', JSON.stringify(updatedBlocks));
-    console.log('Block added and saved to localStorage:', newBlock);
   };
 
   const updateBlock = (updatedBlock: Block) => {
@@ -243,7 +255,6 @@ export default function PageEditor() {
     
     // Save to localStorage immediately after deleting block
     localStorage.setItem('page-editor-blocks', JSON.stringify(updatedBlocks));
-    console.log('Block deleted and saved to localStorage:', blockId);
   };
 
   const moveBlock = (blockId: string, direction: 'up' | 'down') => {
@@ -259,17 +270,12 @@ export default function PageEditor() {
       
       // Save to localStorage immediately after moving block
       localStorage.setItem('page-editor-blocks', JSON.stringify(newBlocks));
-      console.log('Block moved and saved to localStorage:', blockId, direction);
     }
   };
 
   const handleDragEnd = (result: DropResult) => {
-    console.log('Drag ended:', result);
-    console.log('Source:', result.source);
-    console.log('Destination:', result.destination);
     
     if (!result.destination) {
-      console.log('No destination, drag cancelled');
       return;
     }
 
@@ -277,14 +283,11 @@ export default function PageEditor() {
 
     // If dragging from available blocks to page blocks
     if (source.droppableId === 'available-blocks' && destination.droppableId === 'page-blocks') {
-      console.log('Dragging from available blocks to page blocks');
       const blockType = result.draggableId.replace('available-', '') as Block['type'];
       const availableBlock = availableBlocks.find(b => b.type === blockType);
       if (!availableBlock) {
-        console.log('Available block not found');
         return;
       }
-        console.log('Block type:', blockType);
       
       const newBlock: Block = {
         id: nextId.toString(),
@@ -304,14 +307,12 @@ export default function PageEditor() {
       
       // Save to localStorage immediately after drag and drop
       localStorage.setItem('page-editor-blocks', JSON.stringify(newBlocks));
-      console.log('Block added from sidebar and saved to localStorage:', newBlock);
       return;
     }
 
     // If reordering within page blocks
     if (source.droppableId === 'page-blocks' && destination.droppableId === 'page-blocks') {
       if (source.index === destination.index) {
-        console.log('Same position, no change needed');
         return;
       }
 
@@ -323,15 +324,88 @@ export default function PageEditor() {
       
       // Save to localStorage immediately after reordering
       localStorage.setItem('page-editor-blocks', JSON.stringify(newBlocks));
-      console.log('Blocks reordered and saved to localStorage:', newBlocks.map(b => ({ id: b.id, type: b.type })));
       return;
     }
 
-    console.log('Unhandled drag operation');
+  };
+
+  const editBlock = async (blockId: string) => {
+    const block = blocks.find(b => b.id === blockId);
+    if (!block) return;
+
+    setEditingBlock(block);
+    setEditDialogOpen(true);
+    setEditorLoading(true);
+
+    try {
+      const importMatch = block.importString?.match(/from ['"]([^'"]+)['"]/);
+      if (!importMatch) {
+        throw new Error('Cannot determine component path');
+      }
+
+      const importPath = importMatch[1];
+      // @/components/widgets/button/button-primary -> button/button-primary.tsx
+      const filePath = importPath.replace('@/components/widgets/', '').replace(/\/$/, '') + '.tsx';
+
+      const response = await fetch(`/api/admin/components/${encodeURIComponent(filePath)}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch component content');
+      }
+
+      const data = await response.json();
+      setEditorContent(data.content);
+    } catch (error) {
+      console.error('Error loading component:', error);
+      setDialogMessage('Failed to load component for editing');
+      setDialogOpen(true);
+      setEditDialogOpen(false);
+    } finally {
+      setEditorLoading(false);
+    }
+  };
+
+  const saveComponentChanges = async (content: string) => {
+    if (!editingBlock) return;
+
+    try {
+      const importMatch = editingBlock.importString?.match(/from ['"]([^'"]+)['"]/);
+      if (!importMatch) {
+        throw new Error('Cannot determine component path');
+      }
+
+      const importPath = importMatch[1];
+      const filePath = importPath.replace('@/components/widgets/', '').replace(/\/$/, '') + '.tsx';
+
+      const response = await fetch(`/api/admin/components/${encodeURIComponent(filePath)}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save component');
+      }
+
+      setEditDialogOpen(false);
+      setEditingBlock(null);
+      setEditorContent('');
+      setDialogMessage('Component updated successfully');
+      setDialogOpen(true);
+    } catch (error) {
+      console.error('Error saving component:', error);
+      setDialogMessage('Failed to save component changes');
+      setDialogOpen(true);
+      throw error; 
+    }
   };
 
   const handleContextMenu = (action: string, blockId: string) => {
     switch (action) {
+      case 'edit':
+        editBlock(blockId);
+        break;
       case 'move-up':
         moveBlock(blockId, 'up');
         break;
@@ -441,7 +515,6 @@ export default function PageEditor() {
     localStorage.removeItem('page-editor-blocks');
     setNextId(1);
     setShowClearDialog(false);
-    console.log('All blocks cleared and localStorage cleaned');
   };
 
   // Show loading state while data is being loaded
@@ -500,7 +573,7 @@ export default function PageEditor() {
 
       <DragDropContext 
         onDragEnd={handleDragEnd}
-        onDragStart={() => console.log('Drag started')}
+        onDragStart={() => {}}
       >
         <div className="flex-1 flex  ">
           {/* Main content area */}
@@ -718,6 +791,21 @@ export default function PageEditor() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Component Editor Dialog */}
+      <ComponentEditorDialog
+        open={editDialogOpen}
+        onOpenChange={(open) => {
+          setEditDialogOpen(open);
+          if (!open) {
+            setEditingBlock(null);
+            setEditorContent('');
+          }
+        }}
+        block={editingBlock}
+        initialContent={editorContent}
+        onSave={saveComponentChanges}
+      />
     </div>
   );
 }

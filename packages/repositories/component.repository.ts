@@ -13,6 +13,8 @@ function toPascalCase(input: string): string {
 export class ComponentRepository {
     private components: AvailableBlock[] = [];
     private static instance: ComponentRepository;
+    private widgetsRoot = path.join(process.cwd(), '../../',"packages", "components", "widgets");
+
     constructor() {
         this.components = [];
     }
@@ -21,7 +23,6 @@ export class ComponentRepository {
         if (this.components.length > 0 && !force) {
             return this.components;
         }
-        const widgetsRoot = path.join(process.cwd(), '../../',"packages", "components", "widgets");
 
         const discovered: AvailableBlock[] = [];
 
@@ -69,7 +70,7 @@ export class ComponentRepository {
         };
 
         try {
-            await walk(widgetsRoot);
+            await walk(this.widgetsRoot);
         } catch (error) {
             // If the folder does not exist or cannot be read, keep an empty list
             console.error("Failed to scan widgets components", error);
@@ -78,6 +79,116 @@ export class ComponentRepository {
         this.components = discovered;
         return discovered;
     }
+    public async getComponentFileContent(relativePath: string): Promise<{
+        path: string;
+        content: string;
+        lastModified: string;
+    }> {
+        const decodedPath = decodeURIComponent(relativePath);
+        
+        if (decodedPath.includes('..') || decodedPath.includes('~')) {
+            throw new Error('Invalid path');
+        }
+
+        const fullPath = path.join(this.widgetsRoot, decodedPath);
+        
+        if (!fullPath.endsWith('.tsx')) {
+            throw new Error('Only .tsx files are supported');
+        }
+
+        try {
+            const content = await fs.readFile(fullPath, 'utf-8');
+            const stats = await fs.stat(fullPath);
+            
+            return {
+                path: decodedPath,
+                content,
+                lastModified: stats.mtime.toISOString()
+            };
+        } catch (error) {
+            if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
+                throw new Error('File not found');
+            }
+            throw error;
+        }
+    }
+
+    public async updateComponentFile(relativePath: string, content: string): Promise<{
+        path: string;
+        content: string;
+        lastModified: string;
+        message: string;
+    }> {
+        if (!content || typeof content !== 'string') {
+            throw new Error('Content is required and must be a string');
+        }
+
+        const decodedPath = decodeURIComponent(relativePath);
+        
+        if (decodedPath.includes('..') || decodedPath.includes('~')) {
+            throw new Error('Invalid path');
+        }
+
+        const fullPath = path.join(this.widgetsRoot, decodedPath);
+        
+        if (!fullPath.endsWith('.tsx')) {
+            throw new Error('Only .tsx files are supported');
+        }
+
+        try {
+            const dirPath = path.dirname(fullPath);
+            await fs.mkdir(dirPath, { recursive: true });
+
+            await fs.writeFile(fullPath, content, 'utf-8');
+            
+            const stats = await fs.stat(fullPath);
+            
+            this.components = [];
+            
+            return {
+                path: decodedPath,
+                content,
+                lastModified: stats.mtime.toISOString(),
+                message: 'File updated successfully'
+            };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    public async deleteComponentFile(relativePath: string): Promise<{
+        message: string;
+        path: string;
+    }> {
+        const decodedPath = decodeURIComponent(relativePath);
+        
+        if (decodedPath.includes('..') || decodedPath.includes('~')) {
+            throw new Error('Invalid path');
+        }
+
+        const fullPath = path.join(this.widgetsRoot, decodedPath);
+        
+        if (!fullPath.endsWith('.tsx')) {
+            throw new Error('Only .tsx files are supported');
+        }
+
+        try {
+            await fs.unlink(fullPath);
+            
+            this.components = [];
+            
+            return {
+                message: 'File deleted successfully',
+                path: decodedPath
+            };
+        } catch (error) {
+            if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
+                throw new Error('File not found');
+            }
+            throw error;
+        }
+    }
+
     public static getInstance(): ComponentRepository {
         if (!ComponentRepository.instance) {
             ComponentRepository.instance = new ComponentRepository();
