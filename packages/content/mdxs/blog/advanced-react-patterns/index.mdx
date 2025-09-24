@@ -1,23 +1,18 @@
 ---
-title: Advanced React Patterns for Modern Applications
-date: 2024-01-15
-tags: [react, patterns, hooks, performance]
-excerpt: Explore advanced React patterns that can help you build more maintainable and performant applications.
-category: main-category
-author: jane-smith
+title: "Advanced React Patterns for Modern Applications"
+date: "2025-09-24"
+tags: ["react", "patterns", "hooks", "performance"]
+excerpt: "Explore advanced React patterns that can help you build more maintainable and performant applications."
+category: "technology"
+author: "jane-smith"
 ---
 
-# Advanced React Patterns for Modern Applications
-
-React has evolved significantly over the years, and with it, the patterns we use to build applications. In this article, we'll explore some advanced patterns that can help you write more maintainable, performant, and scalable React applications.
-
-## Custom Hooks for Logic Reuse
-
-Custom hooks are one of the most powerful features in React. They allow you to extract component logic into reusable functions.
-
-```javascript
-function useLocalStorage(key, initialValue) {
-  const [storedValue, setStoredValue] = useState(() => {
+<h1>Advanced React Patterns for Modern Applications</h1>
+<p>React has evolved significantly over the years, and with it, the patterns we use to build applications. In this article, we&#39;ll explore some advanced patterns that can help you write more maintainable, performant, and scalable React applications.</p>
+<h2>Custom Hooks for Logic Reuse</h2>
+<p>Custom hooks are one of the most powerful features in React. They allow you to extract component logic into reusable functions.</p>
+<pre><code class="language-javascript">function useLocalStorage(key, initialValue) {
+  const [storedValue, setStoredValue] = useState(() =&gt; {
     try {
       const item = window.localStorage.getItem(key);
       return item ? JSON.parse(item) : initialValue;
@@ -27,82 +22,26 @@ function useLocalStorage(key, initialValue) {
     }
   });
 
-  const setValue = (value) => {
-    try {
-      setStoredValue(value);
-      window.localStorage.setItem(key, JSON.stringify(value));
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  return [storedValue, setValue];
-}
-```
-
-## Compound Components Pattern
-
-The compound components pattern allows you to create components that work together while maintaining a clean API.
-
-```javascript
-const Tabs = ({ children, defaultTab }) => {
+<p>  const setValue = (value) =&gt; {<br>    try {<br>      setStoredValue(value);<br>      window.localStorage.setItem(key, JSON.stringify(value));<br>    } catch (error) {<br>      console.log(error);<br>    }<br>  };</p>
+<p>  return [storedValue, setValue];<br>}<br></code></pre></p>
+<h2>Compound Components Pattern</h2>
+<p>The compound components pattern allows you to create components that work together while maintaining a clean API.</p>
+<pre><code class="language-javascript">const Tabs = ({ children, defaultTab }) =&gt; {
   const [activeTab, setActiveTab] = useState(defaultTab);
   
-  return (
-    <TabsContext.Provider value={{ activeTab, setActiveTab }}>
-      {children}
-    </TabsContext.Provider>
-  );
-};
-
-const TabList = ({ children }) => (
-  <div className="tab-list">{children}</div>
-);
-
-const Tab = ({ id, children }) => {
-  const { activeTab, setActiveTab } = useContext(TabsContext);
-  return (
-    <button
-      className={activeTab === id ? 'active' : ''}
-      onClick={() => setActiveTab(id)}
-    >
-      {children}
-    </button>
-  );
-};
-```
-
-## Render Props and Higher-Order Components
-
-Both render props and HOCs are powerful patterns for sharing logic between components.
-
-### Render Props
-
-```javascript
-function DataFetcher({ url, render }) {
+<p>  return (<br>    &lt;TabsContext.Provider value={{ activeTab, setActiveTab }}&gt;<br>      {children}<br>    &lt;/TabsContext.Provider&gt;<br>  );<br>};</p>
+<p>const TabList = ({ children }) =&gt; (<br>  &lt;div className=&quot;tab-list&quot;&gt;{children}&lt;/div&gt;<br>);</p>
+<p>const Tab = ({ id, children }) =&gt; {<br>  const { activeTab, setActiveTab } = useContext(TabsContext);<br>  return (<br>    &lt;button<br>      className={activeTab === id ? &#39;active&#39; : &#39;&#39;}<br>      onClick={() =&gt; setActiveTab(id)}<br>    &gt;<br>      {children}<br>    &lt;/button&gt;<br>  );<br>};<br></code></pre></p>
+<h2>Render Props and Higher-Order Components</h2>
+<p>Both render props and HOCs are powerful patterns for sharing logic between components.</p>
+<h3>Render Props</h3>
+<pre><code class="language-javascript">function DataFetcher({ url, render }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetch(url)
-      .then(response => response.json())
-      .then(data => {
-        setData(data);
-        setLoading(false);
-      })
-      .catch(error => {
-        setError(error);
-        setLoading(false);
-      });
-  }, [url]);
-
-  return render({ data, loading, error });
-}
-```
-
-## Conclusion
-
-These patterns represent just a few of the many ways you can structure your React applications for better maintainability and performance. The key is to choose the right pattern for your specific use case and team needs.
-
-Remember, the best pattern is the one that makes your code more readable, maintainable, and performant for your specific situation.
+<p>  useEffect(() =&gt; {<br>    fetch(url)<br>      .then(response =&gt; response.json())<br>      .then(data =&gt; {<br>        setData(data);<br>        setLoading(false);<br>      })<br>      .catch(error =&gt; {<br>        setError(error);<br>        setLoading(false);<br>      });<br>  }, [url]);</p>
+<p>  return render({ data, loading, error });<br>}<br></code></pre></p>
+<h2>Conclusion</h2>
+<p>These patterns represent just a few of the many ways you can structure your React applications for better maintainability and performance. The key is to choose the right pattern for your specific use case and team needs.</p>
+<p>Remember, the best pattern is the one that makes your code more readable, maintainable, and performant for your specific situation.</p>

@@ -109,7 +109,7 @@ export default function PostsPage() {
       
       const response = await fetch(`/api/admin/blog?${params.toString()}`);
       const data = await response.json();
-      
+
       if (data.success) {
         setPosts(data.posts);
         setPagination(data.pagination);
@@ -348,7 +348,8 @@ export default function PostsPage() {
                 </TableCell>
               </TableRow>
             ) : (
-              posts.map((post) => (
+               posts.map((post, index) => {
+                return (
                 <TableRow 
                   key={post.slug}
                   onMouseEnter={() => handleMouseEnter(post.slug)}
@@ -499,7 +500,7 @@ export default function PostsPage() {
                     </div>
                   </TableCell>
                 </TableRow>
-              ))
+              )})
             )}
           </TableBody>
         </Table>

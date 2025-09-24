@@ -7,6 +7,11 @@ export const frontmatterSchema = z.object({
   tags: z.array(z.string()).optional(),
   excerpt: z.string().optional(),
   media: z.string().optional(),
+  category: z.string().optional(),
+  author: z.string().optional(),
+  seoTitle: z.string().optional(),
+  seoDescription: z.string().optional(),
+  seoKeywords: z.string().optional(),
 });
 
 export type Frontmatter = z.infer<typeof frontmatterSchema>;

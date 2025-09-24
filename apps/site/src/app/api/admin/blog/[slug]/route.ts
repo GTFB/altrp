@@ -4,6 +4,7 @@ import path from 'path';
 import matter from 'gray-matter';
 import { frontmatterSchema } from '@/lib/validators/content.schema';
 import { PostRepository } from '@/repositories/post.repository';
+import { getContentDir } from '@/lib/content-path';
 
 
 interface UpdatePostRequest {
@@ -38,7 +39,7 @@ export async function PUT(
       );
     }
 
-    const contentDir = path.join(process.cwd(), 'content', 'blog');
+    const contentDir = getContentDir('blog');
     const currentPostPath = path.join(contentDir, slug);
     const currentIndexPath = path.join(currentPostPath, 'index.mdx');
 
@@ -141,7 +142,7 @@ export async function GET(
 ) {
   try {
     const { slug } = params;
-    const contentDir = path.join(process.cwd(), 'content', 'blog');
+    const contentDir = getContentDir('blog');
     const postPath = path.join(contentDir, slug, 'index.mdx');
 
 
@@ -175,7 +176,7 @@ export async function DELETE(
 ) {
   try {
     const { slug } = params;
-    const contentDir = path.join(process.cwd(), 'content', 'blog');
+    const contentDir = getContentDir('blog');
     const postPath = path.join(contentDir, slug);
 
     // Check if post exists

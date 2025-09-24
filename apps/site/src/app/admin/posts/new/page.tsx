@@ -152,8 +152,19 @@ export default function NewPostPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          ...formData,
+          title: formData.title,
+          slug: formData.slug,
+          description: formData.description || undefined,
+          date: undefined,
           tags: tagsArray,
+          excerpt: formData.excerpt || undefined,
+          content: formData.content,
+          category: formData.category || undefined,
+          author: formData.author || undefined,
+          media: formData.media || undefined,
+          seoTitle: formData.seoTitle || undefined,
+          seoDescription: formData.seoDescription || undefined,
+          seoKeywords: formData.seoKeywords || undefined,
         }),
       });
 
@@ -205,12 +216,12 @@ export default function NewPostPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              <Tabs defaultValue="content" className="w-full">
+              <Tabs defaultValue="content" className="w-full max-h-[calc(100vh-330px)] overflow-y-auto">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="content">Post Details</TabsTrigger>
                   <TabsTrigger value="seo">SEO Settings</TabsTrigger>
                 </TabsList>
-                
+
                 <TabsContent value="content" className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-6">

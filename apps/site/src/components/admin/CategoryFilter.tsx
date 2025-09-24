@@ -5,12 +5,17 @@ import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 
+interface Category {
+  slug: string;
+  title: string;
+}
+
 interface CategoryFilterProps {
   className?: string;
 }
 
 export function CategoryFilter({ className = '' }: CategoryFilterProps) {
-  const [categories, setCategories] = useState<string[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -78,16 +83,16 @@ export function CategoryFilter({ className = '' }: CategoryFilterProps) {
 
       {/* Category filters */}
       {categories.map((category) => {
-        const isActive = currentCategory === category;
+        const isActive = currentCategory === category.slug;
         
         return isActive ? (
-          <Badge key={category} variant="default" className="cursor-default">
-            {category}
+          <Badge key={category.slug} variant="default" className="cursor-default">
+            {category.title}
           </Badge>
         ) : (
-          <Link key={category} href={createUrl(category) as any}>
+          <Link key={category.slug} href={createUrl(category.slug) as any}>
             <Badge variant="outline" className="cursor-pointer hover:bg-muted">
-              {category}
+              {category.title}
             </Badge>
           </Link>
         );

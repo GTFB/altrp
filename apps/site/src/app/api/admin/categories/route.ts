@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { PostRepository } from '@/repositories/post.repository';
+import { CategoryRepository } from '@/repositories/category.repository';
 
 export async function GET() {
   try {
-    const postRepo = PostRepository.getInstance();
-    const categories = await postRepo.findAllCategories();
+    const categoryRepo = CategoryRepository.getInstance();
+    const categories = await categoryRepo.findAll();
 
     return NextResponse.json({
       success: true,
