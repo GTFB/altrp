@@ -35,7 +35,7 @@
       },
     },
     "apps/site": {
-      "name": "jambo-site",
+      "name": "jambo-cms",
       "version": "0.1.0",
       "dependencies": {
         "@hello-pangea/dnd": "^18.0.1",
@@ -1567,7 +1567,7 @@
 
     "jambo-cms": ["jambo-cms@workspace:apps/cms"],
 
-    "jambo-site": ["jambo-site@workspace:apps/site"],
+    "jambo-cms": ["jambo-cms@workspace:apps/site"],
 
     "jest-worker": ["jest-worker@27.5.1", "", { "dependencies": { "@types/node": "*", "merge-stream": "^2.0.0", "supports-color": "^8.0.0" } }, "sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg=="],
 

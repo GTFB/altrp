@@ -10,15 +10,16 @@
         "bun": ">=1.1.0"
     },
     "scripts": {
-        "dev:site": "bun run --filter=jambo-site dev",
-        "build:site": "bun run --filter=jambo-site build",
-        "start:site": "bun run --filter=jambo-site start",
-        "lint:site": "bun run --filter=jambo-site lint",
+        "dev:site": "bun run --filter=jambo-cms dev",
+        "build:site": "bun run --filter=jambo-cms build",
+        "start:site": "bun run --filter=jambo-cms start",
+        "lint:site": "bun run --filter=jambo-cms lint",
         "dev:cms": "bun run --filter=jambo-cms dev",
         "build:cms": "bun run --filter=jambo-cms build",
         "start:cms": "bun run --filter=jambo-cms start",
         "dev": "concurrently \"bun run dev:site\" \"bun run dev:cms\"",
-        "build": "bun run build:site && bun run build:cms"
+        "build": "bun run build:site && bun run build:cms",
+        "quick-test": "bun run --filter=jambo-cms test:e2e:quick-public"
     },
     "devDependencies": {
         "@changesets/cli": "^2.27.1",

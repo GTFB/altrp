@@ -48,17 +48,18 @@ export const PROJECT_SETTINGS = {
 // Language configuration (ordered by popularity)
 export const LANGUAGES = [
   { code: 'en', name: 'English', shortName: 'EN' },
-  { code: 'zh', name: '中文', shortName: 'CN' },
-  { code: 'hi', name: 'हिन्दी', shortName: 'IN' },
-  { code: 'es', name: 'Español', shortName: 'ES' },
-  { code: 'fr', name: 'Français', shortName: 'FR' },
-  { code: 'ar', name: 'العربية', shortName: 'AR' },
-  { code: 'pt', name: 'Português', shortName: 'PT' },
-  { code: 'ru', name: 'Русский', shortName: 'RU' },
-  { code: 'ja', name: '日本語', shortName: 'JP' },
-  { code: 'de', name: 'Deutsch', shortName: 'DE' },
-  { code: 'ko', name: '한국어', shortName: 'KR' },
-  { code: 'it', name: 'Italiano', shortName: 'IT' },
+  // { code: 'rs', name: 'Srpski', shortName: 'RS' },
+  // { code: 'zh', name: '中文', shortName: 'CN' },
+  // { code: 'hi', name: 'हिन्दी', shortName: 'IN' },
+  // { code: 'es', name: 'Español', shortName: 'ES' },
+  // { code: 'fr', name: 'Français', shortName: 'FR' },
+  // { code: 'ar', name: 'العربية', shortName: 'AR' },
+  // { code: 'pt', name: 'Português', shortName: 'PT' },
+  // { code: 'ru', name: 'Русский', shortName: 'RU' },
+  // { code: 'ja', name: '日本語', shortName: 'JP' },
+  // { code: 'de', name: 'Deutsch', shortName: 'DE' },
+  // { code: 'ko', name: '한국어', shortName: 'KR' },
+  // { code: 'it', name: 'Italiano', shortName: 'IT' },
 ] as const;
 
 // Get supported language codes

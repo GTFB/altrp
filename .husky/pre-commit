@@ -67,5 +67,11 @@ for file in $FILES; do
     fi
 done
 
+echo "🧪 Running quick e2e tests..."
+if ! bun run quick-test; then
+    echo "❌ E2E quick tests failed. Aborting commit."
+    exit 1
+fi
+
 echo "✅ Code validation passed!"
 echo "🚀 Proceeding with commit..."

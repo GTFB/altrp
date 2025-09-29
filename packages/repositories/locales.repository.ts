@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
 import * as path from 'path';
-import { i18nConfig } from '../../apps/site/src/config/i18n';
+import { i18nConfig } from '../../apps/cms/src/config/i18n';
 
 export type LocaleCode = (typeof i18nConfig.locales)[number];
 export type LocaleData = Record<string, unknown>;

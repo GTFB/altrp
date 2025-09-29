@@ -6,7 +6,7 @@ import { parseMarkdown } from '@/lib/markdown';
 import { frontmatterSchema, type Frontmatter } from '@/lib/validators/content.schema';
 import { getContentDir } from '@/lib/content-path';
 import { BaseSearchableRepository, SearchResult, SearchOptions } from './base.repository';
-import { i18nConfig } from '../../apps/site/src/config/i18n';
+import { i18nConfig } from '../../apps/cms/src/config/i18n';
 
 export interface Post {
   slug: string;

@@ -1,3 +1,4 @@
+'use client';
 import { ComponentsHeader } from "@/components/shared/components-header";
 import { ToTopButton } from "@/components/shared/to-top-button";
 import { Card, CardContent } from "@/components/ui/card";
