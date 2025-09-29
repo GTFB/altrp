@@ -147,3 +147,7 @@ out/
 
 # External storage (as per user rules)
 external/
+
+# Tests results
+**/playwright-report/**
+**/test-results/**
