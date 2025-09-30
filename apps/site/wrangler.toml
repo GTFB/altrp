@@ -1,0 +1,9 @@
+name = "finurcons"
+compatibility_date = "2025-09-25"
+
+[build]
+command = "bun run build"
+cwd = "."
+
+[[pages.functions]]
+runtime = "nodejs20"
