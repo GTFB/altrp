@@ -35,11 +35,9 @@ export interface NavigationItem {
   href: string
 }
 
-
-
 export const PROJECT_SETTINGS = {
-  name: 'Jambo',
-  description: 'Commercial Proposal Generator',
+  name: 'Altrp',
+  description: 'Website Builder',
   defaultLanguage: 'en',
   defaultTheme: 'light',
   supportedThemes: ['light', 'dark',],
@@ -64,54 +62,3 @@ export const LANGUAGES = [
 
 // Get supported language codes
 export const SUPPORTED_LANGUAGES: string[] = LANGUAGES.map(lang => lang.code);
-
-// Password groups configuration
-export const PASSWORD_GROUPS = {
-  'group1': {
-    password: 'password1',
-    sections: ['2', '3'], // Sections A, B, C
-    name: 'Group 1 - Basic Access',
-    description: 'Access to basic content sections'
-  },
-  'group2': {
-    password: 'password2', 
-    sections: ['4', '5', '6'], // Sections D, E, F
-    name: 'Group 2 - Premium Access',
-    description: 'Access to premium content sections'
-  },
-  'default': {
-    password: 'password',
-    sections: ['*'], // All other sections
-    name: 'Default Group',
-    description: 'Access to all other content'
-  }
-} as const;
-
-
-// Static navigation items based on MDX files
-// This will be updated when MDX files change
-export const NAVIGATION_ITEMS: NavigationItem[] = [
-  {
-    id: '1',
-    title: 'MDX Styling Examples',
-    icon: Code,
-    href: '/widgets'
-  },
-  {
-    id: '2',
-    title: 'Group 1 - Section A',
-    icon: Users,
-    href: '/group-1-section-a'
-  },
-  {
-    id: '4',
-    title: 'Group 2 - Section D',
-    icon: Cpu,
-    href: '/group-2-section-d'
-  }
-]
-
-export const MDX_FILES = NAVIGATION_ITEMS.map(item => ({
-  id: item.id,
-  name: item.title
-}));
