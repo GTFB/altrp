@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, ArrowRight, Hash } from 'lucide-react';
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 interface TagSectionProps {
   tags: string[];
@@ -34,7 +35,7 @@ export function TagSection({
 }: TagSectionProps) {
     const locale = useLocale() === 'en' ? '' : useLocale();
   const localePath = locale !== '' ? `/${locale}` : '';
-  
+  const t = useTranslations('blog');
   // Generate title and description if not provided
   const tagsText = tags.join(', ');
   const sectionTitle = title || `Posts with tags: ${tagsText}`;
@@ -123,8 +124,8 @@ export function TagSection({
       {showViewAll && (
         <div className="text-center">
           <Button asChild variant="outline" size="lg">
-            <Link href={`${localePath}/blog?tags=${encodeURIComponent(tags.join(','))}`}>
-              View All Posts with Tags
+            <Link href={`${localePath}/tags`}>
+              {t('viewAllPostsWithTags')}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>

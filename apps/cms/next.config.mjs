@@ -6,9 +6,9 @@ const withNextIntl = i18nPlugin(
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
+  typedRoutes: true,
   experimental: {
     externalDir: true,
-    typedRoutes: true,
   },
 };
 

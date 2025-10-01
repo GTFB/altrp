@@ -1,5 +1,5 @@
 import { TrendingDownIcon, TrendingUpIcon } from "lucide-react"
-import { useTranslations } from "next-intl"
+import { getTranslations } from "next-intl/server"
 
 import { Badge } from "@/components/ui/badge"
 import {
@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card"
 
 export function SectionCards() {
-  const t = useTranslations('demo.sectionCards');
+  const t = getTranslations('demo.sectionCards');
 
   return (
     <div className="*:data-[slot=card]:shadow-xs @xl/main:grid-cols-2 @5xl/main:grid-cols-4 grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:from-gray-100/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card lg:px-6">

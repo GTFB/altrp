@@ -5,7 +5,7 @@ import { Metadata } from 'next';
 import { Badge } from '@/components/ui/badge';
 import { Tag } from 'lucide-react';
 import { PostCard } from '@/components/blocks-app/blog/PostCard/PostCard';
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { Container } from '@/components/misc/layout/Container';
 export const dynamic = 'force-dynamic';
 
@@ -53,7 +53,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const categoryRepo = CategoryRepository.getInstance();
   const category = await categoryRepo.findBySlug(params.slug);
-  const t = useTranslations('category');  
+  const t = await getTranslations({ locale: params.locale, namespace: 'category' });  
   if (!category) {
     notFound();
   }

@@ -1,7 +1,7 @@
 import { PostRepository } from '@/repositories/post.repository';
 import { Metadata } from 'next';
 import { Tag } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { TagPostList } from '@/components/blocks-app/blog/TagPostList';
 import { Container } from '@/components/misc/layout/Container';
 export const dynamic = 'force-dynamic';
@@ -48,11 +48,11 @@ export async function generateMetadata({ params }: TagPageProps): Promise<Metada
   };
 }
 
-export default function TagPage({ params }: TagPageProps) {
+export default async function TagPage({ params }: TagPageProps) {
  
 
   const tagName = params.slug;
-  const t = useTranslations('tags');
+  const t = await getTranslations({ locale: params.locale, namespace: 'tags' });
   return (
     <Container className="py-8">
       {/* Tag Header */}

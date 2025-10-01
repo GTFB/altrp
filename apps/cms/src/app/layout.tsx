@@ -53,8 +53,8 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = getSession();
-  const headersList = headers();
+  const session = await getSession();
+  const headersList = await headers();
   const pathname = headersList.get('x-pathname') || '';
   const locale = pathname.split('/')[1] || i18nConfig.defaultLocale;
   const currentLocale = i18nConfig.locales.includes(locale) ? locale : i18nConfig.defaultLocale;

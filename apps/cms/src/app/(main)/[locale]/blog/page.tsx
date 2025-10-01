@@ -1,14 +1,20 @@
 import { PostList } from '@/components/blocks-app/blog/PostList/PostList';
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { Container } from '@/components/misc/layout/Container';
-export const dynamic = 'force-dynamic';
+import { Metadata } from 'next';
 
-export default function BlogPage() {
-  const t = useTranslations('blog');
+export const metadata: Metadata = {
+  title: 'Blog | Jambo Blog',
+  description: 'Explore our content organized by tags.',
+};
+
+export default async function BlogPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'blog' });
   return (
     <Container className="py-8">
       <h1 className="text-3xl font-bold mb-8">{t('blog')}</h1>
-      <PostList />
+      <PostList noPostsFound={t('noPostsFound')}/>
     </Container>
   );
 }

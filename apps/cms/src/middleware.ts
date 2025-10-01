@@ -32,7 +32,6 @@ export default withAuth(
         // if (!email) {
         //   return false;
         // }
-        console.log(token?.role);
         if (req.nextUrl.pathname.startsWith("/admin") || req.nextUrl.pathname.startsWith("/api/admin")) {
           return token?.role === "admin"; 
         }

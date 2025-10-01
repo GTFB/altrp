@@ -32,9 +32,9 @@ export default function LoginPage() {
           <h1 className="text-2xl font-bold text-center mb-8">Welcome back!</h1>
           <div className="space-y-4">
             <div className="text-center">
-              <p className="text-muted-foreground mb-2">
+              <h1 className="text-muted-foreground mb-2">
                 You are signed in as:
-              </p>
+              </h1>
               <p className="font-medium">{session.user.name}</p>
               <p className="text-sm text-muted-foreground">{session.user.email}</p>
             </div>
@@ -57,9 +57,9 @@ export default function LoginPage() {
       <div className="max-w-md mx-auto">
         <h1 className="text-2xl font-bold text-center mb-8">Sign In</h1>
         <div className="space-y-4">
-          <p className="text-center text-muted-foreground">
+          <h1 className="text-center text-muted-foreground">
             Sign in with your GitHub account to access the admin panel
-          </p>
+          </h1>  
           <div className="flex justify-center">
             <Button className="w-full" onClick={() => signIn('github')}>
               Sign in with GitHub

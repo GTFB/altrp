@@ -1,4 +1,4 @@
-import { CategoryList } from '@/components/CategoryList/CategoryList';
+import { CategoryList } from '@/components/blocks-app/CategoryList';
 import { Metadata } from 'next';
 import { Container } from '@/components/misc/layout/Container';
 export const dynamic = 'force-dynamic';

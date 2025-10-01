@@ -1,16 +1,17 @@
 import { PostRepository } from '@/repositories/post.repository';
 import { PostCard } from '@/components/blocks-app/blog/PostCard/PostCard';
+import { getTranslations } from 'next-intl/server';
 
-export const dynamic = 'force-dynamic';
 
-export async function PostList() {
+export async function PostList({noPostsFound = ''}: {noPostsFound: string}) {
   const postRepo = PostRepository.getInstance();
   const posts = await postRepo.findAll();
+
 
   if (posts.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground">No posts found.</p>
+        <p className="text-muted-foreground">{noPostsFound}</p>
       </div>
     );
   }

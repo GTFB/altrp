@@ -1,6 +1,6 @@
-import { TagList } from '@/components/TagList/TagList';
+import { TagList } from '@/components/blocks-app/TagList';
 import { Metadata } from 'next';
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 import { Container } from '@/components/misc/layout/Container';
 export const dynamic = 'force-dynamic';
 
@@ -9,8 +9,9 @@ export const metadata: Metadata = {
   description: 'Explore our content organized by tags.',
 };
 
-export default function TagsPage() {
-  const t = useTranslations('tags');
+export default async function TagsPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'tags' });
   return (
     <Container className="py-8">
       <div className="text-center mb-12">

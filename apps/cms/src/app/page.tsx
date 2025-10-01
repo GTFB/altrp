@@ -4,10 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import {  Globe, Languages } from 'lucide-react';
 import { HeroBlock } from '@/components/features/HeroBlock/HeroBlock';
 import { Container } from '@/components/misc/layout/Container';
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 
-export default function HomePage() {
-  const { t } = useTranslations('Home');
+export default async function HomePage() {
+  const t = await getTranslations('Home');
   return (
     <main>
       <HeroBlock />
