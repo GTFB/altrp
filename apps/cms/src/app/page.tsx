@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {  Globe, Languages } from 'lucide-react';
 import { HeroBlock } from '@/components/features/HeroBlock/HeroBlock';
-import { Container } from '@/components/layout/Container';
+import { Container } from '@/components/misc/layout/Container';
 import { useTranslations } from 'next-intl';
 
 export default function HomePage() {

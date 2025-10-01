@@ -1,5 +1,5 @@
-import { ComponentsHeader } from "@/components/shared/components-header";
-import { ToTopButton } from "@/components/shared/to-top-button";
+import { ComponentsHeader } from "@/components/misc/components-header";
+import { ToTopButton } from "@/components/misc/to-top-button";
 import { Card, CardContent } from "@/components/ui/card";
 import { PROJECT_SETTINGS } from "@/settings";
 import { useLocale, useTranslations } from "next-intl";

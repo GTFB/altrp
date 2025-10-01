@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { signIn, signOut, useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
-import { Container } from '@/components/layout/Container';
+import { Container } from '@/components/misc/layout/Container';
 export default function LoginPage() {
   const { data: session, status } = useSession()
   const router = useRouter()

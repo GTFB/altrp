@@ -28,7 +28,7 @@ import { Plus, Edit, Trash2, Eye, Check, X, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useNotifications } from '@/hooks/use-notifications';
 import { NotificationContainer } from '@/components/ui/notification-container';
-import { CategoryFilter } from '@/components/admin/CategoryFilter';
+import { CategoryFilter } from '@/components/blocks-app/CategoryFilter';
 import {
   Pagination,
   PaginationContent,

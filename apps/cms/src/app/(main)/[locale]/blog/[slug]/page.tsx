@@ -2,9 +2,9 @@ import { PostRepository } from '@/repositories/post.repository';
 import { MediaRepository } from '@/repositories/media.repository';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
-import { PostTags } from '@/components/features/blog/PostTags';
-import { PostMeta } from '@/components/features/blog/PostMeta';
-import { Container } from '@/components/layout/Container';
+import { PostTags } from '@/components/blocks-app/blog/PostTags';
+import { PostMeta } from '@/components/blocks-app/blog/PostMeta';
+import { Container } from '@/components/misc/layout/Container';
 export const dynamic = 'force-dynamic';
 
 interface BlogPostPageProps {

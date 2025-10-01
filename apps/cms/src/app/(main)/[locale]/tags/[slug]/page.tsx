@@ -2,8 +2,8 @@ import { PostRepository } from '@/repositories/post.repository';
 import { Metadata } from 'next';
 import { Tag } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { TagPostList } from '@/components/features/blog/TagPostList';
-import { Container } from '@/components/layout/Container';
+import { TagPostList } from '@/components/blocks-app/blog/TagPostList';
+import { Container } from '@/components/misc/layout/Container';
 export const dynamic = 'force-dynamic';
 
 interface TagPageProps {

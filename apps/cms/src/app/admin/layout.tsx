@@ -1,8 +1,8 @@
 'use client';
 
-import { AppSidebar, type NavigationItem } from "@/components/AppSidebar/AppSidebar"
+import { AppSidebar, type NavigationItem } from "@/components/blocks-app/AppSidebar"
 import { useLeftSidebar } from "@/components/providers/LeftSidebarProvider";
-import { SiteHeader } from "@/components/SiteHeader/SiteHeader"
+import { AdminHeader } from "@/components/blocks-app/AdminHeader"
 import {
   SidebarInset,
   SidebarProvider
@@ -121,7 +121,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           className="flex flex-col min-h-screen  w-[calc(100vw-var(--sidebar-width))] duration-200 transition-transform flex-1"
           
         >
-          <SiteHeader />
+          <AdminHeader />
           <div className="flex-1 p-4 ">
             {children}
           </div>

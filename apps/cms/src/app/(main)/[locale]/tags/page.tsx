@@ -1,7 +1,7 @@
 import { TagList } from '@/components/TagList/TagList';
 import { Metadata } from 'next';
 import { useTranslations } from 'next-intl';
-import { Container } from '@/components/layout/Container';
+import { Container } from '@/components/misc/layout/Container';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {

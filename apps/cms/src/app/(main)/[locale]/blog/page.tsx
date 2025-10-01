@@ -1,6 +1,6 @@
-import { PostList } from '@/components/features/blog/PostList/PostList';
+import { PostList } from '@/components/blocks-app/blog/PostList/PostList';
 import { useTranslations } from 'next-intl';
-import { Container } from '@/components/layout/Container';
+import { Container } from '@/components/misc/layout/Container';
 export const dynamic = 'force-dynamic';
 
 export default function BlogPage() {

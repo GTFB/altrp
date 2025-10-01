@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ComponentsHeader } from "@/components/shared/components-header";
+import { ComponentsHeader } from "@/components/misc/components-header";
 import { PROJECT_SETTINGS } from "@/settings";
 import { useTranslations } from "next-intl";
 import { 

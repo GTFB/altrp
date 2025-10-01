@@ -1,5 +1,5 @@
-import { BlogSection, CategorySection, CategoryPostsSection, AuthorSection, AuthorPostsSection, TagSection } from '@/components/features/blog';
-import { Container } from '@/components/layout/Container';
+import { BlogSection, CategorySection, CategoryPostsSection, AuthorSection, AuthorPostsSection, TagSection } from '@/components/blocks-app/blog';
+import { Container } from '@/components/misc/layout/Container';
 import { useTranslations } from 'next-intl';
 export default function LocalizedHome({ params }: { params: { locale: string } }) {
   const t = useTranslations('home');

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { TipTapEditor } from '@/components/features/cms/TipTapEditor';
+import { TipTapEditor } from '@/components/blocks-app/cms/TipTapEditor';
 import { ArrowLeft, Save, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';

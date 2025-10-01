@@ -5,12 +5,12 @@ import { Button } from '@/components/ui/button';
 import {  Search } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Settings } from 'lucide-react';
-import { LanguageSwitcher } from '@/components/shared/language-switcher';
-import { ThemeToggle } from '@/components/shared/theme-toggle';
+import { LanguageSwitcher } from '@/components/misc/language-switcher';
+import { ThemeToggle } from '@/components/misc/theme-toggle';
 import { useLocale, useTranslations } from 'next-intl';
-import { DynamicBreadcrumbs } from '@/components/shared/dynamic-breadcrumbs';
-import { PopupSearch } from '@/components/features/search/PopupSearch';
-import { Container } from '@/components/layout/Container';
+import { DynamicBreadcrumbs } from '@/components/misc/dynamic-breadcrumbs';
+import { PopupSearch } from '@/components/blocks-app/search/PopupSearch';
+import { Container } from '@/components/misc/layout/Container';
 export default function Layout({
   children,
 }: {

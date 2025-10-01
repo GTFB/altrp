@@ -1,4 +1,4 @@
-import { DynamicHtml } from '@/components/DynamicHtml';
+import { DynamicHtml } from '@/components/misc/layout/DynamicHtml';
 import { IntlProvider } from '@/components/providers/IntlProvider';
 import { Providers } from '@/components/providers/Providers';
 import './globals.css';

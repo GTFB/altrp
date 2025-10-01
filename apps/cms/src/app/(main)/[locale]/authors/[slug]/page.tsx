@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { User } from 'lucide-react';
-import { Container } from '@/components/layout/Container';
+import { Container } from '@/components/misc/layout/Container';
 export const dynamic = 'force-dynamic';
 
 interface AuthorPageProps {

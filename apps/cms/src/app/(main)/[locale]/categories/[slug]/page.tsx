@@ -4,9 +4,9 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { Badge } from '@/components/ui/badge';
 import { Tag } from 'lucide-react';
-import { PostCard } from '@/components/features/blog/PostCard/PostCard';
+import { PostCard } from '@/components/blocks-app/blog/PostCard/PostCard';
 import { useTranslations } from 'next-intl';
-import { Container } from '@/components/layout/Container';
+import { Container } from '@/components/misc/layout/Container';
 export const dynamic = 'force-dynamic';
 
 interface CategoryPageProps {

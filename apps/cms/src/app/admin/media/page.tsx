@@ -2,9 +2,9 @@
 
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { DragDropUpload } from "@/components/features/cms/DragDropUpload"
-import { MediaGrid } from "@/components/features/cms/MediaGrid"
-import { MediaEditPopup } from "@/components/features/cms/MediaEditPopup"
+import { DragDropUpload } from "@/components/blocks-app/cms/DragDropUpload"
+import { MediaGrid } from "@/components/blocks-app/cms/MediaGrid"
+import { MediaEditPopup } from "@/components/blocks-app/cms/MediaEditPopup"
 
 export default function MediaPage() {
   const [refreshTrigger, setRefreshTrigger] = useState(0)
