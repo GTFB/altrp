@@ -174,13 +174,51 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 *   `bun format`: Formats the code with Prettier.
 *   `bun test`: Runs unit tests.
 
-### Available Make Commands
+### Available Commands
 
-*   `make env`: Generate `.env` file from `example.env` with auto-generated `NEXTAUTH_SECRET`
-*   `make component NAME=ComponentName`: Generate a new React component
-*   `make init`: Initialize all project configurations
-*   `make dev`: Run the development server
-*   `make build`: Build the project for production
+#### Development Commands
+
+| Command | Make | NPM/Bun | Description |
+|---------|------|---------|-------------|
+| Run site dev server | `make dev-site` | `bun run dev:site` | Start the site application in development mode |
+| Run CMS dev server | `make dev-cms` | `bun run dev:cms` | Start the CMS application in development mode |
+| Run app dev server | `make dev-app` | `bun run dev:app` | Start the app application in development mode |
+| Run all apps concurrently | `make dev-all` | `bun run dev` | Start all applications simultaneously in development mode |
+
+#### Production Commands
+
+| Command | Make | NPM/Bun | Description |
+|---------|------|---------|-------------|
+| Build site | `make build-site` | `bun run build:site` | Build the site application for production |
+| Build CMS | `make build-cms` | `bun run build:cms` | Build the CMS application for production |
+| Build app | `make build-app` | `bun run build:app` | Build the app application for production |
+| Build all apps | `make build-all` | `bun run build` | Build all applications for production |
+| Start site | `make start-site` | `bun run start:site` | Start the site application in production mode |
+| Start CMS | `make start-cms` | `bun run start:cms` | Start the CMS application in production mode |
+| Start app | `make start-app` | `bun run start:app` | Start the app application in production mode |
+
+#### Testing Commands
+
+| Command | Make | NPM/Bun | Description |
+|---------|------|---------|-------------|
+| Quick E2E tests | `make quick-test` | `bun run quick-test` | Run quick end-to-end tests for CMS public pages |
+
+#### Project Setup Commands
+
+| Command | Make | NPM/Bun | Description |
+|---------|------|---------|-------------|
+| Install dependencies | `make install` | `bun install` | Install all project dependencies |
+| Initialize project | `make init` | - | Initialize all project configurations (ESLint, Prettier, Husky, etc.) |
+| Generate .env file | `make env` | - | Generate .env file from example.env with auto-generated NEXTAUTH_SECRET |
+| Generate component | `make component NAME=ComponentName` | `bun hygen component new --name ComponentName` | Generate a new React component using Hygen |
+
+#### Code Quality Commands
+
+| Command | Make | NPM/Bun | Description |
+|---------|------|---------|-------------|
+| Run linter | `make lint` | `bun run lint` | Run ESLint to check code quality |
+| Format code | `make format` | `bun run format` | Format code using Prettier |
+| Run tests | `make test` | `bun test` | Run unit tests with Bun |
 
 ## 🔐 Access & Permissions
 
