@@ -29,8 +29,8 @@ jobs:
       run: bunx playwright install --with-deps
       
     - name: Run Playwright tests
-      working-directory: apps/site
-      run: bun run test:e2e:quick-public
+      working-directory: apps/cms
+      run: bun run test:e2e:accessibility-public
       
     - uses: actions/upload-artifact@v4
       if: always()
