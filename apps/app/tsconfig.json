@@ -1,63 +1,51 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
+    "strict": true,
+    "baseUrl": ".",
+    "esModuleInterop": true,
+    "target": "ES2022",
     "lib": [
-      "ES2022",
       "DOM",
-      "DOM.Iterable"
+      "DOM.Iterable",
+      "ES2022"
     ],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
     "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "jsxImportSource": "react",
     "incremental": true,
+    "jsx": "preserve",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "isolatedModules": true,
     "plugins": [
       {
         "name": "next"
       }
     ],
-    "baseUrl": ".",
     "paths": {
+      "@payload-config": [
+        "./src/payload.config.ts"
+      ],
+      "react": [
+        "./node_modules/@types/react"
+      ],
       "@/*": [
-        "./src/*",
-        "../../*"
+        "./src/*"
       ],
-      "@/packages/*": [
-        "../../packages/*"
-      ],
-      "@/lib/*": [
-        "../../packages/lib/*",
-        "./src/lib/*"
-      ],
-      "@/hooks/*": [
-        "../../packages/hooks/*",
-        "./src/hooks/*"
-      ],
-      "@/components/*": [
-        "../../packages/components/*",
-        "./src/components/*"
-      ],
-      "@/repositories/*": [
-        "../../packages/repositories/*",
-        "./src/repositories/*"
-      ]
     }
   },
   "include": [
-    "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "redirects.js",
+    "next-env.d.ts",
+    "next.config.js",
+    "next-sitemap.config.cjs"
   ],
   "exclude": [
     "node_modules"
-  ]
+  ],
 }

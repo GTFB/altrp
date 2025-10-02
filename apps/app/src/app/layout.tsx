@@ -5,7 +5,7 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Jambo CMS - Content Management System',
+  title: 'Alptr APP - Content Management System',
   description: 'Payload CMS admin panel for Jambo website',
   icons: {
     icon: '/favicon.ico',
