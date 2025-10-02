@@ -1,7 +1,7 @@
 {
-  "name": "Финюр Консалтинг",
-  "short_name": "Финюр",
-  "description": "Профессиональные бухгалтерские и юридические услуги в Краснодаре",
+  "name": "ALTRP",
+  "short_name": "ALTRP",
+  "description": "Digital Product Generation Platform for creating web and mobile applications",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

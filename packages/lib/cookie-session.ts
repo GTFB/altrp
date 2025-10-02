@@ -7,15 +7,15 @@ type Session = {
     data: any;
 }
 
-export const getSession = (): Session | null => {
-    const cookieStore = cookies();
-    let session: any = cookieStore.get('jambo_session');
+export const getSession = async (): Promise<Session | null> => {
+    const cookieStore = await cookies();
+    const session = cookieStore.get('altrp_session');
     return session ? JSON.parse(session.value) : null;
 }
 
-export const setToSession = (key: string, value: any) => {
-    const cookieStore = cookies();
-    let session = getSession();
+export const setToSession = async (key: string, value: any): Promise<void> => {
+    const cookieStore = await cookies();
+    let session = await getSession();
 
     if (!session) {
         session = {
@@ -28,7 +28,7 @@ export const setToSession = (key: string, value: any) => {
 
     session.data[key] = value;
     session.updatedAt = new Date();
-    cookieStore.set('jambo_session', JSON.stringify(session), {
+    cookieStore.set('altrp_session', JSON.stringify(session), {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         maxAge: 60 * 60 * 24 * 365,
@@ -36,7 +36,7 @@ export const setToSession = (key: string, value: any) => {
     });
 }
 
-export const getFromSession = (key: string) => {
-    const session = getSession();
+export const getFromSession = async (key: string) => {
+    const session = await getSession();
     return session ? session.data[key] || null : null;
 }

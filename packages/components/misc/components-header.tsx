@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { LanguageSwitcher } from "@/components/shared/language-switcher";
-import { ThemeToggle } from "@/components/shared/theme-toggle";
+import { LanguageSwitcher } from "@/components/misc/language-switcher";
+import { ThemeToggle } from "@/components/misc/theme-toggle";
 import { PROJECT_SETTINGS } from "../../../settings";
 import { ArrowLeft, Home, Code } from "lucide-react";
 import { useTranslations } from "next-intl";

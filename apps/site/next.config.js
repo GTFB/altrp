@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Настройки для production (static export)
+  // Settings for production (static export)
   ...(process.env.NODE_ENV === 'production' && {
     output: 'export',
     trailingSlash: true,
@@ -18,16 +18,16 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false,
   generateEtags: false,
-  // Оптимизация производительности
+  // Performance optimization
   experimental: {
-    // optimizeCss: true, // Отключено из-за проблем с critters в static export
+    // optimizeCss: true, // Disabled due to critters issues in static export
     optimizePackageImports: ['lucide-react'],
   },
-  // Настройки для улучшения производительности
+  // Settings for performance improvement
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
-  // Настройки кеширования (отключены для static export)
+  // Caching settings (disabled for static export)
   // async headers() {
   //   return [
   //     {

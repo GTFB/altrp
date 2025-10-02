@@ -1,10 +1,10 @@
-import { AuthorList } from '@/components/AuthorList/AuthorList';
+import { AuthorList } from '@/components/blocks-app/AuthorList';
 import { Metadata } from 'next';
-import { Container } from '@/components/layout/Container';
+import { Container } from '@/components/misc/layout/Container';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Authors | Jambo Blog',
+  title: 'Authors | altrp Blog',
   description: 'Meet our talented authors and discover their stories.',
 };
 

@@ -1,9 +1,9 @@
 import { PostRepository } from '@/repositories/post.repository';
 import { Metadata } from 'next';
 import { Tag } from 'lucide-react';
-import { useTranslations } from 'next-intl';
-import { TagPostList } from '@/components/features/blog/TagPostList';
-import { Container } from '@/components/layout/Container';
+import { getTranslations } from 'next-intl/server';
+import { TagPostList } from '@/components/blocks-app/blog/TagPostList';
+import { Container } from '@/components/misc/layout/Container';
 export const dynamic = 'force-dynamic';
 
 interface TagPageProps {
@@ -16,17 +16,17 @@ export async function generateMetadata({ params }: TagPageProps): Promise<Metada
 
   if (posts.length === 0) {
     return {
-      title: 'Tag Not Found | Jambo Blog',
+      title: 'Tag Not Found | altrp Blog',
       description: 'The requested tag could not be found.',
     };
   }
 
   const tagName = params.slug;
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://jambo.example.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://altrp.example.com';
   const tagUrl = `${baseUrl}/${params.locale}/tags/${params.slug}`;
 
   return {
-    title: `${tagName} | Tags | Jambo Blog`,
+    title: `${tagName} | Tags | altrp Blog`,
     description: `Read articles tagged with ${tagName}`,
     keywords: tagName,
     openGraph: {
@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: TagPageProps): Promise<Metada
       type: 'website',
       url: tagUrl,
       locale: params.locale === 'ru' ? 'ru_RU' : 'en_US',
-      siteName: 'Jambo Blog',
+      siteName: 'altrp Blog',
     },
     twitter: {
       card: 'summary',
@@ -48,11 +48,11 @@ export async function generateMetadata({ params }: TagPageProps): Promise<Metada
   };
 }
 
-export default function TagPage({ params }: TagPageProps) {
+export default async function TagPage({ params }: TagPageProps) {
  
 
   const tagName = params.slug;
-  const t = useTranslations('tags');
+  const t = await getTranslations({ locale: params.locale, namespace: 'tags' });
   return (
     <Container className="py-8">
       {/* Tag Header */}

@@ -137,7 +137,7 @@
     "ourAuthors": "私たちの著者",
     "postsWithDemoAndHelloTags": "デモとハロータグの記事",
     "readOurLatestArticlesAndUpdates": "最新の記事とアップデートをお読みください",
-    "welcomeToJambo": "Jamboへようこそ"
+    "welcomeToaltrp": "altrpへようこそ"
   },
   "navigation": {
     "about": "私たちについて",
@@ -175,7 +175,7 @@
   },
   "project": {
     "description": "商用提案ジェネレーター",
-    "name": "Jambo"
+    "name": "altrp"
   },
   "search": {
     "noHeadings": "見出しがありません",

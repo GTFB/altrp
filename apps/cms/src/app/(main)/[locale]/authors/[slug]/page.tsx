@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { User } from 'lucide-react';
-import { Container } from '@/components/layout/Container';
+import { Container } from '@/components/misc/layout/Container';
 export const dynamic = 'force-dynamic';
 
 interface AuthorPageProps {
@@ -17,16 +17,16 @@ export async function generateMetadata({ params }: AuthorPageProps): Promise<Met
 
   if (!author) {
     return {
-      title: 'Author Not Found | Jambo Blog',
+      title: 'Author Not Found | altrp Blog',
       description: 'The requested author could not be found.',
     };
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://jambo.example.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://altrp.example.com';
   const authorUrl = `${baseUrl}/${params.locale}/authors/${params.slug}`;
 
   return {
-    title: `${author.name} | Authors | Jambo Blog`,
+    title: `${author.name} | Authors | altrp Blog`,
     description: author.bio || `Read articles by ${author.name}`,
     authors: [{ name: author.name }],
     openGraph: {
@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: AuthorPageProps): Promise<Met
       type: 'profile',
       url: authorUrl,
       locale: params.locale === 'ru' ? 'ru_RU' : 'en_US',
-      siteName: 'Jambo Blog',
+      siteName: 'altrp Blog',
     },
     twitter: {
       card: 'summary',

@@ -3,7 +3,7 @@ import NextAuth from 'next-auth';
 const simpleAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   providers: [
-    // Только GitHub
+    // GitHub only
     ...(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET ? [
       {
         id: 'github',

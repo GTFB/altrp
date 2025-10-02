@@ -137,7 +137,7 @@
     "ourAuthors": "我们的作者",
     "postsWithDemoAndHelloTags": "带有演示和问候标签的文章",
     "readOurLatestArticlesAndUpdates": "阅读我们的最新文章和更新",
-    "welcomeToJambo": "欢迎使用 Jambo"
+    "welcomeToaltrp": "欢迎使用 altrp"
   },
   "navigation": {
     "about": "关于",
@@ -175,7 +175,7 @@
   },
   "project": {
     "description": "商业提案生成器",
-    "name": "Jambo"
+    "name": "altrp"
   },
   "search": {
     "noHeadings": "无标题",

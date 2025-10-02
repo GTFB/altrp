@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation';
 import { PageRepository } from '@/repositories/page.repository';
 import { MediaRepository } from '@/repositories/media.repository';
-import { MediaDisplay } from '@/components/features/cms/MediaDisplay';
-import { Container } from '@/components/layout/Container';
+import { MediaDisplay } from '@/components/blocks-app/cms/MediaDisplay';
+import { Container } from '@/components/misc/layout/Container';
 export const dynamic = 'force-dynamic';
 import { Metadata } from 'next';
 
@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: PagePropsWithLocale): Promise
 
   if (!page) {
     return {
-      title: 'Page Not Found | Jambo',
+      title: 'Page Not Found | altrp',
       description: 'The requested page could not be found.',
     };
   }
@@ -28,14 +28,14 @@ export async function generateMetadata({ params }: PagePropsWithLocale): Promise
     mediaData = await mediaRepository.findBySlug(page.media);
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://jambo.example.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://altrp.example.com';
   const pageUrl = `${baseUrl}/${params.locale}/${params.slug}`;
   
   // Build image URL if media exists
   const imageUrl = mediaData ? `${baseUrl}${mediaData.url}` : undefined;
 
   return {
-    title: page.title ? `${page.title} | Jambo` : 'Jambo',
+    title: page.title ? `${page.title} | altrp` : 'altrp',
     description: page.description || `Read the page "${page.title}" on our site`,
     openGraph: {
       title: page.title,
@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: PagePropsWithLocale): Promise
       type: 'website',
       url: pageUrl,
       locale: params.locale === 'ru' ? 'ru_RU' : 'en_US',
-      siteName: 'Jambo',
+      siteName: 'altrp',
       ...(imageUrl && {
         images: [
           {

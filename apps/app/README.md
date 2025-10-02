@@ -1,76 +1,76 @@
-# Jambo CMS
+# ALTRP CMS
 
-Payload CMS приложение для управления контентом сайта Jambo.
+Payload CMS application for managing ALTRP website content.
 
-## Настройка
+## Setup
 
-### 1. Установка зависимостей
+### 1. Install dependencies
 
 ```bash
 bun install
 ```
 
-### 2. Настройка базы данных PostgreSQL
+### 2. PostgreSQL database setup
 
-Создайте базу данных PostgreSQL:
+Create a PostgreSQL database:
 
 ```sql
-CREATE DATABASE jambo_cms;
+CREATE DATABASE altrp_cms;
 ```
 
-### 3. Настройка переменных окружения
+### 3. Environment variables configuration
 
-Скопируйте файл `env.example` в `.env` и настройте переменные:
+Copy the `env.example` file to `.env` and configure the variables:
 
 ```bash
 cp env.example .env
 ```
 
-Обновите следующие переменные в `.env`:
+Update the following variables in `.env`:
 
 ```env
 PAYLOAD_SECRET=your-very-secret-key-here
-DATABASE_URL=postgresql://username:password@localhost:5432/jambo_cms
+DATABASE_URL=postgresql://username:password@localhost:5432/altrp_cms
 ```
 
-### 4. Запуск в режиме разработки
+### 4. Run in development mode
 
 ```bash
 bun run dev
 ```
 
-Админ-панель будет доступна по адресу: http://localhost:3001/admin
+Admin panel will be available at: http://localhost:3001/admin
 
-### 5. Генерация типов TypeScript
+### 5. Generate TypeScript types
 
 ```bash
 bun run generate:types
 ```
 
-## Доступные коллекции
+## Available collections
 
-- **Users** - Пользователи системы с ролями (admin, editor, user)
-- **Posts** - Статьи блога с поддержкой категорий и тегов
-- **Categories** - Категории для статей
-- **Media** - Файлы и изображения
-- **Pages** - Статические страницы сайта
+- **Users** - System users with roles (admin, editor, user)
+- **Posts** - Blog articles with category and tag support
+- **Categories** - Article categories
+- **Media** - Files and images
+- **Pages** - Static website pages
 
-## Скрипты
+## Scripts
 
-- `bun run dev` - Запуск в режиме разработки
-- `bun run build` - Сборка для продакшена
-- `bun run start` - Запуск продакшен версии
-- `bun run generate:types` - Генерация TypeScript типов
-- `bun run migrate` - Выполнение миграций базы данных
+- `bun run dev` - Run in development mode
+- `bun run build` - Build for production
+- `bun run start` - Run production version
+- `bun run generate:types` - Generate TypeScript types
+- `bun run migrate` - Run database migrations
 
-## Интеграция с фронтендом
+## Frontend integration
 
-Для интеграции с фронтенд приложением используйте Payload REST API или GraphQL API:
+For integration with the frontend application, use Payload REST API or GraphQL API:
 
 - REST API: `http://localhost:3001/api/{collection}`
 - GraphQL: `http://localhost:3001/api/graphql`
 
-Пример получения постов:
+Example of fetching posts:
 
 ```typescript
 const posts = await fetch('http://localhost:3001/api/posts').then(res => res.json())

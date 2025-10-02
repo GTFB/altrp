@@ -17,7 +17,7 @@ export function SessionProvider({ children, session }: { children: React.ReactNo
 
   const setToSessionClient = useCallback((key: string, value: any) => {
     setSessionState((prev: any) => ({ ...prev, [key]: value }));
-    fetch('/api/jambo-session', {
+    fetch('/api/altrp-session', {
       method: 'POST',
       body: JSON.stringify({ key, value }),
     }).catch((error) => {

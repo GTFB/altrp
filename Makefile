@@ -1,26 +1,38 @@
 # Use POSIX shell for portability
 SHELL := /bin/sh
 
-.PHONY: help init install dev build lint format prepare tailwind shadcn hygen test clean branch commit component kill-node env
+.PHONY: help init install dev build lint format prepare tailwind shadcn hygen test clean branch commit component kill-node env dev-site build-site start-site dev-cms build-cms start-cms dev-app build-app start-app dev-all build-all quick-test
 
 help:
 	@echo "Available targets:"
-	@echo "  init      - Initialize project configs (ESLint, Prettier, Husky, Tailwind scaffold)"
-	@echo "  install   - Install dependencies using Bun"
-	@echo "  dev       - Run Next.js dev server"
-	@echo "  build     - Build Next.js app"
-	@echo "  lint      - Run ESLint"
-	@echo "  format    - Run Prettier"
-	@echo "  prepare   - Setup Husky"
-	@echo "  tailwind  - Generate Tailwind config and globals.css directives"
-	@echo "  shadcn    - Initialize shadcn/ui"
-	@echo "  hygen     - Initialize Hygen scaffolding (_templates)"
-	@echo "  component - Generate component: make component NAME=ComponentName"
-	@echo "  env       - Generate .env file from example.env with auto-generated NEXTAUTH_SECRET"
-	@echo "  test      - Run unit tests with Bun"
-	@echo "  kill-node - Kill all Node.js processes"
-	@echo "  branch    - Create/switch branch: make branch BR=name"
-	@echo "  commit    - Git add & commit: make commit MSG=\"message\""
+	@echo "  init         - Initialize project configs (ESLint, Prettier, Husky, Tailwind scaffold)"
+	@echo "  install      - Install dependencies using Bun"
+	@echo "  dev          - Run Next.js dev server"
+	@echo "  build        - Build Next.js app"
+	@echo "  lint         - Run ESLint"
+	@echo "  format       - Run Prettier"
+	@echo "  prepare      - Setup Husky"
+	@echo "  tailwind     - Generate Tailwind config and globals.css directives"
+	@echo "  shadcn       - Initialize shadcn/ui"
+	@echo "  hygen        - Initialize Hygen scaffolding (_templates)"
+	@echo "  component    - Generate component: make component NAME=ComponentName"
+	@echo "  env          - Generate .env file from example.env with auto-generated NEXTAUTH_SECRET"
+	@echo "  test         - Run unit tests with Bun"
+	@echo "  kill-node    - Kill all Node.js processes"
+	@echo "  branch       - Create/switch branch: make branch BR=name"
+	@echo "  commit       - Git add & commit: make commit MSG=\"message\""
+	@echo "  dev-site     - Run site development server"
+	@echo "  build-site   - Build site for production"
+	@echo "  start-site   - Start site production server"
+	@echo "  dev-cms      - Run CMS development server"
+	@echo "  build-cms    - Build CMS for production"
+	@echo "  start-cms    - Start CMS production server"
+	@echo "  dev-app      - Run app development server"
+	@echo "  build-app    - Build app for production"
+	@echo "  start-app    - Start app production server"
+	@echo "  dev-all      - Run all applications in development mode concurrently"
+	@echo "  build-all    - Build all applications for production"
+	@echo "  quick-test   - Run quick E2E tests for CMS public pages"
 
 install:
 	bun install
@@ -103,3 +115,44 @@ env:
 		echo "You can generate one at: https://generate-secret.vercel.app/32"; \
 	fi
 	@echo ".env file generated successfully!"
+
+# Site commands
+dev-site:
+	bun run dev:site
+
+build-site:
+	bun run build:site
+
+start-site:
+	bun run start:site
+
+# CMS commands
+dev-cms:
+	bun run dev:cms
+
+build-cms:
+	bun run build:cms
+
+start-cms:
+	bun run start:cms
+
+# App commands
+dev-app:
+	bun run dev:app
+
+build-app:
+	bun run build:app
+
+start-app:
+	bun run start:app
+
+# All applications commands
+dev-all:
+	bun run dev
+
+build-all:
+	bun run build
+
+# Testing commands
+quick-test:
+	bun run quick-test

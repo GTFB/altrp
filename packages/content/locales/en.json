@@ -1067,7 +1067,7 @@
     "ourAuthors": "Our authors",
     "postsWithDemoAndHelloTags": "Posts with demo and hello tags",
     "readOurLatestArticlesAndUpdates": "Read our latest articles and updates",
-    "welcomeToJambo": "Welcome to Jambo"
+    "welcomeToaltrp": "Welcome to altrp"
   },
   "layout": {
     "components": {
@@ -1141,7 +1141,7 @@
   },
   "project": {
     "description": "Commercial Proposal Generator",
-    "name": "Jambo"
+    "name": "altrp"
   },
   "search": {
     "noHeadings": "No headings",

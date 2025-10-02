@@ -1,17 +1,18 @@
-import { BlogSection, CategorySection, CategoryPostsSection, AuthorSection, AuthorPostsSection, TagSection } from '@/components/features/blog';
-import { Container } from '@/components/layout/Container';
-import { useTranslations } from 'next-intl';
-export default function LocalizedHome({ params }: { params: { locale: string } }) {
-  const t = useTranslations('home');
+import { BlogSection, CategorySection, CategoryPostsSection, AuthorSection, AuthorPostsSection, TagSection } from '@/components/blocks-app/blog';
+import { Container } from '@/components/misc/layout/Container';
+import { getTranslations } from 'next-intl/server';
+export default async function LocalizedHome({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'home' });
   return (
     <Container className="py-8">
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4">{t('welcomeToJambo')}</h1>
+        <h1 className="text-4xl font-bold mb-4">{t('welcomeToaltrp')}</h1>
         <p className="text-xl text-muted-foreground">
           {t('aModernGitAsCmsPoweredWebsite')}
         </p>
         <p className="mt-4 text-sm text-muted-foreground">
-          {t('currentLocale')}: {params.locale}
+          {t('currentLocale')}: {locale}
         </p>
       </div>
 

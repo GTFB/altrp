@@ -1,4 +1,4 @@
-import { DynamicHtml } from '@/components/DynamicHtml';
+import { DynamicHtml } from '@/components/misc/layout/DynamicHtml';
 import { IntlProvider } from '@/components/providers/IntlProvider';
 import { Providers } from '@/components/providers/Providers';
 import './globals.css';
@@ -14,26 +14,26 @@ import { i18nConfig } from '@/config/i18n';
 
 export const metadata = {
   title: {
-    default: 'Jambo - Git-as-CMS powered site',
-    template: '%s | Jambo',
+    default: 'altrp - Git-as-CMS powered site',
+    template: '%s | altrp',
   },
   description: 'A modern Git-as-CMS powered website built with Next.js, featuring a blog, internationalization, and beautiful UI components.',
   keywords: ['blog', 'cms', 'nextjs', 'react', 'typescript', 'tailwind'],
-  authors: [{ name: 'Jambo Team' }],
-  creator: 'Jambo Team',
+  authors: [{ name: 'altrp Team' }],
+  creator: 'altrp Team',
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://jambo.example.com',
-    siteName: 'Jambo',
-    title: 'Jambo - Git-as-CMS powered site',
+    url: 'https://altrp.example.com',
+    siteName: 'altrp',
+    title: 'altrp - Git-as-CMS powered site',
     description: 'A modern Git-as-CMS powered website built with Next.js',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Jambo - Git-as-CMS powered site',
+    title: 'altrp - Git-as-CMS powered site',
     description: 'A modern Git-as-CMS powered website built with Next.js',
-    creator: '@jambo',
+    creator: '@altrp',
   },
   robots: {
     index: true,
@@ -53,8 +53,8 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = getSession();
-  const headersList = headers();
+  const session = await getSession();
+  const headersList = await headers();
   const pathname = headersList.get('x-pathname') || '';
   const locale = pathname.split('/')[1] || i18nConfig.defaultLocale;
   const currentLocale = i18nConfig.locales.includes(locale) ? locale : i18nConfig.defaultLocale;

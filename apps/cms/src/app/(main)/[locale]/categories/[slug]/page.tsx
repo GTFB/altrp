@@ -4,9 +4,9 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { Badge } from '@/components/ui/badge';
 import { Tag } from 'lucide-react';
-import { PostCard } from '@/components/features/blog/PostCard/PostCard';
-import { useTranslations } from 'next-intl';
-import { Container } from '@/components/layout/Container';
+import { PostCard } from '@/components/blocks-app/blog/PostCard/PostCard';
+import { getTranslations } from 'next-intl/server';
+import { Container } from '@/components/misc/layout/Container';
 export const dynamic = 'force-dynamic';
 
 interface CategoryPageProps {
@@ -19,16 +19,16 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 
   if (!category) {
     return {
-      title: 'Category Not Found | Jambo Blog',
+      title: 'Category Not Found | altrp Blog',
       description: 'The requested category could not be found.',
     };
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://jambo.example.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://altrp.example.com';
   const categoryUrl = `${baseUrl}/${params.locale}/categories/${params.slug}`;
 
   return {
-    title: `${category.title} | Categories | Jambo Blog`,
+    title: `${category.title} | Categories | altrp Blog`,
     description: category.excerpt || `Read articles in ${category.title} category`,
     keywords: category.tags?.join(', ') || '',
     openGraph: {
@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
       type: 'website',
       url: categoryUrl,
       locale: params.locale === 'ru' ? 'ru_RU' : 'en_US',
-      siteName: 'Jambo Blog',
+      siteName: 'altrp Blog',
     },
     twitter: {
       card: 'summary',
@@ -53,7 +53,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const categoryRepo = CategoryRepository.getInstance();
   const category = await categoryRepo.findBySlug(params.slug);
-  const t = useTranslations('category');  
+  const t = await getTranslations({ locale: params.locale, namespace: 'category' });  
   if (!category) {
     notFound();
   }

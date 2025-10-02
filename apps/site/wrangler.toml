@@ -3,7 +3,9 @@ compatibility_date = "2025-09-25"
 
 [build]
 command = "bun run build"
-cwd = "."
+cwd = "apps/site"
+
+pages_build_output_dir = "dist"
 
 [[pages.functions]]
 runtime = "nodejs20"
