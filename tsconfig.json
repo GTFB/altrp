@@ -32,7 +32,8 @@
   },
   "include": [
     "apps/**/*",
-    "shared/**/*"
-, "packages/types/page-editor.ts"  ],
+    "shared/**/*",
+    "packages/**/*"
+  ],
   "exclude": ["node_modules"]
 }
