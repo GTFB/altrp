@@ -156,3 +156,7 @@ build-all:
 # Testing commands
 quick-test:
 	bun run quick-test
+
+#cms up
+cms-up:
+	bun run cms:up

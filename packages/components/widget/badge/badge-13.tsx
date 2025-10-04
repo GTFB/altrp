@@ -6,13 +6,13 @@ import Link from "next/link";
 const ClickableLinkBadgeDemo = () => {
   return (
     <Link
-      href="https://github.com/shadcn"
+      href={{ pathname: "https://github.com/shadcn" }}
       target="_blank"
       className={cn(
         badgeVariants({
           variant: "outline",
         }),
-        "rounded-full pl-[3px]"
+        "rounded-full pl-[3px]",
       )}
     >
       <Image

@@ -49,14 +49,14 @@ export default function FileTree() {
     <div className="w-[350px] bg-accent p-4 rounded-lg">
       <div className="w-full -ml-4">
         {fileTree.map((treeItem) => (
-          <FileTreeItem key={treeItem.name} {...treeItem} />
+          <FileTreeItemComponent key={treeItem.name} {...treeItem} />
         ))}
       </div>
     </div>
   );
 }
 
-const FileTreeItem = ({ name, type, children }: FileTreeItem) => {
+const FileTreeItemComponent = ({ name, type, children }: FileTreeItem) => {
   if (type === "file") {
     return (
       <div className="flex items-center gap-2 pl-10 py-1">
@@ -75,7 +75,7 @@ const FileTreeItem = ({ name, type, children }: FileTreeItem) => {
       </CollapsibleTrigger>
       <CollapsibleContent>
         {children?.map((child) => (
-          <FileTreeItem key={child.name} {...child} />
+          <FileTreeItemComponent key={child.name} {...child} />
         ))}
       </CollapsibleContent>
     </Collapsible>

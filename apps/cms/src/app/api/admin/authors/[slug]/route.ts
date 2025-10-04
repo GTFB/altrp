@@ -20,11 +20,11 @@ interface UpdateAuthorRequest {
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     const body: UpdateAuthorRequest = await request.json();
-    const { slug } = params;
+    const { slug } = await params;
     
     // Validate required fields
     if (!body.name || !body.content) {
@@ -118,10 +118,10 @@ export async function PUT(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const { slug } = params;
+    const { slug } = await params;
     const contentDir = path.join(process.cwd(), 'content', 'authors');
     const authorPath = path.join(contentDir, `${slug}.mdx`);
 
@@ -161,10 +161,10 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const { slug } = params;
+    const { slug } = await params;
     const contentDir = path.join(process.cwd(), 'content', 'authors');
     const authorPath = path.join(contentDir, `${slug}.mdx`);
 

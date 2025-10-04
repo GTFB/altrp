@@ -1,7 +1,7 @@
-import { promises as fs } from 'fs';
-import path from 'path';
+import { promises as fs } from "fs";
+import path from "path";
 
-export type UserRole = 'admin' | 'user' | 'guest';
+export type UserRole = "admin" | "user" | "guest";
 
 export interface User {
   id: string;
@@ -15,48 +15,57 @@ export interface DbData {
   users: User[];
 }
 
-const dbFilePath = path.join(process.cwd(), '../..', 'db.json');
+const dbFilePath = path.join(process.cwd(), "../..", "db.json");
 
 async function loadDbData(): Promise<DbData> {
   try {
-    const content = await fs.readFile(dbFilePath, 'utf8');
+    const content = await fs.readFile(dbFilePath, "utf8");
     return JSON.parse(content);
   } catch (error) {
-    console.error('Error loading db.json:', error);
+    console.error("Error loading db.json:", error);
     return { admins: [], users: [] };
   }
 }
 
-export async function getUserRole(userId: string, userEmail: string): Promise<UserRole> {
+export async function getUserRole(
+  userId: string,
+  userEmail: string,
+): Promise<UserRole> {
   const dbData = await loadDbData();
-  
+
   // Check if user is admin
-  const isAdmin = dbData.admins.some(admin => 
-    admin.id === userId || admin.email === userEmail
+  const isAdmin = dbData.admins.some(
+    (admin) => admin.id === userId || admin.email === userEmail,
   );
-  
+
   if (isAdmin) {
-    return 'admin';
+    return "admin";
   }
-  
+
   // Check if user is regular user
-  const isUser = dbData.users.some(user => 
-    user.id === userId || user.email === userEmail
+  const isUser = dbData.users.some(
+    (user) => user.id === userId || user.email === userEmail,
   );
-  
+
   if (isUser) {
-    return 'user';
+    return "user";
   }
-  
-  return 'guest';
+
+  return "guest";
 }
 
-export async function isAdmin(userId: string, userEmail: string): Promise<boolean> {
+export async function isAdmin(
+  userId: string,
+  userEmail: string,
+): Promise<boolean> {
   const role = await getUserRole(userId, userEmail);
-  return role === 'admin';
+  return role === "admin";
 }
 
-export async function isUser(userId: string, userEmail: string): Promise<boolean> {
+export async function isUser(
+  userId: string,
+  userEmail: string,
+): Promise<boolean> {
   const role = await getUserRole(userId, userEmail);
-  return role === 'user' || role === 'admin';
+  return role === "user" || role === "admin";
 }

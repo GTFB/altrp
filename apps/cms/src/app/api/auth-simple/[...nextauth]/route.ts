@@ -8,7 +8,7 @@ const simpleAuthOptions = {
       {
         id: 'github',
         name: 'GitHub',
-        type: 'oauth',
+        type: 'oauth' as const,
         authorization: {
           url: 'https://github.com/login/oauth/authorize',
           params: {

@@ -10,11 +10,8 @@ const Hero06 = () => {
       <BackgroundPattern />
 
       <div className="relative z-10 text-center max-w-3xl">
-        <Badge
-          variant="secondary"
-          className="rounded-full py-1 border-border"
-        >
-          <Link href="#" className="flex items-center gap-1">
+        <Badge variant="secondary" className="rounded-full py-1 border-border">
+          <Link href={{ pathname: "#" }} className="flex items-center gap-1">
             <span>Just released v1.0.0</span>
             <ArrowUpRight className="size-4 flex-shrink-0" />
           </Link>

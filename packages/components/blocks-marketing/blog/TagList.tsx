@@ -1,7 +1,7 @@
-import { PostRepository } from '@/repositories/post.repository';
-import { TagCard } from '@/components/TagCard/TagCard';
+import { PostRepository } from "@/repositories/post.repository";
+import { TagCard } from "@/components/TagCard/TagCard";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function TagList() {
   const postRepo = PostRepository.getInstance();

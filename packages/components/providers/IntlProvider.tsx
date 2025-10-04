@@ -1,7 +1,5 @@
-'use client';
 
-import { NextIntlClientProvider } from 'next-intl';
-import { i18nConfig } from '@/config/i18n';
+import { NextIntlClientProvider } from "next-intl";
 
 interface IntlProviderProps {
   children: React.ReactNode;
@@ -13,14 +11,15 @@ interface IntlProviderProps {
 export function IntlProvider({
   children,
   locale,
-  messages = '',
-  timeZone = 'UTC', 
+  messages = "",
+  timeZone = "UTC",
 }: IntlProviderProps) {
   return (
-    <NextIntlClientProvider 
-    timeZone={timeZone}
-    messages={messages} 
-    locale={locale}>
+    <NextIntlClientProvider
+      timeZone={timeZone}
+      messages={messages}
+      locale={locale}
+    >
       {children}
     </NextIntlClientProvider>
   );

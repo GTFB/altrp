@@ -14,31 +14,31 @@ export default function PaginationWithSecondaryButton() {
     <Pagination>
       <PaginationContent>
         <PaginationItem>
-          <PaginationPrevious href="#" />
+          <PaginationPrevious href={{ pathname: "#" }} />
         </PaginationItem>
         <PaginationItem>
-          <PaginationLink href="#">1</PaginationLink>
+          <PaginationLink href={{ pathname: "#" }}>1</PaginationLink>
         </PaginationItem>
         <PaginationItem>
           <PaginationLink
-            href="#"
+            href={{ pathname: "#" }}
             isActive
             className={cn(
               "shadow-none! hover:text-secondary-foreground! border-none!",
               buttonVariants({
                 variant: "secondary",
                 size: "icon",
-              })
+              }),
             )}
           >
             2
           </PaginationLink>
         </PaginationItem>
         <PaginationItem>
-          <PaginationLink href="#">3</PaginationLink>
+          <PaginationLink href={{ pathname: "#" }}>3</PaginationLink>
         </PaginationItem>
         <PaginationItem>
-          <PaginationNext href="#" />
+          <PaginationNext href={{ pathname: "#" }} />
         </PaginationItem>
       </PaginationContent>
     </Pagination>

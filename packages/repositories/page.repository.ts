@@ -1,18 +1,13 @@
-import { promises as fs } from 'fs';
-import path from 'path';
-import matter from 'gray-matter';
-import { parseMarkdown } from '@/lib/markdown';
-import { frontmatterSchema, type Frontmatter } from '@/lib/validators/content.schema';
-import { getContentDir } from '@/lib/content-path';
-import type { Page, PageFilters, PageSortOptions } from '@/types/page';
-import type { PageDataProvider } from '@/types/providers';
-import { MdxPageProvider } from './providers/mdx';
+import { getContentDir } from "@/lib/content-path";
+import type { Page, PageFilters, PageSortOptions } from "@/types/page";
+import type { PageDataProvider } from "@/types/providers";
+import { MdxPageProvider } from "./providers/mdx";
 
 // types are imported from '@/types/page'
 
 export class PageRepository {
   private static instance: PageRepository | null = null;
-  private contentDir = getContentDir('pages');
+  private contentDir = getContentDir("pages");
   private readonly provider: PageDataProvider;
 
   private constructor() {
@@ -27,27 +22,55 @@ export class PageRepository {
     return PageRepository.instance;
   }
 
-  async findAll(): Promise<Page[]> { return this.provider.findAll(); }
+  async findAll(): Promise<Page[]> {
+    return this.provider.findAll();
+  }
 
-  async findWithFilters(filters: PageFilters = {}, sortOptions: PageSortOptions = { field: 'title', order: 'asc' }): Promise<Page[]> {
+  async findWithFilters(
+    filters: PageFilters = {},
+    sortOptions: PageSortOptions = { field: "title", order: "asc" },
+  ): Promise<Page[]> {
     return this.provider.findWithFilters(filters, sortOptions);
   }
 
-  private applyFilters(pages: Page[], filters: PageFilters): Page[] { return pages; }
+  private applyFilters(pages: Page[], _filters: PageFilters): Page[] {
+    return pages;
+  }
 
-  private applySorting(pages: Page[], sortOptions: PageSortOptions): Page[] { return pages; }
+  private applySorting(pages: Page[], _sortOptions: PageSortOptions): Page[] {
+    return pages;
+  }
 
-  async findBySlug(slug: string): Promise<Page | null> { return this.provider.findBySlug(slug); }
+  async findBySlug(slug: string): Promise<Page | null> {
+    return this.provider.findBySlug(slug);
+  }
 
-  async findAllTags(): Promise<string[]> { return this.provider.findAllTags(); }
+  async findAllTags(): Promise<string[]> {
+    return this.provider.findAllTags();
+  }
 
-  async findByTag(tag: string): Promise<Page[]> { return this.provider.findByTag(tag); }
+  async findByTag(tag: string): Promise<Page[]> {
+    return this.provider.findByTag(tag);
+  }
 
-  async searchPages(query: string): Promise<Page[]> { return this.provider.searchPages(query); }
+  async searchPages(query: string): Promise<Page[]> {
+    return this.provider.searchPages(query);
+  }
 
-  async createPage(pageData: Omit<Page, 'slug'> & { slug: string }): Promise<Page | null> { return this.provider.createPage(pageData); }
+  async createPage(
+    pageData: Omit<Page, "slug"> & { slug: string },
+  ): Promise<Page | null> {
+    return this.provider.createPage(pageData);
+  }
 
-  async updatePage(oldSlug: string, updates: Partial<Page>): Promise<Page | null> { return this.provider.updatePage(oldSlug, updates); }
+  async updatePage(
+    oldSlug: string,
+    updates: Partial<Page>,
+  ): Promise<Page | null> {
+    return this.provider.updatePage(oldSlug, updates);
+  }
 
-  async deletePage(slug: string): Promise<boolean> { return this.provider.deletePage(slug); }
+  async deletePage(slug: string): Promise<boolean> {
+    return this.provider.deletePage(slug);
+  }
 }

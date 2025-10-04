@@ -1,17 +1,25 @@
-'use client'
+"use client";
 
-import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend, ResponsiveContainer } from 'recharts'
+import {
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Radar,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
 interface ChartData {
-  name: string
-  'Dozen': number
-  'WalletFactory': number
-  'OSMI Cards': number
-  'CardPR': number
+  name: string;
+  Dozen: number;
+  WalletFactory: number;
+  "OSMI Cards": number;
+  CardPR: number;
 }
 
 interface CompetitorChartProps {
-  data: ChartData[]
+  data: ChartData[];
 }
 
 export function CompetitorChart({ data }: CompetitorChartProps) {
@@ -52,5 +60,5 @@ export function CompetitorChart({ data }: CompetitorChartProps) {
         <Legend />
       </RadarChart>
     </ResponsiveContainer>
-  )
+  );
 }

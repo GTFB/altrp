@@ -1,25 +1,18 @@
-import { promises as fs } from 'fs';
-import path from 'path';
-import matter from 'gray-matter';
-import { parseMarkdown } from '@/lib/markdown';
-import { z } from 'zod';
-import { getContentDir } from '@/lib/content-path';
-import type { Category } from '@/types/category';
-import type { CategoryDataProvider } from '@/types/providers';
-import { MdxCategoryProvider } from './providers/mdx';
+import { getContentDir } from "@/lib/content-path";
+import type { Category } from "@/types/category";
+import type { CategoryDataProvider } from "@/types/providers";
+import { MdxCategoryProvider } from "./providers/mdx";
 
-const categorySchema = z.object({
-  title: z.string(),
-  date: z.string().optional(),
-  tags: z.array(z.string()).optional(),
-  excerpt: z.string().optional(),
-});
-
-export interface Category {}
+// const categorySchema = z.object({
+//   title: z.string(),
+//   date: z.string().optional(),
+//   tags: z.array(z.string()).optional(),
+//   excerpt: z.string().optional(),
+// });
 
 export class CategoryRepository {
   private static instance: CategoryRepository | null = null;
-  private contentDir = getContentDir('categories');
+  private contentDir = getContentDir("categories");
   private readonly provider: CategoryDataProvider;
 
   private constructor() {
@@ -42,7 +35,9 @@ export class CategoryRepository {
     return this.provider.findBySlug(slug);
   }
 
-  async createCategory(categoryData: Omit<Category, 'slug'> & { slug: string }): Promise<Category | null> {
+  async createCategory(
+    categoryData: Omit<Category, "slug"> & { slug: string },
+  ): Promise<Category | null> {
     return this.provider.createCategory(categoryData);
   }
 }

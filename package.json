@@ -1,5 +1,5 @@
 {
-    "name": "jambo-monorepo",
+    "name": "altrp-monorepo",
     "version": "1.0.0",
     "private": true,
     "workspaces": [
@@ -10,15 +10,15 @@
         "bun": ">=1.1.0"
     },
     "scripts": {
-        "dev:site": "bun run --filter=jambo-site dev",
-        "build:site": "bun run --filter=jambo-site build",
-        "start:site": "bun run --filter=jambo-site start",
+        "dev:site": "bun run --filter=altrp-site dev",
+        "build:site": "bun run --filter=altrp-site build",
+        "start:site": "bun run --filter=altrp-site start",
         "dev:cms": "bun run --filter=altrp-cms dev",
         "build:cms": "bun run --filter=altrp-cms build",
         "start:cms": "bun run --filter=altrp-cms start",
-        "dev:app": "bun run --filter=jambo-app dev",
-        "build:app": "bun run --filter=jambo-app build",
-        "start:app": "bun run --filter=jambo-app start",
+        "dev:app": "bun run --filter=altrp-app dev",
+        "build:app": "bun run --filter=altrp-app build",
+        "start:app": "bun run --filter=altrp-app start",
         "dev": "concurrently \"bun run dev:site\" \"bun run dev:cms\" \"bun run dev:app\"",
         "build": "bun run build:site && bun run build:cms && bun run build:app",
         "quick-test": "bun run --filter=altrp-cms test:e2e:quick-public",
@@ -27,12 +27,15 @@
         "db:cms:studio": "bun run --filter=altrp-cms db:studio",
         "db:cms:push": "bun run --filter=altrp-cms db:push",
         "db:cms:reset": "bun run --filter=altrp-cms db:reset",
-        "cms:up": "node scripts/cms-sql-up.js"
+        "cms:up": "node scripts/cms-sqlite-up.js"
     },
     "devDependencies": {
         "@changesets/cli": "^2.27.1",
+        "@eslint/js": "^9.36.0",
+        "@typescript-eslint/eslint-plugin": "^8.45.0",
+        "@typescript-eslint/parser": "^8.45.0",
         "concurrently": "^8.2.2"
-        },
+    },
     "dependencies": {
         "marked": "^16.2.1"
     }

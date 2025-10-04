@@ -1,7 +1,7 @@
-import { AuthorRepository } from '@/repositories/author.repository';
-import { AuthorCard } from '@/components/blocks-app/AuthorCard';
+import { AuthorRepository } from "@/repositories/author.repository";
+import { AuthorCard } from "@/components/blocks-app/AuthorCard";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function AuthorList() {
   const authorRepo = AuthorRepository.getInstance();

@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useBlogPostsSimple } from '@/hooks/use-blog-posts-simple';
-import { PostCard } from '@/components/blocks-app/blog/PostCard/PostCard';
-import { Button } from '@/components/ui/button';
-import { Loader2, ArrowRight, Tag } from 'lucide-react';
-import Link from 'next/link';
-import { useLocale } from 'next-intl';
+import { useBlogPostsSimple } from "@/hooks/use-blog-posts-simple";
+import { PostCard } from "@/components/blocks-app/blog/PostCard/PostCard";
+import { Button } from "@/components/ui/button";
+import { Loader2, ArrowRight, Tag } from "lucide-react";
+import Link from "next/link";
+import { useLocale } from "next-intl";
 
 interface CategorySectionProps {
   category: string;
@@ -16,42 +16,38 @@ interface CategorySectionProps {
   author?: string;
   tags?: string[];
   search?: string;
-  sortBy?: 'date' | 'title' | 'created';
-  sortOrder?: 'asc' | 'desc';
+  sortBy?: "date" | "title" | "created";
+  sortOrder?: "asc" | "desc";
 }
 
-export function CategoryPostsSection({ 
+export function CategoryPostsSection({
   category,
-  limit = 6, 
+  limit = 6,
   showViewAll = true,
   title,
   description,
   author,
   tags,
   search,
-  sortBy = 'date',
-  sortOrder = 'desc'
+  sortBy = "date",
+  sortOrder = "desc",
 }: CategorySectionProps) {
-    const locale = useLocale() === 'en' ? '' : useLocale();
-  const localePath = locale !== '' ? `/${locale}` : '';
-  
+  const locale = useLocale() === "en" ? "" : useLocale();
+  const localePath = locale !== "" ? `/${locale}` : "";
+
   // Generate title and description if not provided
   const sectionTitle = title || `Posts in "${category}" category`;
-  const sectionDescription = description || `Read articles from "${category}" category`;
-  
-  const { 
-    posts, 
-    loading, 
-    error, 
-    refetch 
-  } = useBlogPostsSimple({
+  const sectionDescription =
+    description || `Read articles from "${category}" category`;
+
+  const { posts, loading, error, refetch } = useBlogPostsSimple({
     limit,
     category,
     author,
     tags,
     search,
     sortBy,
-    sortOrder
+    sortOrder,
   });
 
   if (error) {
@@ -122,7 +118,12 @@ export function CategoryPostsSection({
       {showViewAll && (
         <div className="text-center">
           <Button asChild variant="outline" size="lg">
-            <Link href={`${localePath}/blog?category=${encodeURIComponent(category)}`}>
+            <Link
+              href={{
+                pathname: `${localePath}/blog`,
+                search: `?category=${encodeURIComponent(category)}`,
+              }}
+            >
               View All Posts in Category
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>

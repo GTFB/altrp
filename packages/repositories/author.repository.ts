@@ -1,24 +1,19 @@
-import { promises as fs } from 'fs';
-import path from 'path';
-import matter from 'gray-matter';
-import { parseMarkdown } from '@/lib/markdown';
-import { z } from 'zod';
-import { getContentDir } from '@/lib/content-path';
-import type { AuthorDataProvider } from '@/types/providers';
-import type { Author } from '@/types/author';
-import { MdxAuthorProvider } from './providers/mdx';
+import { getContentDir } from "@/lib/content-path";
+import type { AuthorDataProvider } from "@/types/providers";
+import type { Author } from "@/types/author";
+import { MdxAuthorProvider } from "./providers/mdx";
 
-const authorSchema = z.object({
-  name: z.string(),
-  avatar: z.string().optional(),
-  bio: z.string().optional(),
-});
+// const authorSchema = z.object({
+//   name: z.string(),
+//   avatar: z.string().optional(),
+//   bio: z.string().optional(),
+// });
 
 // type Author is imported from '@/types/author'
 
 export class AuthorRepository {
   private static instance: AuthorRepository | null = null;
-  private contentDir = getContentDir('authors');
+  private contentDir = getContentDir("authors");
   private readonly provider: AuthorDataProvider;
 
   private constructor() {
@@ -41,7 +36,9 @@ export class AuthorRepository {
     return this.provider.findBySlug(slug);
   }
 
-  async createAuthor(authorData: Omit<Author, 'slug'> & { slug: string }): Promise<Author | null> {
+  async createAuthor(
+    authorData: Omit<Author, "slug"> & { slug: string },
+  ): Promise<Author | null> {
     return this.provider.createAuthor(authorData);
   }
 }

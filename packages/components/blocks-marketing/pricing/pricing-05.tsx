@@ -65,7 +65,7 @@ const Pricing05 = () => {
               "relative border p-7 rounded-lg lg:rounded-none lg:first:rounded-l-xl lg:last:rounded-r-xl",
               {
                 "ring-2 ring-inset border-primary": plan.isPopular,
-              }
+              },
             )}
           >
             {plan.isPopular && (

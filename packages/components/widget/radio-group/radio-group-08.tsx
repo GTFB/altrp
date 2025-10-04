@@ -33,7 +33,7 @@ const RadioCardsDemo = () => {
           value={option.value}
           className={cn(
             "relative group ring-[1px] ring-border rounded py-2 px-3 text-start",
-            "data-[state=checked]:ring-2 data-[state=checked]:ring-blue-500"
+            "data-[state=checked]:ring-2 data-[state=checked]:ring-blue-500",
           )}
         >
           <CircleCheck className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 h-6 w-6 text-primary fill-blue-500 stroke-white group-data-[state=unchecked]:hidden" />

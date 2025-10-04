@@ -10,16 +10,14 @@ const nextIntlMiddleware = createMiddleware({
 
 export default withAuth(
   async function middleware(req,res) {
-    const excludedPaths = ['/api', '/admin', '/images', '/.well-known', '/login'];
+    const excludedPaths = ['/api',  '/images', '/.well-known', ];
     const pathname = req.nextUrl.pathname;
     req.headers.set('x-pathname', pathname);
-    const shouldExclude = excludedPaths.some(path => pathname.startsWith(path));
     
+    const shouldExclude = excludedPaths.some(path => pathname.startsWith(path));
     if (shouldExclude) {
       return;
     }
-    const fragments = req.nextUrl.pathname.split('/');
-
 
     
     return nextIntlMiddleware(req);

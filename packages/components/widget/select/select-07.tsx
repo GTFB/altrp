@@ -106,7 +106,7 @@ export function SelectWithForm<K>({
                 id={name}
                 className={cn(
                   "aria-invalid:border-destructive aria-invalid:ring-destructive w-full",
-                  className
+                  className,
                 )}
               >
                 <SelectValue placeholder="Select" />

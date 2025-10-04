@@ -1,4 +1,4 @@
-import sharp from 'sharp';
+import sharp from "sharp";
 
 export async function optimizeImage(
   buffer: Buffer,
@@ -6,33 +6,28 @@ export async function optimizeImage(
     width?: number;
     height?: number;
     quality?: number;
-    format?: 'jpeg' | 'png' | 'webp';
-  } = {}
+    format?: "jpeg" | "png" | "webp";
+  } = {},
 ) {
-  const {
-    width,
-    height,
-    quality = 80,
-    format = 'webp',
-  } = options;
+  const { width, height, quality = 80, format = "webp" } = options;
 
   let pipeline = sharp(buffer);
 
   if (width || height) {
     pipeline = pipeline.resize(width, height, {
-      fit: 'inside',
+      fit: "inside",
       withoutEnlargement: true,
     });
   }
 
   switch (format) {
-    case 'jpeg':
+    case "jpeg":
       pipeline = pipeline.jpeg({ quality });
       break;
-    case 'png':
+    case "png":
       pipeline = pipeline.png({ quality });
       break;
-    case 'webp':
+    case "webp":
     default:
       pipeline = pipeline.webp({ quality });
       break;
@@ -41,14 +36,11 @@ export async function optimizeImage(
   return pipeline.toBuffer();
 }
 
-export async function generateThumbnail(
-  buffer: Buffer,
-  size: number = 300
-) {
+export async function generateThumbnail(buffer: Buffer, size: number = 300) {
   return optimizeImage(buffer, {
     width: size,
     height: size,
     quality: 70,
-    format: 'webp',
+    format: "webp",
   });
 }

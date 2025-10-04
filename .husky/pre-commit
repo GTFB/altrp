@@ -1,7 +1,7 @@
 echo "🔍 Running code validation..."
 
 # Check for Russian characters and non-Latin symbols in code files
-echo "📝 Checking for Russian characters and non-Latin symbols..."
+echo "📝 Checking for Russian characters and non-Latin symbols (deletions are ignored)..."
 
 # Find all TypeScript, JavaScript, JSX, TSX, JSON, and MDX files
 FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|tsx|js|jsx|json|mdx)$' || true)
@@ -12,24 +12,26 @@ if [ -n "$FILES" ]; then
     
     for file in $FILES; do
         # Skip node_modules and other build directories and localization files
-        if [[ "$file" == *"node_modules"* ]] || [[ "$file" == *".next"* ]] || [[ "$file" == *"dist"* ]] || [[ "$file" == *".husky"* ]] || [[ "$file" == *"src/messages/"* ]] || [[ "$file" == "src/lib/transliteration.ts" ]] || 
+        if [[ "$file" == *"node_modules"* ]] || [[ "$file" == *".next"* ]] || [[ "$file" == *"dist"* ]] || [[ "$file" == *".husky"* ]] || [[ "$file" == *"src/messages/"* ]] ||
+         [[ "$file" == "packages/lib/transliteration.ts" ]] || 
+         [[ "$file" == "packages/components/misc/mdx-content.tsx" ]] ||
             [[ "$file" == packages/content/locales/* ]] || [[ "$file" == packages/components/shared/mdx-content.tsx ]] || [[ "$file" == settings.ts ]] ; then
             continue
         fi
         
-        # Check for Russian characters (а-я, А-Я, ё, Ё) - only in actual content lines
-        if git diff --cached "$file" | grep '^[+-][^+-]' | grep -q '[а-яёА-ЯЁ]'; then
+        # Check for Russian characters (а-я, А-Я, ё, Ё) - only in ADDED lines (ignore deletions)
+        if git diff --cached "$file" | grep '^+[^+]' | grep -q '[а-яёА-ЯЁ]'; then
             echo "❌ Russian characters found in: $file"
             echo "   Lines with Russian characters:"
-            git diff --cached "$file" | grep '^[+-][^+-]' | grep -n '[а-яёА-ЯЁ]' | head -5
+            git diff --cached "$file" | grep '^+[^+]' | grep -n '[а-яёА-ЯЁ]' | head -5
             RUSSIAN_FOUND=true
         fi
         
-        # Check for other non-Latin symbols (except allowed ones) - only in actual content lines
-        if git diff --cached "$file" | grep '^[+-][^+-]' | grep -q '[^\x00-\x7F©®™€£¥¢§¶†‡•‣⁂※,.:;!?()[\]{}]'; then
+        # Check for other non-Latin symbols (except allowed ones) - only in ADDED lines (ignore deletions)
+        if git diff --cached "$file" | grep '^+[^+]' | grep -q '[^\x00-\x7F©®™€£¥¢§¶†‡•‣⁂※,.:;!?()[\]{}]'; then
             echo "❌ Non-Latin symbols found in: $file"
             echo "   Lines with non-Latin symbols:"
-            git diff --cached "$file" | grep '^[+-][^+-]' | grep -n '[^\x00-\x7F©®™€£¥¢§¶†‡•‣⁂※,.:;!?()[\]{}]' | head -5
+            git diff --cached "$file" | grep '^+[^+]' | grep -n '[^\x00-\x7F©®™€£¥¢§¶†‡•‣⁂※,.:;!?()[\]{}]' | head -5
             RUSSIAN_FOUND=true
         fi
     done
@@ -54,14 +56,14 @@ for file in $FILES; do
         continue
     fi
     
-    # Check for Russian in comments (// and /* */) - only in actual content lines
-    if git diff --cached "$file" | grep '^[+-][^+-]' | grep -E '(//.*[а-яёА-ЯЁ]|/\*.*[а-яёА-ЯЁ])'; then
+    # Check for Russian in comments (// and /* */) - only in ADDED lines (ignore deletions)
+    if git diff --cached "$file" | grep '^+[^+]' | grep -E '(//.*[а-яёА-ЯЁ]|/\*.*[а-яёА-ЯЁ])'; then
         echo "⚠️  Warning: Russian text found in comments in: $file"
     fi
     
-    # Check for Russian in strings (but allow in content files) - only in actual content lines
+    # Check for Russian in strings (but allow in content files) - only in ADDED lines (ignore deletions)
     if [[ "$file" != *"content/"* ]] && [[ "$file" != *"data/"* ]]; then
-        if git diff --cached "$file" | grep '^[+-][^+-]' | grep -E '[^"]*[а-яёА-ЯЁ][^"]*'; then
+        if git diff --cached "$file" | grep '^+[^+]' | grep -E '[^"]*[а-яёА-ЯЁ][^"]*'; then
             echo "⚠️  Warning: Russian text found in strings in: $file"
         fi
     fi

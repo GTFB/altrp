@@ -2,13 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Playfair_Display, Roboto } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
-import { siteSettings } from "../../../settings";
-import { ScriptOptimizer } from "@/components/ui/script-optimizer";
-import { AccessibilityEnhancer } from "@/components/ui/accessibility-enhancer";
-import { PerformanceMonitor } from "@/components/ui/performance-monitor";
-import { PageTransition } from "@/components/ui/page-transition";
-import { StyleLoader } from "@/components/ui/style-loader";
-import { ToTopButton } from "@/components/home/ui/to-top-button";
+import { PROJECT_SETTINGS } from "@/settings";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -130,15 +124,8 @@ export default function RootLayout({
         <meta name="format-detection" content="telephone=no" />
       </head>
       <body className={`${geistSans.variable} ${playfairDisplay.variable} ${roboto.variable} antialiased`} suppressHydrationWarning>
-        <StyleLoader />
-        <ScriptOptimizer />
-        <AccessibilityEnhancer />
-        <PerformanceMonitor />
-        <ThemeProvider attribute="class" defaultTheme={siteSettings.defaultTheme} enableSystem={false}>
-          <PageTransition>
+        <ThemeProvider attribute="class" defaultTheme={PROJECT_SETTINGS.defaultTheme} enableSystem={false}>
             {children}
-          </PageTransition>
-          <ToTopButton />
         </ThemeProvider>
       </body>
     </html>

@@ -41,7 +41,7 @@ export default function Timeline() {
         {experiences.map(
           (
             { company, description, period, technologies, title, icon: Icon },
-            index
+            index,
           ) => (
             <div key={index} className="relative pl-10 pb-12 last:pb-0">
               {/* Timeline Icon */}
@@ -75,7 +75,7 @@ export default function Timeline() {
                 </div>
               </div>
             </div>
-          )
+          ),
         )}
       </div>
     </div>

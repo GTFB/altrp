@@ -22,10 +22,9 @@ export default function NavigationMenuWithActiveItem() {
           <NavigationMenuItem key={item.title}>
             <NavigationMenuLink
               className={navigationMenuTriggerStyle()}
-    
               active={item.isActive}
             >
-              <Link href={item.href} className="flex-row items-center gap-2.5">
+              <Link href={{ pathname: item.href }} className="flex-row items-center gap-2.5">
                 <item.icon className="h-5 w-5 shrink-0" />
                 {item.title}
               </Link>

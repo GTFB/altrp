@@ -18,7 +18,7 @@ export default function WithSkipDelayTooltipDemo() {
 
   const handleDelayDurationChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSkipDelayDuration(
-      e.target.value === "" ? undefined : Math.max(0, +e.target.value)
+      e.target.value === "" ? undefined : Math.max(0, +e.target.value),
     );
   };
 

@@ -77,7 +77,7 @@ export function InputWithForm<K>({
               {...props}
               className={cn(
                 "aria-invalid:border-destructive aria-invalid:ring-destructive",
-                className
+                className,
               )}
             />
           </FormControl>

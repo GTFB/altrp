@@ -25,11 +25,11 @@ interface UpdatePostRequest {
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     const body: UpdatePostRequest = await request.json();
-    const { slug } = params;
+    const { slug } = await params;
 
     // Validate required fields
     if (!body.title || !body.content) {
@@ -138,10 +138,10 @@ export async function PUT(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const { slug } = params;
+    const { slug } = await params;
     const contentDir = getContentDir('blog');
     const postPath = path.join(contentDir, slug, 'index.mdx');
 
@@ -172,10 +172,10 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const { slug } = params;
+    const { slug } = await params;
     const contentDir = getContentDir('blog');
     const postPath = path.join(contentDir, slug);
 

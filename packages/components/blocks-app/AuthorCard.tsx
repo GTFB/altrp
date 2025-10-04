@@ -1,19 +1,25 @@
-'use client';
+"use client";
 
-import { type Author } from '@/repositories/author.repository';
-import Link from 'next/link';
-import { useLocale } from 'next-intl';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { User } from 'lucide-react';
+import { type Author } from "@/types/author";
+import Link from "next/link";
+import { useLocale } from "next-intl";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { User } from "lucide-react";
 
 interface AuthorCardProps {
   author: Author;
 }
 
 export function AuthorCard({ author }: AuthorCardProps) {
-  const locale = useLocale() === 'en' ? '' : useLocale();
-  const localePath = locale !== '' ? `/${locale}` : '';
+  const locale = useLocale() === "en" ? "" : useLocale();
+  const localePath = locale !== "" ? `/${locale}` : "";
 
   return (
     <Card className="hover:shadow-md transition-shadow">
@@ -27,7 +33,12 @@ export function AuthorCard({ author }: AuthorCardProps) {
           </Avatar>
         </div>
         <CardTitle className="text-xl">
-          <Link href={`${localePath}/authors/${author.slug}`} className="hover:text-primary">
+          <Link
+            href={{
+              pathname: `${localePath}/authors/${author.slug}`,
+            }}
+            className="hover:text-primary"
+          >
             {author.name}
           </Link>
         </CardTitle>
@@ -38,8 +49,10 @@ export function AuthorCard({ author }: AuthorCardProps) {
         )}
       </CardHeader>
       <CardContent className="text-center">
-        <Link 
-          href={`${localePath}/authors/${author.slug}`}
+        <Link
+          href={{
+            pathname: `${localePath}/authors/${author.slug}`,
+          }}
           className="text-sm text-muted-foreground hover:text-primary"
         >
           View posts by {author.name}

@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { SidebarIcon } from "lucide-react"
+import { SidebarIcon } from "lucide-react";
 
-import { SearchForm } from "@/components/ui/search-form"
+import { SearchForm } from "@/components/ui/search-form";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -10,18 +10,18 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { useSidebar } from "@/components/ui/sidebar"
-import { useBreadcrumbs } from "@/hooks/use-breadcrumbs"
-import { useCallback,useEffect } from "react"
-import { useLeftSidebar } from "@/components/providers/LeftSidebarProvider"
+} from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { useSidebar } from "@/components/ui/sidebar";
+import { useBreadcrumbs } from "@/hooks/use-breadcrumbs";
+import { useCallback, useEffect } from "react";
+import { useLeftSidebar } from "@/components/providers/LeftSidebarProvider";
 
 export function AdminHeader() {
-  const { setOpen } = useSidebar()
-  const {leftSidebarOpen, setLeftSidebarOpen} = useLeftSidebar()
-  useEffect(() => { 
+  const { setOpen } = useSidebar();
+  const { leftSidebarOpen, setLeftSidebarOpen } = useLeftSidebar();
+  useEffect(() => {
     setOpen(leftSidebarOpen);
   }, [leftSidebarOpen]);
 
@@ -29,7 +29,7 @@ export function AdminHeader() {
     setLeftSidebarOpen(!leftSidebarOpen);
   }, [leftSidebarOpen]);
 
-  const breadcrumbs = useBreadcrumbs()
+  const breadcrumbs = useBreadcrumbs();
 
   return (
     <header className="flex sticky top-0 z-50 w-full items-center border-b bg-background">
@@ -66,5 +66,5 @@ export function AdminHeader() {
         <SearchForm className="w-full sm:ml-auto sm:w-auto" />
       </div>
     </header>
-  )
+  );
 }

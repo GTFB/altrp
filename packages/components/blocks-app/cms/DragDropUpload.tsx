@@ -1,129 +1,137 @@
-"use client"
+"use client";
 
-import { useCallback, useState } from "react"
-import { useDropzone } from "react-dropzone"
-import { Upload, X, Image as ImageIcon } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { toast } from "sonner"
+import { useCallback, useState } from "react";
+import { useDropzone } from "react-dropzone";
+import { Upload, X, Image as ImageIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { toast } from "sonner";
 
 interface DragDropUploadProps {
-  onUploadSuccess?: () => void
+  onUploadSuccess?: () => void;
 }
 
 interface UploadFile {
-  file: File
-  preview: string
-  uploading: boolean
-  progress: number
+  file: File;
+  preview: string;
+  uploading: boolean;
+  progress: number;
 }
 
 export function DragDropUpload({ onUploadSuccess }: DragDropUploadProps) {
-  const [files, setFiles] = useState<UploadFile[]>([])
-  const [isUploading, setIsUploading] = useState(false)
+  const [files, setFiles] = useState<UploadFile[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
-    const imageFiles = acceptedFiles.filter(file => file.type.startsWith('image/'))
-    
+    const imageFiles = acceptedFiles.filter((file) =>
+      file.type.startsWith("image/"),
+    );
+
     if (imageFiles.length !== acceptedFiles.length) {
-      toast.error("Only image files are allowed")
+      toast.error("Only image files are allowed");
     }
 
-    const newFiles = imageFiles.map(file => ({
+    const newFiles = imageFiles.map((file) => ({
       file,
       preview: URL.createObjectURL(file),
       uploading: false,
-      progress: 0
-    }))
+      progress: 0,
+    }));
 
-    setFiles(prev => [...prev, ...newFiles])
-  }, [])
+    setFiles((prev) => [...prev, ...newFiles]);
+  }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      'image/*': ['.jpeg', '.jpg', '.png', '.gif', '.webp', '.svg']
+      "image/*": [".jpeg", ".jpg", ".png", ".gif", ".webp", ".svg"],
     },
-    multiple: true
-  })
+    multiple: true,
+  });
 
   const removeFile = (index: number) => {
-    setFiles(prev => {
-      const newFiles = [...prev]
-      URL.revokeObjectURL(newFiles[index].preview)
-      newFiles.splice(index, 1)
-      return newFiles
-    })
-  }
+    setFiles((prev) => {
+      const newFiles = [...prev];
+      URL.revokeObjectURL(newFiles[index].preview);
+      newFiles.splice(index, 1);
+      return newFiles;
+    });
+  };
 
   const uploadFiles = async () => {
-    if (files.length === 0) return
+    if (files.length === 0) return;
 
-    setIsUploading(true)
-    
+    setIsUploading(true);
+
     try {
       for (let i = 0; i < files.length; i++) {
-        const file = files[i]
-        
-        // Update upload status
-        setFiles(prev => prev.map((f, index) => 
-          index === i ? { ...f, uploading: true, progress: 0 } : f
-        ))
+        const file = files[i];
 
-        const formData = new FormData()
-        formData.append('file', file.file)
+        // Update upload status
+        setFiles((prev) =>
+          prev.map((f, index) =>
+            index === i ? { ...f, uploading: true, progress: 0 } : f,
+          ),
+        );
+
+        const formData = new FormData();
+        formData.append("file", file.file);
 
         // Simulate upload progress
         const progressInterval = setInterval(() => {
-          setFiles(prev => prev.map((f, index) => 
-            index === i ? { ...f, progress: Math.min(f.progress + 10, 90) } : f
-          ))
-        }, 100)
+          setFiles((prev) =>
+            prev.map((f, index) =>
+              index === i
+                ? { ...f, progress: Math.min(f.progress + 10, 90) }
+                : f,
+            ),
+          );
+        }, 100);
 
-        const response = await fetch('/api/admin/media', {
-          method: 'POST',
-          body: formData
-        })
+        const response = await fetch("/api/admin/media", {
+          method: "POST",
+          body: formData,
+        });
 
-        clearInterval(progressInterval)
+        clearInterval(progressInterval);
 
         if (!response.ok) {
-          throw new Error('Upload failed')
+          throw new Error("Upload failed");
         }
 
         // Complete progress
-        setFiles(prev => prev.map((f, index) => 
-          index === i ? { ...f, progress: 100 } : f
-        ))
+        setFiles((prev) =>
+          prev.map((f, index) => (index === i ? { ...f, progress: 100 } : f)),
+        );
 
-        await new Promise(resolve => setTimeout(resolve, 200)) // Small delay for UX
+        await new Promise((resolve) => setTimeout(resolve, 200)); // Small delay for UX
       }
 
-      toast.success(`${files.length} file(s) uploaded successfully`)
-      setFiles([])
-      onUploadSuccess?.()
+      toast.success(`${files.length} file(s) uploaded successfully`);
+      setFiles([]);
+      onUploadSuccess?.();
     } catch (error) {
-      toast.error("Upload failed. Please try again.")
-      console.error('Upload error:', error)
+      toast.error("Upload failed. Please try again.");
+      console.error("Upload error:", error);
     } finally {
-      setIsUploading(false)
+      setIsUploading(false);
     }
-  }
+  };
 
   const openFileDialog = () => {
-    const input = document.createElement('input')
-    input.type = 'file'
-    input.accept = 'image/*'
-    input.multiple = true
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.multiple = true;
     input.onchange = (e) => {
-      const target = e.target as HTMLInputElement
+      const target = e.target as HTMLInputElement;
       if (target.files) {
-        onDrop(Array.from(target.files))
+        onDrop(Array.from(target.files));
       }
-    }
-    input.click()
-  }
+    };
+    input.click();
+  };
 
   return (
     <div className="space-y-4">
@@ -132,9 +140,10 @@ export function DragDropUpload({ onUploadSuccess }: DragDropUploadProps) {
         {...getRootProps()}
         className={`
           border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors
-          ${isDragActive 
-            ? 'border-primary bg-primary/5' 
-            : 'border-muted-foreground/25 hover:border-primary/50'
+          ${
+            isDragActive
+              ? "border-primary bg-primary/5"
+              : "border-muted-foreground/25 hover:border-primary/50"
           }
         `}
       >
@@ -145,7 +154,7 @@ export function DragDropUpload({ onUploadSuccess }: DragDropUploadProps) {
           </div>
           <div>
             <p className="text-lg font-medium">
-              {isDragActive ? 'Drop images here' : 'Drag & drop images here'}
+              {isDragActive ? "Drop images here" : "Drag & drop images here"}
             </p>
             <p className="text-sm text-muted-foreground">
               or click to select files
@@ -212,11 +221,11 @@ export function DragDropUpload({ onUploadSuccess }: DragDropUploadProps) {
               disabled={isUploading || files.length === 0}
             >
               <Upload className="h-4 w-4 mr-2" />
-              {isUploading ? 'Uploading...' : `Upload ${files.length} file(s)`}
+              {isUploading ? "Uploading..." : `Upload ${files.length} file(s)`}
             </Button>
           </div>
         </div>
       )}
     </div>
-  )
+  );
 }

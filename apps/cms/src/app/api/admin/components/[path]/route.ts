@@ -3,10 +3,10 @@ import { ComponentRepository } from '@/repositories/component.repository';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { path: string } }
+  { params }: { params: Promise<{ path: string }> }
 ) {
   try {
-    const { path: relativePath } = params;
+    const { path: relativePath } = await params;
     const repository = ComponentRepository.getInstance();
     
     const result = await repository.getComponentFileContent(relativePath);
@@ -44,10 +44,10 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { path: string } }
+  { params }: { params: Promise<{ path: string }> }
 ) {
   try {
-    const { path: relativePath } = params;
+    const { path: relativePath } = await params;
     const body = await request.json();
     const repository = ComponentRepository.getInstance();
     
@@ -86,10 +86,10 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { path: string } }
+  { params }: { params: Promise<{ path: string }> }
 ) {
   try {
-    const { path: relativePath } = params;
+    const { path: relativePath } = await params;
     const repository = ComponentRepository.getInstance();
     
     const result = await repository.deleteComponentFile(relativePath);

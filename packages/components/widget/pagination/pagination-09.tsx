@@ -17,7 +17,7 @@ export default function PaginationTabsSecondary() {
       <PaginationContent>
         <PaginationItem>
           <PaginationPrevious
-            href="#"
+            href={{ pathname: "#" }}
             className="bg-secondary text-secondary-foreground"
           />
         </PaginationItem>
@@ -47,7 +47,7 @@ export default function PaginationTabsSecondary() {
 
         <PaginationItem>
           <PaginationNext
-            href="#"
+            href={{ pathname: "#" }}
             className="bg-secondary text-secondary-foreground"
           />
         </PaginationItem>

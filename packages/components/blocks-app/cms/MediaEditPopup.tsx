@@ -1,107 +1,111 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Save, Trash2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
-import { toast } from "sonner"
+import { useState } from "react";
+import { Save, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 interface MediaItem {
-  id: string
-  url: string
-  alt?: string
-  title?: string
-  description?: string
-  filename: string
-  size: number
-  mimeType: string
-  createdAt: string
+  id: string;
+  url: string;
+  alt?: string;
+  title?: string;
+  description?: string;
+  filename: string;
+  size: number;
+  mimeType: string;
+  createdAt: string;
 }
 
 interface MediaEditPopupProps {
-  media: MediaItem
-  onClose: () => void
-  onUpdate: (media: MediaItem) => void
-  onDelete: (mediaId: string) => void
+  media: MediaItem;
+  onClose: () => void;
+  onUpdate: (media: MediaItem) => void;
+  onDelete: (mediaId: string) => void;
 }
 
-export function MediaEditPopup({ 
-  media, 
-  onClose, 
-  onUpdate, 
-  onDelete 
+export function MediaEditPopup({
+  media,
+  onClose,
+  onUpdate,
+  onDelete,
 }: MediaEditPopupProps) {
   const [formData, setFormData] = useState({
-    alt: media.alt || '',
-    title: media.title || '',
-    description: media.description || ''
-  })
-  const [isSaving, setIsSaving] = useState(false)
-  const [isDeleting, setIsDeleting] = useState(false)
+    alt: media.alt || "",
+    title: media.title || "",
+    description: media.description || "",
+  });
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleSave = async () => {
     try {
-      setIsSaving(true)
-      
+      setIsSaving(true);
+
       const response = await fetch(`/api/admin/media/${media.id}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error('Failed to update media')
+        throw new Error("Failed to update media");
       }
 
-      const updatedMedia = await response.json()
-      onUpdate(updatedMedia)
-      toast.success('Media updated successfully')
+      const updatedMedia = await response.json();
+      onUpdate(updatedMedia);
+      toast.success("Media updated successfully");
     } catch (error) {
-      console.error('Error updating media:', error)
-      toast.error('Failed to update media')
+      console.error("Error updating media:", error);
+      toast.error("Failed to update media");
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
+  };
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this media file? This action cannot be undone.')) {
-      return
+    if (
+      !confirm(
+        "Are you sure you want to delete this media file? This action cannot be undone.",
+      )
+    ) {
+      return;
     }
 
     try {
-      setIsDeleting(true)
-      
+      setIsDeleting(true);
+
       const response = await fetch(`/api/admin/media/${media.id}`, {
-        method: 'DELETE',
-      })
+        method: "DELETE",
+      });
 
       if (!response.ok) {
-        throw new Error('Failed to delete media')
+        throw new Error("Failed to delete media");
       }
 
-      onDelete(media.id)
-      toast.success('Media deleted successfully')
+      onDelete(media.id);
+      toast.success("Media deleted successfully");
     } catch (error) {
-      console.error('Error deleting media:', error)
-      toast.error('Failed to delete media')
+      console.error("Error deleting media:", error);
+      toast.error("Failed to delete media");
     } finally {
-      setIsDeleting(false)
+      setIsDeleting(false);
     }
-  }
+  };
 
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes'
-    const k = 1024
-    const sizes = ['Bytes', 'KB', 'MB', 'GB']
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
-  }
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  };
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
@@ -133,10 +137,19 @@ export function MediaEditPopup({
                   File Information
                 </Label>
                 <div className="space-y-1 text-sm">
-                  <div><strong>Filename:</strong> {media.filename}</div>
-                  <div><strong>Size:</strong> {formatFileSize(media.size)}</div>
-                  <div><strong>Type:</strong> {media.mimeType}</div>
-                  <div><strong>Uploaded:</strong> {new Date(media.createdAt).toLocaleString()}</div>
+                  <div>
+                    <strong>Filename:</strong> {media.filename}
+                  </div>
+                  <div>
+                    <strong>Size:</strong> {formatFileSize(media.size)}
+                  </div>
+                  <div>
+                    <strong>Type:</strong> {media.mimeType}
+                  </div>
+                  <div>
+                    <strong>Uploaded:</strong>{" "}
+                    {new Date(media.createdAt).toLocaleString()}
+                  </div>
                 </div>
               </div>
 
@@ -146,7 +159,9 @@ export function MediaEditPopup({
                 <Input
                   id="alt"
                   value={formData.alt}
-                  onChange={(e) => setFormData(prev => ({ ...prev, alt: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, alt: e.target.value }))
+                  }
                   placeholder="Describe the image for accessibility"
                 />
                 <p className="text-xs text-muted-foreground">
@@ -160,7 +175,9 @@ export function MediaEditPopup({
                 <Input
                   id="title"
                   value={formData.title}
-                  onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, title: e.target.value }))
+                  }
                   placeholder="Enter a title for this media"
                 />
               </div>
@@ -171,7 +188,12 @@ export function MediaEditPopup({
                 <Textarea
                   id="description"
                   value={formData.description}
-                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
                   placeholder="Enter a description for this media"
                   rows={4}
                 />
@@ -187,7 +209,7 @@ export function MediaEditPopup({
                   className="flex-1"
                 >
                   <Save className="h-4 w-4 mr-2" />
-                  {isSaving ? 'Saving...' : 'Save Changes'}
+                  {isSaving ? "Saving..." : "Save Changes"}
                 </Button>
                 <Button
                   variant="destructive"
@@ -196,7 +218,7 @@ export function MediaEditPopup({
                   className="flex-1"
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
-                  {isDeleting ? 'Deleting...' : 'Delete'}
+                  {isDeleting ? "Deleting..." : "Delete"}
                 </Button>
               </div>
               <Button
@@ -212,5 +234,5 @@ export function MediaEditPopup({
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

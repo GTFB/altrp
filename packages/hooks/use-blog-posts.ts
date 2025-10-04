@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 
 export interface Post {
   slug: string;
@@ -14,8 +14,8 @@ export interface UseBlogPostsOptions {
   limit?: number;
   tags?: string[];
   search?: string;
-  sortBy?: 'date' | 'title';
-  sortOrder?: 'asc' | 'desc';
+  sortBy?: "date" | "title";
+  sortOrder?: "asc" | "desc";
 }
 
 export interface UseBlogPostsReturn {
@@ -27,13 +27,15 @@ export interface UseBlogPostsReturn {
   loadMore: () => Promise<void>;
 }
 
-export function useBlogPosts(options: UseBlogPostsOptions = {}): UseBlogPostsReturn {
+export function useBlogPosts(
+  options: UseBlogPostsOptions = {},
+): UseBlogPostsReturn {
   const {
     limit = 10,
     tags = [],
-    search = '',
-    sortBy = 'date',
-    sortOrder = 'desc'
+    search = "",
+    sortBy = "date",
+    sortOrder = "desc",
   } = options;
 
   const [posts, setPosts] = useState<Post[]>([]);
@@ -49,8 +51,8 @@ export function useBlogPosts(options: UseBlogPostsOptions = {}): UseBlogPostsRet
       limit: limit.toString(),
       sortBy,
       sortOrder,
-      ...(tags.length > 0 && { tags: tags.join(',') }),
-      ...(search && { search })
+      ...(tags.length > 0 && { tags: tags.join(",") }),
+      ...(search && { search }),
     });
     return params.toString();
   }, [limit, sortBy, sortOrder, tags, search]);
@@ -62,16 +64,16 @@ export function useBlogPosts(options: UseBlogPostsOptions = {}): UseBlogPostsRet
       setError(null);
 
       const response = await fetch(`/api/posts?${searchParams}`);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
       setPosts(data.posts);
       setAllPosts(data.posts);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error loading posts');
+      setError(err instanceof Error ? err.message : "Error loading posts");
     } finally {
       setLoading(false);
     }
@@ -80,32 +82,32 @@ export function useBlogPosts(options: UseBlogPostsOptions = {}): UseBlogPostsRet
   // Load additional posts
   const loadMore = useCallback(async () => {
     if (loading) return;
-    
+
     const nextPage = currentPage + 1;
     const newLimit = nextPage * limit;
-    
+
     try {
       setLoading(true);
-      
+
       const newSearchParams = new URLSearchParams({
         limit: newLimit.toString(),
         sortBy,
         sortOrder,
-        ...(tags.length > 0 && { tags: tags.join(',') }),
-        ...(search && { search })
+        ...(tags.length > 0 && { tags: tags.join(",") }),
+        ...(search && { search }),
       });
 
       const response = await fetch(`/api/posts?${newSearchParams}`);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
       setPosts(data.posts);
       setCurrentPage(nextPage);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error loading posts');
+      setError(err instanceof Error ? err.message : "Error loading posts");
     } finally {
       setLoading(false);
     }
@@ -135,7 +137,7 @@ export function useBlogPosts(options: UseBlogPostsOptions = {}): UseBlogPostsRet
     error,
     refetch,
     hasMore,
-    loadMore
+    loadMore,
   };
 }
 
@@ -147,13 +149,13 @@ export function useBlogPost(slug: string) {
 
   const loadPost = useCallback(async () => {
     if (!slug) return;
-    
+
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await fetch(`/api/posts/${slug}`);
-      
+
       if (!response.ok) {
         if (response.status === 404) {
           setPost(null);
@@ -161,11 +163,11 @@ export function useBlogPost(slug: string) {
         }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
       setPost(data.post);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error loading post');
+      setError(err instanceof Error ? err.message : "Error loading post");
     } finally {
       setLoading(false);
     }
@@ -179,6 +181,6 @@ export function useBlogPost(slug: string) {
     post,
     loading,
     error,
-    refetch: loadPost
+    refetch: loadPost,
   };
 }

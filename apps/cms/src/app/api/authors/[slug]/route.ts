@@ -3,11 +3,12 @@ import { AuthorRepository } from '@/repositories/author.repository';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const { slug } = await params;
     const authorRepo = AuthorRepository.getInstance();
-    const author = await authorRepo.findBySlug(params.slug);
+    const author = await authorRepo.findBySlug(slug);
 
     if (!author) {
       return NextResponse.json(

@@ -14,7 +14,7 @@ export default function PaginationWithRoundedButton() {
     <Pagination>
       <PaginationContent>
         <PaginationItem>
-          <PaginationPrevious href="#" />
+          <PaginationPrevious href={{ pathname: "#" }} />
         </PaginationItem>
         {pages.map((page) => (
           <PaginationItem key={page}>
@@ -28,7 +28,7 @@ export default function PaginationWithRoundedButton() {
           </PaginationItem>
         ))}
         <PaginationItem>
-          <PaginationNext href="#" />
+          <PaginationNext href={{ pathname: "#" }} />
         </PaginationItem>
       </PaginationContent>
     </Pagination>

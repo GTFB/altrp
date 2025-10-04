@@ -19,4 +19,4 @@ export interface BaseSearchableRepository<T> extends Repository<T> {
 }
 
 // Re-export function from packages/lib/content-path.ts for convenience
-export { getContentDir } from '@/lib/content-path';
+export { getContentDir } from "@/lib/content-path";

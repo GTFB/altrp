@@ -77,7 +77,7 @@ const Features07Page = () => {
         </p>
         <div className="mt-12 sm:mt-16 grid md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-y-8">
           {features.map((feature, index) => (
-            <Link key={index} href="#">
+            <Link key={index} href={{ pathname: "#" }}>
               <div className="flex gap-6 items-center rounded-lg -mx-2 sm:mx-0 max-w-lg">
                 <div className="h-24 aspect-square shrink-0 rounded-lg bg-muted" />
                 <div className="">

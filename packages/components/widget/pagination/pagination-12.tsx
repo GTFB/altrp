@@ -12,13 +12,13 @@ export default function PaginationNumberless() {
       <Pagination className="w-full">
         <PaginationContent className="w-full justify-between">
           <PaginationItem>
-            <PaginationPrevious href="#" className="border" />
+            <PaginationPrevious href={{ pathname: "#" }} className="border" />
           </PaginationItem>
           <PaginationItem>
             <span className="text-sm text-muted-foreground">Page 1 of 21</span>
           </PaginationItem>
           <PaginationItem>
-            <PaginationNext href="#" className="border" />
+            <PaginationNext href={{ pathname: "#" }} className="border" />
           </PaginationItem>
         </PaginationContent>
       </Pagination>

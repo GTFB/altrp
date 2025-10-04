@@ -44,7 +44,7 @@ export default function SlideOpacity() {
                   "bg-primary text-primary-foreground transition-all duration-500",
                   {
                     "opacity-30": index !== current - 1,
-                  }
+                  },
                 )}
               >
                 <CardContent className="flex aspect-video items-center justify-center p-6">

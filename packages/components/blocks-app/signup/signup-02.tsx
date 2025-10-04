@@ -103,7 +103,7 @@ const SignUp02Page = () => {
 
         <p className="mt-5 text-sm text-center">
           Already have an account?
-          <Link href="#" className="ml-1 underline text-muted-foreground">
+          <Link href={{ pathname: "#" }} className="ml-1 underline text-muted-foreground">
             Log in
           </Link>
         </p>

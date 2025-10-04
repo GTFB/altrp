@@ -14,15 +14,12 @@ const Hero07 = () => {
         duration={3}
         className={cn(
           "mask-[radial-gradient(500px_circle_at_center,white,transparent)]",
-          "inset-x-0 h-full skew-y-12"
+          "inset-x-0 h-full skew-y-12",
         )}
       />
       <div className="relative z-10 text-center max-w-3xl">
-        <Badge
-          variant="secondary"
-          className="rounded-full py-1 border-border"
-        >
-          <Link href="#" className="flex items-center gap-1">
+        <Badge variant="secondary" className="rounded-full py-1 border-border">
+          <Link href={{ pathname: "#" }} className="flex items-center gap-1">
             <span>Just released v1.0.0</span>
             <ArrowUpRight className="size-4 flex-shrink-0" />
           </Link>

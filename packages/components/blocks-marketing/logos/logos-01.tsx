@@ -1,4 +1,9 @@
-import { Logo01, Logo02, Logo03, Logo04 } from "@/components/blocks-marketing/logos/logos";
+import {
+  Logo01,
+  Logo02,
+  Logo03,
+  Logo04,
+} from "@/components/blocks-marketing/logos/logos";
 
 const Logos01Page = () => {
   return (

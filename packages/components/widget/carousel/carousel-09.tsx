@@ -35,7 +35,7 @@ export default function CarouselWithThumbs() {
     (index: number) => {
       api?.scrollTo(index);
     },
-    [api]
+    [api],
   );
 
   return (
@@ -61,7 +61,7 @@ export default function CarouselWithThumbs() {
               key={index}
               className={cn(
                 "basis-1/5 cursor-pointer",
-                current === index + 1 ? "opacity-100" : "opacity-50"
+                current === index + 1 ? "opacity-100" : "opacity-50",
               )}
               onClick={() => handleThumbClick(index)}
             >

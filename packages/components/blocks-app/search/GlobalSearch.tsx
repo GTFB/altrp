@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useDebounce } from '@/hooks/use-debounce';
-import { createSearchIndex, type SearchRecord } from '@/lib/search';
-import { Search, X } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { useDebounce } from "@/hooks/use-debounce";
+import { createSearchIndex, type SearchRecord } from "@/lib/search";
+import { Search, X } from "lucide-react";
 
 export function GlobalSearch() {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchRecord[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [searchItems, setSearchItems] = useState<SearchRecord[]>([]);
@@ -15,7 +15,12 @@ export function GlobalSearch() {
   useEffect(() => {
     // In a real application, data loading would happen here
     setSearchItems([
-      { id: '1', title: 'Sample Post', content: 'Sample content', tags: ['sample'] },
+      {
+        id: "1",
+        title: "Sample Post",
+        content: "Sample content",
+        tags: ["sample"],
+      },
     ]);
   }, []);
 
@@ -28,9 +33,9 @@ export function GlobalSearch() {
     try {
       const searchIndex = createSearchIndex(searchItems);
       const searchResults = searchIndex.search(searchQuery, { limit: 5 });
-      setResults(searchResults.map(result => result.item));
+      setResults(searchResults.map((result) => result.item));
     } catch (error) {
-      console.error('Search error:', error);
+      console.error("Search error:", error);
       setResults([]);
     }
   };
@@ -51,7 +56,7 @@ export function GlobalSearch() {
   const handleResultClick = (result: SearchRecord) => {
     window.location.href = `/blog/${result.id}`;
     setIsOpen(false);
-    setQuery('');
+    setQuery("");
   };
 
   return (
@@ -68,7 +73,7 @@ export function GlobalSearch() {
         {query && (
           <button
             onClick={() => {
-              setQuery('');
+              setQuery("");
               setIsOpen(false);
             }}
             className="absolute right-3 top-1/2 -translate-y-1/2"

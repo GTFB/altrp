@@ -16,7 +16,7 @@ export default function PaginationBordered() {
     <Pagination>
       <PaginationContent className="gap-0 border rounded-lg divide-x overflow-hidden">
         <PaginationItem>
-          <PaginationPrevious href="#" className="rounded-none" />
+          <PaginationPrevious href={{ pathname: "#" }} className="rounded-none" />
         </PaginationItem>
         {pages.map((page) => {
           const isActive = page === 2;
@@ -33,7 +33,7 @@ export default function PaginationBordered() {
                         "dark:bg-primary dark:hover:bg-primary/90 hover:text-primary-foreground!",
                     })]: isActive,
                   },
-                  "rounded-none border-none"
+                  "rounded-none border-none",
                 )}
                 isActive={isActive}
               >
@@ -43,7 +43,7 @@ export default function PaginationBordered() {
           );
         })}
         <PaginationItem>
-          <PaginationNext href="#" className="rounded-none" />
+          <PaginationNext href={{ pathname: "#" }} className="rounded-none" />
         </PaginationItem>
       </PaginationContent>
     </Pagination>

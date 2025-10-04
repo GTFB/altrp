@@ -88,7 +88,7 @@ const Testimonial01 = () => (
                 </div>
               </div>
               <Button variant="ghost" size="icon" asChild>
-                <Link href="#" target="_blank">
+                <Link href={{ pathname: "#" }} target="_blank">
                   <TwitterLogo className="w-4 h-4" />
                 </Link>
               </Button>

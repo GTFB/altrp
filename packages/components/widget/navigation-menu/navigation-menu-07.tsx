@@ -29,11 +29,10 @@ export default function NavigationMenuWithIcon() {
                   size: "icon",
                   variant: item.isActive ? "secondary" : "ghost",
                 }),
-                "h-11 w-11"
+                "h-11 w-11",
               )}
-    
             >
-              <Link href={item.href}>
+              <Link href={{ pathname: item.href }}>
                 <item.icon className="h-6! w-6!" />
               </Link>
             </NavigationMenuLink>

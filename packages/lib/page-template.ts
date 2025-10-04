@@ -11,10 +11,10 @@ export default function Page() {
     )
 }
 
-`
+`;
 
 export const componentTemplate = `
             <Container>
                 <_COMPONENT_/>
             </Container>
-`
+`;

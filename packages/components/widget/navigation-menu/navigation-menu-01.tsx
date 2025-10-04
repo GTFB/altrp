@@ -19,11 +19,8 @@ export default function NavigationMenuDemo() {
       <NavigationMenuList>
         {navigationMenuItems.map((item) => (
           <NavigationMenuItem key={item.title}>
-            <NavigationMenuLink
-              className={navigationMenuTriggerStyle()}
-    
-            >
-              <Link href={item.href}>{item.title}</Link>
+            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              <Link href={{ pathname: item.href }}>{item.title}</Link>
             </NavigationMenuLink>
           </NavigationMenuItem>
         ))}

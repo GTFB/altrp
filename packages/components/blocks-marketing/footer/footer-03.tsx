@@ -110,7 +110,7 @@ const Footer03Page = () => {
                   {links.map(({ title, href }) => (
                     <li key={title}>
                       <Link
-                        href={href}
+                        href={{ pathname: href }}
                         className="text-muted-foreground hover:text-foreground"
                       >
                         {title}
@@ -139,23 +139,23 @@ const Footer03Page = () => {
             {/* Copyright */}
             <span className="text-muted-foreground">
               &copy; {new Date().getFullYear()}{" "}
-              <Link href="/" target="_blank">
+              <Link href={{ pathname: "/" }} target="_blank">
                 Shadcn UI Blocks
               </Link>
               . All rights reserved.
             </span>
 
             <div className="flex items-center gap-5 text-muted-foreground">
-              <Link href="#" target="_blank">
+              <Link href={{ pathname: "#" }} target="_blank">
                 <TwitterIcon className="h-5 w-5" />
               </Link>
-              <Link href="#" target="_blank">
+              <Link href={{ pathname: "#" }} target="_blank">
                 <DribbbleIcon className="h-5 w-5" />
               </Link>
-              <Link href="#" target="_blank">
+              <Link href={{ pathname: "#" }} target="_blank">
                 <TwitchIcon className="h-5 w-5" />
               </Link>
-              <Link href="#" target="_blank">
+              <Link href={{ pathname: "#" }} target="_blank">
                 <GithubIcon className="h-5 w-5" />
               </Link>
             </div>

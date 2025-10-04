@@ -1,51 +1,56 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
-import { cn } from "@/lib/utils"
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { cn } from "@/lib/utils";
 
 interface MediaItem {
-  id: string
-  url: string
-  alt?: string
-  title?: string
-  description?: string
-  filename: string
-  size: number
-  mimeType: string
-  createdAt: string
+  id: string;
+  url: string;
+  alt?: string;
+  title?: string;
+  description?: string;
+  filename: string;
+  size: number;
+  mimeType: string;
+  createdAt: string;
 }
 
 interface MediaCardProps {
-  media: MediaItem
-  onClick: () => void
-  isSelected?: boolean
-  onSelect?: (mediaId: string, selected: boolean) => void
+  media: MediaItem;
+  onClick: () => void;
+  isSelected?: boolean;
+  onSelect?: (mediaId: string, selected: boolean) => void;
 }
 
-export function MediaCard({ media, onClick, isSelected = false, onSelect }: MediaCardProps) {
-  const [imageLoaded, setImageLoaded] = useState(false)
-  const [imageError, setImageError] = useState(false)
+export function MediaCard({
+  media,
+  onClick,
+  isSelected = false,
+  onSelect,
+}: MediaCardProps) {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes'
-    const k = 1024
-    const sizes = ['Bytes', 'KB', 'MB', 'GB']
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
-  }
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  };
 
   const handleCheckboxChange = (checked: boolean) => {
-    onSelect?.(media.id, checked)
-  }
+    onSelect?.(media.id, checked);
+  };
 
   return (
-    <Card 
+    <Card
       className={cn(
         "group cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-105",
         "border-0 shadow-sm bg-card",
-        isSelected && "ring-2 ring-primary"
+        isSelected && "ring-2 ring-primary",
       )}
       onClick={onClick}
     >
@@ -57,7 +62,7 @@ export function MediaCard({ media, onClick, isSelected = false, onSelect }: Medi
               alt={media.alt || media.filename}
               className={cn(
                 "w-full h-full object-cover transition-opacity duration-200",
-                imageLoaded ? "opacity-100" : "opacity-0"
+                imageLoaded ? "opacity-100" : "opacity-0",
               )}
               onLoad={() => setImageLoaded(true)}
               onError={() => setImageError(true)}
@@ -99,5 +104,5 @@ export function MediaCard({ media, onClick, isSelected = false, onSelect }: Medi
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

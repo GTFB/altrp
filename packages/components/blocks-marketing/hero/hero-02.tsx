@@ -13,7 +13,7 @@ const Hero02 = () => {
             variant="secondary"
             className="rounded-full py-1 border-border"
           >
-            <Link href="#" className="flex items-center gap-1">
+            <Link href={{ pathname: "#" }} className="flex items-center gap-1">
               <span>Just released v1.0.0</span>
               <ArrowUpRight className="size-4 flex-shrink-0" />
             </Link>
