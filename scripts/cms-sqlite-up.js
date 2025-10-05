@@ -101,7 +101,7 @@ function main() {
   }
 
   // build CMS
-  run('bun run --filter=altrp-cms build', { cwd: projectRoot });
+  run('bun run --filter=altrp-cms build --experimental-build-mode compile', { cwd: projectRoot });
 }
 
 try {

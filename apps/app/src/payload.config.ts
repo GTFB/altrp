@@ -7,6 +7,28 @@ import { buildConfig, PayloadRequest } from 'payload'
 import { fileURLToPath } from 'url'
 
 import { Categories } from './collections/Categories'
+import { Archieve } from './collections/Archieve'
+import { ArchieveVariant } from './collections/ArchieveVariant'
+import { Base } from './collections/Base'
+import { BaseMove } from './collections/BaseMove'
+import { BaseMoveRout } from './collections/BaseMoveRout'
+import { Contractor } from './collections/Contractor'
+import { Deal } from './collections/Deal'
+import { DealProduct } from './collections/DealProduct'
+import { Echelon } from './collections/Echelon'
+import { EchelonEmployee } from './collections/EchelonEmployee'
+import { Finance } from './collections/Finance'
+import { Goal } from './collections/Goal'
+import { Human } from './collections/Human'
+import { Identity } from './collections/Identity'
+import { JournalActivity } from './collections/JournalActivity'
+import { JournalConnection } from './collections/JournalConnection'
+import { JournalGeneration } from './collections/JournalGeneration'
+import { JournalSystem } from './collections/JournalSystem'
+import { Key } from './collections/Key'
+import { Location } from './collections/Location'
+import { Relation } from './collections/Relation'
+import { Taxonomy } from './collections/Taxonomy'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
@@ -64,7 +86,7 @@ export default buildConfig({
       connectionString: process.env.DATABASE_URI || '',
     },
   }),
-  collections: [Pages, Posts, Media, Categories, Users],
+  collections: [Pages, Posts, Media, Categories, Archieve, ArchieveVariant, Base, BaseMove, BaseMoveRout, Contractor, Deal, DealProduct, Echelon, EchelonEmployee, Finance, Goal, Human, Identity, JournalActivity, JournalConnection, JournalGeneration, JournalSystem, Key, Location, Relation, Taxonomy, Users],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
   plugins: [

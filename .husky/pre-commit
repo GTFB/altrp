@@ -75,5 +75,11 @@ if ! bun run quick-test; then
     exit 1
 fi
 
+echo "🧪 Running build cms..."
+if ! bun run build:cms; then
+    echo "❌ Running build failed. Aborting commit."
+    exit 1
+fi
+
 echo "✅ Code validation passed!"
 echo "🚀 Proceeding with commit..."
