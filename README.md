@@ -136,6 +136,7 @@ cd <YOUR_PROJECT>
 ```bash
 # Change origin to your repository
 git remote set-url origin https://github.com/<YOUR_ORG>/<YOUR_PROJECT>
+git remote -v
 git push -u origin main
 ```
 
