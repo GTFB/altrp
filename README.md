@@ -1,4 +1,4 @@
-# Next.js & Git-CMS: Modern Content Platform
+# Next.js: Digital Product Generation Platform
 
 ![Project Screenshot](./apps/site/public/images/altrp.jpg)
 
