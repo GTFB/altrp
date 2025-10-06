@@ -1,11 +1,11 @@
 # Next.js & Git-CMS: Modern Content Platform
 
-![Project Screenshot](https://placehold.co/1200x600.png?text=Your+Project+Screenshot)
+![Project Screenshot](./apps/site/public/images/altrp.jpg)
 
 <p align="center">
   <a href="#-about-the-project">About The Project</a> •
   <a href="#-key-features">Key Features</a> •
-  <a href="#-tech-stack">Tech Stack</a> •
+  <a href="#️-tech-stack">Tech Stack</a> •
   <a href="#-project-structure">Project Structure</a> •
   <a href="#-getting-started">Getting Started</a>
 </p>
