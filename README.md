@@ -203,6 +203,7 @@ git push origin main
 
 # Watch deployment in Cloudflare Pages
 # Check changes on production
+```
 
 ### Available Scripts
 
