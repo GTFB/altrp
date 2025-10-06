@@ -42,6 +42,7 @@ export function TipTapEditor({
       }),
     ],
     content,
+    immediatelyRender: false,
     editorProps: {
       attributes: {
         class:
