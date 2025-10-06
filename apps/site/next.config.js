@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  //  production (static export)
+
   ...(process.env.NODE_ENV === 'production' && {
     output: 'export',
     trailingSlash: true,
@@ -27,6 +27,7 @@ const nextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
+
 }
 
 module.exports = nextConfig

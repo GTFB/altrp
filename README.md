@@ -1,11 +1,11 @@
-# Next.js & Git-CMS: Modern Content Platform
+# Next.js: Digital Product Generation Platform
 
-![Project Screenshot](https://via.placeholder.com/1200x600.png?text=Your+Project+Screenshot)
+![Project Screenshot](./apps/site/public/images/altrp.jpg)
 
 <p align="center">
   <a href="#-about-the-project">About The Project</a> •
   <a href="#-key-features">Key Features</a> •
-  <a href="#-tech-stack">Tech Stack</a> •
+  <a href="#️-tech-stack">Tech Stack</a> •
   <a href="#-project-structure">Project Structure</a> •
   <a href="#-getting-started">Getting Started</a>
 </p>
@@ -19,7 +19,12 @@
 
 ## ✨ About The Project
 
-This isn't just another blog template. It's a modern, type-safe, and high-performance foundation for building content-driven web applications. It's built upon a **Git-as-CMS** strategy, where all content is stored as MDX files directly within the Git repository. This approach ensures versioning, simplicity, and full control over your data without the need for an external database.
+**Altrp** is a modern, type-safe, and high-performance monorepo for building web applications. It consists of 4 main projects:
+
+- **📱 site** - Static website (Next.js 15, React 19, Tailwind CSS 4)
+- **🎛️ cms** - Admin panel with MDX support
+- **🤖 bot** - AI agents and Telegram bots with SQLite
+- **🗄️ app** - Payload Backend with PostgreSQL
 
 The project is built with a strong focus on **Developer Experience (DX)** and scalability, leveraging the best tools from the modern web ecosystem.
 
@@ -70,7 +75,6 @@ This project uses a carefully curated set of technologies to achieve maximum eff
 | **Zod** | Schema validation for MDX frontmatter and form data. |
 | **Fuse.js** | A lightweight fuzzy-search library for client-side search. |
 | **TipTap** | A headless editor framework for creating custom WYSIWYG experiences. |
-| **Sharp** | A high-performance image optimization library. |
 
 ### Tooling & DX
 
@@ -79,42 +83,74 @@ This project uses a carefully curated set of technologies to achieve maximum eff
 | **React Hook Form** | Performant and flexible form management. |
 | **Husky + lint-staged**| Automatically run linters and tests before each commit. |
 | **ESLint + Prettier** | Enforcing consistent code style and catching errors. |
-| **Hygen** | A code generator for quickly scaffolding components, hooks, etc. |
+
 
 ## 📁 Project Structure
 
-The project structure is organized around the principle of Separation of Concerns for easy navigation and scalability.
-
-<details>
-<summary>View detailed folder structure</summary>
+This is a **monorepo** with 4 main applications:
 
 ```
-src
-├── app/                  # App Router: pages, layouts, API routes
-├── components/           # Reusable React components (ui, features, layout)
-├── lib/                  # Helper functions, API clients, validators
-├── repositories/         # Implementation of the Repository Pattern for data access
-├── stores/               # Zustand global state stores
-├── hooks/                # Custom React hooks
-├── config/               # Application-wide configuration files (auth, i18n, site)
-├── messages/             # Localization files for next-intl
-└── types/                # Global TypeScript definitions
+altrp/
+├── apps/
+│   ├── site/             # Static website (port 3100)
+│   ├── cms/              # Admin panel (port 3101)
+│   ├── bot/              # AI bots (port 3102)
+│   └── app/              # Payload CMS (port 3103)
+├── packages/
+│   ├── components/       # Shared UI components
+│   ├── lib/              # Shared utilities
+│   └── types/            # Shared TypeScript types
+└── settings.ts           # Global configuration
 ```
 
-</details>
+### Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `bun run dev` | Run all projects |
+| `bun run dev:site` | Run site only |
+| `bun run dev:cms` | Run CMS only |
+| `bun run dev:bot` | Run bot only |
+| `bun run dev:app` | Run app only |
+| `bun run build:site` | Build site for production |
+| `bun run build:cms` | Build CMS for production |
 
 ## 🚀 Getting Started
 
 Follow these steps to get the project running locally.
 
-### 1. Clone the repository
-
+### 1. Create Repository
 ```bash
-git clone https://github.com/your-username/your-repo-name.git
-cd your-repo-name
+# Create a new repository on GitHub
+# Name: <YOUR_PROJECT>
 ```
 
-### 2. Install dependencies
+### 2. Clone the repository
+```bash
+# Open Cursor and terminal
+git clone https://github.com/GTFB/altrp <YOUR_PROJECT>
+cd <YOUR_PROJECT>
+```
+
+### 3. Change remote origin
+```bash
+# Change origin to your repository
+git remote set-url origin https://github.com/<YOUR_ORG>/<YOUR_PROJECT>
+git remote -v
+git push -u origin main
+```
+
+### 4. Setup Cloudflare Pages
+1. Open [Cloudflare Dashboard](https://dash.cloudflare.com)
+2. Go to **Pages** → **Create a project**
+3. Connect GitHub and select `<YOUR_PROJECT>`
+4. Configure build settings:
+   - **Build command**: `bun run build:site`
+   - **Build output**: `apps/site/dist`
+   - **Root directory**: `apps/site`
+   - **Build comments**: `Enabled`
+
+### 5. Install dependencies
 
 This project uses **Bun**. If you don't have it installed, please [install it first](https://bun.sh/docs/installation).
 
@@ -122,48 +158,53 @@ This project uses **Bun**. If you don't have it installed, please [install it fi
 bun install
 ```
 
-### 3. Configure Environment Variables
+### 6. Configure ports (if needed)
+```bash
+# If this is not your first project, change port in apps/site/package.json
+# Change 3100 to 3101, 3102, etc.
+```
 
-#### Option 1: Using Make Command (Recommended)
-Generate the `.env` file automatically with a pre-generated `NEXTAUTH_SECRET`:
+### 7. Run the Development Server
 
 ```bash
-make env
+# Run site only
+cd apps/site
+bun run dev
+
+# Or run all projects
+bun run dev
 ```
 
-This command will:
-- Copy `apps/site/example.env` to `apps/site/.env`
-- Automatically generate a secure `NEXTAUTH_SECRET` using OpenSSL
-- Backup existing `.env` file if it exists
+Open [http://localhost:3100](http://localhost:3100) in your browser.
 
-#### Option 2: Manual Setup
-If you prefer to set up manually:
+### 8. Development Workflow
+- Open site in hot reload mode: `http://localhost:3100`
+- All changes are visible in real time
+- Edit components in `apps/site/components/`
 
+### 9. Test changes
 ```bash
-cp apps/site/example.env apps/site/.env
+# Stop server
+taskkill /F /IM node.exe
+
+# Restart
+bun run dev
 ```
 
-Then fill in the required values in `apps/site/.env`:
-
-```env
-# apps/site/.env
-GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
-GITHUB_CLIENT_ID=your_github_client_id
-GITHUB_CLIENT_SECRET=your_github_client_secret
-NEXTAUTH_SECRET=your_generated_secret # Generate with: openssl rand -base64 32
-NEXTAUTH_URL=http://localhost:3000
-```
-
-**Note**: You'll need to obtain OAuth credentials from your chosen providers (Google, GitHub, etc.) and add them to the `.env` file.
-
-### 4. Run the Development Server
-
+### 10. Deploy changes
 ```bash
-bun dev
-```
+# Add changes
+git add .
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+# Create commit
+git commit -m "feat: added new features"
+
+# Push changes
+git push origin main
+
+# Watch deployment in Cloudflare Pages
+# Check changes on production
+```
 
 ### Available Scripts
 

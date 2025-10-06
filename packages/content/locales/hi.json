@@ -137,7 +137,7 @@
     "ourAuthors": "हमारे लेखक",
     "postsWithDemoAndHelloTags": "डेमो और हेलो टैग के साथ पोस्ट",
     "readOurLatestArticlesAndUpdates": "हमारे नवीनतम लेख और अपडेट पढ़ें",
-    "welcomeToJambo": "Jambo में आपका स्वागत है"
+    "welcomeToaltrp": "altrp में आपका स्वागत है"
   },
   "navigation": {
     "about": "हमारे बारे में",
@@ -175,7 +175,7 @@
   },
   "project": {
     "description": "व्यावसायिक प्रस्ताव जेनरेटर",
-    "name": "Jambo"
+    "name": "altrp"
   },
   "search": {
     "noHeadings": "कोई शीर्षक नहीं",

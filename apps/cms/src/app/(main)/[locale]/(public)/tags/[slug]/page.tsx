@@ -17,18 +17,18 @@ export async function generateMetadata({ params }: TagPageProps): Promise<Metada
 
   if (posts.length === 0) {
     return {
-      title: 'Tag Not Found | Jambo Blog',
+      title: 'Tag Not Found | altrp Blog',
       description: 'The requested tag could not be found.',
     };
   }
 
   const { locale } = await params;
   const tagName = slug;
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://jambo.example.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://altrp.example.com';
   const tagUrl = `${baseUrl}/${locale}/tags/${slug}`;
 
   return {
-    title: `${tagName} | Tags | Jambo Blog`,
+    title: `${tagName} | Tags | altrp Blog`,
     description: `Read articles tagged with ${tagName}`,
     keywords: tagName,
     openGraph: {
@@ -37,8 +37,8 @@ export async function generateMetadata({ params }: TagPageProps): Promise<Metada
       type: 'website',
       url: tagUrl,
       locale: locale === 'ru' ? 'ru_RU' : 'en_US',
-      siteName: 'Jambo Blog',
-    },
+      siteName: 'altrp Blog',
+   },
     twitter: {
       card: 'summary',
       title: `Articles tagged with ${tagName}`,

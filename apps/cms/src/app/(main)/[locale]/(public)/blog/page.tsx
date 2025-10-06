@@ -4,7 +4,7 @@ import { Container } from '@/components/misc/layout/Container';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Blog | Jambo Blog',
+  title: 'Blog | altrp Blog',
   description: 'Explore our content organized by tags.',
 };
 

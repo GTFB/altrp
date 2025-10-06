@@ -1,6 +1,6 @@
-# Payload Website Template
+# ALTRP CMS
 
-This is the official [Payload Website Template](https://github.com/payloadcms/payload/blob/main/templates/website). Use it to power websites, blogs, or portfolios from small to enterprise. This repo includes a fully-working backend, enterprise-grade admin panel, and a beautifully designed, production-ready website.
+Payload CMS application for managing ALTRP website content. This is based on the official [Payload Website Template](https://github.com/payloadcms/payload/blob/main/templates/website) and includes a fully-working backend, enterprise-grade admin panel, and a beautifully designed, production-ready website.
 
 This template is right for you if you are working on:
 
@@ -27,9 +27,7 @@ Core features:
 
 To spin up this example locally, follow these steps:
 
-### Clone
-
-If you have not done so already, you need to have standalone copy of this repo on your machine. If you've already cloned this repo, skip to [Development](#development).
+### Setup
 
 #### Method 1 (recommended)
 
@@ -51,12 +49,51 @@ Use the `git` CLI to clone this template directly to your machine:
 git clone -n --depth=1 --filter=tree:0 https://github.com/payloadcms/payload my-project && cd my-project && git sparse-checkout set --no-cone templates/website && git checkout && rm -rf .git && git init && git add . && git mv -f templates/website/{.,}* . && git add . && git commit -m "Initial commit"
 ```
 
-### Development
+### 1. Install dependencies
 
-1. First [clone the repo](#clone) if you have not done so already
+```bash
+bun install
+```
+
+### 2. PostgreSQL database setup
+
+Create a PostgreSQL database:
+
+```sql
+CREATE DATABASE altrp_cms;
+```
+
+### 3. Environment variables configuration
+
+Copy the `env.example` file to `.env` and configure the variables:
+
+```env
+PAYLOAD_SECRET=your-very-secret-key-here
+DATABASE_URL=postgresql://username:password@localhost:5432/altrp_cms
+```
+
+### 4. Run in development mode
+
+```bash
+bun run dev
+```
+
+Admin panel will be available at: http://localhost:3001/admin
+
+### 5. Generate TypeScript types
+
+```bash
+bun run generate:types
+```
+
+## Development
+
+To spin up this example locally, follow the [Quick Start](#quick-start). Then [Seed](#seed) the database with a few pages, posts, and projects.
+
+1. First [clone the repo](#setup) if you have not done so already
 1. `cd my-project && cp .env.example .env` to copy the example environment variables
-1. `pnpm install && pnpm dev` to install dependencies and start the dev server
-1. open `http://localhost:3000` to open the app in your browser
+1. `bun install && bun run dev` to install dependencies and start the dev server
+1. open `http://localhost:3001` to open the app in your browser
 
 That's it! Changes made in `./src` will be reflected in your app. Follow the on-screen instructions to login and create your first admin user. Then check out [Production](#production) once you're ready to build and serve your app, and [Deployment](#deployment) when you're ready to go live.
 
@@ -210,18 +247,18 @@ If your database is pointed to production you will want to set `push: false` oth
 
 [Migrations](https://payloadcms.com/docs/database/migrations) are essentially SQL code versions that keeps track of your schema. When deploy with Postgres you will need to make sure you create and then run your migrations.
 
-Locally create a migration
+Locally create a migration:
 
 ```bash
-pnpm payload migrate:create
+bun run migrate
 ```
 
 This creates the migration files you will need to push alongside with your new configuration.
 
-On the server after building and before running `pnpm start` you will want to run your migrations
+On the server after building and before running `bun run start` you will want to run your migrations:
 
 ```bash
-pnpm payload migrate
+bun run migrate
 ```
 
 This command will check for any migrations that have not yet been run and try to run them and it will keep a record of migrations that have been run in the database.
@@ -236,6 +273,26 @@ Alternatively, you can use [Docker](https://www.docker.com) to spin up this temp
 
 That's it! The Docker instance will help you get up and running quickly while also standardizing the development environment across your teams.
 
+## Available collections
+
+- **Users** - System users with roles (admin, editor, user)
+- **Posts** - Blog articles with category and tag support
+- **Categories** - Article categories
+- **Media** - Files and images
+- **Pages** - Static website pages
+
+## Scripts
+
+- `bun run dev` - Run in development mode
+- `bun run build` - Build for production
+- `bun run start` - Run production version
+- `bun run generate:types` - Generate TypeScript types
+- `bun run migrate` - Run database migrations
+
+## Frontend integration
+
+For integration with the frontend application, use Payload REST API or GraphQL API:
+
 ### Seed
 
 To seed the database with a few pages, posts, and projects you can click the 'seed database' link from the admin panel.
@@ -248,12 +305,33 @@ The seed script will also create a demo user for demonstration purposes only:
 
 > NOTICE: seeding the database is destructive because it drops your current database to populate a fresh one from the seed template. Only run this command if you are starting a new project or can afford to lose your current data.
 
+Example of fetching posts:
+
+```typescript
+// REST API
+const posts = await fetch('/api/posts').then(res => res.json())
+
+// GraphQL API
+const query = `
+  query {
+    Posts {
+      docs {
+        id
+        title
+        content
+        publishedDate
+      }
+    }
+  }
+`
+```
+
 ## Production
 
 To run Payload in production, you need to build and start the Admin panel. To do so, follow these steps:
 
-1. Invoke the `next build` script by running `pnpm build` or `npm run build` in your project root. This creates a `.next` directory with a production-ready admin bundle.
-1. Finally run `pnpm start` or `npm run start` to run Node in production and serve Payload from the `.build` directory.
+1. Invoke the `next build` script by running `bun run build` in your project root. This creates a `.next` directory with a production-ready admin bundle.
+1. Finally run `bun run start` to run Node in production and serve Payload from the `.build` directory.
 1. When you're ready to go live, see Deployment below for more details.
 
 ### Deploying to Payload Cloud
@@ -265,7 +343,7 @@ The easiest way to deploy your project is to use [Payload Cloud](https://payload
 This template can also be deployed to Vercel for free. You can get started by choosing the Vercel DB adapter during the setup of the template or by manually installing and configuring it:
 
 ```bash
-pnpm add @payloadcms/db-vercel-postgres
+bun add @payloadcms/db-vercel-postgres
 ```
 
 ```ts
@@ -285,7 +363,7 @@ export default buildConfig({
 We also support Vercel's blob storage:
 
 ```bash
-pnpm add @payloadcms/storage-vercel-blob
+bun add @payloadcms/storage-vercel-blob
 ```
 
 ```ts

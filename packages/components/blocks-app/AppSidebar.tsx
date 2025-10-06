@@ -41,30 +41,21 @@ export function AppSidebar({ items, onToggle: _onToggle }: AppSidebarProps) {
       >
         <div className="flex items-center gap-3">
           <div className="flex-shrink-0">
-            <Link
-              href={{
-                pathname: `/`,
-              }}
-              target="_blank"
-            >
-              <img
-                src="/images/logo.svg"
-                alt="Jambo Logo"
-                className="w-8 h-8"
-                width="32"
-                height="32"
-              />
+
+            <Link href={{pathname:`/`}} target="_blank">
+            <img 
+              src="/images/logo.svg" 
+              alt="altrp Logo" 
+              className="w-8 h-8"
+              width="32"
+              height="32"
+            />
             </Link>
           </div>
           <div>
-            <Link
-              href={{
-                pathname: `/`,
-              }}
-              target="_blank"
-            >
-              <h2 className="text-lg font-semibold">Jambo</h2>
-              <p className="text-xs text-muted-foreground">Admin Panel</p>
+            <Link href={`/`} target="_blank">
+            <h2 className="text-lg font-semibold">altrp</h2>
+            <p className="text-xs text-muted-foreground">Admin Panel</p>
             </Link>
           </div>
         </div>

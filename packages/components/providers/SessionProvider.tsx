@@ -21,18 +21,16 @@ export function SessionProvider({
 }) {
   const [sessionState, setSessionState] = useState<any | null>(session);
 
-  const setToSessionClient = useCallback(
-    (key: string, value: any) => {
-      setSessionState((prev: any) => ({ ...prev, [key]: value }));
-      fetch("/api/jambo-session", {
-        method: "POST",
-        body: JSON.stringify({ key, value }),
-      }).catch((error) => {
-        console.error("Error setting session:", error);
-      });
-    },
-    [sessionState],
-  );
+
+  const setToSessionClient = useCallback((key: string, value: any) => {
+    setSessionState((prev: any) => ({ ...prev, [key]: value }));
+    fetch('/api/altrp-session', {
+      method: 'POST',
+      body: JSON.stringify({ key, value }),
+    }).catch((error) => {
+      console.error('Error setting session:', error);
+    });
+  }, [sessionState]);
 
   return (
     <SessionContext.Provider

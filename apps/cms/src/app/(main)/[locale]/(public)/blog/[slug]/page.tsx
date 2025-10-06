@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
 
   if (!post) {
     return {
-      title: 'Post Not Found | Jambo Blog',
+      title: 'Post Not Found | altrp Blog',
       description: 'The requested blog post could not be found.',
     };
   }
@@ -30,26 +30,26 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
     mediaData = await mediaRepository.findBySlug(post.media);
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://jambo.example.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://altrp.example.com';
   const postUrl = `${baseUrl}/${locale}/blog/${slug}`;
-  
+
   // Build image URL if media exists
   const imageUrl = mediaData ? `${baseUrl}${mediaData.url}` : undefined;
 
   return {
-    title: `${post.title} | Jambo Blog`,
+    title: `${post.title} | altrp Blog`,
     description: post.excerpt || post.description || `Read the article "${post.title}" on our blog`,
     keywords: post.tags?.join(', ') || '',
-    authors: [{ name: 'Jambo Team' }],
+    authors: [{ name: 'altrp Team' }],
     openGraph: {
       title: post.title,
       description: post.excerpt || post.description,
       type: 'article',
       url: postUrl,
       locale: locale === 'ru' ? 'ru_RU' : 'en_US',
-      siteName: 'Jambo Blog',
+      siteName: 'altrp Blog',
       publishedTime: post.date,
-      authors: ['Jambo Team'],
+      authors: ['altrp Team'],
       tags: post.tags,
       ...(imageUrl && {
         images: [
@@ -87,20 +87,20 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   return (
     <Container className="py-8 max-w-4xl">
-        <header className="mb-8">
-          <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
-          <PostMeta 
-            date={post.date}
-            author={post.author} 
-            category={post.category}
-            className="mb-4"
-          />
-          <PostTags tags={post.tags || []} />
-        </header>
-        
-        <div className="prose prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: post.content || '' }}>
-          
-        </div>
-      </Container>
+      <header className="mb-8">
+        <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
+        <PostMeta
+          date={post.date}
+          author={post.author}
+          category={post.category}
+          className="mb-4"
+        />
+        <PostTags tags={post.tags || []} />
+      </header>
+
+      <div className="prose prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: post.content || '' }}>
+
+      </div>
+    </Container>
   );
 }

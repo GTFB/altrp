@@ -7,7 +7,7 @@ export default async function LocalizedHome({ params }: { params: Promise<{ loca
   return (
     <Container className="py-8">
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4">{t('welcomeToJambo')}</h1>
+        <h1 className="text-4xl font-bold mb-4">{t('welcomeToaltrp')}</h1>
         <p className="text-xl text-muted-foreground">
           {t('aModernGitAsCmsPoweredWebsite')}
         </p>

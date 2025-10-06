@@ -1067,7 +1067,7 @@
     "ourAuthors": "Наши авторы",
     "postsWithDemoAndHelloTags": "Статьи с тегами demo и hello",
     "readOurLatestArticlesAndUpdates": "Читайте наши последние статьи и обновления",
-    "welcomeToJambo": "Добро пожаловать в Jambo"
+    "welcomeToaltrp": "Добро пожаловать в altrp"
   },
   "layout": {
     "components": {
@@ -1140,7 +1140,7 @@
   },
   "project": {
     "description": "Генератор коммерческих предложений",
-    "name": "Jambo"
+    "name": "altrp"
   },
   "search": {
     "noHeadings": "Нет заголовков",

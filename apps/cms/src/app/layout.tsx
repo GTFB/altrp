@@ -8,26 +8,26 @@ import { i18nConfig } from '@/config/i18n';
 
 export const metadata = {
   title: {
-    default: 'Jambo - Git-as-CMS powered site',
-    template: '%s | Jambo',
+    default: 'altrp - Git-as-CMS powered site',
+    template: '%s | altrp',
   },
   description: 'A modern Git-as-CMS powered website built with Next.js, featuring a blog, internationalization, and beautiful UI components.',
   keywords: ['blog', 'cms', 'nextjs', 'react', 'typescript', 'tailwind'],
-  authors: [{ name: 'Jambo Team' }],
-  creator: 'Jambo Team',
+  authors: [{ name: 'altrp Team' }],
+  creator: 'altrp Team',
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://jambo.example.com',
-    siteName: 'Jambo',
-    title: 'Jambo - Git-as-CMS powered site',
+    url: 'https://altrp.example.com',
+    siteName: 'altrp',
+    title: 'altrp - Git-as-CMS powered site',
     description: 'A modern Git-as-CMS powered website built with Next.js',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Jambo - Git-as-CMS powered site',
+    title: 'altrp - Git-as-CMS powered site',
     description: 'A modern Git-as-CMS powered website built with Next.js',
-    creator: '@jambo',
+    creator: '@altrp',
   },
   robots: {
     index: true,

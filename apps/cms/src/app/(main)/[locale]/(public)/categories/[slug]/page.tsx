@@ -20,17 +20,17 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 
   if (!category) {
     return {
-      title: 'Category Not Found | Jambo Blog',
+      title: 'Category Not Found | altrp Blog',
       description: 'The requested category could not be found.',
     };
   }
 
   const { locale } = await params;
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://jambo.example.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://altrp.example.com';
   const categoryUrl = `${baseUrl}/${locale}/categories/${slug}`;
 
   return {
-    title: `${category.title} | Categories | Jambo Blog`,
+    title: `${category.title} | Categories | altrp Blog`,
     description: category.excerpt || `Read articles in ${category.title} category`,
     keywords: category.tags?.join(', ') || '',
     openGraph: {
@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
       type: 'website',
       url: categoryUrl,
       locale: locale === 'ru' ? 'ru_RU' : 'en_US',
-      siteName: 'Jambo Blog',
+      siteName: 'altrp Blog',
     },
     twitter: {
       card: 'summary',
@@ -56,7 +56,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const { slug, locale } = await params;
   const categoryRepo = CategoryRepository.getInstance();
   const category = await categoryRepo.findBySlug(slug);
-  const t = await getTranslations({ locale, namespace: 'category' });  
+  const t = await getTranslations({ locale, namespace: 'category' });
   if (!category) {
     notFound();
   }
@@ -89,7 +89,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           </div>
         )}
         {category.content && (
-          <div 
+          <div
             className="prose prose-lg max-w-none mx-auto"
             dangerouslySetInnerHTML={{ __html: category.content }}
           />

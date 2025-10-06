@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: PagePropsWithLocale): Promise
 
   if (!page) {
     return {
-      title: 'Page Not Found | Jambo',
+      title: 'Page Not Found | altrp',
       description: 'The requested page could not be found.',
     };
   }
@@ -36,14 +36,14 @@ export async function generateMetadata({ params }: PagePropsWithLocale): Promise
   }
 
   const { locale } = await params;
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://jambo.example.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://altrp.example.com';
   const pageUrl = `${baseUrl}/${locale}/${slug}`;
   
   // Build image URL if media exists
   const imageUrl = mediaData ? `${baseUrl}${mediaData.url}` : undefined;
 
   return {
-    title: page.title ? `${page.title} | Jambo` : 'Jambo',
+    title: page.title ? `${page.title} | altrp` : 'altrp',
     description: page.description || `Read the page "${page.title}" on our site`,
     openGraph: {
       title: page.title,
@@ -51,7 +51,7 @@ export async function generateMetadata({ params }: PagePropsWithLocale): Promise
       type: 'website',
       url: pageUrl,
       locale: locale === 'ru' ? 'ru_RU' : 'en_US',
-      siteName: 'Jambo',
+      siteName: 'altrp',
       ...(imageUrl && {
         images: [
           {

@@ -4,7 +4,7 @@ import { Container } from '@/components/misc/layout/Container';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Authors | Jambo Blog',
+  title: 'Authors | altrp Blog',
   description: 'Meet our talented authors and discover their stories.',
 };
 

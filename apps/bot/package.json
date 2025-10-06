@@ -1,0 +1,50 @@
+{
+  "name": "telegram-bot",
+  "version": "1.0.0",
+  "description": "Telegram bot for Maikloriss supporting both Cloudflare Workers and Node.js",
+  "main": "src/worker.ts",
+  "scripts": {
+    "build:worker": "tsc -p tsconfig.worker.json",
+    "build:nodejs": "tsc -p tsconfig.nodejs.json",
+    "generate:content": "node src/core/generate-content.ts",
+    "dev": "npm run generate:content && wrangler dev",
+    "dev:nodejs": "npm run generate:content && nodemon src/nodejs/server.js",
+    "start:worker": "npm run generate:content && wrangler dev",
+    "start:nodejs": "npm run generate:content && node src/nodejs/server.js",
+    "deploy": "npm run generate:content && wrangler deploy",
+    "deploy:dev": "npm run generate:content && wrangler deploy --env development",
+    "deploy:prod": "npm run generate:content && wrangler deploy --env production",
+    "d1:create": "wrangler d1 create maikloriss-db",
+    "d1:migrate": "wrangler d1 migrations apply maikloriss-db",
+    "d1:local": "wrangler d1 execute maikloriss-db --local --file=./schema.sql",
+    "d1:remote": "wrangler d1 execute maikloriss-db --file=./schema.sql"
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "cloudflare",
+    "workers",
+    "d1",
+    "nodejs",
+    "postgresql",
+    "redis"
+  ],
+  "author": "Maikloriss",
+  "license": "MIT",
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20231218.0",
+    "@types/node": "^20.10.0",
+    "@types/pg": "^8.10.0",
+    "typescript": "^5.3.0",
+    "wrangler": "^3.19.0",
+    "nodemon": "^3.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.12.2",
+    "express": "^4.18.0",
+    "pg": "^8.11.0",
+    "redis": "^4.6.0",
+    "node-cron": "^3.0.0",
+    "dotenv": "^16.0.0"
+  }
+}

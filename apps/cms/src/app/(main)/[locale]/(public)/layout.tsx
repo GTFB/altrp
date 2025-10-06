@@ -35,7 +35,7 @@ export default function Layout({
                 }}
                 className="flex items-center space-x-2">
                   <div className="h-8 w-8 rounded bg-primary"></div>
-                  <span className="text-xl font-bold">Jambo</span>
+                  <span className="text-xl font-bold">altrp</span>
                 </Link>
               </div>
 
@@ -113,7 +113,7 @@ export default function Layout({
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
                   <div className="h-8 w-8 rounded bg-primary"></div>
-                  <span className="text-xl font-bold">Jambo</span>
+                  <span className="text-xl font-bold">altrp</span>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   {t('discover_amazing_content_organized_by_tags_and_categories')}
@@ -204,7 +204,7 @@ export default function Layout({
             <Separator className="my-6" />
             <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
               <p className="text-sm text-muted-foreground">
-                © {new Date().getFullYear()} Jambo. {t('all_rights_reserved')}
+                © {new Date().getFullYear()} altrp. {t('all_rights_reserved')}
               </p>
               <div className="flex items-center space-x-6">
                 <Link 

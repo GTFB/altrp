@@ -1,8 +1,14 @@
 import type { Metadata } from "next";
-import { Geist, Playfair_Display, Roboto } from "next/font/google";
+import { Geist } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import { PROJECT_SETTINGS } from "@/settings";
+import { ScriptOptimizer } from "@/components/ui/script-optimizer";
+import { AccessibilityEnhancer } from "@/components/ui/accessibility-enhancer";
+import { PerformanceMonitor } from "@/components/ui/performance-monitor";
+import { PageTransition } from "@/components/ui/page-transition";
+import { StyleLoader } from "@/components/ui/style-loader";
+import { ToTopButton } from "@/components/home/ui/to-top-button";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -11,64 +17,45 @@ const geistSans = Geist({
   fallback: ['system-ui', 'arial'],
 });
 
-const playfairDisplay = Playfair_Display({
-  variable: "--font-playfair-display",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
-  style: ["normal", "italic"],
-  display: "swap",
-  preload: true,
-  fallback: ['serif'],
-});
-
-const roboto = Roboto({
-  variable: "--font-roboto",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "700"],
-  display: "swap",
-  preload: false, // Не preload, так как используется реже
-  fallback: ['system-ui', 'arial'],
-});
-
 export const metadata: Metadata = {
-  metadataBase: new URL('https://finurcons.ru'),
-  title: "Финюр Консалтинг - Бухгалтерские и юридические услуги",
-  description: "Профессиональные бухгалтерские и юридические услуги в Краснодаре. Налоговое планирование, ведение учета, юридическое сопровождение бизнеса.",
+  metadataBase: new URL('https://altrp.org'),
+  title: "ALTRP",
+  description: "Digital Product Generation Platform",
   keywords: [
-    "бухгалтерские услуги",
-    "юридические услуги", 
-    "налоговое планирование",
-    "ведение учета",
-    "Краснодар",
-    "ООО",
-    "ИП",
-    "консалтинг",
-    "аудит",
-    "договоры"
+    "digital products",
+    "product generation",
+    "platform development",
+    "web applications",
+    "mobile apps",
+    "software development",
+    "digital solutions",
+    "productivity tools",
+    "automation",
+    "technology platform"
   ],
   openGraph: {
     type: "website",
-    siteName: "Финюр Консалтинг",
+    siteName: "ALTRP",
     locale: "ru_RU",
-    url: "https://finurcons.ru",
-    title: "Финюр Консалтинг - Ваши налоги и договоры под защитой",
-    description: "Крупнейший центр в Краснодарском крае, где бухгалтера, юристы и специалисты по тендерам работают как одна команда.",
+    url: "https://altrp.org",
+    title: "ALTRP - Digital Product Generation Platform",
+    description: "Digital Product Generation Platform",
     images: [
       {
         url: "/images/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Финюр Консалтинг - Бухгалтерские и юридические услуги",
+        alt: "ALTRP",
       },
     ],
   },
   authors: [
     {
-      name: "Финюр Консалтинг",
-      url: "https://finurcons.ru",
+      name: "ALTRP",
+      url: "https://altrp.org",
     },
   ],
-  creator: "Финюр Консалтинг",
+  creator: "ALTRP",
   icons: [
     {
       rel: "icon",
@@ -123,9 +110,16 @@ export default function RootLayout({
         <meta name="color-scheme" content="light dark" />
         <meta name="format-detection" content="telephone=no" />
       </head>
-      <body className={`${geistSans.variable} ${playfairDisplay.variable} ${roboto.variable} antialiased`} suppressHydrationWarning>
+
+      <body className={`${geistSans.variable} antialiased`} suppressHydrationWarning>
+        <StyleLoader />
+        <ScriptOptimizer />
+        <AccessibilityEnhancer />
+        <PerformanceMonitor />
         <ThemeProvider attribute="class" defaultTheme={PROJECT_SETTINGS.defaultTheme} enableSystem={false}>
+          <PageTransition>
             {children}
+          </PageTransition>
         </ThemeProvider>
       </body>
     </html>

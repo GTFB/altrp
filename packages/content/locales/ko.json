@@ -137,7 +137,7 @@
     "ourAuthors": "저자들",
     "postsWithDemoAndHelloTags": "데모와 헬로 태그가 있는 게시물",
     "readOurLatestArticlesAndUpdates": "최신 기사와 업데이트를 읽어보세요",
-    "welcomeToJambo": "Jambo에 오신 것을 환영합니다"
+    "welcomeToaltrp": "altrp에 오신 것을 환영합니다"
   },
   "navigation": {
     "about": "소개",
@@ -175,7 +175,7 @@
   },
   "project": {
     "description": "상업적 제안 생성기",
-    "name": "Jambo"
+    "name": "altrp"
   },
   "search": {
     "noHeadings": "제목이 없습니다",

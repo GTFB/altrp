@@ -142,7 +142,7 @@
     "ourAuthors": "Nuestros autores",
     "postsWithDemoAndHelloTags": "Artículos con etiquetas demo y hello",
     "readOurLatestArticlesAndUpdates": "Lee nuestros últimos artículos y actualizaciones",
-    "welcomeToJambo": "Bienvenido a Jambo"
+    "welcomeToaltrp": "Bienvenido a altrp"
   },
   "navigation": {
     "about": "Acerca de",
@@ -180,7 +180,7 @@
   },
   "project": {
     "description": "Generador de propuestas comerciales",
-    "name": "Jambo"
+    "name": "altrp"
   },
   "search": {
     "noHeadings": "Sin encabezados",
