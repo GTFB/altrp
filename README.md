@@ -145,8 +145,8 @@ git push -u origin main
 2. Go to **Pages** → **Create a project**
 3. Connect GitHub and select `<YOUR_PROJECT>`
 4. Configure build settings:
-   - **Build command**: `bun run build:site`
-   - **Build output**: `apps/site/dist`
+   - **Build command**: `bun run build`
+   - **Build output**: `dist`
    - **Root directory**: `apps/site`
    - **Build comments**: `Enabled`
 
