@@ -12,6 +12,8 @@
     "format": "prettier --write .",
     "prepare": "husky install",
     "test": "bun test",
+    "test:integration": "bun test tests/integration",
+    "test:integration:api-posts": "bun test tests/integration/api-posts.test.ts",
     "db:generate": "drizzle-kit generate --config=drizzle.config.ts",
     "db:migrate": "drizzle-kit migrate --config=drizzle.config.ts",
     "db:studio": "drizzle-kit studio --config=drizzle.config.ts",
@@ -28,7 +30,11 @@
     "test:e2e:accessibility-public": "playwright test tests/e2e/accessibility-public.spec.ts",
     "test:e2e:accessibility-public:ui": "playwright test tests/e2e/accessibility-public.spec.ts --ui",
     "test:e2e:accessibility-public:headed": "playwright test tests/e2e/accessibility-public.spec.ts --headed",
-    "test:e2e:accessibility-public:debug": "playwright test tests/e2e/accessibility-public.spec.ts --debug"
+    "test:e2e:accessibility-public:debug": "playwright test tests/e2e/accessibility-public.spec.ts --debug",
+    "test:e2e:api-posts": "playwright test tests/e2e/api-posts.spec.ts",
+    "test:e2e:api-posts:ui": "playwright test tests/e2e/api-posts.spec.ts --ui",
+    "test:e2e:api-posts:headed": "playwright test tests/e2e/api-posts.spec.ts --headed",
+    "test:e2e:api-posts:debug": "playwright test tests/e2e/api-posts.spec.ts --debug"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
@@ -112,6 +118,7 @@
     "@tailwindcss/postcss": "4.1.13",
     "@tailwindcss/typography": "^0.5.16",
     "@types/better-sqlite3": "^7.6.13",
+    "@types/bun": "^1.2.23",
     "@types/node": "^20.14.11",
     "@types/react": "^19",
     "@types/react-dom": "^19",
