@@ -28,6 +28,8 @@ describe('API Posts Categories Route - Integration Tests', () => {
     // mock PostRepository.getInstance to return a failing mock
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (PostRepository as any).getInstance = () => repoMock;
+    const originalError = console.error;
+    console.error = () => { };
 
     try {
       const response = await GET();
@@ -38,6 +40,7 @@ describe('API Posts Categories Route - Integration Tests', () => {
     } finally {
       // restore original method
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      console.error = originalError;
       (PostRepository as any).getInstance = original;
     }
   });

@@ -75,6 +75,12 @@ if ! bun run quick-test; then
     exit 1
 fi
 
+echo "🧪 Running integration tests..."
+if ! bun run test:integration; then
+    echo "❌ Integration tests failed. Aborting commit."
+    exit 1
+fi
+
 echo "🧪 Running build cms..."
 if ! bun run build:cms; then
     echo "❌ Running build failed. Aborting commit."

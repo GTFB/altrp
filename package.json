@@ -21,6 +21,7 @@
         "dev": "concurrently \"bun run dev:site\" \"bun run dev:cms\" \"bun run dev:app\"",
         "build": "bun run build:site && bun run build:cms && bun run build:app",
         "quick-test": "bun run --filter=altrp-cms test:e2e:quick-public",
+        "test:integration": "bun run --filter=altrp-cms test:integration",
         "db:cms:generate": "bun run --filter=altrp-cms db:generate",
         "db:cms:migrate": "bun run --filter=altrp-cms db:migrate",
         "db:cms:studio": "bun run --filter=altrp-cms db:studio",

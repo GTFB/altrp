@@ -169,7 +169,7 @@ export class MdxPostProvider implements PostDataProvider {
         author: (data as any).author,
       };
     } catch (error) {
-      console.error(`Error reading post ${slug}:`, error);
+      //console.error(`Error reading post ${slug}:`, error);
       return null;
     }
   }

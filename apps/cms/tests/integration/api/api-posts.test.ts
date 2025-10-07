@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'bun:test';
 import { NextRequest } from 'next/server';
 import { GET } from '@/app/api/posts/route';
+import { PostRepository } from '@/repositories/post.repository';
 
 describe('API Posts Route - Integration Tests', () => {
   describe('GET /api/posts', () => {
@@ -260,6 +261,35 @@ describe('API Posts Route - Integration Tests', () => {
         expect(Array.isArray(data.posts)).toBe(true);
         expect(typeof data.total).toBe('number');
         expect(typeof data.hasMore).toBe('boolean');
+      }
+    });
+
+    it('should return 500 on internal error', async () => {
+      const originalGetInstance = PostRepository.getInstance;
+      const originalConsoleError = console.error;
+
+      const failingRepo = {
+        findWithFilters: async () => {
+          throw new Error('Mocked failure');
+        },
+      } as unknown as PostRepository;
+
+      (PostRepository as unknown as { getInstance: () => PostRepository }).getInstance = () => failingRepo;
+      // silence error logs for this negative case
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      console.error = () => {};
+
+      try {
+        const request = new NextRequest('http://localhost:3000/api/posts');
+        const response = await GET(request);
+        const data = await response.json();
+
+        expect(response.status).toBe(500);
+        expect(data).toHaveProperty('error');
+      } finally {
+        // restore originals
+        (PostRepository as unknown as { getInstance: typeof originalGetInstance }).getInstance = originalGetInstance;
+        console.error = originalConsoleError;
       }
     });
   });
