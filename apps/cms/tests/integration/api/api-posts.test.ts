@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'bun:test';
 import { NextRequest } from 'next/server';
 import { GET } from '@/app/api/posts/route';
-import { PostRepository } from '@/repositories/post.repository';
 
 describe('API Posts Route - Integration Tests', () => {
   describe('GET /api/posts', () => {
@@ -265,6 +264,7 @@ describe('API Posts Route - Integration Tests', () => {
     });
 
     it('should return 500 on internal error', async () => {
+      const { PostRepository } = await import('@/repositories/post.repository');
       const originalGetInstance = PostRepository.getInstance;
       const originalConsoleError = console.error;
 
@@ -272,9 +272,9 @@ describe('API Posts Route - Integration Tests', () => {
         findWithFilters: async () => {
           throw new Error('Mocked failure');
         },
-      } as unknown as PostRepository;
+      } as any;
 
-      (PostRepository as unknown as { getInstance: () => PostRepository }).getInstance = () => failingRepo;
+      (PostRepository as any).getInstance = () => failingRepo;
       // silence error logs for this negative case
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       console.error = () => {};
@@ -288,7 +288,7 @@ describe('API Posts Route - Integration Tests', () => {
         expect(data).toHaveProperty('error');
       } finally {
         // restore originals
-        (PostRepository as unknown as { getInstance: typeof originalGetInstance }).getInstance = originalGetInstance;
+        (PostRepository as any).getInstance = originalGetInstance;
         console.error = originalConsoleError;
       }
     });

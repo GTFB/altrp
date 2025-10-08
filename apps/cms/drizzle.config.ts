@@ -5,7 +5,7 @@ export default defineConfig({
 	out: '../../migrations/cms',
 	dialect: 'sqlite',
 	dbCredentials: {
-		url: process.env.CMS_SQLITE_PATH || 'apps/cms/db.sqlite',
+		url: process.env.CMS_SQLITE_PATH || '../../packages/db/cms.database.sqlite',
 	},
 });
 

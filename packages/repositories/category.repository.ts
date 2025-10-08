@@ -1,7 +1,7 @@
 import { getContentDir } from "@/lib/content-path";
 import type { Category } from "@/types/category";
 import type { CategoryDataProvider } from "@/types/providers";
-import { MdxCategoryProvider } from "./providers/mdx";
+import { createCategoryProvider } from "@/repositories/providers/factory";
 
 // const categorySchema = z.object({
 //   title: z.string(),
@@ -17,7 +17,7 @@ export class CategoryRepository {
 
   private constructor() {
     // Markdown configuration is handled in packages/lib/markdown.ts
-    this.provider = new MdxCategoryProvider();
+    this.provider = createCategoryProvider();
   }
 
   public static getInstance(): CategoryRepository {

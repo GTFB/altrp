@@ -1,7 +1,7 @@
 import { getContentDir } from "@/lib/content-path";
 import type { Page, PageFilters, PageSortOptions } from "@/types/page";
 import type { PageDataProvider } from "@/types/providers";
-import { MdxPageProvider } from "./providers/mdx";
+import { createPageProvider } from "./providers/factory";
 
 // types are imported from '@/types/page'
 
@@ -12,7 +12,7 @@ export class PageRepository {
 
   private constructor() {
     // Markdown configuration is handled in packages/lib/markdown.ts
-    this.provider = new MdxPageProvider();
+    this.provider = createPageProvider();
   }
 
   public static getInstance(): PageRepository {

@@ -18,7 +18,7 @@ export class ComponentRepository {
     "../../",
     "packages",
     "components",
-    "widgets",
+    "widget",
   );
 
   constructor() {

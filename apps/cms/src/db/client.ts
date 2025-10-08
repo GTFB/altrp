@@ -1,9 +1,14 @@
-import Database from 'better-sqlite3';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
+import { Database } from 'bun:sqlite';
+import { drizzle } from 'drizzle-orm/bun-sqlite';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 
-const dbFile = process.env.CMS_SQLITE_PATH || 'apps/cms/db.sqlite';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-export const sqlite = new Database(dbFile);
+const dbFile = process.env.CMS_SQLITE_PATH || join(__dirname, '../../../../packages/db/cms.database.sqlite');
+
+const sqlite = new Database(dbFile);
 export const db = drizzle(sqlite);
 
 

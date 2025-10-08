@@ -20,6 +20,8 @@ export interface AuthorDataProvider {
   createAuthor(
     authorData: Omit<Author, "slug"> & { slug: string },
   ): Promise<Author | null>;
+  deleteAuthor(slug: string): Promise<boolean>;
+  updateAuthor(oldSlug: string, updates: Partial<Author> & { newSlug?: string }): Promise<Author | null>;
 }
 
 export interface CategoryDataProvider {

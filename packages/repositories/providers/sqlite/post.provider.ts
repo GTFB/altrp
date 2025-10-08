@@ -6,14 +6,17 @@ import type {
   PaginationOptions,
   PaginatedResult,
 } from "@/types/post";
-import { db } from "../../../../apps/cms/src/db/client";
-import { posts } from "../../../../apps/cms/src/db/schema";
+// lazy imports to avoid initializing sqlite client at module load time
+const loadDb = async () => (await import("../../../../apps/cms/src/db/client")).db;
+const loadSchema = async () => (await import("../../../../apps/cms/src/db/schema")).posts;
 import { and, eq } from "drizzle-orm";
 import { parseMarkdown } from "@/lib/markdown";
 import { i18nConfig } from "../../../../apps/cms/src/config/i18n";
 
 export class SqlitePostProvider implements PostDataProvider {
   async findAll(): Promise<Post[]> {
+    const db = await loadDb();
+    const posts = await loadSchema();
     const rows = await db.select().from(posts);
     return Promise.all(
       rows.map(async (r) => ({
@@ -85,6 +88,8 @@ export class SqlitePostProvider implements PostDataProvider {
     slug: string,
     locale: string = i18nConfig.defaultLocale,
   ): Promise<Post | null> {
+    const db = await loadDb();
+    const posts = await loadSchema();
     const rows = await db
       .select()
       .from(posts)
@@ -112,6 +117,8 @@ export class SqlitePostProvider implements PostDataProvider {
   }
 
   async findAllCategories(): Promise<string[]> {
+    const db = await loadDb();
+    const posts = await loadSchema();
     const rows = await db.select({ category: posts.category }).from(posts);
     const set = new Set<string>();
     rows.forEach((r) => {
@@ -121,6 +128,8 @@ export class SqlitePostProvider implements PostDataProvider {
   }
 
   async findAllAuthors(): Promise<string[]> {
+    const db = await loadDb();
+    const posts = await loadSchema();
     const rows = await db.select({ author: posts.author }).from(posts);
     const set = new Set<string>();
     rows.forEach((r) => {
@@ -145,6 +154,8 @@ export class SqlitePostProvider implements PostDataProvider {
   }
 
   async findAllTags(): Promise<Array<{ tag: string; count: number }>> {
+    const db = await loadDb();
+    const posts = await loadSchema();
     const rows = await db.select({ tagsJson: posts.tagsJson }).from(posts);
     const counts = new Map<string, number>();
     rows.forEach((r) => {
@@ -177,6 +188,8 @@ export class SqlitePostProvider implements PostDataProvider {
   async createPost(
     postData: Omit<Post, "slug"> & { slug: string },
   ): Promise<Post | null> {
+    const db = await loadDb();
+    const posts = await loadSchema();
     await db.insert(posts).values({
       slug: postData.slug,
       locale: i18nConfig.defaultLocale,

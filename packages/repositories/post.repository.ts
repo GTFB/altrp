@@ -4,9 +4,9 @@ import {
   SearchResult,
   SearchOptions,
 } from "./base.repository";
-import { i18nConfig } from "../../apps/cms/src/config/i18n";
+import { PROJECT_SETTINGS, SUPPORTED_LANGUAGES } from "@/settings";
 import type { PostDataProvider } from "@/types/providers";
-import { MdxPostProvider } from "./providers/mdx";
+import { createPostProvider } from "@/repositories/providers/factory";
 import type {
   Post,
   PostFilters,
@@ -24,7 +24,7 @@ export class PostRepository implements BaseSearchableRepository<Post> {
 
   private constructor() {
     // Markdown configuration is handled in packages/lib/markdown.ts
-    this.provider = new MdxPostProvider();
+    this.provider = createPostProvider();
   }
 
   public static getInstance(): PostRepository {
@@ -67,7 +67,7 @@ export class PostRepository implements BaseSearchableRepository<Post> {
 
   async findBySlug(
     slug: string,
-    locale: string = i18nConfig.defaultLocale,
+    locale: string = PROJECT_SETTINGS.defaultLanguage,
   ): Promise<Post | null> {
     return this.provider.findBySlug(slug, locale);
   }

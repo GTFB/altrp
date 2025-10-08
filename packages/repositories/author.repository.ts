@@ -1,7 +1,7 @@
 import { getContentDir } from "@/lib/content-path";
 import type { AuthorDataProvider } from "@/types/providers";
 import type { Author } from "@/types/author";
-import { MdxAuthorProvider } from "./providers/mdx";
+import { createAuthorProvider } from "@/repositories/providers/factory";
 
 // const authorSchema = z.object({
 //   name: z.string(),
@@ -18,7 +18,7 @@ export class AuthorRepository {
 
   private constructor() {
     // Markdown configuration is handled in packages/lib/markdown.ts
-    this.provider = new MdxAuthorProvider();
+    this.provider = createAuthorProvider();
   }
 
   public static getInstance(): AuthorRepository {
@@ -40,5 +40,16 @@ export class AuthorRepository {
     authorData: Omit<Author, "slug"> & { slug: string },
   ): Promise<Author | null> {
     return this.provider.createAuthor(authorData);
+  }
+
+  async deleteAuthor(slug: string): Promise<boolean> {
+    return this.provider.deleteAuthor(slug);
+  }
+
+  async updateAuthor(
+    oldSlug: string,
+    updates: Partial<Author> & { newSlug?: string },
+  ): Promise<Author | null> {
+    return this.provider.updateAuthor(oldSlug, updates);
   }
 }

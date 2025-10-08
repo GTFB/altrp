@@ -87,4 +87,46 @@ export class MdxAuthorProvider implements AuthorDataProvider {
       return null;
     }
   }
+
+  async deleteAuthor(slug: string): Promise<boolean> {
+    try {
+      const filePath = path.join(this.contentDir, `${slug}.mdx`);
+      await fs.unlink(filePath);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  async updateAuthor(
+    oldSlug: string,
+    updates: Partial<Author> & { newSlug?: string },
+  ): Promise<Author | null> {
+    const currentPath = path.join(this.contentDir, `${oldSlug}.mdx`);
+    try {
+      const raw = await fs.readFile(currentPath, "utf8");
+      const { data, content } = matter(raw);
+      const merged = {
+        name: updates.name ?? data.name,
+        avatar: updates.avatar ?? data.avatar,
+        bio: updates.bio ?? data.bio,
+      };
+      const validated = authorSchema.parse(merged);
+      const newSlug = updates.newSlug || oldSlug;
+      const newPath = path.join(this.contentDir, `${newSlug}.mdx`);
+      const mdxContent = `---\n${Object.entries(validated)
+        .filter(([_, value]) => value !== undefined && value !== null)
+        .map(([key, value]) => `${key}: ${typeof value === "string" ? `"${value}"` : value}`)
+        .join("\n")}\n---\n\n${updates.content ?? content}`;
+      if (newSlug !== oldSlug) {
+        await fs.writeFile(newPath, mdxContent, "utf8");
+        await fs.unlink(currentPath);
+      } else {
+        await fs.writeFile(currentPath, mdxContent, "utf8");
+      }
+      return this.findBySlug(newSlug);
+    } catch (e) {
+      return null;
+    }
+  }
 }

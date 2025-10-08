@@ -1,7 +1,7 @@
 import { getContentDir } from "@/lib/content-path";
 import type { Media, MediaFilters, MediaSortOptions } from "@/types/media";
 import type { MediaDataProvider } from "@/types/providers";
-import { MdxMediaProvider } from "./providers/mdx";
+import { createMediaProvider } from "./providers/factory";
 
 // const mediaSchema = z.object({
 //   title: z.string(),
@@ -30,7 +30,7 @@ export class MediaRepository {
 
   private constructor() {
     // Markdown configuration is handled in packages/lib/markdown.ts
-    this.provider = new MdxMediaProvider();
+    this.provider = createMediaProvider();
   }
 
   public static getInstance(): MediaRepository {

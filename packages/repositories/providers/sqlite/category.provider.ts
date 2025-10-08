@@ -1,11 +1,13 @@
 import type { CategoryDataProvider } from "@/types/providers";
 import type { Category } from "@/types/category";
-import { db } from "../../../../apps/cms/src/db/client";
-import { categories } from "../../../../apps/cms/src/db/schema";
+const loadDb = async () => (await import("../../../../apps/cms/src/db/client")).db;
+const loadCategories = async () => (await import("../../../../apps/cms/src/db/schema")).categories;
 import { eq } from "drizzle-orm";
 
 export class SqliteCategoryProvider implements CategoryDataProvider {
   async findAll(): Promise<Category[]> {
+    const db = await loadDb();
+    const categories = await loadCategories();
     const rows = await db.select().from(categories);
     return rows.map((r) => ({
       slug: r.slug!,
@@ -18,6 +20,8 @@ export class SqliteCategoryProvider implements CategoryDataProvider {
   }
 
   async findBySlug(slug: string): Promise<Category | null> {
+    const db = await loadDb();
+    const categories = await loadCategories();
     const rows = await db
       .select()
       .from(categories)
@@ -39,6 +43,8 @@ export class SqliteCategoryProvider implements CategoryDataProvider {
   async createCategory(
     categoryData: Omit<Category, "slug"> & { slug: string },
   ): Promise<Category | null> {
+    const db = await loadDb();
+    const categories = await loadCategories();
     await db.insert(categories).values({
       slug: categoryData.slug,
       title: categoryData.title,
