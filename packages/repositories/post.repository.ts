@@ -108,4 +108,15 @@ export class PostRepository implements BaseSearchableRepository<Post> {
   ): Promise<Post | null> {
     return this.provider.createPost(postData);
   }
+
+  async updatePost(
+    oldSlug: string,
+    updates: Partial<Post>,
+  ): Promise<Post | null> {
+    return this.provider.updatePost(oldSlug, updates);
+  }
+
+  async deletePost(slug: string): Promise<boolean> {
+    return this.provider.deletePost(slug);
+  }
 }

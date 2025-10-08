@@ -27,6 +27,9 @@
       "@/packages/*": [
         "../../packages/*"
       ],
+      "@/db/*": [
+        "../../packages/db/*"
+      ],
       "@/lib/*": [
         "../../packages/lib/*",
         "./src/lib/*"
@@ -46,6 +49,9 @@
       "@/types/*": [
         "../../packages/types/*",
         "./src/types/*"
+      ],
+      "@/settings": [
+        "../../settings.ts"
       ]
     },
     "plugins": [
@@ -58,8 +64,9 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
-, "../../packages/types/page-editor.ts"  ],
+    ".next/types/**/*.ts",
+    "../../packages/types/page-editor.ts"
+  ],
   "exclude": [
     "node_modules"
   ]

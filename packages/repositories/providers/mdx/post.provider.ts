@@ -290,4 +290,69 @@ export class MdxPostProvider implements PostDataProvider {
       return null;
     }
   }
+
+  async updatePost(
+    oldSlug: string,
+    updates: Partial<Post>,
+  ): Promise<Post | null> {
+    try {
+      const existing = await this.findBySlug(oldSlug);
+      if (!existing) return null;
+
+      const newSlug = (updates as any).slug || oldSlug;
+      const oldPath = path.join(this.contentDir, oldSlug);
+      const newPath = path.join(this.contentDir, newSlug);
+
+      // Prepare updated data
+      const updatedPost = { ...existing, ...updates, slug: newSlug };
+      
+      const frontmatter = frontmatterSchema.parse({
+        title: updatedPost.title,
+        description: updatedPost.description,
+        date: updatedPost.date || new Date().toISOString().split("T")[0],
+        tags: updatedPost.tags || [],
+        excerpt: updatedPost.excerpt,
+        category: updatedPost.category,
+        author: updatedPost.author,
+        media: updatedPost.media,
+        seoTitle: updatedPost.seoTitle,
+        seoDescription: updatedPost.seoDescription,
+        seoKeywords: updatedPost.seoKeywords,
+      });
+
+      const mdxContent = `---\n${Object.entries(frontmatter)
+        .filter(([_, value]) => value !== undefined && value !== null)
+        .map(([key, value]) => {
+          if (Array.isArray(value))
+            return `${key}: [${value.map((v) => `"${v}"`).join(", ")}]`;
+          return `${key}: ${typeof value === "string" ? `"${value}"` : value}`;
+        })
+        .join("\n")}\n---\n\n${updatedPost.content || ""}`;
+
+      // If slug changed, rename directory
+      if (newSlug !== oldSlug) {
+        await fs.mkdir(newPath, { recursive: true });
+        await fs.writeFile(path.join(newPath, "index.mdx"), mdxContent, "utf8");
+        await fs.rm(oldPath, { recursive: true, force: true });
+      } else {
+        await fs.writeFile(path.join(oldPath, "index.mdx"), mdxContent, "utf8");
+      }
+
+      return this.findBySlug(newSlug);
+    } catch (error) {
+      console.error("Error updating post:", error);
+      return null;
+    }
+  }
+
+  async deletePost(slug: string): Promise<boolean> {
+    try {
+      const postPath = path.join(this.contentDir, slug);
+      await fs.rm(postPath, { recursive: true, force: true });
+      return true;
+    } catch (error) {
+      console.error("Error deleting post:", error);
+      return false;
+    }
+  }
 }

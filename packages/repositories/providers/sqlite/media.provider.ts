@@ -1,13 +1,11 @@
 import type { MediaDataProvider } from "@/types/providers";
 import type { Media, MediaFilters, MediaSortOptions } from "@/types/media";
-const loadDb = async () => (await import("../../../../apps/cms/src/db/client")).db;
-const loadMedia = async () => (await import("../../../../apps/cms/src/db/schema")).media;
+import { db } from "@/db/client";
+import { media } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export class SqliteMediaProvider implements MediaDataProvider {
   async findAll(): Promise<Media[]> {
-    const db = await loadDb();
-    const media = await loadMedia();
     const rows = await db.select().from(media);
     return rows.map((r) => ({
       slug: r.slug!,
@@ -51,8 +49,6 @@ export class SqliteMediaProvider implements MediaDataProvider {
   }
 
   async findBySlug(slug: string): Promise<Media | null> {
-    const db = await loadDb();
-    const media = await loadMedia();
     const rows = await db
       .select()
       .from(media)
@@ -78,8 +74,6 @@ export class SqliteMediaProvider implements MediaDataProvider {
   }
 
   async findAllTypes(): Promise<string[]> {
-    const db = await loadDb();
-    const media = await loadMedia();
     const rows = await db.select({ type: media.type }).from(media);
     const set = new Set<string>();
     rows.forEach((r) => {
@@ -89,8 +83,6 @@ export class SqliteMediaProvider implements MediaDataProvider {
   }
 
   async findAllTags(): Promise<string[]> {
-    const db = await loadDb();
-    const media = await loadMedia();
     const rows = await db.select({ tagsJson: media.tagsJson }).from(media);
     const set = new Set<string>();
     rows.forEach((r) => {
@@ -100,8 +92,6 @@ export class SqliteMediaProvider implements MediaDataProvider {
   }
 
   async findByType(type: NonNullable<Media["type"]>): Promise<Media[]> {
-    const db = await loadDb();
-    const media = await loadMedia();
     const rows = await db
       .select()
       .from(media)
@@ -143,8 +133,6 @@ export class SqliteMediaProvider implements MediaDataProvider {
   async createMedia(
     mediaData: Omit<Media, "slug"> & { slug: string },
   ): Promise<Media | null> {
-    const db = await loadDb();
-    const media = await loadMedia();
     await db.insert(media).values({
       slug: mediaData.slug,
       title: mediaData.title,
@@ -167,8 +155,6 @@ export class SqliteMediaProvider implements MediaDataProvider {
     oldSlug: string,
     updates: Partial<Media>,
   ): Promise<Media | null> {
-    const db = await loadDb();
-    const media = await loadMedia();
     const existing = await this.findBySlug(oldSlug);
     if (!existing) return null;
     const newSlug = (updates as any).slug || oldSlug;
@@ -178,8 +164,6 @@ export class SqliteMediaProvider implements MediaDataProvider {
   }
 
   async deleteMedia(slug: string): Promise<boolean> {
-    const db = await loadDb();
-    const media = await loadMedia();
     await db.delete(media).where(eq(media.slug, slug));
     return true;
   }

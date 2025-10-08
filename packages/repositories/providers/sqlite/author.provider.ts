@@ -1,11 +1,11 @@
 import type { AuthorDataProvider } from "@/types/providers";
 import type { Author } from "@/types/author";
+import { db } from "@/db/client";
+import { authors } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export class SqliteAuthorProvider implements AuthorDataProvider {
   async findAll(): Promise<Author[]> {
-    const { db } = await import("../../../../apps/cms/src/db/client");
-    const { authors } = await import("../../../../apps/cms/src/db/schema");
     const rows = await db.select().from(authors);
     return rows.map((r) => ({
       slug: r.slug!,
@@ -17,8 +17,6 @@ export class SqliteAuthorProvider implements AuthorDataProvider {
   }
 
   async findBySlug(slug: string): Promise<Author | null> {
-    const { db } = await import("../../../../apps/cms/src/db/client");
-    const { authors } = await import("../../../../apps/cms/src/db/schema");
     const rows = await db
       .select()
       .from(authors)
@@ -39,8 +37,6 @@ export class SqliteAuthorProvider implements AuthorDataProvider {
   async createAuthor(
     authorData: Omit<Author, "slug"> & { slug: string },
   ): Promise<Author | null> {
-    const { db } = await import("../../../../apps/cms/src/db/client");
-    const { authors } = await import("../../../../apps/cms/src/db/schema");
     await db.insert(authors).values({
       slug: authorData.slug,
       name: authorData.name,
@@ -52,8 +48,6 @@ export class SqliteAuthorProvider implements AuthorDataProvider {
   }
 
   async deleteAuthor(slug: string): Promise<boolean> {
-    const { db } = await import("../../../../apps/cms/src/db/client");
-    const { authors } = await import("../../../../apps/cms/src/db/schema");
     const res = await db.delete(authors).where(eq(authors.slug, slug));
     // drizzle better-sqlite3 returns info via changes on run; treat success if no error
     return true;
@@ -63,8 +57,6 @@ export class SqliteAuthorProvider implements AuthorDataProvider {
     oldSlug: string,
     updates: Partial<Author> & { newSlug?: string },
   ): Promise<Author | null> {
-    const { db } = await import("../../../../apps/cms/src/db/client");
-    const { authors } = await import("../../../../apps/cms/src/db/schema");
     const values: any = {};
     if (updates.name !== undefined) values.name = updates.name;
     if (updates.avatar !== undefined) values.avatar = updates.avatar;

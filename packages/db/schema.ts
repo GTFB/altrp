@@ -69,4 +69,3 @@ export const media = sqliteTable('media', {
 	tagsJson: text('tags_json'),
 });
 
-

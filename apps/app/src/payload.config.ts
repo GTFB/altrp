@@ -90,7 +90,7 @@ export default buildConfig({
       })
     : sqliteAdapter({
         client: {
-          url: process.env.DATABASE_URL || 'file:../../packages/db/app.database.sqlite',
+          url: process.env.DATABASE_URL || 'file:../../packages/data/app.database.sqlite',
         },
       }),
   collections: [Pages, Posts, Media, Categories, Archieve, ArchieveVariant, Base, BaseMove, BaseMoveRout, Contractor, Deal, DealProduct, Echelon, EchelonEmployee, Finance, Goal, Human, Identity, JournalActivity, JournalConnection, JournalGeneration, JournalSystem, Key, Location, Relation, Taxonomy, Users],

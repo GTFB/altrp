@@ -17,6 +17,9 @@
       "@/*": [
         "./*"
       ],
+      "@/db/*": [
+        "./packages/db/*"
+      ],
       "@/lib/*": [
         "./packages/lib/*"
       ],
@@ -31,6 +34,9 @@
       ],
       "@/types/*": [
         "./packages/types/*"
+      ],
+      "@/settings": [
+        "./settings.ts"
       ]
     }
   },

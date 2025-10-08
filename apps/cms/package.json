@@ -6,9 +6,9 @@
     "bun": ">=1.1.0"
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "bun --bun next dev",
     "build": "next build --experimental-build-mode compile",
-    "start": "next start",
+    "start": "bun --bun next start",
     "format": "prettier --write .",
     "prepare": "husky install",
     "test": "bun test",

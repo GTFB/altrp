@@ -96,4 +96,6 @@ export interface PostDataProvider {
   createPost(
     postData: Omit<Post, "slug"> & { slug: string },
   ): Promise<Post | null>;
+  updatePost(oldSlug: string, updates: Partial<Post>): Promise<Post | null>;
+  deletePost(slug: string): Promise<boolean>;
 }

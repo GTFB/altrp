@@ -1,14 +1,12 @@
 import type { PageDataProvider } from "@/types/providers";
 import type { Page, PageFilters, PageSortOptions } from "@/types/page";
-const loadDb = async () => (await import("../../../../apps/cms/src/db/client")).db;
-const loadPages = async () => (await import("../../../../apps/cms/src/db/schema")).pages;
+import { db } from "@/db/client";
+import { pages } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { parseMarkdown } from "@/lib/markdown";
 
 export class SqlitePageProvider implements PageDataProvider {
   async findAll(): Promise<Page[]> {
-    const db = await loadDb();
-    const pages = await loadPages();
     const rows = await db.select().from(pages);
     return Promise.all(
       rows.map(async (r) => ({
@@ -38,8 +36,6 @@ export class SqlitePageProvider implements PageDataProvider {
   }
 
   async findBySlug(slug: string): Promise<Page | null> {
-    const db = await loadDb();
-    const pages = await loadPages();
     const rows = await db
       .select()
       .from(pages)
@@ -65,8 +61,6 @@ export class SqlitePageProvider implements PageDataProvider {
   }
 
   async findAllTags(): Promise<string[]> {
-    const db = await loadDb();
-    const pages = await loadPages();
     const rows = await db.select({ tagsJson: pages.tagsJson }).from(pages);
     const set = new Set<string>();
     rows.forEach((r) => {
@@ -94,8 +88,6 @@ export class SqlitePageProvider implements PageDataProvider {
   async createPage(
     pageData: Omit<Page, "slug"> & { slug: string },
   ): Promise<Page | null> {
-    const db = await loadDb();
-    const pages = await loadPages();
     await db.insert(pages).values({
       slug: pageData.slug,
       title: pageData.title,
@@ -116,8 +108,6 @@ export class SqlitePageProvider implements PageDataProvider {
     oldSlug: string,
     updates: Partial<Page>,
   ): Promise<Page | null> {
-    const db = await loadDb();
-    const pages = await loadPages();
     const existing = await this.findBySlug(oldSlug);
     if (!existing) return null;
     const newSlug = (updates as any).slug || oldSlug;
@@ -127,8 +117,6 @@ export class SqlitePageProvider implements PageDataProvider {
   }
 
   async deletePage(slug: string): Promise<boolean> {
-    const db = await loadDb();
-    const pages = await loadPages();
     await db.delete(pages).where(eq(pages.slug, slug));
     return true;
   }

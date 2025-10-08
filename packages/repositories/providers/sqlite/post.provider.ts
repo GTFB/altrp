@@ -6,17 +6,14 @@ import type {
   PaginationOptions,
   PaginatedResult,
 } from "@/types/post";
-// lazy imports to avoid initializing sqlite client at module load time
-const loadDb = async () => (await import("../../../../apps/cms/src/db/client")).db;
-const loadSchema = async () => (await import("../../../../apps/cms/src/db/schema")).posts;
+import { db } from "@/db/client";
+import { posts } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import { parseMarkdown } from "@/lib/markdown";
-import { i18nConfig } from "../../../../apps/cms/src/config/i18n";
+import { PROJECT_SETTINGS } from "@/settings";
 
 export class SqlitePostProvider implements PostDataProvider {
   async findAll(): Promise<Post[]> {
-    const db = await loadDb();
-    const posts = await loadSchema();
     const rows = await db.select().from(posts);
     return Promise.all(
       rows.map(async (r) => ({
@@ -86,10 +83,8 @@ export class SqlitePostProvider implements PostDataProvider {
 
   async findBySlug(
     slug: string,
-    locale: string = i18nConfig.defaultLocale,
+    locale: string = PROJECT_SETTINGS.defaultLanguage,
   ): Promise<Post | null> {
-    const db = await loadDb();
-    const posts = await loadSchema();
     const rows = await db
       .select()
       .from(posts)
@@ -117,8 +112,6 @@ export class SqlitePostProvider implements PostDataProvider {
   }
 
   async findAllCategories(): Promise<string[]> {
-    const db = await loadDb();
-    const posts = await loadSchema();
     const rows = await db.select({ category: posts.category }).from(posts);
     const set = new Set<string>();
     rows.forEach((r) => {
@@ -128,8 +121,6 @@ export class SqlitePostProvider implements PostDataProvider {
   }
 
   async findAllAuthors(): Promise<string[]> {
-    const db = await loadDb();
-    const posts = await loadSchema();
     const rows = await db.select({ author: posts.author }).from(posts);
     const set = new Set<string>();
     rows.forEach((r) => {
@@ -154,8 +145,6 @@ export class SqlitePostProvider implements PostDataProvider {
   }
 
   async findAllTags(): Promise<Array<{ tag: string; count: number }>> {
-    const db = await loadDb();
-    const posts = await loadSchema();
     const rows = await db.select({ tagsJson: posts.tagsJson }).from(posts);
     const counts = new Map<string, number>();
     rows.forEach((r) => {
@@ -188,11 +177,9 @@ export class SqlitePostProvider implements PostDataProvider {
   async createPost(
     postData: Omit<Post, "slug"> & { slug: string },
   ): Promise<Post | null> {
-    const db = await loadDb();
-    const posts = await loadSchema();
     await db.insert(posts).values({
       slug: postData.slug,
-      locale: i18nConfig.defaultLocale,
+      locale: PROJECT_SETTINGS.defaultLanguage,
       title: postData.title,
       description: postData.description,
       date: postData.date,
@@ -206,6 +193,23 @@ export class SqlitePostProvider implements PostDataProvider {
       seoKeywords: postData.seoKeywords,
       tagsJson: postData.tags ? JSON.stringify(postData.tags) : null,
     });
-    return this.findBySlug(postData.slug, i18nConfig.defaultLocale);
+    return this.findBySlug(postData.slug, PROJECT_SETTINGS.defaultLanguage);
+  }
+
+  async updatePost(
+    oldSlug: string,
+    updates: Partial<Post>,
+  ): Promise<Post | null> {
+    const existing = await this.findBySlug(oldSlug);
+    if (!existing) return null;
+    const newSlug = (updates as any).slug || oldSlug;
+    await db.delete(posts).where(eq(posts.slug, oldSlug));
+    await this.createPost({ ...existing, ...updates, slug: newSlug });
+    return this.findBySlug(newSlug);
+  }
+
+  async deletePost(slug: string): Promise<boolean> {
+    await db.delete(posts).where(eq(posts.slug, slug));
+    return true;
   }
 }
