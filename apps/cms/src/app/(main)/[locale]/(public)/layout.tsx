@@ -18,7 +18,7 @@ export default function Layout({
 
   const currentLocale = useLocale();
   const locale = currentLocale !== 'en' ? currentLocale : '';
-  const localePath = locale !== '' ? `/${locale}` : '/';
+  const localePath = locale !== '' ? `/${locale}` : '';
   const t = useTranslations('navigation');
   return (
     <div className="min-h-screen flex flex-col">
@@ -63,14 +63,6 @@ export default function Layout({
                   className="text-sm font-medium transition-colors hover:text-primary"
                 >
                   {t('about')}
-                </Link>
-                <Link 
-                  href={{
-                    pathname: `${localePath}/contact`,
-                  }}
-                  className="text-sm font-medium transition-colors hover:text-primary"
-                >
-                  {t('contact')}
                 </Link>
               </nav>
 
@@ -146,14 +138,6 @@ export default function Layout({
                   >
                     {t('about')}
                   </Link>
-                  <Link 
-                    href={{
-                      pathname: `${localePath}/contact`,
-                    }} 
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {t('contact')}
-                  </Link>
                 </nav>
               </div>
               
@@ -207,22 +191,7 @@ export default function Layout({
                 © {new Date().getFullYear()} altrp. {t('all_rights_reserved')}
               </p>
               <div className="flex items-center space-x-6">
-                <Link 
-                  href={{
-                    pathname: `${localePath}/privacy`,
-                  }} 
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                >
-                  {t('privacy_policy')}
-                </Link>
-                <Link 
-                  href={{
-                    pathname: `${localePath}/terms`,
-                  }} 
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                >
-                  {t('terms_of_service')}
-                </Link>
+                
               </div>
             </div>
           </Container>

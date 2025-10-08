@@ -22,6 +22,7 @@
         "build": "bun run build:site && bun run build:cms && bun run build:app",
         "quick-test": "bun run --filter=altrp-cms test:e2e:quick-public",
         "test:integration": "bun run --filter=altrp-cms test:integration",
+        "test:e2e": "bun run --filter=altrp-cms test:e2e",
         "db:cms:generate": "bun run --filter=altrp-cms db:generate",
         "db:cms:migrate": "bun run --filter=altrp-cms db:migrate",
         "db:cms:studio": "bun run --filter=altrp-cms db:studio",
