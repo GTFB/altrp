@@ -15,7 +15,8 @@
     "publishedOn": "公開日",
     "readMore": "続きを読む",
     "tags": "タグ",
-    "title": "ブログ"
+    "title": "ブログ",
+    "viewAllPostsWithTags": "タグ付きのすべての投稿を見る"
   },
   "breadcrumb": {
     "buildingApplication": "アプリケーションの構築",

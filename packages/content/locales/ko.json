@@ -15,7 +15,8 @@
     "publishedOn": "게시일",
     "readMore": "더 읽기",
     "tags": "태그",
-    "title": "블로그"
+    "title": "블로그",
+    "viewAllPostsWithTags": "태그가 있는 모든 게시물 보기"
   },
   "breadcrumb": {
     "buildingApplication": "애플리케이션 구축",

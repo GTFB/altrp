@@ -15,7 +15,8 @@
     "publishedOn": "Veröffentlicht am",
     "readMore": "Weiterlesen",
     "tags": "Tags",
-    "title": "Blog"
+    "title": "Blog",
+    "viewAllPostsWithTags": "Alle Beiträge mit Tags anzeigen"
   },
   "breadcrumb": {
     "buildingApplication": "Ihre Anwendung erstellen",

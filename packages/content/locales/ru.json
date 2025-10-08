@@ -291,7 +291,8 @@
     "publishedOn": "Опубликовано",
     "readMore": "Читать далее",
     "tags": "Теги",
-    "title": "Блог"
+    "title": "Блог",
+    "viewAllPostsWithTags": "Посмотреть все статьи с тегами"
   },
   "breadcrumb": {
     "buildingApplication": "Создание приложения",
