@@ -23,9 +23,6 @@
         "quick-test": "bun run --filter=altrp-cms test:e2e:quick-public",
         "test:integration": "bun run --filter=altrp-cms test:integration",
         "test:e2e": "bun run --filter=altrp-cms test:e2e",
-        "db:cms:generate": "bun run --filter=altrp-cms db:generate",
-        "db:cms:migrate": "bun run --filter=altrp-cms db:migrate",
-        "db:cms:studio": "bun run --filter=altrp-cms db:studio",
         "db:cms:push": "bun run --filter=altrp-cms db:push",
         "db:cms:reset": "bun run --filter=altrp-cms db:reset",
         "cms:up": "node scripts/cms-sqlite-up.js"
