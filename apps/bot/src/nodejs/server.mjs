@@ -1,11 +1,12 @@
-// Express server for Node.js bot version
-const express = require('express');
-const cron = require('node-cron');
-const { TelegramBotNode } = require('./bot');
-const { PostgreSQLStorageService, RedisStorageService } = require('./storage-service');
+// Express сервер для Node.js версии бота
+import express from 'express';
+import cron from 'node-cron';
+import { TelegramBotNode } from './bot.ts';
+import { PostgreSQLStorageService, RedisStorageService } from './storage-service.ts';
 
-// Load environment variables
-require('dotenv').config();
+// Загружаем переменные окружения
+import dotenv from 'dotenv';
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -35,14 +36,11 @@ let bot;
 async function initializeBot() {
   try {
     console.log('🚀 Initializing Node.js Telegram Bot...');
-    
-    // Initialize storage
+
     await postgresStorage.initialize();
     await redisStorage.initialize();
-    
-    // Create bot instance
+
     bot = new TelegramBotNode(nodeEnv, redisStorage, postgresStorage);
-    
     console.log('✅ Node.js Telegram Bot initialized successfully');
   } catch (error) {
     console.error('❌ Failed to initialize bot:', error);
@@ -58,10 +56,8 @@ app.post('/webhook', async (req, res) => {
       return res.status(500).json({ error: 'Bot not initialized' });
     }
 
-    // Process request through bot
     const response = await bot.handleRequest(req);
-    
-    // Send response
+
     res.status(response.status).send(await response.text());
   } catch (error) {
     console.error('Error processing webhook:', error);
@@ -113,7 +109,6 @@ process.on('SIGINT', async () => {
   process.exit(0);
 });
 
-// Handle unhandled errors
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
@@ -127,7 +122,6 @@ process.on('uncaughtException', (error) => {
 async function startServer() {
   try {
     await initializeBot();
-    
     app.listen(PORT, () => {
       console.log(`🚀 Node.js Telegram Bot server running on port ${PORT}`);
       console.log(`📡 Webhook endpoint: http://localhost:${PORT}/webhook`);
@@ -140,5 +134,4 @@ async function startServer() {
   }
 }
 
-// Start server
 startServer();

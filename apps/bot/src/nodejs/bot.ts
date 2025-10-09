@@ -130,8 +130,16 @@ export class TelegramBotNode {
       {} // Empty handlers object for now
     );
     
-    // Now create handlers with access to flowEngine
-    const customHandlers = createCustomHandlers(this);
+    // Теперь создаем обработчики с доступом к flowEngine
+    // Создаем адаптер для совместимости с TelegramBotWorker
+    const workerAdapter = {
+      d1Storage: this.postgresStorage,
+      flowEngine: this.flowEngine,
+      env: this.env,
+      messageService: this.messageService,
+      topicService: this.topicService
+    };
+    const customHandlers = createCustomHandlers(workerAdapter as any);
     
     // Set handlers in FlowEngine
     this.flowEngine.setCustomHandlers(customHandlers);
@@ -161,8 +169,9 @@ export class TelegramBotNode {
         return new Response('Method not allowed', { status: 405 });
       }
 
-      // Get update data from Telegram
-      const update: TelegramUpdate = await request.json();
+      // Получаем данные обновления от Telegram
+      const update = await request.json() as TelegramUpdate;
+
       console.log('📨 Received update:', JSON.stringify(update, null, 2));
 
       // Check PostgreSQL connection

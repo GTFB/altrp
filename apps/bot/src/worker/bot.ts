@@ -117,8 +117,16 @@ export class TelegramBotWorker {
       {} // Empty handlers object for now
     );
     
-    // Now create handlers with access to flowEngine
-    const customHandlers = createCustomHandlers(this);
+    // Теперь создаем обработчики с доступом к flowEngine
+    // Создаем адаптер для совместимости с BotInterface
+    const botAdapter = {
+      d1Storage: this.d1Storage,
+      flowEngine: this.flowEngine,
+      env: this.env,
+      messageService: this.messageService,
+      topicService: this.topicService
+    };
+    const customHandlers = createCustomHandlers(botAdapter);
     
     // Set handlers in FlowEngine
     this.flowEngine.setCustomHandlers(customHandlers);
@@ -148,8 +156,9 @@ export class TelegramBotWorker {
         return new Response('Method not allowed', { status: 405 });
       }
 
-      // Get update data from Telegram
-      const update: TelegramUpdate = await request.json();
+      // Получаем данные обновления от Telegram
+      const update = await request.json() as TelegramUpdate;
+
       console.log('📨 Received update:', JSON.stringify(update, null, 2));
 
       // Check D1 connection
