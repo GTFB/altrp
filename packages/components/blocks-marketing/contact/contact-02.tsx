@@ -32,7 +32,7 @@ const Contact02Page = () => (
             </p>
             <Link
               className="font-medium text-primary"
-              href="mailto:akashmoradiya3444@gmail.com"
+              href={{ pathname: "mailto:akashmoradiya3444@gmail.com" }}
             >
               akashmoradiya3444@gmail.com
             </Link>
@@ -45,7 +45,7 @@ const Contact02Page = () => (
             <p className="my-2.5 text-muted-foreground">
               Our friendly team is here to help.
             </p>
-            <Link className="font-medium text-primary" href="#">
+            <Link className="font-medium text-primary" href={{ pathname: "#" }}>
               Start new chat
             </Link>
           </div>
@@ -59,7 +59,7 @@ const Contact02Page = () => (
             </p>
             <Link
               className="font-medium text-primary"
-              href="https://map.google.com"
+              href={{ pathname: "https://map.google.com" }}
               target="_blank"
             >
               100 Smith Street Collingwood <br /> VIC 3066 AU
@@ -75,7 +75,7 @@ const Contact02Page = () => (
             </p>
             <Link
               className="font-medium text-primary"
-              href="tel:akashmoradiya3444@gmail.com"
+              href={{ pathname: "tel:akashmoradiya3444@gmail.com" }}
             >
               +1 (555) 000-0000
             </Link>
@@ -125,7 +125,7 @@ const Contact02Page = () => (
                   <Checkbox id="acceptTerms" className="bg-background" />
                   <Label htmlFor="acceptTerms" className="gap-0">
                     You agree to our
-                    <Link href="#" className="underline ml-1">
+                    <Link href={{ pathname: "#" }} className="underline ml-1">
                       terms and conditions
                     </Link>
                     <span>.</span>

@@ -58,7 +58,7 @@ export default function Timeline() {
                 {
                   "bg-primary border-primary text-primary-foreground":
                     completed,
-                }
+                },
               )}
             >
               <span className="font-semibold text-lg">

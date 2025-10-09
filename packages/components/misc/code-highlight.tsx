@@ -1,44 +1,54 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect } from 'react'
-import { highlightCode } from '../../lib/shiki-config'
-import { useTheme } from '../../hooks/use-theme'
+import React, { useState, useEffect } from "react";
+import { highlightCode } from "../../lib/shiki-config";
+import { useTheme } from "../../hooks/use-theme";
 
 interface CodeHighlightProps {
-  code: string
-  language: string
-  className?: string
+  code: string;
+  language: string;
+  className?: string;
 }
 
-export function CodeHighlight({ code, language, className = '' }: CodeHighlightProps) {
-  const [highlightedCode, setHighlightedCode] = useState<string>('')
-  const [isLoading, setIsLoading] = useState(true)
-  const { theme } = useTheme()
+export function CodeHighlight({
+  code,
+  language,
+  className = "",
+}: CodeHighlightProps) {
+  const [highlightedCode, setHighlightedCode] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true);
+  const { theme } = useTheme();
 
   // Ensure code is a string
-  const codeString = typeof code === 'string' ? code : String(code || '')
+  const codeString = typeof code === "string" ? code : String(code || "");
 
   useEffect(() => {
     const highlight = async () => {
       try {
-        setIsLoading(true)
-        const html = await highlightCode(codeString, language, theme as 'light' | 'dark')
-        setHighlightedCode(html)
+        setIsLoading(true);
+        const html = await highlightCode(
+          codeString,
+          language,
+          theme as "light" | "dark",
+        );
+        setHighlightedCode(html);
       } catch (error) {
-        console.error('Error highlighting code:', error)
+        console.error("Error highlighting code:", error);
         // Fallback to plain text
-        setHighlightedCode(`<pre><code>${codeString}</code></pre>`)
+        setHighlightedCode(`<pre><code>${codeString}</code></pre>`);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    highlight()
-  }, [codeString, language, theme])
+    highlight();
+  }, [codeString, language, theme]);
 
   if (isLoading) {
     return (
-      <div className={`relative my-6 rounded-lg overflow-hidden border bg-muted/50 ${className}`}>
+      <div
+        className={`relative my-6 rounded-lg overflow-hidden border bg-muted/50 ${className}`}
+      >
         <div className="p-4">
           <div className="animate-pulse">
             <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
@@ -47,14 +57,14 @@ export function CodeHighlight({ code, language, className = '' }: CodeHighlightP
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
-    <div 
+    <div
       className={`relative my-6 rounded-lg overflow-hidden border bg-muted/50 ${className}`}
       data-language={language}
       dangerouslySetInnerHTML={{ __html: highlightedCode }}
     />
-  )
+  );
 }

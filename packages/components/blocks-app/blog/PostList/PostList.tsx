@@ -1,12 +1,13 @@
-import { PostRepository } from '@/repositories/post.repository';
-import { PostCard } from '@/components/blocks-app/blog/PostCard/PostCard';
-import { getTranslations } from 'next-intl/server';
+import { PostRepository } from "@/repositories/post.repository";
+import { PostCard } from "@/components/blocks-app/blog/PostCard/PostCard";
 
-
-export async function PostList({noPostsFound = ''}: {noPostsFound: string}) {
+export async function PostList({
+  noPostsFound = "",
+}: {
+  noPostsFound: string;
+}) {
   const postRepo = PostRepository.getInstance();
   const posts = await postRepo.findAll();
-
 
   if (posts.length === 0) {
     return (

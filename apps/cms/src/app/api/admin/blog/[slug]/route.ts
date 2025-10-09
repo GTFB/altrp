@@ -1,10 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
-import path from 'path';
-import matter from 'gray-matter';
-import { frontmatterSchema } from '@/lib/validators/content.schema';
 import { PostRepository } from '@/repositories/post.repository';
-import { getContentDir } from '@/lib/content-path';
 
 
 interface UpdatePostRequest {
@@ -25,11 +20,11 @@ interface UpdatePostRequest {
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     const body: UpdatePostRequest = await request.json();
-    const { slug } = params;
+    const { slug } = await params;
 
     // Validate required fields
     if (!body.title || !body.content) {
@@ -39,14 +34,9 @@ export async function PUT(
       );
     }
 
-    const contentDir = getContentDir('blog');
-    const currentPostPath = path.join(contentDir, slug);
-    const currentIndexPath = path.join(currentPostPath, 'index.mdx');
-
     // Check if post exists
-    try {
-      await fs.access(currentIndexPath);
-    } catch {
+    const existingPost = await PostRepository.getInstance().findBySlug(slug);
+    if (!existingPost) {
       return NextResponse.json(
         { error: 'Post not found' },
         { status: 404 }
@@ -55,77 +45,50 @@ export async function PUT(
 
     // If newSlug is provided and different from current slug, check uniqueness
     if (body.newSlug && body.newSlug !== slug) {
-      const newPostPath = path.join(contentDir, body.newSlug);
-
-      try {
-        await fs.access(newPostPath);
+      const existingWithNewSlug = await PostRepository.getInstance().findBySlug(body.newSlug);
+      if (existingWithNewSlug) {
         return NextResponse.json(
           { error: 'Post with this slug already exists' },
           { status: 409 }
         );
-      } catch {
-        // Path doesn't exist, which is good
       }
     }
 
-    // Prepare frontmatter
-    const frontmatter = {
+    // Prepare updates
+    const updates = {
       title: body.title,
       description: body.description,
       date: body.date || new Date().toISOString().split('T')[0],
       tags: body.tags || [],
       excerpt: body.excerpt,
+      content: body.content,
       category: body.category,
       author: body.author,
       media: body.media,
       seoTitle: body.seoTitle,
       seoDescription: body.seoDescription,
       seoKeywords: body.seoKeywords,
+      slug: body.newSlug || slug,
     };
 
-    // Validate frontmatter
-    const validatedFrontmatter = frontmatterSchema.parse(frontmatter);
+    // Update using repository
+    const updatedPost = await PostRepository.getInstance().updatePost(slug, updates);
 
-    // Prepare content
-    const mdxContent = `---\n${Object.entries(validatedFrontmatter)
-      .filter(([_, value]) => value !== undefined && value !== null)
-      .map(([key, value]) => {
-        if (Array.isArray(value)) {
-          return `${key}: [${value.map(v => `"${v}"`).join(', ')}]`;
-        }
-        return `${key}: ${typeof value === 'string' ? `"${value}"` : value}`;
-      })
-      .join('\n')}\n---\n\n${body.content}`;
-
-    // If slug is changing, rename the folder
-    if (body.newSlug && body.newSlug !== slug) {
-      const newPostPath = path.join(contentDir, body.newSlug);
-
-      // Create new directory
-      await fs.mkdir(newPostPath, { recursive: true });
-
-      // Write new file
-      await fs.writeFile(path.join(newPostPath, 'index.mdx'), mdxContent, 'utf8');
-
-      // Remove old directory
-      await fs.rmdir(currentPostPath, { recursive: true });
-
-      return NextResponse.json({
-        success: true,
-        message: 'Post updated and renamed successfully',
-        slug: body.newSlug,
-        oldSlug: slug
-      });
-    } else {
-      // Just update the content
-      await fs.writeFile(currentIndexPath, mdxContent, 'utf8');
-
-      return NextResponse.json({
-        success: true,
-        message: 'Post updated successfully',
-        slug: slug
-      });
+    if (!updatedPost) {
+      return NextResponse.json(
+        { error: 'Failed to update post' },
+        { status: 500 }
+      );
     }
+
+    return NextResponse.json({
+      success: true,
+      message: body.newSlug && body.newSlug !== slug 
+        ? 'Post updated and renamed successfully' 
+        : 'Post updated successfully',
+      slug: body.newSlug || slug,
+      oldSlug: slug
+    });
 
   } catch (error) {
     console.error('Error updating post:', error);
@@ -138,13 +101,10 @@ export async function PUT(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const { slug } = params;
-    const contentDir = getContentDir('blog');
-    const postPath = path.join(contentDir, slug, 'index.mdx');
-
+    const { slug } = await params;
 
     const post = await PostRepository.getInstance().findBySlug(slug);
     // Check if post exists
@@ -154,7 +114,6 @@ export async function GET(
         { status: 404 }
       );
     }
-
 
     return NextResponse.json({
       success: true,
@@ -172,25 +131,29 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const { slug } = params;
-    const contentDir = getContentDir('blog');
-    const postPath = path.join(contentDir, slug);
+    const { slug } = await params;
 
     // Check if post exists
-    try {
-      await fs.access(postPath);
-    } catch {
+    const post = await PostRepository.getInstance().findBySlug(slug);
+    if (!post) {
       return NextResponse.json(
         { error: 'Post not found' },
         { status: 404 }
       );
     }
 
-    // Remove the post directory
-    await fs.rmdir(postPath, { recursive: true });
+    // Delete the post using repository
+    const success = await PostRepository.getInstance().deletePost(slug);
+
+    if (!success) {
+      return NextResponse.json(
+        { error: 'Failed to delete post' },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({
       success: true,

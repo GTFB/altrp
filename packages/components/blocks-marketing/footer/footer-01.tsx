@@ -192,7 +192,7 @@ const Footer01Page = () => {
                   {links.map(({ title, href }) => (
                     <li key={title}>
                       <Link
-                        href={href}
+                        href={{ pathname: href }}
                         className="text-muted-foreground hover:text-foreground"
                       >
                         {title}
@@ -227,7 +227,7 @@ const Footer01Page = () => {
             {/* Copyright */}
             <span className="text-muted-foreground">
               &copy; {new Date().getFullYear()}{" "}
-              <Link href="/" target="_blank">
+              <Link href={{ pathname: "/" }} target="_blank">
                 Shadcn UI Blocks
               </Link>
               . All rights reserved.

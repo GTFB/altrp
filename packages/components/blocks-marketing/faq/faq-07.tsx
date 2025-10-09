@@ -62,7 +62,7 @@ const FAQ07 = () => {
                 <AccordionPrimitive.Trigger
                   className={cn(
                     "flex flex-1 items-center justify-between pt-4 pb-3 font-semibold tracking-tight transition-all hover:underline [&[data-state=open]>svg]:rotate-45",
-                    "text-start text-lg"
+                    "text-start text-lg",
                   )}
                 >
                   {question}

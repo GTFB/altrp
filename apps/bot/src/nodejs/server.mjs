@@ -11,14 +11,14 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware для парсинга JSON
+// Middleware for JSON parsing
 app.use(express.json());
 
-// Инициализируем сервисы хранения
+// Initialize storage services
 const postgresStorage = new PostgreSQLStorageService(process.env.DATABASE_URL);
 const redisStorage = new RedisStorageService(process.env.REDIS_URL);
 
-// Конфигурация окружения для Node.js
+// Environment configuration for Node.js
 const nodeEnv = {
   BOT_TOKEN: process.env.BOT_TOKEN,
   ADMIN_CHAT_ID: process.env.ADMIN_CHAT_ID,
@@ -30,14 +30,16 @@ const nodeEnv = {
   PORT: PORT
 };
 
-// Инициализируем бота
+// Initialize bot
 let bot;
 
 async function initializeBot() {
   try {
     console.log('🚀 Initializing Node.js Telegram Bot...');
+
     await postgresStorage.initialize();
     await redisStorage.initialize();
+
     bot = new TelegramBotNode(nodeEnv, redisStorage, postgresStorage);
     console.log('✅ Node.js Telegram Bot initialized successfully');
   } catch (error) {
@@ -46,7 +48,7 @@ async function initializeBot() {
   }
 }
 
-// Webhook endpoint для Telegram
+// Webhook endpoint for Telegram
 app.post('/webhook', async (req, res) => {
   try {
     if (!bot) {
@@ -55,6 +57,7 @@ app.post('/webhook', async (req, res) => {
     }
 
     const response = await bot.handleRequest(req);
+
     res.status(response.status).send(await response.text());
   } catch (error) {
     console.error('Error processing webhook:', error);
@@ -83,7 +86,7 @@ app.get('/', (req, res) => {
   });
 });
 
-// Настройка cron задач для проверки отложенных сообщений
+// Setup cron jobs for checking delayed messages
 cron.schedule('* * * * *', async () => {
   try {
     console.log('🕐 Running scheduled task: checking delayed messages');
@@ -115,7 +118,7 @@ process.on('uncaughtException', (error) => {
   process.exit(1);
 });
 
-// Запуск сервера
+// Start server
 async function startServer() {
   try {
     await initializeBot();

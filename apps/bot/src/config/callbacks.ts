@@ -1,27 +1,27 @@
-// Сообщения бота
+// Bot messages
 // export const messages = {
-//   selectLanguage: `Izaberite jezik / Выберите язык:`,
-//   welcome: `Добро пожаловать в bznrs! Ваш цифровой помощник для паушальцев. Давайте настроим ваш профиль.`,
-//   companyName: `Введите полное название вашей фирмы.`,
-//   pib: `Спасибо. Теперь введите ваш PIB (налоговый номер).`,
-//   okved: `Отлично. Теперь введите ваш код деятельности (ОКВЭД).`,
-//   mainService: `Введите вашу основную услугу (напр., 'Услуги программирования'). Мы будем использовать её как основу для быстрого создания счетов.`,
-//   phone: `Спасибо. Теперь введите ваш контактный телефон.`,
-//   email: `И напоследок, введите ваш email.`,
-//   onboardingThanks: `Отлично, ваш профиль настроен! Теперь можно пользоваться главным меню.`,
-//   consultation_greeting: `Выберите, к кому создать обращение.`,
-//   ask_to_lawyer: `Опишите свой вопрос юристу.`,
-//   ask_to_accountant: `Опишите свой вопрос бухгалтеру.`,
-//   consultation_auto_answer: `Спасибо! Ваш вопрос успешно отправлен.`,
-//   mainMenu: `Выберите раздел меню.`,
+//   selectLanguage: `Izaberite jezik / Choose language:`,
+//   welcome: `Welcome to bznrs! Your digital assistant for freelancers. Let's set up your profile.`,
+//   companyName: `Enter the full name of your company.`,
+//   pib: `Thank you. Now enter your PIB (tax number).`,
+//   okved: `Great. Now enter your activity code (OKVED).`,
+//   mainService: `Enter your main service (e.g., 'Programming services'). We will use it as a basis for quick invoice creation.`,
+//   phone: `Thank you. Now enter your contact phone number.`,
+//   email: `And finally, enter your email.`,
+//   onboardingThanks: `Great, your profile is set up! Now you can use the main menu.`,
+//   consultation_greeting: `Choose who to contact.`,
+//   ask_to_lawyer: `Describe your question to the lawyer.`,
+//   ask_to_accountant: `Describe your question to the accountant.`,
+//   consultation_auto_answer: `Thank you! Your question has been sent successfully.`,
+//   mainMenu: `Choose a menu section.`,
 
-//   help: `Доступные команды:
-// /start - начать работу
-// /help - помощь`,
+//   help: `Available commands:
+// /start - start working
+// /help - help`,
 
 // };
 
-// Клавиатуры
+// Keyboards
 export const keyboards = {
   lang: {
     inline_keyboard: [[
@@ -30,7 +30,7 @@ export const keyboards = {
         callback_data: "lang_select_sr"
       },
       {
-        text: "🇷🇺 Русский",
+        text: "🇷🇺 Russian",
         callback_data: "lang_select_ru"
       }
     ]]
@@ -42,7 +42,7 @@ export const keyboards = {
         callback_data: "save_edited_language_sr"
       },
       {
-        text: "🇷🇺 Русский",
+        text: "🇷🇺 Russian",
         callback_data: "save_edited_language_ru"
       }
     ]]
@@ -51,7 +51,7 @@ export const keyboards = {
   start_creating_company: {
     inline_keyboard: [[
       {
-        text: "Начать настройку",
+        text: "Start setup",
         callback_data: "start_creating_company_step"
       },
     ]]
@@ -60,31 +60,31 @@ export const keyboards = {
     inline_keyboard: [
       [
         {
-          text: "📄 Выставить счет",
+          text: "📄 Create invoice",
           callback_data: "create_invoice"
         },
       ],
       [
         {
-          text: "📊 Отчеты",
+          text: "📊 Reports",
           callback_data: "reports"
         },
       ],
       [
         {
-          text: "📁 Шаблоны",
+          text: "📁 Templates",
           callback_data: "doc_templates"
         },
       ],
       [
         {
-          text: "💡 Помощь и консультации",
+          text: "💡 Help and consultations",
           callback_data: "consultation"
         },
       ],
       [
         {
-          text: "⚙️ Мой профиль",
+          text: "⚙️ My profile",
           callback_data: "profile"
         },
       ],
@@ -93,11 +93,11 @@ export const keyboards = {
   consultation: {
     inline_keyboard: [[
       {
-        text: "⚖️ Юрист",
+        text: "⚖️ Lawyer",
         callback_data: "consultation_lawyer"
       },
       {
-        text: "🧾 Бухгалтер",
+        text: "🧾 Accountant",
         callback_data: "consultation_accountant"
       }
     ]]
@@ -105,11 +105,11 @@ export const keyboards = {
   client_card_buttons: {
     inline_keyboard: [[
       {
-        text: "Продолжить",
+        text: "Continue",
         callback_data: "show_main_service"
       },
       {
-        text: "Новый клиент",
+        text: "New client",
         callback_data: "create_invoice"
       }
     ]]
@@ -117,11 +117,11 @@ export const keyboards = {
   service_card_buttons: {
     inline_keyboard: [[
       {
-        text: "Да, верно",
+        text: "Yes, correct",
         callback_data: "ask_to_invoice_amount"
       },
       {
-        text: "Ввести другую услугу",
+        text: "Enter different service",
         callback_data: "ask_to_invoice_service_name"
       }
     ]]
@@ -130,11 +130,11 @@ export const keyboards = {
   edit_service: {
     inline_keyboard: [[
       {
-        text: "Редактировать",
+        text: "Edit",
         callback_data: "edit_service_name"
       },
       {
-        text: "Внести другую услугу",
+        text: "Add different service",
         callback_data: "add_new_service_name"
       }
     ]]
@@ -143,11 +143,11 @@ export const keyboards = {
   invoice_card_buttons: {
     inline_keyboard: [[
       {
-        text: "Все верно",
+        text: "All correct",
         callback_data: "confirm_invoice_data"
       },
       {
-        text: "Создать новый",
+        text: "Create new",
         callback_data: "create_invoice"
       }
     ]]
@@ -156,11 +156,11 @@ export const keyboards = {
   select_template: {
     inline_keyboard: [[
       {
-        text: "📄 Договор",
+        text: "📄 Contract",
         callback_data: "get_contract_template"
       },
       {
-        text: "✅ Акт выполненных работ",
+        text: "✅ Work completion certificate",
         callback_data: "get_act_template"
       }
     ]]
@@ -169,11 +169,11 @@ export const keyboards = {
   select_report: {
     inline_keyboard: [[
       {
-        text: "📈 Доходы / КПО",
+        text: "📈 Income / Payments",
         callback_data: "get_payments"
       },
       {
-        text: "📉 Расходы",
+        text: "📉 Expenses",
         callback_data: "get_expenses"
       }
     ]]
@@ -182,7 +182,7 @@ export const keyboards = {
   add_new_expense: {
     inline_keyboard: [[
       {
-        text: "Внести новый расход",
+        text: "Add new expense",
         callback_data: "add_new_expense"
       },
     ]]
@@ -192,7 +192,7 @@ export const keyboards = {
     inline_keyboard: [
       [
         {
-          text: "Название фирмы",
+          text: "Company name",
           callback_data: "edit_company_name"
         },
       ],
@@ -204,19 +204,19 @@ export const keyboards = {
       ],
       [
         {
-          text: "ОКВЭД",
+          text: "OKVED",
           callback_data: "edit_company_okved"
         },
       ],
       [
         {
-          text: "Основная услуга",
+          text: "Main service",
           callback_data: "edit_service"
         },
       ],
       [
         {
-          text: "Сменить язык",
+          text: "Change language",
           callback_data: "edit_language"
         }
       ],
@@ -227,13 +227,13 @@ export const keyboards = {
   //   inline_keyboard: [
   //     [
   //       {
-  //         text: "👉 Наш Telegram",
+  //         text: "👉 Our Telegram",
   //         url: "https://t.me/ml_cosmetic"
   //       }
   //     ],
   //     [
   //       {
-  //         text: "✨Готово! Проверяй!",
+  //         text: "✨Ready! Check!",
   //         callback_data: "check_subscription"
   //       }
   //     ]
@@ -241,7 +241,7 @@ export const keyboards = {
   // }
 };
 
-// Команды и их обработчики
+// Commands and their handlers
 export const commands = {
   "/start": "start",
   "/help": "help", 
@@ -249,20 +249,20 @@ export const commands = {
   "/not_confirmed": "notConfirmed"
 } as const;
 
-// Конфигурация callback кнопок - что делать при нажатии
+// Callback button configuration - what to do when pressed
 // export const callbackActions = {
 //   "start_flow": {
-//     action: "start_flow", // Запустить флоу
+//     action: "start_flow", // Start flow
 //     flowName: "subscription"
 //   },
 //   "check_subscription": {
-//     action: "go_to_step", // Перейти к шагу
+//     action: "go_to_step", // Go to step
 //     stepId: "ask_vk_link"
 //   }
 // } as const;
-// Уникальные действия для каждого контекста
+// Unique actions for each context
 export const callbackActions = {
-  // Выбор языка при регистрации
+  // Language selection during registration
   "lang_select_sr": {
     action: "set_variable",
     variable: "profile.language",
@@ -291,7 +291,7 @@ export const callbackActions = {
     nextStep: "save_edited_language"
   },
 
-  // Навигация в onboarding
+  // Onboarding navigation
   "start_creating_company_step": {
     action: "go_to_step",
     stepId: "ask_company_name"
@@ -364,7 +364,7 @@ export const callbackActions = {
     nextStep: "ask_to_accountant"
   },
 
-  //Запрос шаблонов
+  //Template requests
   "get_contract_template": {
     action: "set_variable",
     variable: "need_template.type",
@@ -423,7 +423,7 @@ export const callbackActions = {
 
 
 
-  // Глобальные действия
+  // Global actions
   "restart_bot": {
     action: "start_flow",
     flowName: "start_registration"
@@ -435,18 +435,18 @@ export const callbackActions = {
 } as const;
 
 
-// Legacy callbacks удалены - теперь используется только callbackActions
+// Legacy callbacks removed - now only callbackActions is used
 
-// Типы для TypeScript
+// TypeScript types
 export type CommandHandler = keyof typeof commands;
 export type CallbackActionType = 'start_flow' | 'go_to_step' | 'go_to_flow' | 'set_variable';
 
 export interface CallbackActionConfig {
   action: CallbackActionType;
-  flowName?: string;    // Для start_flow
-  stepId?: string;      // Для go_to_step
-  variable?: string;    // Для set_variable
-  value?: any;          // Для set_variable
-  nextFlow?: string;    // Для перехода к следующему флоу после действия
-  nextStep?: string;    // Для перехода к следующему шагу после действия
+  flowName?: string;    // For start_flow
+  stepId?: string;      // For go_to_step
+  variable?: string;    // For set_variable
+  value?: any;          // For set_variable
+  nextFlow?: string;    // For transition to next flow after action
+  nextStep?: string;    // For transition to next step after action
 }

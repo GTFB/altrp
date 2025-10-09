@@ -101,13 +101,13 @@ const Team04Page = () => {
             <p className="text-muted-foreground text-sm">{member.title}</p>
             <p className="mt-2 mb-6 text-pretty">{member.bio}</p>
             <div className="mt-auto flex items-center gap-4">
-              <Link href="#" target="_blank">
+              <Link href={{ pathname: "#" }} target="_blank">
                 <TwitterIcon className="stroke-muted-foreground h-5 w-5" />
               </Link>
-              <Link href="#" target="_blank">
+              <Link href={{ pathname: "#" }} target="_blank">
                 <DribbbleIcon className="stroke-muted-foreground h-5 w-5" />
               </Link>
-              <Link href="#" target="_blank">
+              <Link href={{ pathname: "#" }} target="_blank">
                 <TwitchIcon className="stroke-muted-foreground h-5 w-5" />
               </Link>
             </div>

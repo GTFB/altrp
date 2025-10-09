@@ -16,33 +16,33 @@ export default function PaginationWithFirstAndLastPageNavigation() {
     <Pagination>
       <PaginationContent>
         <PaginationItem>
-          <PaginationLink href="#" aria-label="Go to first page" size="icon">
+          <PaginationLink href={{ pathname: "#" }} aria-label="Go to first page" size="icon">
             <ChevronFirst className="h-4 w-4" />
           </PaginationLink>
         </PaginationItem>
         <PaginationItem>
-          <PaginationLink href="#" aria-label="Go to previous page" size="icon">
+          <PaginationLink href={{ pathname: "#" }} aria-label="Go to previous page" size="icon">
             <ChevronLeft className="h-4 w-4" />
           </PaginationLink>
         </PaginationItem>
         <PaginationItem>
-          <PaginationLink href="#">1</PaginationLink>
+          <PaginationLink href={{ pathname: "#" }}>1</PaginationLink>
         </PaginationItem>
         <PaginationItem>
-          <PaginationLink href="#" isActive>
+          <PaginationLink href={{ pathname: "#" }} isActive>
             2
           </PaginationLink>
         </PaginationItem>
         <PaginationItem>
-          <PaginationLink href="#">3</PaginationLink>
+          <PaginationLink href={{ pathname: "#" }}>3</PaginationLink>
         </PaginationItem>
         <PaginationItem>
-          <PaginationLink href="#" aria-label="Go to next page" size="icon">
+          <PaginationLink href={{ pathname: "#" }} aria-label="Go to next page" size="icon">
             <ChevronRight className="h-4 w-4" />
           </PaginationLink>
         </PaginationItem>
         <PaginationItem>
-          <PaginationLink href="#" aria-label="Go to last page" size="icon">
+          <PaginationLink href={{ pathname: "#" }} aria-label="Go to last page" size="icon">
             <ChevronLast className="h-4 w-4" />
           </PaginationLink>
         </PaginationItem>

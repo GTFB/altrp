@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { buttonStyles } from "@/lib/button-styles";
 
 export function ToTopButton() {
-  const [isVisible, setIsVisible] = useState(false);
+  const [, setIsVisible] = useState(false);
 
   useEffect(() => {
     const toggleVisibility = () => {
@@ -17,17 +17,16 @@ export function ToTopButton() {
       }
     };
 
-    window.addEventListener('scroll', toggleVisibility);
-    return () => window.removeEventListener('scroll', toggleVisibility);
+    window.addEventListener("scroll", toggleVisibility);
+    return () => window.removeEventListener("scroll", toggleVisibility);
   }, []);
 
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
-      behavior: 'smooth'
+      behavior: "smooth",
     });
   };
-
 
   return (
     <Button

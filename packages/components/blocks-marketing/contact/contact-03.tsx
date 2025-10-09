@@ -24,7 +24,7 @@ const Contact03Page = () => (
           </p>
           <Link
             className="font-medium"
-            href="mailto:akashmoradiya3444@gmail.com"
+            href={{ pathname: "mailto:akashmoradiya3444@gmail.com" }}
           >
             akashmoradiya3444@gmail.com
           </Link>
@@ -37,7 +37,7 @@ const Contact03Page = () => (
           <p className="mt-2.5 mb-4 text-muted-foreground">
             Our friendly team is here to help.
           </p>
-          <Link className="font-medium" href="#">
+          <Link className="font-medium" href={{ pathname: "#" }}>
             Start new chat
           </Link>
         </div>
@@ -51,7 +51,7 @@ const Contact03Page = () => (
           </p>
           <Link
             className="font-medium"
-            href="https://map.google.com"
+            href={{ pathname: "https://map.google.com" }}
             target="_blank"
           >
             100 Smith Street Collingwood <br /> VIC 3066 AU
@@ -65,7 +65,7 @@ const Contact03Page = () => (
           <p className="mt-2.5 mb-4 text-muted-foreground">
             Mon-Fri from 8am to 5pm.
           </p>
-          <Link className="font-medium" href="tel:akashmoradiya3444@gmail.com">
+          <Link className="font-medium" href={{ pathname: "tel:akashmoradiya3444@gmail.com" }}>
             +1 (555) 000-0000
           </Link>
         </div>

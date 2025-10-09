@@ -1,154 +1,159 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useCallback } from "react"
-import { useInView } from "react-intersection-observer"
-import { MediaCard } from "./MediaCard"
-import { MediaEditPopup } from "./MediaEditPopup"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Button } from "@/components/ui/button"
-import { Trash2, CheckSquare, Square } from "lucide-react"
+import { useState, useEffect, useCallback } from "react";
+import { useInView } from "react-intersection-observer";
+import { MediaCard } from "./MediaCard";
+import { MediaEditPopup } from "./MediaEditPopup";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Trash2, CheckSquare, Square } from "lucide-react";
 
 interface MediaItem {
-  id: string
-  url: string
-  alt?: string
-  title?: string
-  description?: string
-  filename: string
-  size: number
-  mimeType: string
-  createdAt: string
+  id: string;
+  url: string;
+  alt?: string;
+  title?: string;
+  description?: string;
+  filename: string;
+  size: number;
+  mimeType: string;
+  createdAt: string;
 }
 
 interface MediaGridProps {
-  refreshTrigger?: number
+  refreshTrigger?: number;
 }
 
 export function MediaGrid({ refreshTrigger }: MediaGridProps) {
-  const [media, setMedia] = useState<MediaItem[]>([])
-  const [loading, setLoading] = useState(true)
-  const [hasMore, setHasMore] = useState(true)
-  const [page, setPage] = useState(1)
-  const [selectedMedia, setSelectedMedia] = useState<MediaItem | null>(null)
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [media, setMedia] = useState<MediaItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
+  const [selectedMedia, setSelectedMedia] = useState<MediaItem | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const { ref, inView } = useInView({
     threshold: 0.1,
-  })
+  });
 
   const loadMedia = useCallback(async (pageNum: number, reset = false) => {
     try {
-      setLoading(true)
-      const response = await fetch(`/api/admin/media?page=${pageNum}&limit=18`)
-      
+      setLoading(true);
+      const response = await fetch(`/api/admin/media?page=${pageNum}&limit=18`);
+
       if (!response.ok) {
-        throw new Error('Failed to load media')
+        throw new Error("Failed to load media");
       }
 
-      const data = await response.json()
-      
+      const data = await response.json();
+
       if (reset) {
-        setMedia(data.media)
+        setMedia(data.media);
       } else {
-        setMedia(prev => [...prev, ...data.media])
+        setMedia((prev) => [...prev, ...data.media]);
       }
-      
-      setHasMore(data.hasMore)
+
+      setHasMore(data.hasMore);
     } catch (error) {
-      console.error('Error loading media:', error)
+      console.error("Error loading media:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [])
+  }, []);
 
   // Load media on mount and when refreshTrigger changes (18 items per page)
   useEffect(() => {
-    setPage(1)
-    setMedia([])
-    loadMedia(1, true)
-  }, [refreshTrigger, loadMedia])
+    setPage(1);
+    setMedia([]);
+    loadMedia(1, true);
+  }, [refreshTrigger, loadMedia]);
 
   // Load next page on scroll
   useEffect(() => {
     if (inView && hasMore && !loading) {
-      const nextPage = page + 1
-      setPage(nextPage)
-      loadMedia(nextPage, false)
+      const nextPage = page + 1;
+      setPage(nextPage);
+      loadMedia(nextPage, false);
     }
-  }, [inView, hasMore, loading, page, loadMedia])
+  }, [inView, hasMore, loading, page, loadMedia]);
 
   const handleMediaSelect = (mediaItem: MediaItem) => {
-    setSelectedMedia(mediaItem)
-  }
+    setSelectedMedia(mediaItem);
+  };
 
   const handleMediaUpdate = (updatedMedia: MediaItem) => {
-    setMedia(prev => prev.map(item => 
-      item.id === updatedMedia.id ? updatedMedia : item
-    ))
-    setSelectedMedia(null)
-  }
+    setMedia((prev) =>
+      prev.map((item) => (item.id === updatedMedia.id ? updatedMedia : item)),
+    );
+    setSelectedMedia(null);
+  };
 
   const handleMediaDelete = (mediaId: string) => {
-    setMedia(prev => prev.filter(item => item.id !== mediaId))
-    setSelectedMedia(null)
-  }
+    setMedia((prev) => prev.filter((item) => item.id !== mediaId));
+    setSelectedMedia(null);
+  };
 
   const handleSelectMedia = (mediaId: string, selected: boolean) => {
-    setSelectedIds(prev => {
-      const newSet = new Set(prev)
+    setSelectedIds((prev) => {
+      const newSet = new Set(prev);
       if (selected) {
-        newSet.add(mediaId)
+        newSet.add(mediaId);
       } else {
-        newSet.delete(mediaId)
+        newSet.delete(mediaId);
       }
-      return newSet
-    })
-  }
+      return newSet;
+    });
+  };
 
   const handleSelectAll = () => {
-    const allIds = new Set(media.map(item => item.id))
-    const isAllSelected = media.length > 0 && media.every(item => selectedIds.has(item.id))
-    
+    const allIds = new Set(media.map((item) => item.id));
+    const isAllSelected =
+      media.length > 0 && media.every((item) => selectedIds.has(item.id));
+
     if (isAllSelected) {
       // Deselect all
-      setSelectedIds(new Set())
+      setSelectedIds(new Set());
     } else {
       // Select all
-      setSelectedIds(allIds)
+      setSelectedIds(allIds);
     }
-  }
+  };
 
   const handleDeleteSelected = async () => {
-    if (selectedIds.size === 0) return
+    if (selectedIds.size === 0) return;
 
-    if (!confirm(`Are you sure you want to delete ${selectedIds.size} selected media files?`)) {
-      return
+    if (
+      !confirm(
+        `Are you sure you want to delete ${selectedIds.size} selected media files?`,
+      )
+    ) {
+      return;
     }
 
     try {
       // Delete each selected media
       for (const mediaId of selectedIds) {
         const response = await fetch(`/api/admin/media/${mediaId}`, {
-          method: 'DELETE',
-        })
-        
+          method: "DELETE",
+        });
+
         if (!response.ok) {
-          throw new Error(`Failed to delete media ${mediaId}`)
+          throw new Error(`Failed to delete media ${mediaId}`);
         }
       }
 
       // Remove from local state
-      setMedia(prev => prev.filter(item => !selectedIds.has(item.id)))
-      setSelectedIds(new Set())
-      
+      setMedia((prev) => prev.filter((item) => !selectedIds.has(item.id)));
+      setSelectedIds(new Set());
+
       // Close popup if selected media was deleted
       if (selectedMedia && selectedIds.has(selectedMedia.id)) {
-        setSelectedMedia(null)
+        setSelectedMedia(null);
       }
     } catch (error) {
-      console.error('Error deleting selected media:', error)
+      console.error("Error deleting selected media:", error);
     }
-  }
+  };
 
   if (loading && media.length === 0) {
     return (
@@ -157,7 +162,7 @@ export function MediaGrid({ refreshTrigger }: MediaGridProps) {
           <Skeleton key={i} className="aspect-square rounded-lg" />
         ))}
       </div>
-    )
+    );
   }
 
   if (media.length === 0) {
@@ -165,11 +170,12 @@ export function MediaGrid({ refreshTrigger }: MediaGridProps) {
       <div className="text-center py-12">
         <p className="text-muted-foreground">No media files found</p>
       </div>
-    )
+    );
   }
 
-  const isAllSelected = media.length > 0 && media.every(item => selectedIds.has(item.id))
-  const hasSelection = selectedIds.size > 0
+  const isAllSelected =
+    media.length > 0 && media.every((item) => selectedIds.has(item.id));
+  const hasSelection = selectedIds.size > 0;
 
   return (
     <>
@@ -240,5 +246,5 @@ export function MediaGrid({ refreshTrigger }: MediaGridProps) {
         />
       )}
     </>
-  )
+  );
 }

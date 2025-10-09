@@ -1,10 +1,10 @@
-// Node.js адаптеры для хранения данных
-// Использует PostgreSQL и Redis вместо D1 и KV
+// Node.js adapters for data storage
+// Uses PostgreSQL and Redis instead of D1 and KV
 
 import { Pool } from 'pg';
 import { createClient } from 'redis';
 
-// Интерфейсы для совместимости с существующим кодом
+// Interfaces for compatibility with existing code
 export interface User {
   id?: number;
   telegramId: number;
@@ -34,7 +34,7 @@ export interface Message {
   createdAt?: string;
 }
 
-// PostgreSQL Storage Service (аналог D1StorageService)
+// PostgreSQL Storage Service (analog of D1StorageService)
 export class PostgreSQLStorageService {
   private pool: Pool;
 
@@ -48,7 +48,7 @@ export class PostgreSQLStorageService {
   async initialize(): Promise<void> {
     console.log('🗄️ PostgreSQL Storage Service initialized');
     
-    // Проверяем подключение
+    // Check connection
     try {
       const client = await this.pool.connect();
       const result = await client.query("SELECT name FROM information_schema.tables WHERE table_name = 'messages'");
@@ -297,7 +297,7 @@ export class PostgreSQLStorageService {
   }
 }
 
-// Redis Storage Service (аналог KVStorageService)
+// Redis Storage Service (analog of KVStorageService)
 export class RedisStorageService {
   private client: any;
 

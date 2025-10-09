@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { usePathname } from 'next/navigation';
-import { useLocale, useTranslations } from 'next-intl';
-import { useState, useEffect } from 'react';
-import { 
-  Breadcrumb, 
-  BreadcrumbItem, 
-  BreadcrumbLink, 
-  BreadcrumbList, 
-  BreadcrumbPage, 
-  BreadcrumbSeparator 
-} from '@/components/ui/breadcrumb';
+import { usePathname } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
+import { useState, useEffect } from "react";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 interface BreadcrumbSegment {
   label: string;
@@ -20,22 +20,22 @@ interface BreadcrumbSegment {
 
 interface ContentInfo {
   title: string;
-  type: 'post' | 'category' | 'author' | 'page';
+  type: "post" | "category" | "author" | "page";
 }
 
 export function DynamicBreadcrumbs() {
   const pathname = usePathname();
-  const locale = useLocale() !== 'en' ? useLocale() : '';
-  const localePath = locale !== '' ? `/${locale}` : '';
-  const t = useTranslations('navigation');
+  const locale = useLocale() !== "en" ? useLocale() : "";
+  const localePath = locale !== "" ? `/${locale}` : "";
+  const t = useTranslations("navigation");
   const [contentInfo, setContentInfo] = useState<ContentInfo | null>(null);
 
   // Fetch content info for dynamic segments
   useEffect(() => {
     const fetchContentInfo = async () => {
-      const segments = pathname.split('/').filter(Boolean);
-      let contentType = '';
-      let slug = '';
+      const segments = pathname.split("/").filter(Boolean);
+      let contentType = "";
+      let slug = "";
 
       // Find content type and slug
       for (let i = 0; i < segments.length; i++) {
@@ -43,9 +43,12 @@ export function DynamicBreadcrumbs() {
         if (i === 0 && segments[i] === locale) {
           continue;
         }
-        
+
         // Check for known content types
-        if (['blog', 'categories', 'authors'].includes(segments[i]) && i + 1 < segments.length) {
+        if (
+          ["blog", "categories", "authors"].includes(segments[i]) &&
+          i + 1 < segments.length
+        ) {
           contentType = segments[i];
           slug = segments[i + 1];
           break;
@@ -55,29 +58,31 @@ export function DynamicBreadcrumbs() {
       // Fetch content info based on type
       if (contentType && slug) {
         try {
-          let apiType = '';
+          let apiType = "";
           switch (contentType) {
-            case 'blog':
-              apiType = 'post';
+            case "blog":
+              apiType = "post";
               break;
-            case 'categories':
-              apiType = 'category';
+            case "categories":
+              apiType = "category";
               break;
-            case 'authors':
-              apiType = 'author';
+            case "authors":
+              apiType = "author";
               break;
           }
 
-          const response = await fetch(`/api/content-info?slug=${encodeURIComponent(slug)}&type=${apiType}`);
+          const response = await fetch(
+            `/api/content-info?slug=${encodeURIComponent(slug)}&type=${apiType}`,
+          );
           if (response.ok) {
             const data = await response.json();
             setContentInfo({
               title: data.title,
-              type: data.type
+              type: data.type,
             });
           }
         } catch (error) {
-          console.error('Error fetching content info:', error);
+          console.error("Error fetching content info:", error);
         }
       }
     };
@@ -86,44 +91,44 @@ export function DynamicBreadcrumbs() {
   }, [pathname, locale]);
 
   const generateBreadcrumbs = (): BreadcrumbSegment[] => {
-    const segments = pathname.split('/').filter(Boolean);
+    const segments = pathname.split("/").filter(Boolean);
     const breadcrumbs: BreadcrumbSegment[] = [];
 
     breadcrumbs.push({
-      label: t('home'),
-      href: localePath || '/'
+      label: t("home"),
+      href: localePath || "/",
     });
 
     let currentPath = localePath;
-    
+
     for (let i = 0; i < segments.length; i++) {
       const segment = segments[i];
-      
+
       if (i === 0 && segment === locale) {
         continue;
       }
-      
+
       currentPath += `/${segment}`;
-      
+
       let label = segment;
       let href: string | undefined = currentPath;
       let isLast = i === segments.length - 1;
-      
+
       switch (segment) {
-        case 'blog':
-          label = t('blog');
+        case "blog":
+          label = t("blog");
           break;
-        case 'about':
-          label = t('about');
+        case "about":
+          label = t("about");
           break;
-        case 'contact':
-          label = t('contact');
+        case "contact":
+          label = t("contact");
           break;
-        case 'tags':
-          label = t('tags');
+        case "tags":
+          label = t("tags");
           break;
-        case 'categories':
-          label = t('categories');
+        case "categories":
+          label = t("categories");
           break;
         default:
           // Check if this is a content slug and we have content info
@@ -132,15 +137,15 @@ export function DynamicBreadcrumbs() {
           }
           break;
       }
-      
+
       if (isLast) {
         href = undefined;
       }
-      
+
       breadcrumbs.push({
         label,
         href,
-        isLast
+        isLast,
       });
     }
 

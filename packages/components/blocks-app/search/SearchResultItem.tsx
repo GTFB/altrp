@@ -1,15 +1,14 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { FileText, User, FolderOpen, File } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
-import { PostTags } from '@/components/blocks-app/blog/PostTags/PostTags';
+import Link from "next/link";
+import { FileText, User, FolderOpen, File } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 
 interface SearchResult {
   id: string;
   title: string;
   description?: string;
-  type: 'post' | 'category' | 'author' | 'page';
+  type: "post" | "category" | "author" | "page";
   url: string;
   excerpt?: string;
   tags?: string[];
@@ -22,20 +21,19 @@ interface SearchResultItemProps {
 }
 
 export function SearchResultItem({ result, onClick }: SearchResultItemProps) {
-  const tBlog = useTranslations('blog');
-  const tCategories = useTranslations('categories');
-  const tNavigation = useTranslations('navigation');
-  const tComponents = useTranslations('components');
+  const tBlog = useTranslations("blog");
+  const tCategories = useTranslations("categories");
+  const tNavigation = useTranslations("navigation");
 
   const getResultIcon = (type: string) => {
     switch (type) {
-      case 'post':
+      case "post":
         return <FileText className="h-4 w-4" />;
-      case 'author':
+      case "author":
         return <User className="h-4 w-4" />;
-      case 'category':
+      case "category":
         return <FolderOpen className="h-4 w-4" />;
-      case 'page':
+      case "page":
         return <File className="h-4 w-4" />;
       default:
         return <FileText className="h-4 w-4" />;
@@ -44,25 +42,25 @@ export function SearchResultItem({ result, onClick }: SearchResultItemProps) {
 
   const getResultTypeLabel = (type: string) => {
     switch (type) {
-      case 'post':
-        return tBlog('blog');
-      case 'author':
-        return tBlog('author');
-      case 'category':
-        return tCategories('title');
-      case 'page':
-        return tNavigation('page');
+      case "post":
+        return tBlog("blog");
+      case "author":
+        return tBlog("author");
+      case "category":
+        return tCategories("title");
+      case "page":
+        return tNavigation("page");
       default:
         return type;
     }
   };
 
-  const locale = useLocale() !== 'en' ? useLocale() : '';
-  const localePath = locale !== '' ? `/${locale}` : '';
+  const locale = useLocale() !== "en" ? useLocale() : "";
+  const localePath = locale !== "" ? `/${locale}` : "";
   return (
     <div className="w-full border-b last:border-b-0">
       <Link
-        href={(localePath + result.url) as any}
+        href={{ pathname: localePath + result.url }}
         onClick={() => onClick?.(result)}
         className="block w-full text-left p-4 hover:bg-muted/50 transition-colors"
       >
@@ -84,7 +82,7 @@ export function SearchResultItem({ result, onClick }: SearchResultItemProps) {
                 {result.description}
               </span>
             )}
-            {result.excerpt && result.type === 'post' && (
+            {result.excerpt && result.type === "post" && (
               <span className="text-xs text-muted-foreground line-clamp-1 block">
                 {result.excerpt}
               </span>

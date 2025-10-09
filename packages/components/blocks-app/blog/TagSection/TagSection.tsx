@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useBlogPostsSimple } from '@/hooks/use-blog-posts-simple';
-import { PostCard } from '@/components/blocks-app/blog/PostCard/PostCard';
-import { Button } from '@/components/ui/button';
-import { Loader2, ArrowRight, Hash } from 'lucide-react';
-import Link from 'next/link';
-import { useLocale } from 'next-intl';
-import { useTranslations } from 'next-intl';
+import { useBlogPostsSimple } from "@/hooks/use-blog-posts-simple";
+import { PostCard } from "@/components/blocks-app/blog/PostCard/PostCard";
+import { Button } from "@/components/ui/button";
+import { Loader2, ArrowRight, Hash } from "lucide-react";
+import Link from "next/link";
+import { useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 
 interface TagSectionProps {
   tags: string[];
@@ -17,43 +17,39 @@ interface TagSectionProps {
   category?: string;
   author?: string;
   search?: string;
-  sortBy?: 'date' | 'title' | 'created';
-  sortOrder?: 'asc' | 'desc';
+  sortBy?: "date" | "title" | "created";
+  sortOrder?: "asc" | "desc";
 }
 
-export function TagSection({ 
+export function TagSection({
   tags,
-  limit = 6, 
+  limit = 6,
   showViewAll = true,
   title,
   description,
   category,
   author,
   search,
-  sortBy = 'date',
-  sortOrder = 'desc'
+  sortBy = "date",
+  sortOrder = "desc",
 }: TagSectionProps) {
-    const locale = useLocale() === 'en' ? '' : useLocale();
-  const localePath = locale !== '' ? `/${locale}` : '';
-  const t = useTranslations('blog');
+  const locale = useLocale() === "en" ? "" : useLocale();
+  const localePath = locale !== "" ? `/${locale}` : "";
+  const t = useTranslations("blog");
   // Generate title and description if not provided
-  const tagsText = tags.join(', ');
+  const tagsText = tags.join(", ");
   const sectionTitle = title || `Posts with tags: ${tagsText}`;
-  const sectionDescription = description || `Read articles with tags: ${tagsText}`;
-  
-  const { 
-    posts, 
-    loading, 
-    error, 
-    refetch 
-  } = useBlogPostsSimple({
+  const sectionDescription =
+    description || `Read articles with tags: ${tagsText}`;
+
+  const { posts, loading, error, refetch } = useBlogPostsSimple({
     limit,
     category,
     author,
     tags,
     search,
     sortBy,
-    sortOrder
+    sortOrder,
   });
 
   if (error) {
@@ -99,7 +95,9 @@ export function TagSection({
             <h2 className="text-3xl font-bold">{sectionTitle}</h2>
           </div>
           <p className="text-muted-foreground mb-6">{sectionDescription}</p>
-          <p className="text-muted-foreground">No posts found with these tags</p>
+          <p className="text-muted-foreground">
+            No posts found with these tags
+          </p>
         </div>
       </section>
     );
@@ -124,8 +122,12 @@ export function TagSection({
       {showViewAll && (
         <div className="text-center">
           <Button asChild variant="outline" size="lg">
-            <Link href={`${localePath}/tags`}>
-              {t('viewAllPostsWithTags')}
+            <Link
+              href={{
+                pathname: `${localePath}/tags`,
+              }}
+            >
+              {t("viewAllPostsWithTags")}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </Button>

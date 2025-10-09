@@ -3,11 +3,12 @@ import { CategoryRepository } from '@/repositories/category.repository';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const { slug } = await params;
     const categoryRepo = CategoryRepository.getInstance();
-    const category = await categoryRepo.findBySlug(params.slug);
+    const category = await categoryRepo.findBySlug(slug);
 
     if (!category) {
       return NextResponse.json(

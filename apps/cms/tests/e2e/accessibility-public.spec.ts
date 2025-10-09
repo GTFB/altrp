@@ -9,7 +9,7 @@ for (const locale of locales) {
     const pages: string[] = getPages(locale === defaultLocale ? '' : locale);
 
     for (const _page of pages) {
-      test(`should have proper heading structure - ${locale} - ${_page}`, async ({ page }) => {
+      test(`should have proper heading structure - ${locale} - ${_page}`, async ({ page, request }) => {
         test.setTimeout(600_000);
 
         const response = await page.goto(_page, { waitUntil: 'domcontentloaded' });
@@ -28,6 +28,43 @@ for (const locale of locales) {
         expect(!!headingText && headingText.length > 0, `Empty H1 on ${_page}`).toBeTruthy();
 
         await expect(page).toHaveTitle(/\S/);
+
+        // Check that all internal links are working (status < 400)
+        const currentOrigin = new URL(page.url()).origin;
+        const hrefs = await page.$$eval('a[href]', (anchors) =>
+          anchors
+            .map((a) => (a.getAttribute('href') || '').trim())
+            .filter(Boolean)
+        );
+
+        const urls = Array.from(new Set(hrefs))
+          .filter((href) =>
+            !href.startsWith('#') &&
+            !href.startsWith('mailto:') &&
+            !href.startsWith('tel:') &&
+            !href.toLowerCase().startsWith('javascript:')
+          )
+          .map((href) => {
+            try {
+              return new URL(href, page.url()).toString();
+            } catch {
+              return '';
+            }
+          })
+          .filter(Boolean)
+          .filter((url) => {
+            try {
+              return new URL(url).origin === currentOrigin;
+            } catch {
+              return false;
+            }
+          });
+
+        for (const url of urls) {
+          const res = await request.get(url, { maxRedirects: 5 });
+          const linkStatus = res.status();
+          expect(linkStatus, `Broken link ${url} on ${_page}`).toBeLessThan(400);
+        }
       });
     }
   });

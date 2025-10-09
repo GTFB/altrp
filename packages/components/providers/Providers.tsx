@@ -1,26 +1,31 @@
 'use client';
 
-import { ThemeProvider } from 'next-themes';
-import { SessionProvider as NextAuthSessionProvider } from 'next-auth/react';
-import { SessionProvider } from '@/components/providers/SessionProvider';
-import { Toaster } from 'sonner';
-import { LeftSidebarProvider } from './LeftSidebarProvider';
-import { TooltipProvider } from '@/components/ui/tooltip';
+import { ThemeProvider } from "next-themes";
+import { SessionProvider as NextAuthSessionProvider } from "next-auth/react";
+import { SessionProvider } from "@/components/providers/SessionProvider";
+import { Toaster } from "sonner";
+import { LeftSidebarProvider } from "@/components/providers/LeftSidebarProvider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
-export function Providers({ children, session = {} }: { children: React.ReactNode, session: any }) {
-const{leftSidebarOpen=true,theme='light'} = session || {};
-  
-  
+export function Providers({
+  children,
+  session = {},
+}: {
+  children: React.ReactNode;
+  session: any;
+}) {
+  const { leftSidebarOpen = true, theme = "light" } = session || {};
 
   return (
     <SessionProvider session={session}>
       <NextAuthSessionProvider>
-        <LeftSidebarProvider open={leftSidebarOpen} >
+        <LeftSidebarProvider open={leftSidebarOpen}>
           <TooltipProvider>
             <ThemeProvider
-              themes={['light', 'dark']}
+              themes={["light", "dark"]}
               attribute="class"
-              defaultTheme={theme}>
+              defaultTheme={theme}
+            >
               {children}
               <Toaster />
             </ThemeProvider>

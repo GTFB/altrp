@@ -12,7 +12,7 @@ export default function PaginationWithIconAndLabel() {
       <PaginationContent>
         <PaginationItem>
           <PaginationLink
-            href="#"
+            href={{ pathname: "#" }}
             aria-label="Go to previous page"
             size="default"
             className="gap-1 pl-2.5"
@@ -22,19 +22,19 @@ export default function PaginationWithIconAndLabel() {
           </PaginationLink>
         </PaginationItem>
         <PaginationItem>
-          <PaginationLink href="#">1</PaginationLink>
+          <PaginationLink href={{ pathname: "#" }}>1</PaginationLink>
         </PaginationItem>
         <PaginationItem>
-          <PaginationLink href="#" isActive>
+          <PaginationLink href={{ pathname: "#" }} isActive>
             2
           </PaginationLink>
         </PaginationItem>
         <PaginationItem>
-          <PaginationLink href="#">3</PaginationLink>
+          <PaginationLink href={{ pathname: "#" }}>3</PaginationLink>
         </PaginationItem>
         <PaginationItem>
           <PaginationLink
-            href="#"
+            href={{ pathname: "#" }}
             aria-label="Go to next page"
             size="default"
             className="gap-1 pr-2.5"

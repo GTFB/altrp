@@ -1,15 +1,11 @@
-'use client'
+"use client";
 
-import { ReactNode } from 'react'
+import { ReactNode } from "react";
 
 interface MDXLayoutProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 export function MDXLayout({ children }: MDXLayoutProps) {
-  return (
-    <div className="mdx-content">
-      {children}
-    </div>
-  )
+  return <div className="mdx-content">{children}</div>;
 }

@@ -12,21 +12,25 @@ export default function PaginationDemo() {
     <Pagination>
       <PaginationContent>
         <PaginationItem>
-          <PaginationPrevious href="#" size="default" />
+          <PaginationPrevious href={{ pathname: "#" }} size="default" />
         </PaginationItem>
         <PaginationItem>
-          <PaginationLink href="#" size="default">1</PaginationLink>
+          <PaginationLink href={{ pathname: "#" }} size="default">
+            1
+          </PaginationLink>
         </PaginationItem>
         <PaginationItem>
-          <PaginationLink href="#" isActive size="default">
+          <PaginationLink href={{ pathname: "#" }} isActive size="default">
             2
           </PaginationLink>
         </PaginationItem>
         <PaginationItem>
-          <PaginationLink href="#" size="default">3</PaginationLink>
+          <PaginationLink href={{ pathname: "#" }} size="default">
+            3
+          </PaginationLink>
         </PaginationItem>
         <PaginationItem>
-          <PaginationNext href="#" size="default" />
+          <PaginationNext href={{ pathname: "#" }} size="default" />
         </PaginationItem>
       </PaginationContent>
     </Pagination>

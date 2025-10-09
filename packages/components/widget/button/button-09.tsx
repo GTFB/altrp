@@ -9,7 +9,7 @@ const ButtonGradient = ({
   <Button
     className={cn(
       "bg-linear-to-r from-blue-500 to-indigo-500 text-primary-foreground dark:text-foreground shadow-sm hover:to-blue-500",
-      className
+      className,
     )}
     {...props}
   />

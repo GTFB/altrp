@@ -291,7 +291,8 @@
     "publishedOn": "Published on",
     "readMore": "Read more",
     "tags": "Tags",
-    "title": "Blog"
+    "title": "Blog",
+    "viewAllPostsWithTags": "View all posts with tags"
   },
   "breadcrumb": {
     "buildingApplication": "Building Your Application",

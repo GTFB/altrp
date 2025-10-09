@@ -1,4 +1,9 @@
-import { Logo03, Logo04, Logo05, Logo06 } from "@/components/blocks-marketing/logos/logos";
+import {
+  Logo03,
+  Logo04,
+  Logo05,
+  Logo06,
+} from "@/components/blocks-marketing/logos/logos";
 
 const logos = [Logo03, Logo06, Logo04, Logo05, Logo03, Logo06, Logo04, Logo05];
 

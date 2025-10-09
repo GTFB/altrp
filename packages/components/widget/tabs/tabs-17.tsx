@@ -32,7 +32,7 @@ const VerticalBorderedTabs = () => {
             value={item.value}
             className={cn(
               "rounded-none first:rounded-t-md last:rounded-b-md bg-background h-10 w-11 p-0",
-              "data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              "data-[state=active]:bg-primary data-[state=active]:text-primary-foreground",
             )}
           >
             <item.icon className="h-5 w-5" />

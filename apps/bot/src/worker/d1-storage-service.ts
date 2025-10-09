@@ -1,15 +1,15 @@
 import { D1Database } from '@cloudflare/workers-types';
 
 export interface User {
-  id?: number; // Автоинкрементный ID из таблицы users
+  id?: number; // Auto-increment ID from users table
   telegramId: number; // Telegram user ID
   firstName?: string;
   lastName?: string;
   username?: string;
   registeredAt: string;
   topicId?: number;
-  language?: string; // Язык пользователя
-  data?: string; // JSON строка для дополнительных данных
+  language?: string; // User language
+  data?: string; // JSON string for additional data
 }
 
 export interface Registration {
@@ -27,7 +27,7 @@ export interface Registration {
 
 export interface Message {
   id?: number;
-  userId: number; // DB user ID (users.id) - автоинкрементный ID пользователя
+  userId: number; // DB user ID (users.id) - auto-increment user ID
   messageType: 'user_text' | 'user_voice' | 'user_photo' | 'user_document' | 'user_callback' | 'bot_text' | 'bot_photo' | 'bot_voice' | 'bot_document' | 'command';
   direction: 'incoming' | 'outgoing';
   content?: string;
@@ -38,7 +38,7 @@ export interface Message {
   fileName?: string;
   caption?: string;
   topicId?: number;
-  data?: string; // JSON строка для дополнительных данных
+  data?: string; // JSON string for additional data
   createdAt?: string;
 }
 
@@ -52,7 +52,7 @@ export class D1StorageService {
   async initialize(): Promise<void> {
     console.log('🗄️ D1 Storage Service initialized');
     
-    // Проверяем, что таблица messages существует
+    // Check that messages table exists
     try {
       const result = await this.db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='messages'").first();
       if (result) {
@@ -65,7 +65,7 @@ export class D1StorageService {
     }
   }
 
-  // Пользователи
+  // Users
   async addUser(user: User): Promise<void> {
     console.log(`Adding user ${user.telegramId} to D1 database`);
 
@@ -197,13 +197,13 @@ export class D1StorageService {
     }
   }
 
-  // Сессии
+  // Sessions
   async setSession(key: string, value: any): Promise<void> {
     try {
       const telegramUserId = this.extractUserIdFromKey(key);
       const sessionData = JSON.stringify(value);
       
-      // Получаем ID пользователя из таблицы users
+      // Get user ID from users table
       const user = await this.getUser(telegramUserId);
       if (!user || !user.id) {
         throw new Error(`User with telegram ID ${telegramUserId} not found`);
@@ -248,7 +248,7 @@ export class D1StorageService {
     }
   }
 
-  // Регистрации
+  // Registrations
   async addRegistration(registration: Registration): Promise<number> {
     console.log(`Adding registration for user ${registration.userId}`);
 
@@ -299,14 +299,14 @@ export class D1StorageService {
     }
   }
 
-  // Вспомогательные методы
+  // Helper methods
   private extractUserIdFromKey(key: string): number {
-    // Извлекаем user_id из ключа вида "user:123"
+    // Extract user_id from key like "user:123"
     const match = key.match(/user:(\d+)/);
     return match ? parseInt(match[1] || '0') : 0;
   }
 
-  // Проверка существования пользователя
+  // Check user existence
   async userExists(userId: number): Promise<boolean> {
     try {
       const result = await this.db.prepare(`
@@ -320,7 +320,7 @@ export class D1StorageService {
     }
   }
 
-  // Получение пользователя по topic_id
+  // Get user by topic_id
   async getUserIdByTopic(topicId: number): Promise<number | null> {
     console.log(`Getting user ID for topic ${topicId}`);
 
@@ -343,7 +343,7 @@ export class D1StorageService {
     }
   }
 
-  // Получение всех пользователей (для отладки)
+  // Get all users (for debugging)
   async getAllUsers(): Promise<User[]> {
     try {
       const results = await this.db.prepare(`
@@ -367,7 +367,7 @@ export class D1StorageService {
     }
   }
 
-  // Методы для работы с курсами и группами (если нужно)
+  // Methods for working with courses and groups (if needed)
   async getCourses(): Promise<any[]> {
     try {
       const results = await this.db.prepare(`
@@ -414,13 +414,13 @@ export class D1StorageService {
     }
   }
 
-  // Методы для работы с сообщениями
+  // Methods for working with messages
   async addMessage(message: Message): Promise<number> {
     console.log(`💾 D1: Adding message for user ${message.userId}, type: ${message.messageType}, direction: ${message.direction}`);
     console.log(`💾 D1: Message content: ${message.content?.substring(0, 100)}...`);
 
     try {
-      // Проверяем подключение к базе
+      // Check database connection
       if (!this.db) {
         throw new Error('D1 database connection is not initialized');
       }
@@ -572,19 +572,19 @@ export class D1StorageService {
         params = [userId];
       }
 
-      // Общее количество сообщений
+      // Total number of messages
       const totalResult = await this.db.prepare(`
         SELECT COUNT(*) as total FROM messages ${whereClause}
       `).bind(...params).first();
 
-      // Количество по типам
+      // Count by types
       const typeResults = await this.db.prepare(`
         SELECT message_type, COUNT(*) as count 
         FROM messages ${whereClause}
         GROUP BY message_type
       `).bind(...params).all();
 
-      // Количество по направлениям
+      // Count by directions
       const directionResults = await this.db.prepare(`
         SELECT direction, COUNT(*) as count 
         FROM messages ${whereClause}
@@ -627,7 +627,7 @@ export class D1StorageService {
     }
   }
 
-  // Универсальный метод для выполнения произвольных SQL-запросов
+  // Universal method for executing arbitrary SQL queries
   async executeQuery(sql: string, params: any[] = []): Promise<any> {
     try {
       const result = await this.db.prepare(sql).bind(...params).run();

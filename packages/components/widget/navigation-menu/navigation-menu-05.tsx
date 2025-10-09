@@ -28,12 +28,11 @@ export default function NavigationMenuWithActiveItem() {
                 "focus:before:scale-x-100 focus:text-accent-foreground focus:outline-hidden",
                 "disabled:pointer-events-none disabled:opacity-50",
                 "data-active:before:scale-x-100 data-[state=open]:before:scale-x-100",
-                "hover:bg-transparent active:bg-transparent focus:bg-transparent"
+                "hover:bg-transparent active:bg-transparent focus:bg-transparent",
               )}
-    
               active={item.isActive}
             >
-              <Link href={item.href} className="flex-row items-center gap-2.5">
+              <Link href={{ pathname: item.href }} className="flex-row items-center gap-2.5">
                 <item.icon className="h-5 w-5 shrink-0" />
                 {item.title}
               </Link>

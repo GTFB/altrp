@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
-import { PROJECT_SETTINGS } from "../../../settings";
+import { PROJECT_SETTINGS } from "@/settings";
 import { ScriptOptimizer } from "@/components/ui/script-optimizer";
 import { AccessibilityEnhancer } from "@/components/ui/accessibility-enhancer";
 import { PerformanceMonitor } from "@/components/ui/performance-monitor";
@@ -110,6 +110,7 @@ export default function RootLayout({
         <meta name="color-scheme" content="light dark" />
         <meta name="format-detection" content="telephone=no" />
       </head>
+
       <body className={`${geistSans.variable} antialiased`} suppressHydrationWarning>
         <StyleLoader />
         <ScriptOptimizer />
@@ -119,7 +120,6 @@ export default function RootLayout({
           <PageTransition>
             {children}
           </PageTransition>
-          <ToTopButton />
         </ThemeProvider>
       </body>
     </html>

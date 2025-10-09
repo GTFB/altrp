@@ -24,13 +24,16 @@
     ],
     "paths": {
       "@/*": [
-        "./*"
+        "./*",
+        "../../*"
       ],
       "@/components/*": [
-        "./components/*"
+        "./components/*",
+        "../../packages/components/*"
       ],
       "@/lib/*": [
-        "./lib/*"
+        "./lib/*",
+        "../../packages/lib/*"
       ]
     }
   },

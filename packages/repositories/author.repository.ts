@@ -1,30 +1,24 @@
-import { promises as fs } from 'fs';
-import path from 'path';
-import matter from 'gray-matter';
-import { parseMarkdown } from '@/lib/markdown';
-import { z } from 'zod';
-import { getContentDir } from '@/lib/content-path';
+import { getContentDir } from "@/lib/content-path";
+import type { AuthorDataProvider } from "@/types/providers";
+import type { Author } from "@/types/author";
+import { createAuthorProvider } from "@/repositories/providers/factory";
 
-const authorSchema = z.object({
-  name: z.string(),
-  avatar: z.string().optional(),
-  bio: z.string().optional(),
-});
+// const authorSchema = z.object({
+//   name: z.string(),
+//   avatar: z.string().optional(),
+//   bio: z.string().optional(),
+// });
 
-export interface Author {
-  slug: string;
-  name: string;
-  avatar?: string;
-  bio?: string;
-  content?: string;
-}
+// type Author is imported from '@/types/author'
 
 export class AuthorRepository {
   private static instance: AuthorRepository | null = null;
-  private contentDir = getContentDir('authors');
+  private contentDir = getContentDir("authors");
+  private readonly provider: AuthorDataProvider;
 
   private constructor() {
     // Markdown configuration is handled in packages/lib/markdown.ts
+    this.provider = createAuthorProvider();
   }
 
   public static getInstance(): AuthorRepository {
@@ -35,93 +29,27 @@ export class AuthorRepository {
   }
 
   async findAll(): Promise<Author[]> {
-    try {
-      const entries = await fs.readdir(this.contentDir, { withFileTypes: true });
-      const authors: Author[] = [];
-
-      for (const entry of entries) {
-        if (entry.isFile() && entry.name.endsWith('.mdx')) {
-          const slug = entry.name.replace('.mdx', '');
-          const author = await this.findBySlug(slug);
-          if (author) {
-            authors.push(author);
-          }
-        }
-      }
-
-      return authors.sort((a, b) => a.name.localeCompare(b.name));
-    } catch (error) {
-      console.error('Error reading authors:', error);
-      return [];
-    }
+    return this.provider.findAll();
   }
 
   async findBySlug(slug: string): Promise<Author | null> {
-    try {
-      const filePath = path.join(this.contentDir, `${slug}.mdx`);
-      const raw = await fs.readFile(filePath, 'utf8');
-      const { data, content } = matter(raw);
-
-      const validatedData = authorSchema.parse(data);
-      
-      // Parse Markdown content to HTML
-      const parsedContent = await parseMarkdown(content);
-      
-      return {
-        slug,
-        name: validatedData.name,
-        avatar: validatedData.avatar,
-        bio: validatedData.bio,
-        content: parsedContent,
-      };
-    } catch (error) {
-      console.error(`Error reading author ${slug}:`, error);
-      return null;
-    }
+    return this.provider.findBySlug(slug);
   }
 
-  async createAuthor(authorData: Omit<Author, 'slug'> & { slug: string }): Promise<Author | null> {
-    try {
-      const { slug, ...frontmatterData } = authorData;
-      const filePath = path.join(this.contentDir, `${slug}.mdx`);
+  async createAuthor(
+    authorData: Omit<Author, "slug"> & { slug: string },
+  ): Promise<Author | null> {
+    return this.provider.createAuthor(authorData);
+  }
 
-      // Check if author already exists
-      try {
-        await fs.access(filePath);
-        throw new Error('Author with this slug already exists');
-      } catch (error) {
-        if (error instanceof Error && error.message !== 'Author with this slug already exists') {
-          // File doesn't exist, which is good
-        } else {
-          throw error;
-        }
-      }
+  async deleteAuthor(slug: string): Promise<boolean> {
+    return this.provider.deleteAuthor(slug);
+  }
 
-      // Prepare frontmatter
-      const frontmatter = {
-        name: frontmatterData.name,
-        avatar: frontmatterData.avatar,
-        bio: frontmatterData.bio,
-      };
-
-      // Validate frontmatter
-      const validatedFrontmatter = authorSchema.parse(frontmatter);
-
-      // Prepare content
-      const mdxContent = `---\n${Object.entries(validatedFrontmatter)
-        .filter(([_, value]) => value !== undefined && value !== null)
-        .map(([key, value]) => {
-          return `${key}: ${typeof value === 'string' ? `"${value}"` : value}`;
-        })
-        .join('\n')}\n---\n\n${frontmatterData.content || ''}`;
-
-      // Write the author file
-      await fs.writeFile(filePath, mdxContent, 'utf8');
-
-      return this.findBySlug(slug);
-    } catch (error) {
-      console.error('Error creating author:', error);
-      return null;
-    }
+  async updateAuthor(
+    oldSlug: string,
+    updates: Partial<Author> & { newSlug?: string },
+  ): Promise<Author | null> {
+    return this.provider.updateAuthor(oldSlug, updates);
   }
 }

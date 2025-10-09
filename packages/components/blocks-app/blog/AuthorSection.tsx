@@ -1,12 +1,12 @@
-'use client'; 
+"use client";
 
-import { AuthorRepository } from '@/repositories/author.repository';
-import { AuthorCard } from '@/components/blocks-app/AuthorCard';
-import { Button } from '@/components/ui/button';
-import { Loader2, ArrowRight, Users } from 'lucide-react';
-import Link from 'next/link';
-import { useLocale } from 'next-intl';
-import { useEffect, useState } from 'react';
+import { AuthorCard } from "@/components/blocks-app/AuthorCard";
+import { Button } from "@/components/ui/button";
+import { Loader2, ArrowRight, Users } from "lucide-react";
+import Link from "next/link";
+import { useLocale } from "next-intl";
+import { useEffect, useState } from "react";
+import { type Author } from "@/types/author";
 
 interface AuthorSectionProps {
   limit?: number;
@@ -15,30 +15,30 @@ interface AuthorSectionProps {
   description?: string;
 }
 
-export function AuthorSection({ 
-  limit = 6, 
+export function AuthorSection({
+  limit = 6,
   showViewAll = true,
   title = "Our Authors",
-  description = "Meet the talented writers behind our content"
+  description = "Meet the talented writers behind our content",
 }: AuthorSectionProps) {
-    const locale = useLocale() === 'en' ? '' : useLocale();
-  const localePath = locale !== '' ? `/${locale}` : '';
-  const [authors, setAuthors] = useState<any[]>([]);
+  const locale = useLocale() === "en" ? "" : useLocale();
+  const localePath = locale !== "" ? `/${locale}` : "";
+  const [authors, setAuthors] = useState<Author[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchAuthors = async () => {
       try {
-        const response = await fetch('/api/authors');
+        const response = await fetch("/api/authors");
         if (!response.ok) {
-          throw new Error('Failed to fetch authors');
+          throw new Error("Failed to fetch authors");
         }
         const data = await response.json();
         setAuthors(data.authors.slice(0, limit));
         setLoading(false);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
+        setError(err instanceof Error ? err.message : "Unknown error");
         setLoading(false);
       }
     };
@@ -54,7 +54,9 @@ export function AuthorSection({
             <Users className="h-8 w-8 text-muted-foreground mr-2" />
             <h2 className="text-3xl font-bold">{title}</h2>
           </div>
-          <p className="text-destructive mb-4">Error loading authors: {error}</p>
+          <p className="text-destructive mb-4">
+            Error loading authors: {error}
+          </p>
           <Button onClick={() => window.location.reload()} variant="outline">
             Try Again
           </Button>
@@ -114,7 +116,7 @@ export function AuthorSection({
       {showViewAll && (
         <div className="text-center">
           <Button asChild variant="outline" size="lg">
-            <Link href={(localePath + '/authors') as any}>
+            <Link href={{ pathname: localePath + "/authors" }}>
               View All Authors
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>

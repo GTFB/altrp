@@ -9,7 +9,7 @@ const ButtonNeon = ({
   <Button
     className={cn(
       "bg-indigo-500 text-primary-foreground hover:bg-indigo-600 dark:text-foreground shadow-lg shadow-indigo-400 dark:shadow-indigo-700",
-      className
+      className,
     )}
     {...props}
   />

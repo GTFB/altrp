@@ -1,9 +1,12 @@
-'use client';
+"use client";
 
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { postFormSchema, type PostFormData } from '@/lib/validators/form.schema';
-import { TipTapEditor } from '@/components/blocks-app/cms/TipTapEditor';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  postFormSchema,
+  type PostFormData,
+} from "@/lib/validators/form.schema";
+import { TipTapEditor } from "@/components/blocks-app/cms/TipTapEditor";
 
 export function PostForm() {
   const {
@@ -16,7 +19,7 @@ export function PostForm() {
   });
 
   const onSubmit = (data: PostFormData) => {
-    console.log('Form data:', data);
+    console.log("Form data:", data);
   };
 
   return (
@@ -24,7 +27,7 @@ export function PostForm() {
       <div>
         <label className="block text-sm font-medium mb-2">Title</label>
         <input
-          {...register('title')}
+          {...register("title")}
           className="w-full px-3 py-2 border rounded-md bg-background"
         />
         {errors.title && (
@@ -35,7 +38,7 @@ export function PostForm() {
       <div>
         <label className="block text-sm font-medium mb-2">Description</label>
         <textarea
-          {...register('description')}
+          {...register("description")}
           className="w-full px-3 py-2 border rounded-md bg-background"
           rows={3}
         />
@@ -44,7 +47,7 @@ export function PostForm() {
       <div>
         <label className="block text-sm font-medium mb-2">Date</label>
         <input
-          {...register('date')}
+          {...register("date")}
           type="date"
           className="w-full px-3 py-2 border rounded-md bg-background"
         />
@@ -52,9 +55,7 @@ export function PostForm() {
 
       <div>
         <label className="block text-sm font-medium mb-2">Content</label>
-        <TipTapEditor
-          onChange={(content) => setValue('content', content)}
-        />
+        <TipTapEditor onChange={(content) => setValue("content", content)} />
         {errors.content && (
           <p className="text-sm text-red-500 mt-1">{errors.content.message}</p>
         )}

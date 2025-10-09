@@ -1,94 +1,103 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Lock, Eye, EyeOff } from 'lucide-react'
-import { useAuth } from '@/components/providers/AuthProvider'
-import { useTranslations } from '@/hooks/use-translations'
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Lock, Eye, EyeOff } from "lucide-react";
+import { useAuth } from "@/components/providers/AuthProvider";
+import { useTranslations } from "@/hooks/use-translations";
 
 interface PasswordPromptProps {
-  sectionId: string
-  onSuccess: () => void
-  onCancel?: () => void
+  sectionId: string;
+  onSuccess: () => void;
+  onCancel?: () => void;
 }
 
-export function PasswordPrompt({ sectionId, onSuccess, onCancel }: PasswordPromptProps) {
-  const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [groupInfo, setGroupInfo] = useState<string>('')
-  const { setSessionData } = useAuth()
-  const t = useTranslations()
+export function PasswordPrompt({
+  sectionId,
+  onSuccess,
+  onCancel,
+}: PasswordPromptProps) {
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [groupInfo, setGroupInfo] = useState<string>("");
+  const { setSessionData } = useAuth();
+  const t = useTranslations();
 
   // Handle Escape key and background click
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        handleCancel()
+      if (event.key === "Escape") {
+        handleCancel();
       }
-    }
+    };
 
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [])
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const handleCancel = () => {
     if (onCancel) {
-      onCancel()
+      onCancel();
     } else {
       // If no cancel handler, go back in browser history
       if (window.history.length > 1) {
-        window.history.back()
+        window.history.back();
       } else {
         // If no history, reload the page to show password prompt again
-        window.location.reload()
+        window.location.reload();
       }
     }
-  }
+  };
 
   const handleBackgroundClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
-      handleCancel()
+      handleCancel();
     }
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError('')
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
 
     try {
-      const response = await fetch('/api/auth', {
-        method: 'POST',
+      const response = await fetch("/api/auth", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ password, sectionId }),
-      })
+      });
 
-      const data = await response.json()
-      console.log('data', data)
-      setSessionData(data)
-
+      const data = await response.json();
+      console.log("data", data);
+      setSessionData(data);
 
       if (response.ok && data.success) {
-        setGroupInfo(`${t('auth.accessGranted')} ${data.groupName}`)
-        onSuccess()
+        setGroupInfo(`${t("auth.accessGranted")} ${data.groupName}`);
+        onSuccess();
       } else {
-        setError(data.error || t('auth.authenticationFailed'))
+        setError(data.error || t("auth.authenticationFailed"));
       }
-    } catch (err) {
-      setError(t('auth.networkError'))
+    } catch {
+      setError(t("auth.networkError"));
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
-    <div 
+    <div
       className="fixed inset-0 z-[9999] flex items-center justify-center bg-background/60 backdrop-blur-sm p-4"
       onClick={handleBackgroundClick}
     >
@@ -97,9 +106,9 @@ export function PasswordPrompt({ sectionId, onSuccess, onCancel }: PasswordPromp
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
             <Lock className="h-6 w-6 text-primary" />
           </div>
-          <CardTitle>{t('auth.protectedContent')}</CardTitle>
+          <CardTitle>{t("auth.protectedContent")}</CardTitle>
           <CardDescription>
-            {t('auth.passwordProtected')}
+            {t("auth.passwordProtected")}
             {groupInfo && (
               <div className="mt-2 text-sm text-green-600 dark:text-green-400">
                 {groupInfo}
@@ -111,7 +120,7 @@ export function PasswordPrompt({ sectionId, onSuccess, onCancel }: PasswordPromp
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="password" className="text-sm font-medium">
-                {t('common.password')}
+                {t("common.password")}
               </label>
               <div className="relative">
                 <Button
@@ -129,10 +138,10 @@ export function PasswordPrompt({ sectionId, onSuccess, onCancel }: PasswordPromp
                 </Button>
                 <Input
                   id="password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder={t('common.enterPassword')}
+                  placeholder={t("common.enterPassword")}
                   className="pl-10"
                   required
                 />
@@ -147,11 +156,11 @@ export function PasswordPrompt({ sectionId, onSuccess, onCancel }: PasswordPromp
 
             <div className="flex gap-2">
               <Button type="submit" className="flex-1" disabled={isLoading}>
-                {isLoading ? t('common.verifying') : t('common.unlockContent')}
+                {isLoading ? t("common.verifying") : t("common.unlockContent")}
               </Button>
               {onCancel && (
                 <Button type="button" variant="outline" onClick={onCancel}>
-                  {t('common.cancel')}
+                  {t("common.cancel")}
                 </Button>
               )}
             </div>
@@ -159,5 +168,5 @@ export function PasswordPrompt({ sectionId, onSuccess, onCancel }: PasswordPromp
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

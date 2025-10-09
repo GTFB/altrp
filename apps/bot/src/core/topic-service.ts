@@ -19,7 +19,7 @@ export class TopicService {
   }
 
   /**
-   * Создает топик в админской группе для нового пользователя
+   * Creates topic in admin group for new user
    */
   async createTopicInAdminGroup(userId: number, user: TelegramUser): Promise<number | null> {
     try {
@@ -35,7 +35,7 @@ export class TopicService {
         body: JSON.stringify({
           chat_id: this.adminChatId,
           name: topicName,
-          icon_color: 0x6FB9F0, // Синий цвет иконки
+          icon_color: 0x6FB9F0, // Blue icon color
           icon_custom_emoji_id: undefined
         })
       });
@@ -52,11 +52,11 @@ export class TopicService {
       if (topicId) {
         console.log(`Topic created successfully with ID: ${topicId}`);
         
-        // Отправляем приветственное сообщение в топик
+        // Send welcome message to topic
         await this.messageService.sendMessageToTopic(this.adminChatId, topicId, 
-          `👋 Новый пользователь!\n\n` +
-          `Имя: ${user.first_name} ${user.last_name || ''}\n` +
-          `Username: @${user.username || 'не указан'}\n` +
+          `👋 New user!\n\n` +
+          `Name: ${user.first_name} ${user.last_name || ''}\n` +
+          `Username: @${user.username || 'not specified'}\n` +
           `ID: ${userId}\n\n`
         );
         
@@ -72,7 +72,7 @@ export class TopicService {
   }
 
   /**
-   * Пересылает сообщение пользователю из топика админской группы
+   * Forwards message to user from admin group topic
    */
   async forwardMessageToUser(userId: number, message: TelegramMessage, getDbUserId: (telegramId: number) => Promise<number | null>): Promise<void> {
     try {
@@ -83,17 +83,17 @@ export class TopicService {
       }
 
       if (message.text) {
-        // Пересылаем текстовое сообщение
+        // Forward text message
         await this.messageService.sendMessage(userId, message.text, dbUserId);
       } else if (message.voice) {
-        // Пересылаем голосовое сообщение
+        // Forward voice message
         await this.messageService.sendVoiceToUser(userId, message.voice.file_id, message.voice.duration, dbUserId);
       } else if (message.photo && message.photo.length > 0) {
-        // Пересылаем фото
+        // Forward photo
         const photoFileId = message.photo?.[message.photo.length - 1]?.file_id;
         await this.messageService.sendPhotoToUser(userId, photoFileId || '', message.caption, dbUserId);
       } else if (message.document) {
-        // Пересылаем документ
+        // Forward document
         await this.messageService.sendDocumentToUser(userId, message.document.file_id, message.document.file_name, message.caption, dbUserId);
       } 
     } catch (error) {
@@ -102,35 +102,35 @@ export class TopicService {
   }
 
   /**
-   * Пересылает сообщение пользователя в его топик в админской группе
+   * Forwards user message to their topic in admin group
    */
   async forwardMessageToUserTopic(userId: number, topicId: number, message: TelegramMessage): Promise<void> {
     try {
-      // Определяем тип сообщения и создаем соответствующее описание
+      // Determine message type and create appropriate description
       let messageDescription = '';
       let fileId = '';
       
       if (message.text) {
-        messageDescription = `📝 Текст: ${message.text}`;
+        messageDescription = `📝 Text: ${message.text}`;
       } else if (message.voice) {
-        messageDescription = `🎤 Голосовое сообщение (${message.voice.duration}с)`;
+        messageDescription = `🎤 Voice message (${message.voice.duration}s)`;
         fileId = message.voice.file_id;
       } else if (message.photo && message.photo.length > 0) {
-        messageDescription = `📷 Фото`;
-        fileId = message.photo?.[message.photo.length - 1]?.file_id || ''; // Берем самое большое фото
+        messageDescription = `📷 Photo`;
+        fileId = message.photo?.[message.photo.length - 1]?.file_id || ''; // Take largest photo
       } else if (message.document) {
-        messageDescription = `📄 Документ: ${message.document.file_name || 'Без названия'}`;
+        messageDescription = `📄 Document: ${message.document.file_name || 'No name'}`;
         fileId = message.document.file_id;
       } else {
-        messageDescription = `📎 Медиафайл`;
+        messageDescription = `📎 Media file`;
       }
 
-      // Отправляем описание сообщения в топик
+      // Send message description to topic
       const topicMessage = `👤 ${message.from.first_name} ${message.from.last_name || ''} (ID: ${userId})\n\n${messageDescription}`;
       
       await this.messageService.sendMessageToTopic(this.adminChatId, topicId, topicMessage);
 
-      // Если есть файл, пересылаем его
+      // If there is a file, forward it
       if (fileId) {
         await this.forwardFileToTopic(topicId, fileId, message);
       }
@@ -141,7 +141,7 @@ export class TopicService {
   }
 
   /**
-   * Пересылает файл в топик админской группы
+   * Forwards file to admin group topic
    */
   async forwardFileToTopic(topicId: number, fileId: string, message: TelegramMessage): Promise<void> {
     try {
@@ -153,7 +153,7 @@ export class TopicService {
         message_id: message.message_id
       };
 
-      // Определяем метод в зависимости от типа файла
+      // Determine method based on file type
       if (message.voice) {
         method = 'sendVoice';
         body = {
@@ -176,7 +176,7 @@ export class TopicService {
           document: fileId
         };
       } else {
-        // Используем общий метод пересылки
+        // Use general forwarding method
         method = 'forwardMessage';
         body = {
           chat_id: this.adminChatId,
@@ -206,29 +206,29 @@ export class TopicService {
   }
 
   /**
-   * Обрабатывает сообщение из топика админской группы
+   * Processes message from admin group topic
    */
   async handleMessageFromTopic(message: TelegramMessage, getUserIdByTopic: (topicId: number) => Promise<number | null>, getDbUserId: (telegramId: number) => Promise<number | null>): Promise<void> {
     const topicId = (message as any).message_thread_id;
     
     console.log(`Processing message from topic ${topicId}`);
 
-    // Находим пользователя по topic_id
+    // Find user by topic_id
     const userId = await getUserIdByTopic(topicId!);
     
     if (userId) {
       console.log(`Found user ${userId} for topic ${topicId}`);
       
-      // Проверяем, если это команда (начинается с '/'), то не пересылаем
+      // Check if this is a command (starts with '/'), then don't forward
       if (message.text && message.text.startsWith('/')) {
         console.log(`Command message from topic ignored: ${message.text}`);
         return;
       }
       
-      // Пересылаем сообщение пользователю
+      // Forward message to user
       await this.forwardMessageToUser(userId, message, getDbUserId);
       
-      // Сообщение уже логируется в соответствующих методах sendMessage/sendVoice/sendPhoto/sendDocument
+      // Message is already logged in corresponding methods sendMessage/sendVoice/sendPhoto/sendDocument
     } else {
       console.log(`No user found for topic ${topicId}`);
     }

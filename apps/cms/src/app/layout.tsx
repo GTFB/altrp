@@ -1,13 +1,7 @@
-import { DynamicHtml } from '@/components/misc/layout/DynamicHtml';
 import { IntlProvider } from '@/components/providers/IntlProvider';
 import { Providers } from '@/components/providers/Providers';
 import './globals.css';
 import { getSession } from '@/lib/cookie-session';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Search } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
-import { Settings } from 'lucide-react';
 import { getMessages } from 'next-intl/server';
 import { headers } from 'next/headers';
 import { i18nConfig } from '@/config/i18n';
@@ -61,7 +55,7 @@ export default async function RootLayout({
   const messages = await getMessages({ locale: currentLocale });
 
   return (
-    <DynamicHtml>
+    <html lang={locale} suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" />
       </head>
@@ -74,6 +68,6 @@ export default async function RootLayout({
           </Providers>
         </body>
       </IntlProvider>
-    </DynamicHtml>
+    </html>
   );
 }

@@ -2,10 +2,10 @@ import type { BotFlow, FlowStepType } from '../core/flow-types';
 
 export const flows: Record<string, BotFlow> = {
 
-  // Основной флоу для команды /start (регистрация + приветствие)
+  // Main flow for /start command (registration + welcome)
   start_registration: {
     name: 'start_registration',
-    description: 'Проверка языка и выбор действия',
+    description: 'Language check and action selection',
     steps: [
       {
         type: 'handler',
@@ -17,15 +17,15 @@ export const flows: Record<string, BotFlow> = {
         type: 'handler',
         id: 'check_language_and_route',
         handlerName: 'checkLanguageAndRoute'
-        // Handler сам решает куда перейти: send_lang или onboarding
+        // Handler decides where to go: send_lang or onboarding
       },
       {
         type: 'message',
         id: 'send_lang',
         messageKey: 'selectLanguage',
         keyboardKey: 'lang'
-        // Значение языка сохраняется через callbackActions в callbacks.ts
-        // sr/ru кнопки сохраняют выбор в profile.language и запускают onboarding
+        // Language value is saved through callbackActions in callbacks.ts
+        // sr/ru buttons save selection in profile.language and start onboarding
       },
       {
         type: 'handler',
@@ -44,13 +44,13 @@ export const flows: Record<string, BotFlow> = {
 
   onboarding: {
     name: 'onboarding',
-    description: 'Процесс первичного заполнения карточки организации',
+    description: 'Primary organization card filling process',
     steps: [
       {
         type: 'handler',
         id: 'check_user_company',
         handlerName: 'checkUserCompany'
-        // Handler сам решает куда перейти: main_menu или send_welcome
+        // Handler decides where to go: main_menu or send_welcome
       },
       {
         type: 'message',
@@ -123,7 +123,7 @@ export const flows: Record<string, BotFlow> = {
   
   menu: {
     name: 'menu',
-    description: 'Главное меню',
+    description: 'Main menu',
     steps: [
       {
         type: 'message',
@@ -137,7 +137,7 @@ export const flows: Record<string, BotFlow> = {
 
   create_invoice: {
     name: 'create_invoice',
-    description: 'Выставить счет',
+    description: 'Create invoice',
     steps: [
       {
         type: 'wait_input',
@@ -234,7 +234,7 @@ export const flows: Record<string, BotFlow> = {
 
   consultation: {
     name: 'consultation',
-    description: 'Запрос консультации',
+    description: 'Consultation request',
     steps: [
       {
         type: 'message',
@@ -274,7 +274,7 @@ export const flows: Record<string, BotFlow> = {
 
   doc_templates: {
     name: 'doc_templates',
-    description: 'Запрос шаблона',
+    description: 'Template request',
     steps: [
       {
         type: 'message',
@@ -299,7 +299,7 @@ export const flows: Record<string, BotFlow> = {
 
   reports: {
     name: 'reports',
-    description: 'Отчеты',
+    description: 'Reports',
     steps: [
       {
         type: 'message',
@@ -344,7 +344,7 @@ export const flows: Record<string, BotFlow> = {
 
   profile: {
     name: 'profile',
-    description: 'Меню редактирования профиля',
+    description: 'Profile editing menu',
     steps: [
       {
         type: 'dynamic',
@@ -357,7 +357,7 @@ export const flows: Record<string, BotFlow> = {
 
   edit_company_name: {
     name: 'edit_company_name',
-    description: 'Изменение названия компании',
+    description: 'Company name change',
     steps: [
       {
         type: 'wait_input',
@@ -382,7 +382,7 @@ export const flows: Record<string, BotFlow> = {
 
   edit_company_pib: {
     name: 'edit_company_pib',
-    description: 'Изменение PIB компании',
+    description: 'Company PIB change',
     steps: [
       {
         type: 'wait_input',
@@ -408,7 +408,7 @@ export const flows: Record<string, BotFlow> = {
 
   edit_company_okved: {
     name: 'edit_company_okved',
-    description: 'Изменение ОКВЭД компании',
+    description: 'Company OKVED change',
     steps: [
       {
         type: 'wait_input',
@@ -433,7 +433,7 @@ export const flows: Record<string, BotFlow> = {
 
   edit_language: {
     name: 'edit_language',
-    description: 'Изменение языка',
+    description: 'Language change',
     steps: [
       {
         type: 'message',
@@ -457,7 +457,7 @@ export const flows: Record<string, BotFlow> = {
 
   edit_service: {
     name: 'edit_service',
-    description: 'редактирование услуги',
+    description: 'Service editing',
     steps: [
       {
         type: 'dynamic',

@@ -88,27 +88,24 @@ const Team03Page = () => {
                 <Button
                   className="bg-accent hover:bg-accent shadow-none"
                   size="icon"
-        
                 >
-                  <Link href="#" target="_blank">
+                  <Link href={{ pathname: "#" }} target="_blank">
                     <TwitterIcon className="stroke-muted-foreground" />
                   </Link>
                 </Button>
                 <Button
                   className="bg-accent hover:bg-accent shadow-none"
                   size="icon"
-        
                 >
-                  <Link href="#" target="_blank">
+                  <Link href={{ pathname: "#" }} target="_blank">
                     <DribbbleIcon className="stroke-muted-foreground" />
                   </Link>
                 </Button>
                 <Button
                   className="bg-accent hover:bg-accent shadow-none"
                   size="icon"
-        
                 >
-                  <Link href="#" target="_blank">
+                  <Link href={{ pathname: "#" }} target="_blank">
                     <TwitchIcon className="stroke-muted-foreground" />
                   </Link>
                 </Button>

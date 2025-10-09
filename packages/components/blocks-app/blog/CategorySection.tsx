@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { CategoryRepository } from '@/repositories/category.repository';
-import { CategoryCard } from '@/components/blocks-app/CategoryCard';
-import { Button } from '@/components/ui/button';
-import { Loader2, ArrowRight, Tag } from 'lucide-react';
-import Link from 'next/link';
-import { useLocale } from 'next-intl';
-import { useEffect, useState } from 'react';
+import { CategoryCard } from "@/components/blocks-app/CategoryCard";
+import { Button } from "@/components/ui/button";
+import { Loader2, ArrowRight, Tag } from "lucide-react";
+import Link from "next/link";
+import { useLocale } from "next-intl";
+import { useEffect, useState } from "react";
+import { type Category } from "@/types/category";
 
 interface CategorySectionProps {
   limit?: number;
@@ -15,30 +15,30 @@ interface CategorySectionProps {
   description?: string;
 }
 
-export function CategorySection({ 
-  limit = 6, 
+export function CategorySection({
+  limit = 6,
   showViewAll = true,
   title = "Categories",
-  description = "Explore our content organized by topics"
+  description = "Explore our content organized by topics",
 }: CategorySectionProps) {
-    const locale = useLocale() === 'en' ? '' : useLocale();
-  const localePath = locale !== '' ? `/${locale}` : '';
-  const [categories, setCategories] = useState<any[]>([]);
+  const locale = useLocale() === "en" ? "" : useLocale();
+  const localePath = locale !== "" ? `/${locale}` : "";
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch('/api/categories');
+        const response = await fetch("/api/categories");
         if (!response.ok) {
-          throw new Error('Failed to fetch categories');
+          throw new Error("Failed to fetch categories");
         }
         const data = await response.json();
         setCategories(data.categories.slice(0, limit));
         setLoading(false);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
+        setError(err instanceof Error ? err.message : "Unknown error");
         setLoading(false);
       }
     };
@@ -54,7 +54,9 @@ export function CategorySection({
             <Tag className="h-8 w-8 text-muted-foreground mr-2" />
             <h2 className="text-3xl font-bold">{title}</h2>
           </div>
-          <p className="text-destructive mb-4">Error loading categories: {error}</p>
+          <p className="text-destructive mb-4">
+            Error loading categories: {error}
+          </p>
           <Button onClick={() => window.location.reload()} variant="outline">
             Try Again
           </Button>
@@ -114,7 +116,11 @@ export function CategorySection({
       {showViewAll && (
         <div className="text-center">
           <Button asChild variant="outline" size="lg">
-            <Link href={`${localePath}/categories`}>
+            <Link
+              href={{
+                pathname: `${localePath}/categories`,
+              }}
+            >
               View All Categories
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>

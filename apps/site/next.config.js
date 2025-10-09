@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Settings for production (static export)
+
   ...(process.env.NODE_ENV === 'production' && {
     output: 'export',
     trailingSlash: true,
@@ -18,55 +18,16 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false,
   generateEtags: false,
-  // Performance optimization
+  //  
   experimental: {
-    // optimizeCss: true, // Disabled due to critters issues in static export
+    // optimizeCss: true, 
     optimizePackageImports: ['lucide-react'],
   },
-  // Settings for performance improvement
+  //  
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
-  // Caching settings (disabled for static export)
-  // async headers() {
-  //   return [
-  //     {
-  //       source: '/(.*)',
-  //       headers: [
-  //         {
-  //           key: 'X-Content-Type-Options',
-  //           value: 'nosniff',
-  //         },
-  //         {
-  //           key: 'X-Frame-Options',
-  //           value: 'DENY',
-  //         },
-  //         {
-  //           key: 'X-XSS-Protection',
-  //           value: '1; mode=block',
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       source: '/images/(.*)',
-  //       headers: [
-  //         {
-  //           key: 'Cache-Control',
-  //           value: 'public, max-age=31536000, immutable',
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       source: '/_next/static/(.*)',
-  //       headers: [
-  //         {
-  //           key: 'Cache-Control',
-  //           value: 'public, max-age=31536000, immutable',
-  //         },
-  //       ],
-  //     },
-  //   ];
-  // },
+
 }
 
 module.exports = nextConfig

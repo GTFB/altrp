@@ -1,7 +1,7 @@
-import { CategoryRepository } from '@/repositories/category.repository';
-import { CategoryCard } from '@/components/blocks-app/CategoryCard';
+import { CategoryRepository } from "@/repositories/category.repository";
+import { CategoryCard } from "@/components/blocks-app/CategoryCard";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function CategoryList() {
   const categoryRepo = CategoryRepository.getInstance();

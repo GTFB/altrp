@@ -8,8 +8,8 @@ export interface MessageServiceConfig {
 }
 
 /**
- * Сервис для работы с сообщениями Telegram бота
- * Отвечает за отправку сообщений и их логирование
+ * Service for working with Telegram bot messages
+ * Responsible for sending messages and their logging
  */
 export class MessageService {
   private botToken: string;
@@ -21,11 +21,11 @@ export class MessageService {
   }
 
   // ===========================================
-  // МЕТОДЫ ОТПРАВКИ СООБЩЕНИЙ
+  // MESSAGE SENDING METHODS
   // ===========================================
 
   /**
-   * Отправляет текстовое сообщение
+   * Sends text message
    */
   async sendMessage(chatId: number, text: string, dbUserId: number): Promise<void> {
     try {
@@ -50,7 +50,7 @@ export class MessageService {
       const result = await response.json();
       console.log('Message sent successfully:', (result as any).message_id);
 
-      // Логируем отправленное сообщение
+      // Log sent message
       await this.logSentMessage(chatId, text, (result as any).message_id, dbUserId);
     } catch (error) {
       console.error('Error sending message:', error);
@@ -58,7 +58,7 @@ export class MessageService {
   }
 
   /**
-   * Отправляет сообщение с клавиатурой
+   * Sends message with keyboard
    */
   async sendMessageWithKeyboard(chatId: number, text: string, replyMarkup: any, dbUserId: number): Promise<void> {
     try {
@@ -84,7 +84,7 @@ export class MessageService {
       const result = await response.json();
       console.log('Message with keyboard sent successfully:', (result as any).message_id);
 
-      // Логируем отправленное сообщение
+      // Log sent message
       await this.logSentMessage(chatId, text, (result as any).message_id, dbUserId);
     } catch (error) {
       console.error('Error sending message with keyboard:', error);
@@ -92,7 +92,7 @@ export class MessageService {
   }
 
   /**
-   * Отправляет голосовое сообщение
+   * Sends voice message
    */
   async sendVoiceToUser(userId: number, fileId: string, duration: number, dbUserId: number): Promise<void> {
     try {
@@ -115,7 +115,7 @@ export class MessageService {
         const result = await response.json();
         console.log('Voice sent to user successfully');
         
-        // Логируем отправленное голосовое сообщение
+        // Log sent voice message
         await this.logSentVoiceMessage(userId, fileId, (result as any).message_id, duration, dbUserId);
       }
     } catch (error) {
@@ -124,7 +124,7 @@ export class MessageService {
   }
 
   /**
-   * Отправляет фото
+   * Sends photo
    */
   async sendPhotoToUser(userId: number, fileId: string, caption: string | undefined, dbUserId: number): Promise<void> {
     try {
@@ -147,7 +147,7 @@ export class MessageService {
         const result = await response.json();
         console.log('Photo sent to user successfully');
         
-        // Логируем отправленное фото
+        // Log sent photo
         await this.logSentPhotoMessage(userId, fileId, (result as any).message_id, caption, dbUserId);
       }
     } catch (error) {
@@ -156,7 +156,7 @@ export class MessageService {
   }
 
   /**
-   * Отправляет документ
+   * Sends document
    */
   async sendDocumentToUser(userId: number, fileId: string, fileName: string | undefined, caption: string | undefined, dbUserId: number): Promise<void> {
     try {
@@ -179,7 +179,7 @@ export class MessageService {
         const result = await response.json();
         console.log('Document sent to user successfully');
         
-        // Логируем отправленный документ
+        // Log sent document
         await this.logSentDocumentMessage(userId, fileId, (result as any).message_id, fileName, caption, dbUserId);
       }
     } catch (error) {
@@ -188,7 +188,7 @@ export class MessageService {
   }
 
   /**
-   * Отправляет сообщение в топик
+   * Sends message to topic
    */
   async sendMessageToTopic(chatId: number, topicId: number, text: string): Promise<void> {
     try {
@@ -215,7 +215,7 @@ export class MessageService {
   }
 
   /**
-   * Отвечает на callback query
+   * Answers callback query
    */
   async answerCallbackQuery(callbackQueryId: string): Promise<void> {
     try {
@@ -241,14 +241,14 @@ export class MessageService {
   }
 
   /**
-   * Обрабатывает callback query: логирует и отвечает на него
+   * Handles callback query: logs and answers it
    */
   async handleCallbackQuery(callbackQuery: any, dbUserId: number): Promise<void> {
     try {
-      // Логируем callback query
+      // Log callback query
       await this.logCallbackQuery(callbackQuery, dbUserId);
       
-      // Отвечаем на callback query чтобы убрать индикатор загрузки
+      // Answer callback query to remove loading indicator
       await this.answerCallbackQuery(callbackQuery.id);
       
       console.log(`✅ Callback query handled successfully for user with DB ID: ${dbUserId}`);
@@ -259,18 +259,18 @@ export class MessageService {
   }
 
   // ===========================================
-  // МЕТОДЫ ЛОГИРОВАНИЯ СООБЩЕНИЙ
+  // MESSAGE LOGGING METHODS
   // ===========================================
 
   /**
-   * Логирует входящее сообщение от пользователя
+   * Logs incoming message from user
    */
   async logMessage(message: TelegramMessage, direction: 'incoming' | 'outgoing', dbUserId: number): Promise<void> {
     try {
       console.log(`📝 Logging ${direction} message from user ${message.from.id} (DB ID: ${dbUserId})`);
       
       const messageLog = {
-        userId: dbUserId, // Используем ID из таблицы users, а не Telegram ID
+        userId: dbUserId, // Use ID from users table, not Telegram ID
         messageType: this.getMessageType(message),
         direction,
         content: message.text || '',
@@ -292,14 +292,14 @@ export class MessageService {
   }
 
   /**
-   * Логирует callback query
+   * Logs callback query
    */
   async logCallbackQuery(callbackQuery: TelegramCallbackQuery, dbUserId: number): Promise<void> {
     try {
       console.log(`🔘 Logging callback query from user ${callbackQuery.from.id} (DB ID: ${dbUserId}): ${callbackQuery.data}`);
       
       const messageLog = {
-        userId: dbUserId, // Используем ID из таблицы users, а не Telegram ID
+        userId: dbUserId, // Use ID from users table, not Telegram ID
         messageType: 'user_callback' as const,
         direction: 'incoming' as const,
         content: callbackQuery.data || '',
@@ -319,14 +319,14 @@ export class MessageService {
   }
 
   /**
-   * Логирует отправленное текстовое сообщение
+   * Logs sent text message
    */
   async logSentMessage(chatId: number, text: string, messageId: number, dbUserId: number): Promise<void> {
     try {
       console.log(`🤖 Logging bot message to user ${chatId} (DB ID: ${dbUserId})`);
       
       const messageLog = {
-        userId: dbUserId, // Используем ID из таблицы users, а не Telegram ID
+        userId: dbUserId, // Use ID from users table, not Telegram ID
         messageType: 'bot_text' as const,
         direction: 'outgoing' as const,
         content: text,
@@ -345,14 +345,14 @@ export class MessageService {
   }
 
   /**
-   * Логирует отправленное голосовое сообщение
+   * Logs sent voice message
    */
   async logSentVoiceMessage(userId: number, fileId: string, messageId: number, duration: number, dbUserId: number): Promise<void> {
     try {
       console.log(`🎤 Logging bot voice message to user ${userId} (DB ID: ${dbUserId})`);
       
       const messageLog = {
-        userId: dbUserId, // Используем ID из таблицы users, а не Telegram ID
+        userId: dbUserId, // Use ID from users table, not Telegram ID
         messageType: 'bot_voice' as const,
         direction: 'outgoing' as const,
         content: `Voice message (${duration}s)`,
@@ -372,14 +372,14 @@ export class MessageService {
   }
 
   /**
-   * Логирует отправленное фото
+   * Logs sent photo
    */
   async logSentPhotoMessage(userId: number, fileId: string, messageId: number, caption: string | undefined, dbUserId: number): Promise<void> {
     try {
       console.log(`📷 Logging bot photo message to user ${userId} (DB ID: ${dbUserId})`);
       
       const messageLog = {
-        userId: dbUserId, // Используем ID из таблицы users, а не Telegram ID
+        userId: dbUserId, // Use ID from users table, not Telegram ID
         messageType: 'bot_photo' as const,
         direction: 'outgoing' as const,
         content: caption || 'Photo',
@@ -400,14 +400,14 @@ export class MessageService {
   }
 
   /**
-   * Логирует отправленный документ
+   * Logs sent document
    */
   async logSentDocumentMessage(userId: number, fileId: string, messageId: number, fileName: string | undefined, caption: string | undefined, dbUserId: number): Promise<void> {
     try {
       console.log(`📄 Logging bot document message to user ${userId} (DB ID: ${dbUserId})`);
       
       const messageLog = {
-        userId: dbUserId, // Используем ID из таблицы users, а не Telegram ID
+        userId: dbUserId, // Use ID from users table, not Telegram ID
         messageType: 'bot_document' as const,
         direction: 'outgoing' as const,
         content: caption || `Document: ${fileName || 'Unknown'}`,
@@ -429,11 +429,11 @@ export class MessageService {
   }
 
   // ===========================================
-  // ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
+  // HELPER METHODS
   // ===========================================
 
   /**
-   * Определяет тип входящего сообщения
+   * Determines the type of incoming message
    */
   private getMessageType(message: TelegramMessage): 'user_text' | 'user_voice' | 'user_photo' | 'user_document' {
     if (message.text) return 'user_text';
@@ -444,7 +444,7 @@ export class MessageService {
   }
 
   /**
-   * Определяет тип исходящего сообщения от бота
+   * Determines the type of outgoing message from bot
    */
   private getBotMessageType(message: TelegramMessage): 'bot_text' | 'bot_voice' | 'bot_photo' | 'bot_document' {
     if (message.text) return 'bot_text';

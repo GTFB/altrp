@@ -26,12 +26,11 @@ export default function NavigationMenuMobile() {
             <NavigationMenuLink
               className={cn(
                 navigationMenuTriggerStyle(),
-                "flex flex-col h-auto items-center px-5 py-2.5"
+                "flex flex-col h-auto items-center px-5 py-2.5",
               )}
               active={item.isActive}
-    
             >
-              <Link href={item.href}>
+              <Link href={{ pathname: item.href }}>
                 <item.icon className="mb-1.5 h-5 w-5" />
                 {item.title}
               </Link>

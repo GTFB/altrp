@@ -15,7 +15,8 @@
     "publishedOn": "发布于",
     "readMore": "阅读更多",
     "tags": "标签",
-    "title": "博客"
+    "title": "博客",
+    "viewAllPostsWithTags": "查看所有带标签的文章"
   },
   "breadcrumb": {
     "buildingApplication": "构建您的应用程序",

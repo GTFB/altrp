@@ -1,22 +1,22 @@
 export interface BaseFlowStep {
   type: 'message' | 'wait_input' | 'callback' | 'condition' | 'handler' | 'flow' | 'delay' | 'forwarding_control' | 'dynamic';
-  id?: string; // Уникальный ID шага для навигации
+  id?: string; // Unique step ID for navigation
 }
 
 export interface MessageStep extends BaseFlowStep {
   type: 'message';
   messageKey: string;
   keyboardKey?: string;
-  nextStep?: string | number; // ID следующего шага или номер
+  nextStep?: string | number; // Next step ID or number
 }
 
 export interface WaitInputStep extends BaseFlowStep {
   type: 'wait_input';
-  prompt?: string; // Текст запроса (опционально)
-  saveToVariable: string; // Путь куда сохранить ответ (например: "onboarding.name")
+  prompt?: string; // Request text (optional)
+  saveToVariable: string; // Path where to save response (e.g.: "onboarding.name")
   validation?: {
     type: 'text' | 'number' | 'email' | 'phone' | 'url';
-    pattern?: string; // regex для валидации
+    pattern?: string; // regex for validation
     errorMessage?: string;
   };
   nextStep?: string | number;
@@ -26,54 +26,54 @@ export interface CallbackStep extends BaseFlowStep {
   type: 'callback';
   buttons: Array<{
     text: string;
-    value: any; // Значение которое сохраняется
-    saveToVariable?: string; // Куда сохранить значение
-    nextStep?: string | number; // Следующий шаг для этой кнопки
-    nextFlow?: string; // Следующий флоу для этой кнопки
+    value: any; // Value that gets saved
+    saveToVariable?: string; // Where to save value
+    nextStep?: string | number; // Next step for this button
+    nextFlow?: string; // Next flow for this button
   }>;
 }
 
 export interface ConditionStep extends BaseFlowStep {
   type: 'condition';
-  condition: string; // JS условие как строка
-  trueStep?: string | number; // Шаг если условие true
-  falseStep?: string | number; // Шаг если условие false
-  trueFlow?: string; // Флоу если условие true
-  falseFlow?: string; // Флоу если условие false
+  condition: string; // JS condition as string
+  trueStep?: string | number; // Step if condition is true
+  falseStep?: string | number; // Step if condition is false
+  trueFlow?: string; // Flow if condition is true
+  falseFlow?: string; // Flow if condition is false
 }
 
 export interface HandlerStep extends BaseFlowStep {
   type: 'handler';
-  handlerName: string; // Имя кастомного обработчика
+  handlerName: string; // Custom handler name
   nextStep?: string | number;
 }
 
 export interface FlowStep extends BaseFlowStep {
   type: 'flow';
-  flowName: string; // Имя флоу для перехода
-  returnStep?: string | number; // Куда вернуться после завершения флоу
+  flowName: string; // Flow name for transition
+  returnStep?: string | number; // Where to return after flow completion
 }
 
 export interface DelayStep extends BaseFlowStep {
   type: 'delay';
-  duration: number; // Задержка в миллисекундах
+  duration: number; // Delay in milliseconds
   nextStep?: string | number;
 }
 
 export interface ForwardingControlStep extends BaseFlowStep {
   type: 'forwarding_control';
-  action: 'enable' | 'disable'; // Включить или отключить пересылку
+  action: 'enable' | 'disable'; // Enable or disable forwarding
   nextStep?: string | number;
 }
 
 export interface DynamicStep extends BaseFlowStep {
   type: 'dynamic';
-  handler: string; // кастомный handler (из customHandlers)
+  handler: string; // custom handler (from customHandlers)
   keyboardKey?: string;
   nextStep?: string | number;
 }
 
-// FlowControlStep удален - теперь автоматически управляется при startFlow/completeFlow
+// FlowControlStep removed - now automatically managed at startFlow/completeFlow
 
 export type FlowStepType = MessageStep | WaitInputStep | CallbackStep | ConditionStep | 
                           HandlerStep | FlowStep | DelayStep | ForwardingControlStep | DynamicStep;

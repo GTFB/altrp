@@ -17,7 +17,7 @@ const sliderTrackVariants = cva(
     defaultVariants: {
       size: "base",
     },
-  }
+  },
 );
 const sliderThumbVariants = cva(
   "block rounded-full border border-primary/50 bg-background shadow-sm transition-colors focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
@@ -32,7 +32,7 @@ const sliderThumbVariants = cva(
     defaultVariants: {
       size: "base",
     },
-  }
+  },
 );
 
 type SliderProps = React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root> &
@@ -46,7 +46,7 @@ const Slider = React.forwardRef<
     ref={ref}
     className={cn(
       "relative flex w-full touch-none select-none items-center",
-      className
+      className,
     )}
     {...props}
   >

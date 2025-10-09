@@ -7,7 +7,7 @@ import {
   Logo06,
   Logo07,
   Logo08,
-  } from "@/components/blocks-marketing/logos/logos";
+} from "@/components/blocks-marketing/logos/logos";
 
 const Logos02Page = () => {
   return (

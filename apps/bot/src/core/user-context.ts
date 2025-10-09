@@ -5,12 +5,12 @@ export interface UserContext {
   telegramId: number;
   currentFlow: string;
   currentStep: number;
-  data: Record<string, any>; // Здесь храним все переменные пользователя
+  data: Record<string, any>; // Here we store all user variables
   stepHistory: Array<{flow: string, step: number, timestamp: string}>;
   
-  // Новые поля для управления пересылкой
-  messageForwardingEnabled: boolean; // Включена ли пересылка в топик
-  flowMode: boolean; // Находится ли пользователь в режиме флоу
+  // New fields for forwarding management
+  messageForwardingEnabled: boolean; // Whether forwarding to topic is enabled
+  flowMode: boolean; // Whether user is in flow mode
 }
 
 export class UserContextManager {
@@ -68,11 +68,11 @@ export class UserContextManager {
       currentStep: 0,
       data: {},
       stepHistory: [],
-      messageForwardingEnabled: true, // По умолчанию включено
-      flowMode: false // По умолчанию не в флоу
+      messageForwardingEnabled: true, // Enabled by default
+      flowMode: false // By default not in flow
     };
     
-    // Сразу сохраняем в БД
+    // Immediately save to DB
     await this.saveContextToDatabase(context);
     console.log(`✅ Context created and saved to DB for user ${telegramId}`);
     return context;
@@ -84,7 +84,7 @@ export class UserContextManager {
       Object.assign(context, updates);
       console.log(`🔄 Context updated for user ${telegramId}:`, updates);
       
-      // Сохраняем обновленный контекст в БД
+      // Save updated context to DB
       await this.saveContextToDatabase(context);
     } else {
       console.warn(`⚠️ Context not found for user ${telegramId}`);
@@ -96,7 +96,7 @@ export class UserContextManager {
     if (context) {
       this.setNestedProperty(context.data, path, value);
       console.log(`📝 Variable set for user ${telegramId}: ${path} = ${JSON.stringify(value)}`);
-      // Сохраняем обновленный контекст в БД
+      // Save updated context to DB
       await this.saveContextToDatabase(context);
     } else {
       console.warn(`⚠️ Context not found for user ${telegramId} when setting variable ${path}`);
@@ -113,7 +113,7 @@ export class UserContextManager {
     return undefined;
   }
 
-  // Методы для управления пересылкой сообщений
+  // Methods for managing message forwarding
   async enableMessageForwarding(telegramId: number): Promise<void> {
     const context = await this.getContext(telegramId);
     if (context) {
@@ -139,12 +139,12 @@ export class UserContextManager {
     return enabled;
   }
 
-  // Методы для управления режимом флоу
+  // Methods for managing flow mode
   async enterFlowMode(telegramId: number): Promise<void> {
     const context = await this.getContext(telegramId);
     if (context) {
       context.flowMode = true;
-      context.messageForwardingEnabled = false; // Автоматически отключаем пересылку
+      context.messageForwardingEnabled = false; // Automatically disable forwarding
       console.log(`🎯 User ${telegramId} ENTERED flow mode (forwarding auto-disabled)`);
       await this.saveContextToDatabase(context);
     }
@@ -154,7 +154,7 @@ export class UserContextManager {
     const context = await this.getContext(telegramId);
     if (context) {
       context.flowMode = false;
-      context.messageForwardingEnabled = true; // Автоматически включаем пересылку обратно
+      context.messageForwardingEnabled = true; // Automatically enable forwarding back
       console.log(`🏁 User ${telegramId} EXITED flow mode (forwarding auto-enabled)`);
       await this.saveContextToDatabase(context);
     }
@@ -181,7 +181,7 @@ export class UserContextManager {
     return path.split('.').reduce((current, key) => current?.[key], obj);
   }
 
-  // Сохраняем контекст в БД
+  // Save context to DB
   private async saveContextToDatabase(context: UserContext): Promise<void> {
     if (!this.d1Storage) {
       console.error('❌ D1Storage not initialized for saving context');
@@ -202,17 +202,17 @@ export class UserContextManager {
     console.log(`✅ Context saved to database for user ${context.telegramId}`);
   }
 
-  // Получить или создать контекст
+  // Get or create context
   async getOrCreateContext(telegramId: number, userId: number): Promise<UserContext> {
     let context = await this.getContext(telegramId);
     if (!context) {
-      // Создаем новый контекст
+      // Create new context
       context = await this.createContext(telegramId, userId);
     }
     return context;
   }
 
-  // Получить язык пользователя из базы данных
+  // Get user language from database
   async getUserLanguage(telegramId: number): Promise<string> {
     if (!this.d1Storage) {
       console.warn('D1Storage not set, using default locale');
@@ -223,7 +223,7 @@ export class UserContextManager {
       const user = await this.d1Storage.getUser(telegramId);
       const userLanguage = user?.language;
       
-      // Проверяем, что язык поддерживается
+      // Check that language is supported
       if (userLanguage && ['ru', 'sr'].includes(userLanguage)) {
         return userLanguage;
       }

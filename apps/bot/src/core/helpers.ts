@@ -1,35 +1,35 @@
 /**
- * Проверяет, является ли текст ссылкой VK
- * @param text - текст для проверки
- * @returns true если текст является ссылкой VK
+ * Checks if text is a VK link
+ * @param text - text to check
+ * @returns true if text is a VK link
  */
 export function isVKLink(text: string): boolean {
-  // Проверяем, является ли текст ссылкой VK
+  // Check if text is a VK link
   const trimmedText = text.trim();
   
-  // Проверяем только явные ссылки VK
+  // Check only explicit VK links
   const vkPatterns = [
     /^https?:\/\/(www\.)?vk\.com\/[a-zA-Z0-9._-]+$/,  // https://vk.com/username
     /^https?:\/\/(www\.)?vkontakte\.ru\/[a-zA-Z0-9._-]+$/   // https://vkontakte.ru/username
   ];
   
-  // Проверяем только полные ссылки VK
+  // Check only full VK links
   return vkPatterns.some(pattern => pattern.test(trimmedText));
 }
 
 /**
- * Нормализует VK ссылку - добавляет https://vk.com/ если нужно
- * @param vkLink - исходная ссылка или username
- * @returns нормализованная ссылка VK
+ * Normalizes VK link - adds https://vk.com/ if needed
+ * @param vkLink - original link or username
+ * @returns normalized VK link
  */
 export function normalizeVKLink(vkLink: string): string {
   let normalizedLink = vkLink.trim();
   
-  // Если начинается с @, убираем @ и добавляем vk.com
+  // If starts with @, remove @ and add vk.com
   if (normalizedLink.startsWith('@')) {
     normalizedLink = `https://vk.com/${normalizedLink.substring(1)}`;
   } 
-  // Если не начинается с http, добавляем vk.com
+  // If does not start with http, add vk.com
   else if (!normalizedLink.startsWith('http')) {
     normalizedLink = `https://vk.com/${normalizedLink}`;
   }

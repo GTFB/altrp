@@ -1,4 +1,4 @@
-import Fuse from 'fuse.js';
+import Fuse from "fuse.js";
 
 export type SearchRecord = Record<string, unknown> & {
   id: string;
@@ -10,7 +10,7 @@ export type SearchRecord = Record<string, unknown> & {
 export function createSearchIndex(items: SearchRecord[]) {
   return new Fuse(items, {
     includeScore: true,
-    keys: ['title', 'content', 'tags'] as Array<keyof SearchRecord>,
+    keys: ["title", "content", "tags"] as Array<keyof SearchRecord>,
     threshold: 0.35,
   });
 }

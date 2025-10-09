@@ -1,8 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Logo } from "../logo/logo";
-import { NavMenu } from "./nav-menu";
-import { NavigationSheet } from "./navigation-sheet";
 import { Search } from "lucide-react";
 
 const Navbar05Page = () => {

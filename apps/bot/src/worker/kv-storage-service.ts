@@ -1,4 +1,4 @@
-// Используем встроенный тип KVNamespace из Cloudflare Workers
+// Using built-in KVNamespace type from Cloudflare Workers
 import type { KVNamespace } from '@cloudflare/workers-types';
 
 export interface User {
@@ -8,7 +8,7 @@ export interface User {
   username?: string;
   registeredAt: string;
   topicId?: number;
-  language?: string; // Язык пользователя
+  language?: string; // User language
 }
 
 export class KVStorageService {
@@ -71,7 +71,7 @@ export class KVStorageService {
   async getUserIdByTopic(topicId: number): Promise<number | undefined> {
     console.log(`Getting userId by topic ${topicId}`);
     
-    // Получаем список всех пользователей
+    // Get list of all users
     const users = await this.getAllUsers();
     const user = users.find(u => u.topicId === topicId);
     
@@ -85,13 +85,13 @@ export class KVStorageService {
   }
 
   async getAllUsers(): Promise<User[]> {
-    // В реальном приложении здесь нужно использовать list() для получения всех ключей
-    // Для простоты возвращаем пустой массив
-    // TODO: Реализовать получение всех пользователей через KV list
+    // In real application, use list() to get all keys here
+    // For simplicity, return empty array
+    // TODO: Implement getting all users through KV list
     return [];
   }
 
-  // Методы для работы с сессиями
+  // Methods for working with sessions
   async getSession(sessionId: string): Promise<any> {
     const sessionKey = `session:${sessionId}`;
     const sessionData = await this.kv.get(sessionKey);

@@ -50,7 +50,7 @@ export class FlowEngine {
         case 'forwarding_control':
           await this.handleForwardingControlStep(telegramId, step as ForwardingControlStep);
           break;
-        // flow_control удален - теперь автоматически в startFlow/completeFlow
+        // flow_control removed - now automatically in startFlow/completeFlow
         default:
           console.error(`❌ Unknown step type: ${(step as any).type}`);
       }
@@ -68,7 +68,7 @@ export class FlowEngine {
       return;
     }
 
-    // Автоматически входим в flow mode при запуске любого флоу
+    // Automatically enter flow mode when starting any flow
     await this.userContextManager.enterFlowMode(telegramId);
 
     await this.userContextManager.updateContext(telegramId, {
@@ -78,7 +78,7 @@ export class FlowEngine {
 
     console.log(`✅ Flow "${flowName}" started for user ${telegramId}, total steps: ${flow.steps.length}`);
 
-    // Выполняем первый шаг
+    // Execute first step
     if (flow.steps.length > 0) {
       if (flow.steps[0]) {
         await this.executeStep(telegramId, flow.steps[0]);
@@ -88,7 +88,7 @@ export class FlowEngine {
     }
   }
 
-  // Публичный метод для внешнего вызова
+  // Public method for external calls
   async goToStep(telegramId: number, stepIdentifier: string | number): Promise<void> {
     return this.goToStepInternal(telegramId, stepIdentifier);
   }
@@ -109,10 +109,10 @@ export class FlowEngine {
     let stepIndex = -1;
     
     if (typeof stepIdentifier === 'string') {
-      // Ищем по ID
+      // Search by ID
       stepIndex = flow.steps.findIndex(step => step.id === stepIdentifier);
     } else {
-      // Используем номер шага
+      // Use step number
       stepIndex = stepIdentifier;
     }
 
@@ -139,7 +139,7 @@ export class FlowEngine {
 
     console.log(`🏁 Completing flow "${context.currentFlow}" for user ${telegramId}`);
     
-    // Автоматически выходим из режима флоу при завершении
+    // Automatically exit flow mode when completing
     await this.userContextManager.exitFlowMode(telegramId);
     
     await this.userContextManager.updateContext(telegramId, {
@@ -154,7 +154,7 @@ export class FlowEngine {
     const context = await this.userContextManager.getContext(telegramId);
     if (!context) return;
     
-    // Получаем язык пользователя через UserContextManager
+    // Get user language through UserContextManager
     const userLanguage = await this.userContextManager.getUserLanguage(telegramId);
     const message = await this.i18nService.getMessage(step.messageKey, userLanguage);
     
@@ -170,17 +170,17 @@ export class FlowEngine {
     if (keyboard) {
       await this.messageService.sendMessageWithKeyboard(telegramId, message, keyboard, context.userId);
       
-      // Если есть клавиатура, НЕ переходим к следующему шагу автоматически
-      // Переход произойдет только при нажатии кнопки
+      // If there is a keyboard, do NOT automatically go to next step
+      // Transition will only happen on button press
       console.log(`⏳ Message with keyboard sent, waiting for user interaction...`);
     } else {
       await this.messageService.sendMessage(telegramId, message, context.userId);
       
-      // Если нет клавиатуры, переходим к следующему шагу
+      // If no keyboard, go to next step
       if (step.nextStep) {
         await this.goToStepInternal(telegramId, step.nextStep);
       } else {
-        // Если нет nextStep - завершаем флоу
+        // If no nextStep - complete flow
         console.log(`🏁 No next step defined, completing flow for user ${telegramId}`);
         await this.completeFlow(telegramId);
       }
@@ -193,7 +193,7 @@ export class FlowEngine {
     
     console.log(`⏳ Setting up wait input for user ${telegramId}, saving to: ${step.saveToVariable}`);
     
-    // Устанавливаем состояние ожидания ввода
+    // Set input waiting state
     await this.userContextManager.setVariable(telegramId, '_system.waitingForInput', {
       stepId: step.id,
       saveToVariable: step.saveToVariable,
@@ -202,7 +202,7 @@ export class FlowEngine {
     });
 
     if (step.prompt) {
-      // Получаем язык пользователя и переведенное сообщение
+      // Get user language and translated message
       const userLanguage = await this.userContextManager.getUserLanguage(telegramId);
       const message = await this.i18nService.getMessage(step.prompt, userLanguage);
       await this.messageService.sendMessage(telegramId, message, context.userId);
@@ -212,7 +212,7 @@ export class FlowEngine {
   private async handleCallbackStep(telegramId: number, step: CallbackStep): Promise<void> {
     console.log(`🔘 Creating callback buttons for user ${telegramId}`, step.buttons);
     
-    // Создаем клавиатуру из кнопок шага
+    // Create keyboard from step buttons
     const keyboard = {
       inline_keyboard: [
         step.buttons.map(button => ({
@@ -231,10 +231,10 @@ export class FlowEngine {
     const context = await this.userContextManager.getContext(telegramId);
     if (!context) return;
 
-    // Отправляем сообщение с кнопками (можно добавить messageKey в CallbackStep если нужно)
+    // Send message with buttons (can add messageKey to CallbackStep if needed)
     await this.messageService.sendMessageWithKeyboard(
       telegramId, 
-      step.buttons.map(b => b.text).join(' или ') + '?', // Временное сообщение
+      step.buttons.map(b => b.text).join(' or ') + '?', // Temporary message
       keyboard, 
       context.userId
     );
@@ -278,12 +278,12 @@ export class FlowEngine {
       console.error(`❌ Custom handler "${step.handlerName}" not found`);
     }
 
-    //TODO Добавить проверку на тип шага?
+    //TODO Add step type check?
     if (step.nextStep) {
       await this.goToStepInternal(telegramId, step.nextStep);
     }
     // else {
-    //   // Если нет nextStep - завершаем флоу
+    //   // If no nextStep - complete flow
     //   console.log(`🏁 Handler step completed with no next step, completing flow for user ${telegramId}`);
     //   await this.completeFlow(telegramId);
     // }
@@ -308,7 +308,7 @@ export class FlowEngine {
     }
   }
 
-  // handleFlowControlStep удален - теперь автоматически в startFlow/completeFlow
+  // handleFlowControlStep removed - now automatically in startFlow/completeFlow
 
   private evaluateCondition(condition: string, globalObject: any): boolean {
     try {
@@ -320,7 +320,7 @@ export class FlowEngine {
     }
   }
 
-  // Универсальный обработчик входящих сообщений
+  // Universal incoming message handler
   async handleIncomingMessage(telegramId: number, messageText: string): Promise<void> {
     console.log(`📥 Handling incoming message from user ${telegramId}: "${messageText}"`);
     
@@ -329,7 +329,7 @@ export class FlowEngine {
     if (waitingState) {
       console.log(`⏳ User ${telegramId} was waiting for input, processing...`);
       
-      // Валидация если задана
+      // Validation if specified
       if (waitingState.validation && !this.validateInput(messageText, waitingState.validation)) {
         const context = await this.userContextManager.getContext(telegramId);
         if (!context) return;
@@ -337,19 +337,19 @@ export class FlowEngine {
         console.log(`❌ Validation failed for user ${telegramId}`);
         await this.messageService.sendMessage(
           telegramId, 
-          waitingState.validation.errorMessage || 'Неверный формат ввода', 
+          waitingState.validation.errorMessage || 'Invalid input format', 
           context.userId
         );
         return;
       }
 
-      // Сохраняем ответ
+      // Save response
       await this.userContextManager.setVariable(telegramId, waitingState.saveToVariable, messageText);
       
-      // Очищаем состояние ожидания
+      // Clear waiting state
       await this.userContextManager.setVariable(telegramId, '_system.waitingForInput', null);
       
-      // Переходим к следующему шагу
+      // Go to next step
       if (waitingState.nextStep) {
         await this.goToStepInternal(telegramId, waitingState.nextStep);
       }
@@ -408,11 +408,11 @@ export class FlowEngine {
     }
   }
 
-  // Универсальный обработчик callback-ов
+  // Universal callback handler
   async handleIncomingCallback(telegramId: number, callbackData: string): Promise<void> {
     console.log(`🔘 Handling incoming callback from user ${telegramId}: ${callbackData}`);
     
-    // СНАЧАЛА проверяем конфигурацию callback'ов
+    // FIRST check callback configuration
     const callbackConfig = callbackActions[callbackData as keyof typeof callbackActions] as any;
     if (callbackConfig) {
       console.log(`🎯 Found callback config for "${callbackData}":`, callbackConfig);
@@ -433,7 +433,7 @@ export class FlowEngine {
           if (callbackConfig.variable && callbackConfig.value !== undefined) {
             await this.userContextManager.setVariable(telegramId, callbackConfig.variable, callbackConfig.value);
           }
-          // Переходим к следующему флоу если указан
+          // Go to next flow if specified
           if (callbackConfig.nextFlow) {
             console.log(`🚀 Starting next flow: ${callbackConfig.nextFlow}`);
             await this.startFlow(telegramId, callbackConfig.nextFlow);
@@ -448,19 +448,19 @@ export class FlowEngine {
       }
     }
     
-    // Если нет в конфигурации - пробуем JSON формат
+    // If not in configuration - try JSON format
     try {
       const data = JSON.parse(callbackData);
       console.log(`📋 Parsed callback data:`, data);
       
-      // Обрабатываем разные типы действий в JSON
+      // Process different action types in JSON
       switch (data.action) {
         case 'set_variable':
           console.log(`💾 Setting variable: ${data.variable} = ${data.value}`);
           if (data.variable && data.value !== undefined) {
             await this.userContextManager.setVariable(telegramId, data.variable, data.value);
           }
-          // Переходим к следующему флоу если указан
+          // Go to next flow if specified
           if (data.nextFlow) {
             console.log(`🚀 Starting next flow: ${data.nextFlow}`);
             await this.startFlow(telegramId, data.nextFlow);
@@ -482,11 +482,11 @@ export class FlowEngine {
           break;
           
         default:
-          // Legacy поддержка старого формата (saveToVariable)
+          // Legacy support for old format (saveToVariable)
           if (data.saveToVariable) {
             await this.userContextManager.setVariable(telegramId, data.saveToVariable, data.value);
           }
-          // Переходим к следующему шагу или флоу
+          // Go to next step or flow
           if (data.nextFlow) {
             await this.startFlow(telegramId, data.nextFlow);
           } else if (data.nextStep) {
@@ -496,7 +496,7 @@ export class FlowEngine {
     } catch (error) {
       console.error('❌ Error parsing callback data:', error);
       
-      // Последняя попытка - обработка через keyboard callback (для пользователей в флоу)
+      // Last attempt - processing through keyboard callback (for users in flow)
       console.log(`🔄 Trying to handle as keyboard callback: ${callbackData}`);
       await this.handleKeyboardCallback(telegramId, callbackData);
     }
@@ -526,18 +526,18 @@ export class FlowEngine {
     console.log(`  - Current step type: ${currentStep?.type}`);
     console.log(`  - Current step ID: ${currentStep?.id}`);
     
-    // Проверяем, является ли текущий шаг message шагом с клавиатурой
+    // Check if current step is a message step with keyboard
     if (currentStep && currentStep.type === 'message' && (currentStep as MessageStep).keyboardKey) {
       console.log(`🎯 Processing keyboard callback for message step "${currentStep.id}"`);
       console.log(`  - Keyboard key: ${(currentStep as MessageStep).keyboardKey}`);
       console.log(`  - Next step: ${(currentStep as MessageStep).nextStep}`);
       
-      // Сохраняем callback data как переменную 
+      // Save callback data as variable 
       await this.userContextManager.setVariable(telegramId, `keyboard.${callbackData}`, callbackData);
       
-      // Конфигурация уже обработана в handleIncomingCallback, здесь только fallback
+      // Configuration already processed in handleIncomingCallback, here only fallback
       
-      // Переходим к следующему шагу, если он указан
+      // Go to next step, if specified
       if ((currentStep as MessageStep).nextStep) {
         console.log(`🚀 Going to next step: ${(currentStep as MessageStep).nextStep}`);
         await this.goToStepInternal(telegramId, (currentStep as MessageStep).nextStep!);

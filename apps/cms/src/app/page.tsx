@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {  Globe, Languages } from 'lucide-react';
-import { HeroBlock } from '@/components/features/HeroBlock/HeroBlock';
+import { HeroBlock } from '@/components/blocks-app/HeroBlock';
 import { Container } from '@/components/misc/layout/Container';
 import { getTranslations } from 'next-intl/server';
 

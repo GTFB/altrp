@@ -16,7 +16,7 @@ export default function WithDelayTooltipDemo() {
 
   const handleDelayDurationChange = (e: ChangeEvent<HTMLInputElement>) => {
     setDelayDuration(
-      e.target.value === "" ? undefined : Math.max(0, +e.target.value)
+      e.target.value === "" ? undefined : Math.max(0, +e.target.value),
     );
   };
 

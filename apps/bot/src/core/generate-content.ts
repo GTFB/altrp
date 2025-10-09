@@ -11,7 +11,7 @@ interface ContentFile {
 }
 
 /**
- * Рекурсивно читает все MDX файлы из папки content
+ * Recursively reads all MDX files from content folder
  */
 function readMdxFiles(dir: string, baseDir: string = dir): ContentFile[] {
   const files: ContentFile[] = [];
@@ -27,7 +27,7 @@ function readMdxFiles(dir: string, baseDir: string = dir): ContentFile[] {
       const relativePath = path.relative(baseDir, fullPath);
       const content = fs.readFileSync(fullPath, 'utf-8');
       files.push({
-        path: relativePath.replace(/\\/g, '/'), // Нормализуем пути для Unix
+        path: relativePath.replace(/\\/g, '/'), // Normalize paths for Unix
         content: content.trim()
       });
     }
@@ -37,13 +37,13 @@ function readMdxFiles(dir: string, baseDir: string = dir): ContentFile[] {
 }
 
 /**
- * Генерирует TypeScript файл с переводами
+ * Generates TypeScript file with translations
  */
 function generateContentFile(contentFiles: ContentFile[]): string {
   const translations: Record<string, Record<string, string>> = {};
   
   for (const file of contentFiles) {
-    // Извлекаем язык и ключ из пути: ru/selectLanguage.mdx -> ru, selectLanguage
+    // Extract language and key from path: ru/selectLanguage.mdx -> ru, selectLanguage
     const pathParts = file.path.split('/');
     if (pathParts.length === 2) {
       const [locale, filename] = pathParts;
@@ -53,7 +53,7 @@ function generateContentFile(contentFiles: ContentFile[]): string {
         translations[locale] = {};
       }
       
-      // Экранируем обратные кавычки и обратные слеши
+      // Escape backticks and backslashes
       const escapedContent = file.content
         .replace(/\\/g, '\\\\')
         .replace(/`/g, '\\`')
@@ -63,29 +63,29 @@ function generateContentFile(contentFiles: ContentFile[]): string {
     }
   }
 
-  return `// Автоматически сгенерированный файл с переводами
-// Не редактировать вручную!
+  return `// Automatically generated file with translations
+// Do not edit manually!
 
 export const translations: Record<string, Record<string, string>> = ${JSON.stringify(translations, null, 2)};
 `;
 }
 
 /**
- * Основная функция
+ * Main function
  */
 function main() {
   const contentDir = path.join(__dirname, '..', 'content');
   const outputFile = path.join(__dirname, '..', 'generated-content.ts');
 
-  console.log('Читаем MDX файлы из:', contentDir);
+  console.log('Reading MDX files from:', contentDir);
   
   if (!fs.existsSync(contentDir)) {
-    console.error('Папка content не найдена:', contentDir);
+    console.error('Content folder not found:', contentDir);
     process.exit(1);
   }
 
   const contentFiles = readMdxFiles(contentDir);
-  console.log(`Найдено ${contentFiles.length} MDX файлов:`);
+  console.log(`Found ${contentFiles.length} MDX files:`);
   
   for (const file of contentFiles) {
     console.log(`  - ${file.path}`);
@@ -93,15 +93,15 @@ function main() {
 
   const generatedContent = generateContentFile(contentFiles);
   
-  // Создаем папку src если её нет
+  // Create src folder if it does not exist
   const srcDir = path.dirname(outputFile);
   if (!fs.existsSync(srcDir)) {
     fs.mkdirSync(srcDir, { recursive: true });
   }
 
   fs.writeFileSync(outputFile, generatedContent, 'utf-8');
-  console.log(`Сгенерирован файл: ${outputFile}`);
+  console.log(`Generated file: ${outputFile}`);
 }
 
-// Запускаем main функцию
+// Run main function
 main();

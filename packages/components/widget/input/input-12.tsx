@@ -72,7 +72,7 @@ export default function InputDemo() {
                     "border-primary bg-secondary": isDragActive && isDragAccept,
                     "border-destructive bg-destructive/20":
                       isDragActive && isDragReject,
-                  }
+                  },
                 )}
               >
                 <input {...getInputProps()} id="profile" />

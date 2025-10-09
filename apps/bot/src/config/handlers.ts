@@ -12,29 +12,29 @@ export const createCustomHandlers = (worker: BotInterface) => {
     topicService: worker['topicService']
   };
 
-  // Проверяем, что flowEngine доступен
+  // Check that flowEngine is available
   if (!handlerWorker.flowEngine) {
     console.error('❌ flowEngine is not available in handlerWorker');
     throw new Error('flowEngine is not initialized');
   }
   
   return {
-    // Обработчик регистрации пользователя
+    // User registration handler
     registerUser: async (telegramId: number, contextManager: UserContextManager) => {
       console.log(`👤 Registering user ${telegramId}`);
       
-      // Проверяем, есть ли уже пользователь в базе
+      // Check if user already exists in database
       let existingUser = await handlerWorker.d1Storage.getUser(telegramId);
       
       if (!existingUser) {
-        // Получаем информацию о пользователе из Telegram (будет передана через контекст)
+        // Get user information from Telegram (will be passed through context)
         const userInfo = await contextManager.getVariable(telegramId, '_system.currentMessage');
         
         if (userInfo && userInfo.from) {
-          // Создаем топик в админ группе для нового пользователя
+          // Create topic in admin group for new user
           const topicId = await handlerWorker.topicService.createTopicInAdminGroup(telegramId, userInfo.from);
           
-          // Регистрируем пользователя
+          // Register user
           const newUser = {
             telegramId: telegramId,
             firstName: userInfo.from.first_name,
@@ -47,7 +47,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
           await handlerWorker.d1Storage.addUser(newUser);
           console.log(`✅ New user ${telegramId} registered via flow`);
           
-          // Сохраняем информацию о регистрации в контексте
+          // Save registration information in context
           await contextManager.setVariable(telegramId, 'registration.isNewUser', true);
           await contextManager.setVariable(telegramId, 'registration.topicId', topicId);
         }
@@ -57,24 +57,24 @@ export const createCustomHandlers = (worker: BotInterface) => {
       }
     },
 
-    // Обработчик проверки подписки
+    // Subscription check handler
     processSubscriptionCheck: async (telegramId: number, contextManager: UserContextManager) => {
       console.log(`📋 Processing subscription check for user ${telegramId}`);
       
       const vkLink = await contextManager.getVariable(telegramId, 'subscription.vk_link');
       if (vkLink) {
-        // Нормализуем VK ссылку (добавляем https://vk.com/ если нужно)
+        // Normalize VK link (add https://vk.com/ if needed)
         const normalizedVkLink = normalizeVKLink(vkLink);
         console.log(`📝 VK link normalized: "${vkLink}" → "${normalizedVkLink}"`);
         
-        // Сохраняем нормализованную VK ссылку в базу данных
+        // Save normalized VK link to database
         const user = await handlerWorker.d1Storage.getUser(telegramId);
         if (user) {
           const userData = user.data ? JSON.parse(user.data) : {};
           userData.vk = normalizedVkLink;
           await handlerWorker.d1Storage.updateUserData(telegramId, JSON.stringify(userData));
           
-          // Отправляем запрос на проверку в топик
+          // Send verification request to topic
           if (user.topicId) {
             const currentDateTime = new Date().toLocaleString('ru-RU', {
               timeZone: 'Europe/Moscow',
@@ -86,14 +86,14 @@ export const createCustomHandlers = (worker: BotInterface) => {
               second: '2-digit'
             });
 
-            const topicMessage = `Пользователь просит проверить подписки в группах
+            const topicMessage = `User requests subscription check in groups
 
 ID: ${telegramId}
-Username: @${user.username || 'не указан'}
-Имя: ${user.firstName || ''} ${user.lastName || ''}`.trim() + `
+Username: @${user.username || 'not specified'}
+Name: ${user.firstName || ''} ${user.lastName || ''}`.trim() + `
 VK: ${normalizedVkLink}
 
-Дата и время: ${currentDateTime}`;
+Date and time: ${currentDateTime}`;
 
             const adminChatId = parseInt(handlerWorker.env.ADMIN_CHAT_ID);
             await handlerWorker.messageService.sendMessageToTopic(adminChatId, user.topicId, topicMessage);
@@ -102,7 +102,7 @@ VK: ${normalizedVkLink}
       }
     },
 
-    // Обработчик запроса на консультацию бухгалтера
+    // Accountant consultation request handler
     processConsultationRequest: async (telegramId: number, contextManager: UserContextManager) => {
       console.log(`📋 Processing consultation for user ${telegramId}`);
       
@@ -126,15 +126,15 @@ VK: ${normalizedVkLink}
 
             const consultationRequest = await contextManager.getVariable(telegramId, 'consultation.request');
 
-            const topicMessage = `Запрос на помощь ${consultationType === 'lawyer' ? 'юриста' : 'бухгалтера'}
+            const topicMessage = `Help request from ${consultationType === 'lawyer' ? 'lawyer' : 'accountant'}
 
 ID: ${telegramId}
-Username: @${user.username || 'не указан'}
-Имя: ${user.firstName || ''} ${user.lastName || ''}`.trim() + `
+Username: @${user.username || 'not specified'}
+Name: ${user.firstName || ''} ${user.lastName || ''}`.trim() + `
 
-Дата и время: ${currentDateTime}
+Date and time: ${currentDateTime}
 
-Вопрос: ${consultationRequest}
+Question: ${consultationRequest}
 `;
 
             const adminChatId = parseInt(handlerWorker.env.ADMIN_CHAT_ID);
@@ -144,7 +144,7 @@ Username: @${user.username || 'не указан'}
       }
     },
 
-    // Поиск компании по PIB
+    // Company search by PIB
     searchingCompanyByPib: async (telegramId: number, contextManager: UserContextManager) => {
       console.log(`🔍 Searching company by PIB for user ${telegramId}`);
 
@@ -166,7 +166,7 @@ Username: @${user.username || 'не указан'}
           const company = result.results[0];
           console.log(`✅ Company found for PIB ${clientPib}: ${company.name}`);
 
-          // Сохраняем найденные данные компании в контексте
+          // Save found company data in context
           await contextManager.setVariable(telegramId, 'client', {
             id: company.id,
             name: company.name,
@@ -175,7 +175,7 @@ Username: @${user.username || 'не указан'}
             address: company.address,
           });
 
-          // Переходим к показу карточки компании
+          // Go to company card display
           await handlerWorker.flowEngine.goToStep(telegramId, 'show_client_card');
         } else {
           console.log(`❌ No company found for PIB ${clientPib}`);
@@ -187,30 +187,30 @@ Username: @${user.username || 'не указан'}
       }
     },
 
-    // Обработчик проверки языка и маршрутизации
+    // Language check and routing handler
     checkLanguageAndRoute: async (telegramId: number, contextManager: UserContextManager) => {
       console.log(`🔍 Checking language for user ${telegramId}`);
       
       const user = await handlerWorker.d1Storage.getUser(telegramId);
       
       if (user?.language) {
-        // У пользователя есть язык - сразу в onboarding
+        // User has language - go straight to onboarding
         console.log(`✅ User ${telegramId} has language: ${user.language}, going to onboarding`);
         await handlerWorker.flowEngine.startFlow(telegramId, 'onboarding');
       } else {
-        // У пользователя нет языка - показываем выбор языка
+        // User has no language - show language selection
         console.log(`❌ User ${telegramId} has no language, showing language selection`);
         await handlerWorker.flowEngine.goToStep(telegramId, 'send_lang');
       }
     },
 
-    // Обработчик сохранения языка пользователя
+    // User language saving handler
     saveLang: async (telegramId: number, contextManager: UserContextManager) => {
       console.log(`🌍 Saving language for user ${telegramId}`);
 
       const language = await contextManager.getVariable(telegramId, 'profile.language');
       if (language) {
-        // Сохраняем язык в БД через D1StorageService
+        // Save language to DB through D1StorageService
         await handlerWorker.d1Storage.updateUser(telegramId, { language });
         console.log(`✅ Language ${language} saved for user ${telegramId}`);
       } else {
@@ -218,21 +218,21 @@ Username: @${user.username || 'не указан'}
       }
     },
 
-    // Обработчик проверки компании пользователя
+    // User company check handler
     checkUserCompany: async (telegramId: number, contextManager: UserContextManager) => {
       console.log(`🔍 Checking if user ${telegramId} has company`);
 
       try {
-        // Получаем пользователя из базы данных
+        // Get user from database
         const user = await handlerWorker.d1Storage.getUser(telegramId);
         if (!user || !user.id) {
           console.error(`❌ User ${telegramId} not found in database`);
-          // Переходим к созданию компании
+          // Go to company creation
           await handlerWorker.flowEngine.goToStep(telegramId, 'send_welcome');
           return;
         }
 
-        // Проверяем есть ли записи в company_users для этого пользователя
+        // Check if there are records in company_users for this user
         const result = await handlerWorker.d1Storage.executeQuery(
           'SELECT COUNT(*) as count FROM company_users WHERE user_id = ?',
           [user.id]
@@ -242,37 +242,37 @@ Username: @${user.username || 'не указан'}
 
         if (hasCompany) {
           console.log(`✅ User ${telegramId} has company, completing onboarding`);
-          // Пользователь имеет компанию, завершаем onboarding и выходим в главное меню
+          // User has company, complete onboarding and go to main menu
           //await this.flowEngine.completeFlow(telegramId);
           await handlerWorker.flowEngine.startFlow(telegramId, 'menu');
         } else {
           console.log(`❌ User ${telegramId} has no company, going to onboarding`);
-          // Пользователь не имеет компании, переходим к созданию
+          // User has no company, go to creation
           await handlerWorker.flowEngine.goToStep(telegramId, 'send_welcome');
         }
 
       } catch (error) {
         console.error(`❌ Error checking user company for ${telegramId}:`, error);
-        // В случае ошибки переходим к созданию компании
+        // In case of error, go to company creation
         await handlerWorker.flowEngine.goToStep(telegramId, 'send_welcome');
       }
     },
 
-    // Обработчик создания компании и главной услуги
+    // Company and main service creation handler
     createCompanyAndMainService: async (telegramId: number, contextManager: UserContextManager) => {
       console.log(`🆕 Creating company and main service for user ${telegramId}`);
 
       const companyData = await contextManager.getVariable(telegramId, 'company') || {};
       if (companyData && companyData.name && companyData.pib && companyData.okved && companyData.phone && companyData.email) {
         try {
-          // Получаем пользователя из базы данных
+          // Get user from database
           const user = await handlerWorker.d1Storage.getUser(telegramId);
           if (!user || !user.id) {
             console.error(`❌ User ${telegramId} not found in database`);
             return;
           }
 
-          // Создаем компанию и получаем её ID
+          // Create company and get its ID
           const companyResult = await handlerWorker.d1Storage.executeQuery(
             'INSERT INTO companies (name, pib, okved, phone, email) VALUES (?, ?, ?, ?, ?)',
             [companyData.name, companyData.pib, companyData.okved, companyData.phone, companyData.email]
@@ -281,7 +281,7 @@ Username: @${user.username || 'не указан'}
           const companyId = companyResult.meta.last_row_id;
           console.log(`✅ Company created with ID ${companyId} for user ${telegramId}`);
 
-          // Создаем запись в company_users
+          // Create record in company_users
           await handlerWorker.d1Storage.executeQuery(
             'INSERT INTO company_users (user_id, company_id) VALUES (?, ?)',
             [user.id, companyId]
@@ -292,7 +292,7 @@ Username: @${user.username || 'не указан'}
           const serviceData = await contextManager.getVariable(telegramId, 'mainService') || {};
           if (serviceData && serviceData.name) {
             try {
-              // Создаем компанию и получаем её ID
+              // Create company and get its ID
               await handlerWorker.d1Storage.executeQuery(
                 'INSERT INTO services (name, description, company_id) VALUES (?, ?, ?)',
                 [serviceData.name, 'main', companyId]
@@ -300,15 +300,15 @@ Username: @${user.username || 'не указан'}
 
               console.log(`✅ Main service created for user ${telegramId}`);
 
-              const topicMessage = `👤 Профиль:
+              const topicMessage = `👤 Profile:
 
-Язык: ${user.language || 'Не указан'}
+Language: ${user.language || 'Not specified'}
 
-Название: ${companyData.name || 'Не указано'}
-PIB: ${companyData.pib || 'Не указан'}
-ОКВЭД: ${companyData.okved || 'Не указан'}
+Name: ${companyData.name || 'Not specified'}
+PIB: ${companyData.pib || 'Not specified'}
+OKVED: ${companyData.okved || 'Not specified'}
 
-Услуга: ${serviceData.name || 'Не указана'}`;
+Service: ${serviceData.name || 'Not specified'}`;
 
               const adminChatId = parseInt(handlerWorker.env.ADMIN_CHAT_ID);
               if (user.topicId) {
@@ -396,28 +396,28 @@ PIB: ${companyData.pib || 'Не указан'}
       await contextManager.setVariable(telegramId, 'invoice.customer_account_number', company.account_number);
       await contextManager.setVariable(telegramId, 'invoice.customer_address', company.address);
 
-      return `📋 Карточка клиента:
+      return `📋 Client card:
 
-    Название: ${company.name || 'Не указано'}
-    PIB: ${company.pib || 'Не указан'}
-    Р/С: ${company.account_number || 'Не указан'}
-    Адрес: ${company.address || 'Не указан'}
+    Name: ${company.name || 'Not specified'}
+    PIB: ${company.pib || 'Not specified'}
+    Account: ${company.account_number || 'Not specified'}
+    Address: ${company.address || 'Not specified'}
 
-    Выберите действие:`;
+    Choose action:`;
     },
 
     generateServiceCard: async (telegramId: number, contextManager: UserContextManager) => {
       try {
-        // Получаем пользователя из базы данных
+        // Get user from database
         const user = await handlerWorker.d1Storage.getUser(telegramId);
         if (!user || !user.id) {
           console.error(`❌ User ${telegramId} not found in database`);
-          // Переходим к созданию компании
+          // Go to company creation
           await handlerWorker.flowEngine.goToStep(telegramId, 'show_client_card');
-          return `Пользователь не найден`;
+          return `User not found`;
         }
 
-        // Проверяем есть ли записи в company_users для этого пользователя
+        // Check if there are records in company_users for this user
         const companyResult = await handlerWorker.d1Storage.executeQuery(
           'SELECT * FROM company_users WHERE user_id = ? ORDER BY id LIMIT 1',
           [user.id]
@@ -425,7 +425,7 @@ PIB: ${companyData.pib || 'Не указан'}
 
         const company = companyResult.results[0];
 
-        // Выполняем запрос к базе данных для получения услуг компании
+        // Execute query to database to get company services
         const result = await handlerWorker.d1Storage.executeQuery(
           'SELECT * FROM services WHERE company_id = ? AND description = ? ORDER BY id LIMIT 1',
           [company.company_id, 'main']
@@ -434,24 +434,24 @@ PIB: ${companyData.pib || 'Не указан'}
         if (result.results.length > 0) {
           const service = result.results[0];
           
-          // Сохраняем найденную услугу в контексте
+          // Save found service in context
           await contextManager.setVariable(telegramId, 'mainService', service);
 
           await contextManager.setVariable(telegramId, 'invoice.service_id', service.id);
           await contextManager.setVariable(telegramId, 'invoice.service_name', service.name);
 
-          return `📋 Карточка услуги:
+          return `📋 Service card:
 
-    Название: ${service.name || 'Не указано'}
+    Name: ${service.name || 'Not specified'}
 
-    Выберите действие:`;
+    Choose action:`;
         } else {
           console.warn(`⚠️ No services found for company ${company.id}`);
-          return 'Услуги для компании не найдены.';
+          return 'Services for company not found.';
         }
       } catch (error) {
         console.error(`❌ Error generating service card for user ${telegramId}:`, error);
-        return 'Ошибка при получении информации об услуге.';
+        return 'Error getting service information.';
       }
     },
 
@@ -461,16 +461,16 @@ PIB: ${companyData.pib || 'Не указан'}
       const serviceData = await contextManager.getVariable(telegramId, 'mainService') || {};
       if (serviceData && serviceData.name) {
         try {
-          // Получаем пользователя из базы данных
+          // Get user from database
           const user = await handlerWorker.d1Storage.getUser(telegramId);
           if (!user || !user.id) {
             console.error(`❌ User ${telegramId} not found in database`);
-            // Переходим к созданию компании
+            // Go to company creation
             await handlerWorker.flowEngine.goToStep(telegramId, 'show_client_card');
             return;
           }
 
-          // Проверяем есть ли записи в company_users для этого пользователя
+          // Check if there are records in company_users for this user
           const companyResult = await handlerWorker.d1Storage.executeQuery(
             'SELECT * FROM company_users WHERE user_id = ? ORDER BY id LIMIT 1',
             [user.id]
@@ -479,7 +479,7 @@ PIB: ${companyData.pib || 'Не указан'}
           const company = companyResult.results[0];
 
       
-          // обновляем услугу
+          // Update service
           await handlerWorker.d1Storage.executeQuery(
             'UPDATE services SET description = ? WHERE company_id = ?',
             ['', company.company_id]
@@ -513,7 +513,7 @@ PIB: ${companyData.pib || 'Не указан'}
           return;
         }
 
-        // Получаем пользователя из базы данных
+        // Get user from database
         const user = await handlerWorker.d1Storage.getUser(telegramId);
         if (!user || !user.id) {
           console.error(`❌ User ${telegramId} not found in database`);
@@ -521,7 +521,7 @@ PIB: ${companyData.pib || 'Не указан'}
           return;
         }
 
-        // Проверяем есть ли записи в company_users для этого пользователя
+        // Check if there are records in company_users for this user
         const companyUserResult = await handlerWorker.d1Storage.executeQuery(
           'SELECT * FROM company_users WHERE user_id = ? ORDER BY id LIMIT 1',
           [user.id]
@@ -535,7 +535,7 @@ PIB: ${companyData.pib || 'Не указан'}
 
         const companyId = companyUserResult.results[0].company_id;
 
-        // Обновляем основную услугу компании
+        // Update main company service
         const updateResult = await handlerWorker.d1Storage.executeQuery(
           'UPDATE services SET name = ? WHERE company_id = ? AND description = ? ORDER BY id LIMIT 1',
           [serviceData.name, companyId, 'main']
@@ -555,25 +555,25 @@ PIB: ${companyData.pib || 'Не указан'}
       if (invoiceData && invoiceData.customer_id && invoiceData.service_id && invoiceData.amount) {
         try {
 
-          return `📋 Данные счета:
+          return `📋 Invoice data:
 
-    Клиент: ${invoiceData.customer_name || 'Не указано'}
-    PIB: ${invoiceData.customer_pib || 'Не указан'}
-    Р/С: ${invoiceData.customer_account_number || 'Не указан'}
-    Адрес: ${invoiceData.customer_address || 'Не указан'}
+    Client: ${invoiceData.customer_name || 'Not specified'}
+    PIB: ${invoiceData.customer_pib || 'Not specified'}
+    Account: ${invoiceData.customer_account_number || 'Not specified'}
+    Address: ${invoiceData.customer_address || 'Not specified'}
 
-    Услуга: ${invoiceData.service_name || 'Не указано'}
-    Сумма: ${invoiceData.amount || 'Не указано'}
+    Service: ${invoiceData.service_name || 'Not specified'}
+    Amount: ${invoiceData.amount || 'Not specified'}
 
-    Выберите действие:`;
+    Choose action:`;
 
         } catch (error) {
           console.error(`❌ Error getting invoice for user ${telegramId}:`, error);
-          return 'Ошибка при получении данных счета.';
+          return 'Error getting invoice data.';
         }
       } else {
         console.warn(`⚠️ Missing invoice data for user ${telegramId}`);
-        return 'Данные счета не найдены.';
+        return 'Invoice data not found.';
       }
 
     },
@@ -586,10 +586,10 @@ PIB: ${companyData.pib || 'Не указан'}
         if (!user || !user.id) {
           console.error(`❌ User ${telegramId} not found in database`);
           await handlerWorker.flowEngine.goToStep(telegramId, 'show_client_card');
-          return 'Пользователь не найден';
+          return 'User not found';
         }
 
-        // Проверяем есть ли записи в company_users для этого пользователя
+        // Check if there are records in company_users for this user
         const companyResult = await handlerWorker.d1Storage.executeQuery(
           'SELECT * FROM company_users WHERE user_id = ? ORDER BY id LIMIT 1',
           [user.id]
@@ -598,7 +598,7 @@ PIB: ${companyData.pib || 'Не указан'}
         if (!companyResult.results.length) {
           console.warn(`⚠️ No company found for user ${telegramId}`);
           await handlerWorker.flowEngine.goToStep(telegramId, 'show_client_card');
-          return 'Компания не найдена';
+          return 'Company not found';
         }
 
         const companyId = companyResult.results[0].company_id;
@@ -608,14 +608,14 @@ PIB: ${companyData.pib || 'Не указан'}
           [companyId]
         );
 
-        let text = `📋 Платежи:\n\n`;
+        let text = `📋 Payments:\n\n`;
         let i = 1;
         if (paymentResult.results.length === 0) {
-          text += 'Платежей пока нет.';
+          text += 'No payments yet.';
         } else {
           for (const p of paymentResult.results) {
             text += `${i}. ${p.amount} RSD - ${new Date(p.created_at).toLocaleDateString('ru-RU')}\n`;
-            text += `Статус: ${p.status}\n\n`;
+            text += `Status: ${p.status}\n\n`;
 
             i++;
           }
@@ -625,7 +625,7 @@ PIB: ${companyData.pib || 'Не указан'}
 
       } catch (error) {
         console.error(`❌ Error getting payments for user ${telegramId}:`, error);
-        return 'Ошибка при получении платежей';
+        return 'Error getting payments';
       }
     },
 
@@ -637,10 +637,10 @@ PIB: ${companyData.pib || 'Не указан'}
         if (!user || !user.id) {
           console.error(`❌ User ${telegramId} not found in database`);
           await handlerWorker.flowEngine.goToStep(telegramId, 'show_client_card');
-          return 'Пользователь не найден';
+          return 'User not found';
         }
 
-        // Проверяем есть ли записи в company_users для этого пользователя
+        // Check if there are records in company_users for this user
         const companyResult = await handlerWorker.d1Storage.executeQuery(
           'SELECT * FROM company_users WHERE user_id = ? ORDER BY id LIMIT 1',
           [user.id]
@@ -649,7 +649,7 @@ PIB: ${companyData.pib || 'Не указан'}
         if (!companyResult.results.length) {
           console.warn(`⚠️ No company found for user ${telegramId}`);
           await handlerWorker.flowEngine.goToStep(telegramId, 'show_client_card');
-          return 'Компания не найдена';
+          return 'Company not found';
         }
 
         const companyId = companyResult.results[0].company_id;
@@ -659,15 +659,15 @@ PIB: ${companyData.pib || 'Не указан'}
           [companyId]
         );
 
-        let text = `📋 Расходы:\n\n`;
+        let text = `📋 Expenses:\n\n`;
 
         let i = 1;
         if (expenseResult.results.length === 0) {
-          text += 'Расходов пока нет.';
+          text += 'No expenses yet.';
         } else {
           for (const e of expenseResult.results) {
             text += `${i}. ${e.amount} RSD - ${new Date(e.created_at).toLocaleDateString('ru-RU')}\n`;
-            text += `Описание: ${e.description}\n\n`;
+            text += `Description: ${e.description}\n\n`;
 
             i++;
           }
@@ -677,7 +677,7 @@ PIB: ${companyData.pib || 'Не указан'}
 
       } catch (error) {
         console.error(`❌ Error getting expenses for user ${telegramId}:`, error);
-        return 'Ошибка при получении расходов';
+        return 'Error getting expenses';
       }
     },
     
@@ -694,7 +694,7 @@ PIB: ${companyData.pib || 'Не указан'}
             return;
           }
 
-          // Проверяем есть ли записи в company_users для этого пользователя
+          // Check if there are records in company_users for this user
           const companyResult = await handlerWorker.d1Storage.executeQuery(
             'SELECT * FROM company_users WHERE user_id = ? ORDER BY id LIMIT 1',
             [user.id]
@@ -708,7 +708,7 @@ PIB: ${companyData.pib || 'Не указан'}
 
           const companyId = companyResult.results[0].company_id;
 
-          // Создаем расход с текущей датой
+          // Create expense with current date
           const expenseResult = await handlerWorker.d1Storage.executeQuery(
             'INSERT INTO expenses (company_id, amount, description) VALUES (?, ?, ?)',
             [companyId, expenseData.amount, expenseData.description || null]
@@ -717,7 +717,7 @@ PIB: ${companyData.pib || 'Не указан'}
           const expenseId = expenseResult.meta.last_row_id;
           console.log(`✅ Expense created for user ${telegramId}`);
           
-          // Сохраняем ID созданного расхода в контекст
+          // Save created expense ID to context
           await contextManager.setVariable(telegramId, 'expense.id', expenseId);
 
         } catch (error) {
@@ -743,7 +743,7 @@ PIB: ${companyData.pib || 'Не указан'}
             return;
           }
 
-          // Проверяем есть ли записи в company_users для этого пользователя
+          // Check if there are records in company_users for this user
           const companyResult = await handlerWorker.d1Storage.executeQuery(
             'SELECT * FROM company_users WHERE user_id = ? ORDER BY id LIMIT 1',
             [user.id]
@@ -751,7 +751,7 @@ PIB: ${companyData.pib || 'Не указан'}
 
           const company = companyResult.results[0];
 
-          // Создаем счет с текущей датой (CURRENT_TIMESTAMP)
+          // Create invoice with current date (CURRENT_TIMESTAMP)
           const invoiceResult = await handlerWorker.d1Storage.executeQuery(
             'INSERT INTO invoices (company_id, amount, status, customer_id) VALUES (?, ?, ?, ?)',
             [company.company_id, invoiceData.amount, 'CREATED', invoiceData.customer_id]
@@ -759,7 +759,7 @@ PIB: ${companyData.pib || 'Не указан'}
 
           const invoiceId = invoiceResult.meta.last_row_id;
 
-          // Связываем счет с услугой
+          // Link invoice with service
           await handlerWorker.d1Storage.executeQuery(
             'INSERT INTO invoice_services (invoice_id, service_id) VALUES (?, ?)',
             [invoiceId, invoiceData.service_id]
@@ -767,10 +767,10 @@ PIB: ${companyData.pib || 'Не указан'}
 
           console.log(`✅ Invoice created for user ${telegramId}`);
           
-          // Сохраняем ID созданного счета в контекст
+          // Save created invoice ID to context
           await contextManager.setVariable(telegramId, 'invoice.id', invoiceId);
           
-          // Переход к следующему шагу
+          // Go to next step
           //await this.flowEngine.goToStep(telegramId, 'show_invoice');
 
         } catch (error) {
@@ -804,13 +804,13 @@ PIB: ${companyData.pib || 'Не указан'}
 
           const templateRequest = await contextManager.getVariable(telegramId, 'need_template.type');
 
-          const topicMessage = `Запрос шаблона ${templateRequest === 'contract' ? 'договора' : 'акта'}
+          const topicMessage = `Template request for ${templateRequest === 'contract' ? 'contract' : 'act'}
 
 ID: ${telegramId}
-Username: @${user.username || 'не указан'}
-Имя: ${user.firstName || ''} ${user.lastName || ''}`.trim() + `
+Username: @${user.username || 'not specified'}
+Name: ${user.firstName || ''} ${user.lastName || ''}`.trim() + `
 
-Дата и время: ${currentDateTime}
+Date and time: ${currentDateTime}
 `;
 
           const adminChatId = parseInt(handlerWorker.env.ADMIN_CHAT_ID);
@@ -821,16 +821,16 @@ Username: @${user.username || 'не указан'}
 
     getProfile: async (telegramId: number, contextManager: UserContextManager) => {
       try {
-        // Получаем пользователя из базы данных
+        // Get user from database
         const user = await handlerWorker.d1Storage.getUser(telegramId);
         if (!user || !user.id) {
           console.error(`❌ User ${telegramId} not found in database`);
-          // Переходим к созданию компании
+          // Go to company creation
           await handlerWorker.flowEngine.goToStep(telegramId, 'show_client_card');
-          return `Пользователь не найден`;
+          return `User not found`;
         }
 
-        // Проверяем есть ли записи в company_users для этого пользователя
+        // Check if there are records in company_users for this user
         const companyUserResult = await handlerWorker.d1Storage.executeQuery(
           'SELECT * FROM company_users WHERE user_id = ? ORDER BY id LIMIT 1',
           [user.id]
@@ -852,21 +852,21 @@ Username: @${user.username || 'не указан'}
 
         const service = serviceResult.results[0];
 
-return `👤 Профиль:
+return `👤 Profile:
 
-Язык: ${user.language || 'Не указан'}
+Language: ${user.language || 'Not specified'}
 
-Название: ${company.name || 'Не указано'}
-PIB: ${company.pib || 'Не указан'}
-ОКВЭД: ${company.okved || 'Не указан'}
+Name: ${company.name || 'Not specified'}
+PIB: ${company.pib || 'Not specified'}
+OKVED: ${company.okved || 'Not specified'}
 
-Услуга: ${service.name || 'Не указана'}
+Service: ${service.name || 'Not specified'}
 
-Выберите действие:`;
+Choose action:`;
         
       } catch (error) {
         console.error(`❌ Error generating profile for user ${telegramId}:`, error);
-        return 'Ошибка при получении профиля.';
+        return 'Error getting profile.';
       }
     },
 

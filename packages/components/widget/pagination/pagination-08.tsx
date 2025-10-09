@@ -16,7 +16,7 @@ export default function PaginationTabs() {
     <Pagination>
       <PaginationContent>
         <PaginationItem>
-          <PaginationPrevious href="#" className="border" />
+          <PaginationPrevious href={{ pathname: "#" }} className="border" />
         </PaginationItem>
 
         {pages.map((page) => {
@@ -43,7 +43,7 @@ export default function PaginationTabs() {
         })}
 
         <PaginationItem>
-          <PaginationNext href="#" className="border" />
+          <PaginationNext href={{ pathname: "#" }} className="border" />
         </PaginationItem>
       </PaginationContent>
     </Pagination>

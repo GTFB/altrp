@@ -21,11 +21,11 @@ export interface ScheduledEvent {
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     try {
-      // Инициализируем сервисы
+      // Initialize services
       const storageService = new KVStorageService(env.BZN_BOT_KV);
       const botWorker = new TelegramBotWorker(env, storageService);
 
-      // Обрабатываем запрос
+      // Process request
       const response = await botWorker.handleRequest(request);
       
       return response;
@@ -39,11 +39,11 @@ export default {
     try {
       console.log('Cron triggered:', event.cron);
       
-      // Инициализируем сервисы
+      // Initialize services
       const storageService = new KVStorageService(env.BZN_BOT_KV);
       const botWorker = new TelegramBotWorker(env, storageService);
 
-      // Проверяем отложенные сообщения
+      // Check delayed messages
       await botWorker.checkDelayedMessages();
     } catch (error) {
       console.error('Scheduled task error:', error);

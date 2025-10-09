@@ -1,25 +1,36 @@
-'use client';
+"use client";
 
-import { type Category } from '@/repositories/category.repository';
-import Link from 'next/link';
-import { useLocale } from 'next-intl';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tag } from 'lucide-react';
+import { type Category } from "@/types/category";
+import Link from "next/link";
+import { useLocale } from "next-intl";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tag } from "lucide-react";
 
 interface CategoryCardProps {
   category: Category;
 }
 
 export function CategoryCard({ category }: CategoryCardProps) {
-    const locale = useLocale() === 'en' ? '' : useLocale();
-  const localePath = locale !== '' ? `/${locale}` : '';
+  const locale = useLocale() === "en" ? "" : useLocale();
+  const localePath = locale !== "" ? `/${locale}` : "";
 
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader>
         <CardTitle className="text-xl">
-          <Link href={`${localePath}/categories/${category.slug}`} className="hover:text-primary">
+          <Link
+            href={{
+              pathname: `${localePath}/categories/${category.slug}`,
+            }}
+            className="hover:text-primary"
+          >
             {category.title}
           </Link>
         </CardTitle>
@@ -31,14 +42,17 @@ export function CategoryCard({ category }: CategoryCardProps) {
       </CardHeader>
       <CardContent>
         <div className="flex flex-wrap gap-2 mb-4">
-          {category.tags && category.tags.map((tag) => (
-            <Badge key={tag} variant="secondary" className="text-xs">
-              {tag}
-            </Badge>
-          ))}
+          {category.tags &&
+            category.tags.map((tag) => (
+              <Badge key={tag} variant="secondary" className="text-xs">
+                {tag}
+              </Badge>
+            ))}
         </div>
-        <Link 
-          href={`${localePath}/categories/${category.slug}`}
+        <Link
+          href={{
+            pathname: `${localePath}/categories/${category.slug}`,
+          }}
           className="text-sm text-muted-foreground hover:text-primary flex items-center"
         >
           <Tag className="h-4 w-4 mr-1" />

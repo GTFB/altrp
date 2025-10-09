@@ -9,8 +9,8 @@ export interface SessionServiceConfig {
 }
 
 /**
- * Сервис для управления сессиями пользователей
- * Использует D1 Database для постоянного хранения состояний
+ * Service for managing user sessions
+ * Uses D1 Database for persistent state storage
  */
 export class SessionService {
   private d1Storage: D1StorageService;
@@ -20,14 +20,14 @@ export class SessionService {
   }
 
   /**
-   * Создает ключ сессии для пользователя
+   * Creates session key for user
    */
   private createSessionKey(userId: number, sessionType: string = 'default'): string {
     return `user:${userId}:${sessionType}`;
   }
 
   /**
-   * Устанавливает данные сессии для пользователя
+   * Sets session data for user
    */
   async setUserSession(userId: number, data: SessionData, sessionType: string = 'default'): Promise<void> {
     try {
@@ -41,7 +41,7 @@ export class SessionService {
   }
 
   /**
-   * Получает данные сессии пользователя
+   * Gets user session data
    */
   async getUserSession(userId: number, sessionType: string = 'default'): Promise<SessionData | null> {
     try {
@@ -56,7 +56,7 @@ export class SessionService {
   }
 
   /**
-   * Удаляет сессию пользователя
+   * Deletes user session
    */
   async deleteUserSession(userId: number, sessionType: string = 'default'): Promise<void> {
     try {
@@ -70,7 +70,7 @@ export class SessionService {
   }
 
   /**
-   * Обновляет часть данных сессии (мерж с существующими)
+   * Updates part of session data (merge with existing)
    */
   async updateUserSession(userId: number, updates: Partial<SessionData>, sessionType: string = 'default'): Promise<void> {
     try {
@@ -85,7 +85,7 @@ export class SessionService {
   }
 
   /**
-   * Проверяет, существует ли сессия пользователя
+   * Checks if user session exists
    */
   async hasUserSession(userId: number, sessionType: string = 'default'): Promise<boolean> {
     try {
@@ -98,14 +98,14 @@ export class SessionService {
   }
 
   /**
-   * Устанавливает флаг состояния для пользователя
+   * Sets state flag for user
    */
   async setUserState(userId: number, state: string, value: any = true): Promise<void> {
     await this.updateUserSession(userId, { [state]: value });
   }
 
   /**
-   * Получает флаг состояния пользователя
+   * Gets user state flag
    */
   async getUserState(userId: number, state: string): Promise<any> {
     const sessionData = await this.getUserSession(userId);
@@ -113,7 +113,7 @@ export class SessionService {
   }
 
   /**
-   * Очищает флаг состояния пользователя
+   * Clears user state flag
    */
   async clearUserState(userId: number, state: string): Promise<void> {
     const sessionData = await this.getUserSession(userId);
@@ -124,11 +124,11 @@ export class SessionService {
   }
 
   /**
-   * Очищает все сессии пользователя
+   * Clears all user sessions
    */
   async clearAllUserSessions(userId: number): Promise<void> {
     try {
-      // Можно расширить для очистки разных типов сессий
+      // Can be extended for clearing different types of sessions
       await this.deleteUserSession(userId, 'default');
       await this.deleteUserSession(userId, 'flow');
       await this.deleteUserSession(userId, 'temp');

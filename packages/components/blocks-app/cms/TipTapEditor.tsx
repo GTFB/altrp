@@ -1,25 +1,25 @@
-'use client';
+"use client";
 
-import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import Image from '@tiptap/extension-image';
-import { Button } from '@/components/ui/button';
-import { useEffect } from 'react';
-import { 
-  Bold, 
-  Italic, 
-  Strikethrough, 
-  Code, 
-  Heading2, 
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Image from "@tiptap/extension-image";
+import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
+import {
+  Bold,
+  Italic,
+  Strikethrough,
+  Code,
+  Heading2,
   Heading3,
   List,
   ListOrdered,
   Quote,
   Undo,
   Redo,
-  Image as ImageIcon
-} from 'lucide-react';
-import { MediaSelectorPopover } from './MediaSelectorPopover';
+  Image as ImageIcon,
+} from "lucide-react";
+import { MediaSelectorPopover } from "./MediaSelectorPopover";
 
 interface TipTapEditorProps {
   content?: string;
@@ -27,21 +27,27 @@ interface TipTapEditorProps {
   placeholder?: string;
 }
 
-export function TipTapEditor({ content = '', onChange, placeholder }: TipTapEditorProps) {
+export function TipTapEditor({
+  content = "",
+  onChange,
+  placeholder,
+}: TipTapEditorProps) {
   const editor = useEditor({
     extensions: [
       StarterKit,
       Image.configure({
         HTMLAttributes: {
-          class: 'max-w-full h-auto rounded-lg',
+          class: "max-w-full h-auto rounded-lg",
         },
       }),
     ],
     content,
+    immediatelyRender: false,
     editorProps: {
       attributes: {
-        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none tiptap-editor',
-        placeholder: placeholder || 'Start writing...',
+        class:
+          "prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none tiptap-editor",
+        placeholder: placeholder || "Start writing...",
       },
     },
     onUpdate: ({ editor }) => {
@@ -53,8 +59,8 @@ export function TipTapEditor({ content = '', onChange, placeholder }: TipTapEdit
 
   // Add custom styles for TipTap editor
   useEffect(() => {
-    const styleId = 'tiptap-editor-styles';
-    
+    const styleId = "tiptap-editor-styles";
+
     // Remove existing styles if they exist
     const existingStyle = document.getElementById(styleId);
     if (existingStyle) {
@@ -62,7 +68,7 @@ export function TipTapEditor({ content = '', onChange, placeholder }: TipTapEdit
     }
 
     // Create new style element
-    const style = document.createElement('style');
+    const style = document.createElement("style");
     style.id = styleId;
     style.textContent = `
       .tiptap-editor h2,
@@ -170,7 +176,7 @@ export function TipTapEditor({ content = '', onChange, placeholder }: TipTapEdit
         display: block !important;
       }
     `;
-    
+
     document.head.appendChild(style);
 
     // Cleanup function
@@ -192,7 +198,7 @@ export function TipTapEditor({ content = '', onChange, placeholder }: TipTapEdit
     if (editor && imageSlug) {
       // Convert slug to full URL
       const imageUrl = `/images/${imageSlug}`;
-      console.log('Adding image to editor:', imageUrl);
+      console.log("Adding image to editor:", imageUrl);
       editor.chain().focus().setImage({ src: imageUrl }).run();
     }
   };
@@ -201,35 +207,35 @@ export function TipTapEditor({ content = '', onChange, placeholder }: TipTapEdit
     if (!file) return;
 
     // Validate file type
-    if (!file.type.startsWith('image/')) {
-      alert('Please select an image file');
+    if (!file.type.startsWith("image/")) {
+      alert("Please select an image file");
       return;
     }
 
     try {
       const formData = new FormData();
-      formData.append('file', file);
-      formData.append('title', file.name.replace(/\.[^/.]+$/, ''));
-      formData.append('alt', file.name.replace(/\.[^/.]+$/, ''));
+      formData.append("file", file);
+      formData.append("title", file.name.replace(/\.[^/.]+$/, ""));
+      formData.append("alt", file.name.replace(/\.[^/.]+$/, ""));
 
-      const response = await fetch('/api/admin/media/upload', {
-        method: 'POST',
+      const response = await fetch("/api/admin/media/upload", {
+        method: "POST",
         body: formData,
       });
 
       if (!response.ok) {
-        throw new Error('File upload error');
+        throw new Error("File upload error");
       }
 
       const result = await response.json();
       const fullFileName = result.fullFileName;
-      
+
       if (fullFileName) {
         addImage(`/images/${fullFileName}`);
       }
     } catch (error) {
-      console.error('Error uploading file:', error);
-      alert('File upload error');
+      console.error("Error uploading file:", error);
+      alert("File upload error");
     }
   };
 
@@ -245,41 +251,65 @@ export function TipTapEditor({ content = '', onChange, placeholder }: TipTapEdit
           type="button"
           variant="ghost"
           size="sm"
-          onClick={(e) => handleToolbarClick(e, () => editor.chain().focus().toggleBold().run())}
-          className={editor.isActive('bold') ? 'bg-accent text-accent-foreground' : ''}
+          onClick={(e) =>
+            handleToolbarClick(e, () =>
+              editor.chain().focus().toggleBold().run(),
+            )
+          }
+          className={
+            editor.isActive("bold") ? "bg-accent text-accent-foreground" : ""
+          }
           title="Bold"
         >
           <Bold className="w-4 h-4" />
         </Button>
-        
+
         <Button
           type="button"
           variant="ghost"
           size="sm"
-          onClick={(e) => handleToolbarClick(e, () => editor.chain().focus().toggleItalic().run())}
-          className={editor.isActive('italic') ? 'bg-accent text-accent-foreground' : ''}
+          onClick={(e) =>
+            handleToolbarClick(e, () =>
+              editor.chain().focus().toggleItalic().run(),
+            )
+          }
+          className={
+            editor.isActive("italic") ? "bg-accent text-accent-foreground" : ""
+          }
           title="Italic"
         >
           <Italic className="w-4 h-4" />
         </Button>
-        
+
         <Button
           type="button"
           variant="ghost"
           size="sm"
-          onClick={(e) => handleToolbarClick(e, () => editor.chain().focus().toggleStrike().run())}
-          className={editor.isActive('strike') ? 'bg-accent text-accent-foreground' : ''}
+          onClick={(e) =>
+            handleToolbarClick(e, () =>
+              editor.chain().focus().toggleStrike().run(),
+            )
+          }
+          className={
+            editor.isActive("strike") ? "bg-accent text-accent-foreground" : ""
+          }
           title="Strikethrough"
         >
           <Strikethrough className="w-4 h-4" />
         </Button>
-        
+
         <Button
           type="button"
           variant="ghost"
           size="sm"
-          onClick={(e) => handleToolbarClick(e, () => editor.chain().focus().toggleCode().run())}
-          className={editor.isActive('code') ? 'bg-accent text-accent-foreground' : ''}
+          onClick={(e) =>
+            handleToolbarClick(e, () =>
+              editor.chain().focus().toggleCode().run(),
+            )
+          }
+          className={
+            editor.isActive("code") ? "bg-accent text-accent-foreground" : ""
+          }
           title="Code"
         >
           <Code className="w-4 h-4" />
@@ -291,19 +321,35 @@ export function TipTapEditor({ content = '', onChange, placeholder }: TipTapEdit
           type="button"
           variant="ghost"
           size="sm"
-          onClick={(e) => handleToolbarClick(e, () => editor.chain().focus().toggleHeading({ level: 2 }).run())}
-          className={editor.isActive('heading', { level: 2 }) ? 'bg-accent text-accent-foreground' : ''}
+          onClick={(e) =>
+            handleToolbarClick(e, () =>
+              editor.chain().focus().toggleHeading({ level: 2 }).run(),
+            )
+          }
+          className={
+            editor.isActive("heading", { level: 2 })
+              ? "bg-accent text-accent-foreground"
+              : ""
+          }
           title="Heading 2"
         >
           <Heading2 className="w-4 h-4" />
         </Button>
-        
+
         <Button
           type="button"
           variant="ghost"
           size="sm"
-          onClick={(e) => handleToolbarClick(e, () => editor.chain().focus().toggleHeading({ level: 3 }).run())}
-          className={editor.isActive('heading', { level: 3 }) ? 'bg-accent text-accent-foreground' : ''}
+          onClick={(e) =>
+            handleToolbarClick(e, () =>
+              editor.chain().focus().toggleHeading({ level: 3 }).run(),
+            )
+          }
+          className={
+            editor.isActive("heading", { level: 3 })
+              ? "bg-accent text-accent-foreground"
+              : ""
+          }
           title="Heading 3"
         >
           <Heading3 className="w-4 h-4" />
@@ -315,30 +361,54 @@ export function TipTapEditor({ content = '', onChange, placeholder }: TipTapEdit
           type="button"
           variant="ghost"
           size="sm"
-          onClick={(e) => handleToolbarClick(e, () => editor.chain().focus().toggleBulletList().run())}
-          className={editor.isActive('bulletList') ? 'bg-accent text-accent-foreground' : ''}
+          onClick={(e) =>
+            handleToolbarClick(e, () =>
+              editor.chain().focus().toggleBulletList().run(),
+            )
+          }
+          className={
+            editor.isActive("bulletList")
+              ? "bg-accent text-accent-foreground"
+              : ""
+          }
           title="Bullet List"
         >
           <List className="w-4 h-4" />
         </Button>
-        
+
         <Button
           type="button"
           variant="ghost"
           size="sm"
-          onClick={(e) => handleToolbarClick(e, () => editor.chain().focus().toggleOrderedList().run())}
-          className={editor.isActive('orderedList') ? 'bg-accent text-accent-foreground' : ''}
+          onClick={(e) =>
+            handleToolbarClick(e, () =>
+              editor.chain().focus().toggleOrderedList().run(),
+            )
+          }
+          className={
+            editor.isActive("orderedList")
+              ? "bg-accent text-accent-foreground"
+              : ""
+          }
           title="Numbered List"
         >
           <ListOrdered className="w-4 h-4" />
         </Button>
-        
+
         <Button
           type="button"
           variant="ghost"
           size="sm"
-          onClick={(e) => handleToolbarClick(e, () => editor.chain().focus().toggleBlockquote().run())}
-          className={editor.isActive('blockquote') ? 'bg-accent text-accent-foreground' : ''}
+          onClick={(e) =>
+            handleToolbarClick(e, () =>
+              editor.chain().focus().toggleBlockquote().run(),
+            )
+          }
+          className={
+            editor.isActive("blockquote")
+              ? "bg-accent text-accent-foreground"
+              : ""
+          }
           title="Quote"
         >
           <Quote className="w-4 h-4" />
@@ -351,12 +421,7 @@ export function TipTapEditor({ content = '', onChange, placeholder }: TipTapEdit
           onChange={addImage}
           onUpload={handleImageUpload}
           trigger={
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              title="Add Image"
-            >
+            <Button type="button" variant="ghost" size="sm" title="Add Image">
               <ImageIcon className="w-4 h-4" />
             </Button>
           }
@@ -368,18 +433,22 @@ export function TipTapEditor({ content = '', onChange, placeholder }: TipTapEdit
           type="button"
           variant="ghost"
           size="sm"
-          onClick={(e) => handleToolbarClick(e, () => editor.chain().focus().undo().run())}
+          onClick={(e) =>
+            handleToolbarClick(e, () => editor.chain().focus().undo().run())
+          }
           disabled={!editor.can().undo()}
           title="Undo"
         >
           <Undo className="w-4 h-4" />
         </Button>
-        
+
         <Button
           type="button"
           variant="ghost"
           size="sm"
-          onClick={(e) => handleToolbarClick(e, () => editor.chain().focus().redo().run())}
+          onClick={(e) =>
+            handleToolbarClick(e, () => editor.chain().focus().redo().run())
+          }
           disabled={!editor.can().redo()}
           title="Redo"
         >

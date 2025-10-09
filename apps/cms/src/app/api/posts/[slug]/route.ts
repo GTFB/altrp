@@ -3,11 +3,12 @@ import { PostRepository } from '@/repositories/post.repository';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const { slug } = await params;
     const postRepo = PostRepository.getInstance();
-    const post = await postRepo.findBySlug(params.slug);
+    const post = await postRepo.findBySlug(slug);
 
     if (!post) {
       return NextResponse.json(

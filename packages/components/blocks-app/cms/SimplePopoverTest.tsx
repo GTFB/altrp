@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover';
+} from "@/components/ui/popover";
 
 export function SimplePopoverTest() {
   const [open, setOpen] = useState(false);
@@ -14,7 +14,7 @@ export function SimplePopoverTest() {
   return (
     <div className="p-4">
       <h2 className="text-lg font-semibold mb-4">Simple Popover Test</h2>
-      
+
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button variant="outline">Open Popover</Button>

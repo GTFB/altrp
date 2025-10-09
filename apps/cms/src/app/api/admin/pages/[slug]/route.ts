@@ -4,10 +4,10 @@ import { htmlToMarkdown, markdownToHtml } from '@/lib/html-to-markdown';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const { slug } = params;
+    const { slug } = await params;
     const pageRepository = PageRepository.getInstance();
     const page = await pageRepository.findBySlug(slug);
 
@@ -37,11 +37,11 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
+    const { slug: oldSlug } = await params;
     const body = await request.json();
-    const { slug: oldSlug } = params;
     
     // Validate required fields
     if (!body.title && !body.slug) {
