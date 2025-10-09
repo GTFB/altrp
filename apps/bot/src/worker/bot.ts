@@ -118,7 +118,15 @@ export class TelegramBotWorker {
     );
     
     // Теперь создаем обработчики с доступом к flowEngine
-    const customHandlers = createCustomHandlers(this);
+    // Создаем адаптер для совместимости с BotInterface
+    const botAdapter = {
+      d1Storage: this.d1Storage,
+      flowEngine: this.flowEngine,
+      env: this.env,
+      messageService: this.messageService,
+      topicService: this.topicService
+    };
+    const customHandlers = createCustomHandlers(botAdapter);
     
     // Устанавливаем обработчики в FlowEngine
     this.flowEngine.setCustomHandlers(customHandlers);
@@ -149,7 +157,7 @@ export class TelegramBotWorker {
       }
 
       // Получаем данные обновления от Telegram
-      const update: TelegramUpdate = await request.json();
+      const update = await request.json() as TelegramUpdate;
       console.log('📨 Received update:', JSON.stringify(update, null, 2));
 
       // Проверяем подключение к D1

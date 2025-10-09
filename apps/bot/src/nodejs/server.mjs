@@ -1,11 +1,12 @@
 // Express сервер для Node.js версии бота
-const express = require('express');
-const cron = require('node-cron');
-const { TelegramBotNode } = require('./bot');
-const { PostgreSQLStorageService, RedisStorageService } = require('./storage-service');
+import express from 'express';
+import cron from 'node-cron';
+import { TelegramBotNode } from './bot.ts';
+import { PostgreSQLStorageService, RedisStorageService } from './storage-service.ts';
 
 // Загружаем переменные окружения
-require('dotenv').config();
+import dotenv from 'dotenv';
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -35,14 +36,9 @@ let bot;
 async function initializeBot() {
   try {
     console.log('🚀 Initializing Node.js Telegram Bot...');
-    
-    // Инициализируем хранилища
     await postgresStorage.initialize();
     await redisStorage.initialize();
-    
-    // Создаем экземпляр бота
     bot = new TelegramBotNode(nodeEnv, redisStorage, postgresStorage);
-    
     console.log('✅ Node.js Telegram Bot initialized successfully');
   } catch (error) {
     console.error('❌ Failed to initialize bot:', error);
@@ -58,10 +54,7 @@ app.post('/webhook', async (req, res) => {
       return res.status(500).json({ error: 'Bot not initialized' });
     }
 
-    // Обрабатываем запрос через бота
     const response = await bot.handleRequest(req);
-    
-    // Отправляем ответ
     res.status(response.status).send(await response.text());
   } catch (error) {
     console.error('Error processing webhook:', error);
@@ -113,7 +106,6 @@ process.on('SIGINT', async () => {
   process.exit(0);
 });
 
-// Обработка необработанных ошибок
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
@@ -127,7 +119,6 @@ process.on('uncaughtException', (error) => {
 async function startServer() {
   try {
     await initializeBot();
-    
     app.listen(PORT, () => {
       console.log(`🚀 Node.js Telegram Bot server running on port ${PORT}`);
       console.log(`📡 Webhook endpoint: http://localhost:${PORT}/webhook`);
@@ -140,5 +131,4 @@ async function startServer() {
   }
 }
 
-// Запускаем сервер
 startServer();

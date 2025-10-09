@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2022",
     "lib": ["ES2022"],
-    "module": "CommonJS",
+    "module": "ES2022",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
@@ -28,10 +28,11 @@
     "types": ["node"]
   },
   "include": [
-    "src/core/**/*",
-    "src/config/**/*",
+    "src/config/bot-interface.ts",
+    "src/config/handlers.ts",
     "src/content/**/*",
-    "src/nodejs/**/*"
+    "src/nodejs/**/*",
+    "src/core/generate-content-nodejs.ts"
   ],
   "exclude": [
     "node_modules",
@@ -39,6 +40,7 @@
     "dist-nodejs",
     "src/worker/**/*",
     "src/worker.ts",
+    "src/core/generate-content.ts",
     "wrangler.toml",
     "**/*.test.ts",
     "**/*.spec.ts"

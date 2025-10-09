@@ -1,10 +1,9 @@
 // handlers.ts
-//import { TelegramBotWorker } from './bot';
-import { TelegramBotWorker } from '../worker/bot';
+import { BotInterface } from './bot-interface';
 import { UserContextManager } from '../core/user-context';
 import { normalizeVKLink } from '../core/helpers';
 
-export const createCustomHandlers = (worker: TelegramBotWorker) => {
+export const createCustomHandlers = (worker: BotInterface) => {
   const handlerWorker = {
     d1Storage: worker['d1Storage'],
     flowEngine: worker['flowEngine'],
