@@ -196,8 +196,10 @@ export function TipTapEditor({
 
   const addImage = (imageSlug: string) => {
     if (editor && imageSlug) {
-      // Convert slug to full URL
-      const imageUrl = `/images/${imageSlug}`;
+      // Convert slug to full URL and encode special characters (cyrillic, spaces, etc.)
+      // This ensures proper URL encoding for TipTap without affecting other components
+      const encodedSlug = encodeURIComponent(imageSlug);
+      const imageUrl = `/images/${encodedSlug}`;
       console.log("Adding image to editor:", imageUrl);
       editor.chain().focus().setImage({ src: imageUrl }).run();
     }
@@ -231,7 +233,7 @@ export function TipTapEditor({
       const fullFileName = result.fullFileName;
 
       if (fullFileName) {
-        addImage(`/images/${fullFileName}`);
+        addImage(fullFileName);
       }
     } catch (error) {
       console.error("Error uploading file:", error);

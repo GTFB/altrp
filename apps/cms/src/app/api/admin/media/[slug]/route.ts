@@ -20,11 +20,13 @@ export async function GET(
     // Transform media to match frontend interface
     const transformedMedia = {
       id: media.slug,
+      slug: media.slug,
       url: media.url,
       alt: media.alt,
       title: media.title,
       description: media.description,
       filename: media.slug,
+      type: media.type,
       size: media.size || 0,
       mimeType: `image/${media.slug.split('.').pop()}`,
       createdAt: media.date || new Date().toISOString()

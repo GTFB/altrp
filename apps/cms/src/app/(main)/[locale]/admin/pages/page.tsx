@@ -422,7 +422,7 @@ export default function PagesPage() {
                     <div className="flex items-center justify-end gap-2">
                       <Button variant="ghost" size="icon" asChild className="cursor-pointer">
                         <Link href={{
-                          pathname: `/en/${page.slug}`,
+                          pathname: `/${page.slug}`,
                         }} target="_blank">
                           <Eye className="w-4 h-4" />
                         </Link>

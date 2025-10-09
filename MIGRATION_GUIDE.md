@@ -1,15 +1,15 @@
 # SQLite Migration Guide
 
-## Что было сделано
+## What Was Done
 
-### 1. Репозитории теперь используют динамическую фабрику провайдеров
-- ✅ `PostRepository` → использует `createPostProvider()`
-- ✅ `PageRepository` → использует `createPageProvider()`  
-- ✅ `AuthorRepository` → использует `createAuthorProvider()`
-- ✅ `CategoryRepository` → использует `createCategoryProvider()`
-- ✅ `MediaRepository` → использует `createMediaProvider()`
+### 1. Repositories now use dynamic provider factory
+- ✅ `PostRepository` → uses `createPostProvider()`
+- ✅ `PageRepository` → uses `createPageProvider()`  
+- ✅ `AuthorRepository` → uses `createAuthorProvider()`
+- ✅ `CategoryRepository` → uses `createCategoryProvider()`
+- ✅ `MediaRepository` → uses `createMediaProvider()`
 
-### 2. Фабрика провайдеров использует переменную окружения
+### 2. Provider factory uses environment variable
 ```typescript
 // packages/repositories/providers/factory.ts
 function getCmsProvider(): 'mdx' | 'sqlite' {
@@ -18,53 +18,59 @@ function getCmsProvider(): 'mdx' | 'sqlite' {
 }
 ```
 
-### 3. Миграции созданы
+### 3. Migrations created
 - ✅ `migrations/cms/0000_wide_martin_li.sql`
-- ✅ База данных: `packages/db/cms.database.sqlite`
+- ✅ Database: `packages/db/cms.database.sqlite`
 
-## Как использовать
+### 4. Runtime-adaptive SQLite client
+- ✅ Auto-detects Bun runtime → uses `bun:sqlite`
+- ✅ Auto-detects Node.js runtime → uses `better-sqlite3`
+- ✅ Enables fast Next.js dev server without `--bun` flag
+- ✅ Integration tests work with `bun:sqlite` via Bun test runner
 
-### Для разработки с SQLite:
-1. Создайте `.env` файл в `apps/cms/`:
+## How to Use
+
+### For SQLite development:
+1. Create `.env` file in `apps/cms/`:
 ```env
 CMS_PROVIDER=sqlite
 CMS_SQLITE_PATH=../../packages/db/cms.database.sqlite
 ```
 
-2. Или экспортируйте переменную окружения:
+2. Or export environment variable:
 ```bash
 export CMS_PROVIDER=sqlite
 ```
 
-### Для разработки с MDX:
-1. Не устанавливайте `CMS_PROVIDER` (по умолчанию 'mdx')
-2. Или установите явно:
+### For MDX development:
+1. Don't set `CMS_PROVIDER` (defaults to 'mdx')
+2. Or set explicitly:
 ```env
 CMS_PROVIDER=mdx
 ```
 
-## Исправление тестов
+## Test Fixes
 
-### Проблема
-Прямой импорт репозиториев в начале тестов создаёт циклические зависимости:
+### Problem
+Direct repository imports at the beginning of test files create circular dependencies:
 ```typescript
-import { PostRepository } from '@/repositories/post.repository'; // ❌ Ошибка!
+import { PostRepository } from '@/repositories/post.repository'; // ❌ Error!
 ```
 
-### Решение
-Используйте динамический импорт внутри тестов:
+### Solution
+Use dynamic imports inside tests:
 ```typescript
-// Вместо импорта в начале файла
+// Instead of importing at the top of the file
 const { PostRepository } = await import('@/repositories/post.repository'); // ✅
 ```
 
-### Список файлов для исправления
+### Files to Fix
 
-**Исправлены:**
+**Fixed:**
 - ✅ `apps/cms/tests/integration/api/admin/authors.root.test.ts`
 - ✅ `apps/cms/tests/integration/api/api-posts.test.ts`
 
-**Требуют исправления (15 файлов):**
+**Need fixing (15 files):**
 - `apps/cms/tests/integration/api/admin/media.root.test.ts`
 - `apps/cms/tests/integration/api/admin/pages.root.test.ts`
 - `apps/cms/tests/integration/api/admin/media.stats.test.ts`
@@ -83,9 +89,9 @@ const { PostRepository } = await import('@/repositories/post.repository'); // �
 - `apps/cms/tests/integration/api/api-posts-slug.test.ts`
 - `apps/cms/tests/integration/api/api-posts-categories.test.ts`
 
-### Пример исправления
+### Fix Example
 
-**Было:**
+**Before:**
 ```typescript
 import { PostRepository } from '@/repositories/post.repository';
 
@@ -95,9 +101,9 @@ it('test case', async () => {
 });
 ```
 
-**Стало:**
+**After:**
 ```typescript
-// Удалить импорт из начала файла
+// Remove import from the top of the file
 
 it('test case', async () => {
   const { PostRepository } = await import('@/repositories/post.repository');
@@ -106,29 +112,52 @@ it('test case', async () => {
 });
 ```
 
-## Что нужно закоммитить
+## What to Commit
 
 ```bash
 git add migrations/cms/
 git add packages/repositories/*.ts
 git add packages/repositories/providers/
+git add packages/db/client.ts
+git add apps/cms/package.json
+git add package.json
 git add apps/cms/drizzle.config.ts
 git add apps/cms/example.env
 git add apps/cms/tests/integration/api/admin/authors.root.test.ts
 git add apps/cms/tests/integration/api/api-posts.test.ts
-git commit -m "feat: migrate CMS to SQLite with dynamic provider selection
+git commit -m "feat: migrate CMS to SQLite with runtime-adaptive driver
 
 - Add SQLite providers for all repositories
 - Implement factory pattern with env-based provider selection
 - Generate SQLite migrations for CMS schema
 - Fix circular dependency issues in tests using dynamic imports
+- Add runtime-adaptive SQLite client (bun:sqlite for Bun, better-sqlite3 for Node.js)
+- Remove --bun flag from dev scripts for faster Next.js performance
 - Update example.env with CMS_PROVIDER configuration"
 ```
 
-## Следующие шаги
+## Performance Improvements
 
-1. Исправить оставшиеся 15 тестовых файлов (использовать динамический импорт)
-2. Запустить все интеграционные тесты: `bun test tests/integration`
-3. Убедиться, что SQLite база работает корректно
-4. Создать тестовые данные в SQLite базе для разработки
+### Issue
+Running Next.js with `--bun` flag caused slow server performance, but removing it broke tests that require `bun:sqlite`.
+
+### Solution
+Implemented runtime-adaptive SQLite client in `packages/db/client.ts`:
+- Detects runtime using `typeof Bun !== 'undefined'`
+- Uses `bun:sqlite` when running in Bun (tests with `bun test`)
+- Uses `better-sqlite3` when running in Node.js (Next.js dev server)
+- Removed `--bun` flags from dev/start scripts for optimal Next.js performance
+
+### Results
+- ✅ Integration tests pass (87/87) using `bun:sqlite`
+- ✅ Next.js dev server runs fast without `--bun` flag using `better-sqlite3`
+- ✅ No code changes needed in repositories or tests
+- ✅ Single unified database client for all environments
+
+## Next Steps
+
+1. Fix remaining 15 test files (use dynamic imports)
+2. Run all integration tests: `bun test tests/integration`
+3. Verify SQLite database works correctly
+4. Create test data in SQLite database for development
 

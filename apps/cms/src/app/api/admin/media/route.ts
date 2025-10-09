@@ -43,11 +43,13 @@ export async function GET(request: NextRequest) {
     // Transform media items to match frontend interface
     const transformedMedia = mediaItems.map(item => ({
       id: item.slug,
+      slug: item.slug,
       url: item.url,
       alt: item.alt,
       title: item.title,
       description: item.description,
       filename: item.slug,
+      type: item.type,
       size: item.size || 0,
       mimeType: `image/${item.slug.split('.').pop()}`,
       createdAt: item.date || new Date().toISOString()
@@ -108,11 +110,13 @@ export async function POST(request: NextRequest) {
     // Transform the response to match our interface
     const transformedMedia = {
       id: uploadData.media.slug,
+      slug: uploadData.media.slug,
       url: uploadData.media.url,
       alt: uploadData.media.alt,
       title: uploadData.media.title,
       description: uploadData.media.description,
       filename: uploadData.media.slug,
+      type: uploadData.media.type,
       size: uploadData.media.size || 0,
       mimeType: file.type,
       createdAt: uploadData.media.date || new Date().toISOString()

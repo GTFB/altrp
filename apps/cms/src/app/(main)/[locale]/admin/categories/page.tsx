@@ -352,7 +352,7 @@ export default function CategoriesPage() {
                     <div className="flex items-center justify-end gap-2">
                       <Button variant="ghost" size="icon" asChild className="cursor-pointer">
                         <Link href={{
-                          pathname: `/en/categories/${category.slug}`,
+                          pathname: `/categories/${category.slug}`,
                         }} target="_blank">
                           <Eye className="w-4 h-4" />
                         </Link>

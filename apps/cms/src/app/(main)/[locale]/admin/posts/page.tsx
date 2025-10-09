@@ -465,7 +465,7 @@ export default function PostsPage() {
                     <div className="flex items-center justify-end gap-2">
                       <Button variant="ghost" size="icon" asChild className="cursor-pointer">
                         <Link href={{
-                          pathname: `/en/blog/${post.slug}`,
+                          pathname: `/blog/${post.slug}`,
                         }} target="_blank">
                           <Eye className="w-4 h-4" />
                         </Link>
