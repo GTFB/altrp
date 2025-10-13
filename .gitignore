@@ -109,7 +109,7 @@ dist
 .pnp.*
 
 # Bun
-bun.lockb
+#bun.lockb
 
 # OS generated files
 .DS_Store
