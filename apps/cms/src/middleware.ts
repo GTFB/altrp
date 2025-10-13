@@ -25,6 +25,20 @@ export default withAuth(
   {
     callbacks: {
       authorized: async ({ token, req }) => {
+        // E2E Test bypass: Check for test cookie in development
+        // Requires both NODE_ENV=development AND E2E_TESTING=true
+        if (process.env.NODE_ENV === 'development' && process.env.E2E_TESTING === 'true') {
+          const e2eTestCookie = req.cookies.get('e2e-test-admin');
+          if (e2eTestCookie?.value) {
+            // Validate cookie format: email:token
+            const [email] = e2eTestCookie.value.split(':');
+            if (email) {
+              console.log('🧪 E2E Test: Bypassing auth for:', email.substring(0, 3) + '***');
+              return true; // Allow access for E2E tests
+            }
+          }
+        }
+
         const email = token?.email;
 
         // if (!email) {

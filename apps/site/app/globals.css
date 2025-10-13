@@ -53,26 +53,11 @@
   
   body {
     overflow-x: hidden;
-    /* Prevent FOUC - hide until styles are loaded */
-    visibility: hidden;
-    opacity: 0;
-    /* Prevent any style changes during loading */
-    contain: layout style;
   }
   
-  /* Show body when styles are loaded */
-  body.styles-loaded {
-    visibility: visible;
-    opacity: 1;
-    transition: opacity 0.3s ease-in-out;
-    contain: none;
-  }
-  
-  /* Prevent style changes during loading */
-  body:not(.styles-loaded) * {
-    opacity: 1 !important;
-    transition: none !important;
-    animation: none !important;
+  /* Avoid heavy transitions by default */
+  body * {
+    transition: color 0.2s ease, background-color 0.2s ease;
   }
   
   /* Prevent layout shift during loading */

@@ -22,6 +22,9 @@ const nextConfig = {
   experimental: {
     // optimizeCss: true, 
     optimizePackageImports: ['lucide-react'],
+    optimizeCss: true  ,
+    //inlineCss: true,
+
   },
   //  
   compiler: {
