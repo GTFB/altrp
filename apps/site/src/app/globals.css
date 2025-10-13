@@ -2,6 +2,9 @@
 
 @plugin "tailwindcss-animate";
 
+@source "../src/**/*.{ts,tsx,mdx}";
+@source "../../../../packages/**/*.{ts,tsx,mdx}";
+
 /* Custom focus styles */
 @layer base {
   *:focus {

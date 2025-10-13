@@ -7,7 +7,8 @@
   },
   "scripts": {
     "dev": "next dev -p 3100",
-    "build": "next build",
+    "build": "next build --experimental-build-mode compile",
+    "build:static": "cross-env STATIC_EXPORT=true next build",
     "start": "next start -p 3100",
     "lint": "next lint",
     "type-check": "tsc --noEmit"
@@ -74,6 +75,7 @@
     "@types/node": "^20.14.11",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "cross-env": "^10.1.0",
     "cssnano": "^7.0.6",
     "eslint": "^8.0.0",
     "eslint-config-next": "^15.0.0",

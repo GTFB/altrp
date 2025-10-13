@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 
-  ...(process.env.NODE_ENV === 'production' && {
+  ...(process.env.STATIC_EXPORT === 'true' && {
     output: 'export',
     trailingSlash: true,
     skipTrailingSlashRedirect: true,
@@ -23,6 +23,7 @@ const nextConfig = {
     // optimizeCss: true, 
     optimizePackageImports: ['lucide-react'],
     optimizeCss: true  ,
+    externalDir: true,
     //inlineCss: true,
 
   },

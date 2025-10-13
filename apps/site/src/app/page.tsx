@@ -1,6 +1,6 @@
 
-import { Container } from "@/components/home/layout/Container";
-import Hero01 from "@/components/home/hero-01";
+import { Container } from "@/components/misc/layout/Container";
+import Hero01 from "@/components/blocks-app/Hero01";
 
 export default function Home() {
   return (

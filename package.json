@@ -10,7 +10,8 @@
     },
     "scripts": {
         "dev:site": "bun run --filter=altrp-site dev",
-        "build:site": "bun run --filter=altrp-site build",
+        "dev:wrangler": "wrangler pages dev apps/site/dist --port 3300",
+        "build:site": "bun run --filter=altrp-site build:static",
         "start:site": "bun run --filter=altrp-site start",
         "dev:cms": "bun run --filter=altrp-cms dev",
         "build:cms": "bun run --filter=altrp-cms build",
@@ -18,15 +19,15 @@
         "dev:app": "bun run --filter=altrp-app dev",
         "build:app": "bun run --filter=altrp-app build",
         "start:app": "bun run --filter=altrp-app start",
-        "dev": "concurrently \"bun run dev:site\" \"bun run dev:cms\" \"bun run dev:app\"",
+        "dev": "concurrently \"bun run dev:cms\" \"bun run dev:app\" \"bun run dev:site\"",
         "build": "bun run build:site && bun run build:cms && bun run build:app",
         "quick-test": "bun run --filter=altrp-cms test:e2e:quick-public",
         "test:integration": "bun run --filter=altrp-cms test:integration",
         "test:e2e": "bun run --filter=altrp-cms test:e2e",
         "db:cms:push": "bun run --filter=altrp-cms db:push",
         "db:cms:reset": "bun run --filter=altrp-cms db:reset",
-        "cms:up": "node scripts/cms-sqlite-up.js"
-
+        "cms:up": "node scripts/cms-sqlite-up.js",
+        "dev:kill": "taskkill /F /IM node.exe"
     },
     "devDependencies": {
         "@changesets/cli": "^2.27.1",
@@ -36,6 +37,7 @@
         "concurrently": "^8.2.2"
     },
     "dependencies": {
-        "marked": "^16.2.1"
+        "marked": "^16.2.1",
+        "wrangler": "4"
     }
 }
