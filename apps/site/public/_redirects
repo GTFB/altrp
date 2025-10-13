@@ -1,1 +1,2 @@
-/*    /index.html   200
+# Redirects for static Next.js site
+# Cloudflare Pages automatically serves index.html from directories

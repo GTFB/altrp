@@ -4,6 +4,3 @@ compatibility_flags=["nodejs_compat"]
 
 pages_build_output_dir="apps/site/dist"
 
-[build]
-command="bun run build:site"
-cwd="./"
