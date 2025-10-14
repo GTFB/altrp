@@ -14,26 +14,41 @@
 ## Необходимо создать файл wrangler.toml
 ## Для этого можно скопировать wrangler.toml.example
 
+## Авторизоваться в cloudflare
+
+```
+npx wrangler login
+```
+
+
 ## 🔧 Шаг 1: Настройка wrangler.toml
 
-### 1.1 Получите Account ID
-```bash
-wrangler whoami
-```
-Скопируйте `Account ID` из вывода команды.
-
-### 1.2 Заполните конфигурацию
+### 1.1 Заполните конфигурацию
 Откройте файл `wrangler.toml` и замените плейсхолдеры:
 
 ```toml
 name = "YOUR_WORKER_NAME"           # ← Замените на имя вашего бота
-account_id = "YOUR_ACCOUNT_ID_HERE" # ← Вставьте ваш Account ID
 ```
 
 **Пример:**
 ```toml
 name = "my-telegram-bot"
-account_id = "7f412ebe1901fb520bca3fbe424faf94"
+```
+
+### 1.2 Получите Account ID
+```bash
+npx wrangler whoami
+```
+Скопируйте `Account ID` из вывода команды.
+
+```
+account_id = "YOUR_ACCOUNT_ID_HERE" # ← Вставьте ваш Account ID
+```
+
+**Пример:**
+```toml
+account_id = "1234567890qwertyuioasdfghzxcvbn4"
+
 ```
 
 ### 1.3 Настройте окружения (опционально)
@@ -49,12 +64,12 @@ name = "YOUR_WORKER_NAME-prod"      # ← Для продакшена
 
 ### 2.1 Создайте базу данных
 ```bash
-wrangler d1 create YOUR_DATABASE_NAME
+npx wrangler d1 create YOUR_DATABASE_NAME
 ```
 
 **Пример:**
 ```bash
-wrangler d1 create my-bot-db
+npx wrangler d1 create my-bot-db
 ```
 
 ### 2.2 Обновите wrangler.toml
