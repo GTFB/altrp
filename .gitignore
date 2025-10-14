@@ -136,6 +136,9 @@ logs
 tmp/
 temp/
 
+# Cloudflare Wrangler
+.wrangler/
+
 # Build outputs
 build/
 dist/

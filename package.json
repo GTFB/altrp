@@ -10,7 +10,7 @@
   },
   "scripts": {
     "dev:site": "bun run --filter=altrp-site dev",
-    "dev:wrangler": "wrangler pages dev apps/site/dist --port 3300",
+    "dev:wrangler:site": "bun run --filter=altrp-site dev:wrangler",
     "build:site": "bun run --filter=altrp-site build:static",
     "start:site": "bun run --filter=altrp-site start",
     "dev:cms": "bun run --filter=altrp-cms dev",
