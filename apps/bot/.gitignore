@@ -2,3 +2,4 @@ node_modules/
 dist-nodejs/
 .env
 .wrangler/
+wrangler.toml

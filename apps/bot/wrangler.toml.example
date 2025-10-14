@@ -1,0 +1,39 @@
+name = "YOUR_WORKER_NAME"
+main = "src/worker.ts"
+compatibility_date = "2024-01-01"
+workers_dev = true
+account_id = "YOUR_ACCOUNT_ID_HERE"
+
+[observability.logs]
+enabled = true
+
+# Environment variables
+[vars]
+NODE_ENV = "production"
+LOCALE = "ru"
+
+# KV Namespace для кэширования
+# [[kv_namespaces]]
+# binding = "BOT_KV"
+# id = "YOUR_KV_ID_HERE"
+# preview_id = "YOUR_PREVIEW_KV_ID_HERE"
+
+# D1 Database
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "YOUR_DATABASE_NAME"
+# database_id = "YOUR_DATABASE_ID_HERE"
+
+# Cron triggers
+[triggers]
+crons = ["* * * * *"]
+
+# Development configuration
+# Для разработки и тестирования
+[env.development]
+name = "YOUR_WORKER_NAME-dev"
+
+# Production configuration  
+# Для продакшена
+[env.production]
+name = "YOUR_WORKER_NAME-prod"
