@@ -11,6 +11,8 @@
 4. **Аккаунт Cloudflare** с доступом к Workers
 5. **Telegram Bot Token** от @BotFather
 
+## Все команды выполняются из папки /apps/bot
+
 ## Необходимо создать файл wrangler.toml
 ## Для этого можно скопировать wrangler.toml.example
 
@@ -19,7 +21,6 @@
 ```
 npx wrangler login
 ```
-
 
 ## 🔧 Шаг 1: Настройка wrangler.toml
 
@@ -85,21 +86,43 @@ database_id = "YOUR_DATABASE_ID_HERE"  # ← Вставьте ID из преды
 ### 2.3 Примените схему базы данных
 ```bash
 # Для локальной разработки
-wrangler d1 execute YOUR_DATABASE_NAME --local --file=./schema.sql
+npx wrangler d1 execute YOUR_DATABASE_NAME --local --file=../../migrations/bot/sqlite/0000_schema.sql
 
 # Для продакшена
-wrangler d1 execute YOUR_DATABASE_NAME --remote --file=./schema.sql
+npx wrangler d1 execute YOUR_DATABASE_NAME --file=../../migrations/bot/sqlite/0000_schema.sql
 ```
 
 ## 💾 Шаг 3: Создание KV Namespace
 
 ### 3.1 Создайте KV namespace
 ```bash
-wrangler kv namespace create "BOT_KV"
+npx wrangler kv namespace create "BOT_KV"
 ```
 
 ### 3.2 Обновите wrangler.toml
-Скопируйте `id` и `preview_id` из вывода команды:
+Скопируйте `id` из вывода команды:
+
+```toml
+[[kv_namespaces]]
+binding = "BOT_KV"
+id = "YOUR_KV_ID_HERE"              # ← Production ID
+```
+
+### 3.3 Создайте preview namespace:
+```bash
+   npx wrangler kv namespace create "BOT_KV" --preview
+```
+
+### 3.4 Обновите wrangler.toml:
+Скопируйте `preview_id` из вывода команды:
+
+```toml
+[[kv_namespaces]]
+binding = "BOT_KV"
+id = "YOUR_KV_ID_HERE"                     # ← Production ID
+preview_id = "ВАШ_PREVIEW_ID_ЗДЕСЬ"        # Preview ID из команды выше
+```
+
 
 ```toml
 [[kv_namespaces]]
@@ -114,13 +137,13 @@ preview_id = "YOUR_PREVIEW_KV_ID_HERE" # ← Preview ID
 
 ```bash
 # Токен бота от @BotFather
-wrangler secret put BOT_TOKEN
+npx wrangler secret put BOT_TOKEN
 
 # ID админского чата (где бот будет отправлять уведомления)
-wrangler secret put ADMIN_CHAT_ID
+npx wrangler secret put ADMIN_CHAT_ID
 
 # Токен для API транскрипции (опционально)
-wrangler secret put TRANSCRIPTION_API_TOKEN
+npx wrangler secret put TRANSCRIPTION_API_TOKEN
 ```
 
 **Как получить ADMIN_CHAT_ID:**
