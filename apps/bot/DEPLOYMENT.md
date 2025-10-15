@@ -131,7 +131,20 @@ id = "YOUR_KV_ID_HERE"              # ← Production ID
 preview_id = "YOUR_PREVIEW_KV_ID_HERE" # ← Preview ID
 ```
 
-## 🔐 Шаг 4: Настройка секретов
+## 📦 Шаг 4: Установка зависимостей
+
+```bash
+npm install --ignore-scripts
+```
+
+
+## 🚀 Шаг 5: Развертывание
+
+```bash
+npm run deploy
+```
+
+## 🔐 Шаг 6: Настройка секретов
 
 Установите необходимые секреты для бота:
 
@@ -146,42 +159,44 @@ npx wrangler secret put ADMIN_CHAT_ID
 npx wrangler secret put TRANSCRIPTION_API_TOKEN
 ```
 
+## либо зайти через web-интерфейс: Compute (Workers) -> "YOUR_WORKER_NAME" -> Settings -> Variables and Secrets -> +Add
+
+Type: Secret
+Variable name: BOT_TOKEN
+Value: <YOUR_BOT_TOKEN>
+
+## и
+
+Type: Secret
+Variable name: ADMIN_CHAT_ID
+Value: <YOUR_ADMIN_CHAT_ID>
+
 **Как получить ADMIN_CHAT_ID:**
 1. Добавьте бота в группу/канал
 2. Отправьте сообщение в группу
-3. Перейдите по ссылке: `https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates`
-4. Найдите `chat.id` в ответе
+3. Измените тип группы на группу с топиками
+4. Выдайте боту права администратора
+5. Перейдите по ссылке: `https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates`
+6. Найдите `chat.id` в ответе
 
-## 📦 Шаг 5: Установка зависимостей
 
-```bash
-npm install --ignore-scripts
-```
-
-## 🚀 Шаг 6: Развертывание
-
-### 6.1 Развертывание в development
-```bash
-npm run deploy:dev
-# или
-wrangler deploy --env development
-```
-
-### 6.2 Развертывание в production
-```bash
-npm run deploy
-# или
-wrangler deploy --env production
-```
 
 ## 🔗 Шаг 7: Настройка Webhook
 
-После успешного развертывания настройте webhook для получения обновлений от Telegram:
+После успешного развертывания настройте webhook для получения обновлений от Telegram.
+Посмотреть url Вашего воркера можно в web-интерфейсе, перейдя: Compute (Workers) -> "YOUR_WORKER_NAME" -> Settings -> Domains & Routes:
 
 ```bash
 curl -X POST "https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook" \
      -H "Content-Type: application/json" \
      -d '{"url": "https://YOUR_WORKER_NAME.YOUR_SUBDOMAIN.workers.dev"}'
+```
+
+Например
+```bash
+curl -X POST "https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook" \
+     -H "Content-Type: application/json" \
+     -d '{"url": "https://my-telegram-bot.altrp.workers.dev"}'
 ```
 
 **Замените:**
