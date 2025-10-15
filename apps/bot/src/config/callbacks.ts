@@ -1,26 +1,3 @@
-// Bot messages
-// export const messages = {
-//   selectLanguage: `Izaberite jezik / Choose language:`,
-//   welcome: `Welcome to bznrs! Your digital assistant for freelancers. Let's set up your profile.`,
-//   companyName: `Enter the full name of your company.`,
-//   pib: `Thank you. Now enter your PIB (tax number).`,
-//   okved: `Great. Now enter your activity code (OKVED).`,
-//   mainService: `Enter your main service (e.g., 'Programming services'). We will use it as a basis for quick invoice creation.`,
-//   phone: `Thank you. Now enter your contact phone number.`,
-//   email: `And finally, enter your email.`,
-//   onboardingThanks: `Great, your profile is set up! Now you can use the main menu.`,
-//   consultation_greeting: `Choose who to contact.`,
-//   ask_to_lawyer: `Describe your question to the lawyer.`,
-//   ask_to_accountant: `Describe your question to the accountant.`,
-//   consultation_auto_answer: `Thank you! Your question has been sent successfully.`,
-//   mainMenu: `Choose a menu section.`,
-
-//   help: `Available commands:
-// /start - start working
-// /help - help`,
-
-// };
-
 // Keyboards
 export const keyboards = {
   lang: {
