@@ -249,14 +249,14 @@ export class TelegramBotWorker {
     }
 
     // Check if user is waiting for VK link (legacy logic)
-    if (message.text) {
-      const userData = user?.data ? JSON.parse(user.data) : {};
-      if (userData.waitingForVK) {
-        // User in VK link waiting state - process as VK link
-        await this.handleVKLink(message.from.id, message.text);
-        return;
-      }
-    }
+    // if (message.text) {
+    //   const userData = user?.data ? JSON.parse(user.data) : {};
+    //   if (userData.waitingForVK) {
+    //     // User in VK link waiting state - process as VK link
+    //     await this.handleVKLink(message.from.id, message.text);
+    //     return;
+    //   }
+    // }
 
     // Process all message types (considering forwarding settings)
     await this.handleAllMessages(message);
@@ -417,75 +417,6 @@ export class TelegramBotWorker {
     console.log(`✅ Menu flow launched for user ${userId}`);
   }
 
-  // Keep old method as legacy (can be removed later)
-  private async handleStartCommandLegacy(message: TelegramMessage): Promise<void> {
-    const userId = message.from.id;
-    const chatId = message.chat.id;
-
-    console.log(`Handling /start command from user ${userId}`);
-
-    // Check if the user already exists in the database
-    const existingUser = await this.d1Storage.getUser(userId);
-    
-    if (!existingUser) {
-        // Create a topic in the admin group
-      const topicId = await this.topicService.createTopicInAdminGroup(userId, message.from);
-      
-      if (topicId) {
-        // Register user with topic_id
-        const newUser = {
-          telegramId: userId,
-          firstName: message.from.first_name,
-          lastName: message.from.last_name || '',
-          username: message.from.username || '',
-          registeredAt: new Date().toISOString(),
-          topicId: topicId
-        };
-
-        await this.d1Storage.addUser(newUser);
-        console.log(`New user ${userId} registered with topic ${topicId}`);
-
-      } else {
-        // If topic creation failed, register without it
-        const newUser = {
-          telegramId: userId,
-          firstName: message.from.first_name,
-          lastName: message.from.last_name || '',
-          username: message.from.username || '',
-          registeredAt: new Date().toISOString()
-        };
-
-        await this.d1Storage.addUser(newUser);
-        console.log(`New user ${userId} registered without topic`);
-      }
-    } else {
-      // User already exists
-      console.log(`User ${userId} already exists in database`);
-    }
-
-    // Get dbUserId to send messages (user definitely exists now)
-    const dbUserId = await this.getDbUserId(chatId);
-    if (!dbUserId) {
-      console.error(`Cannot send start message: user ${userId} not found in database after registration`);
-      return;
-    }
-
-    // Always send a welcome message with a button
-    const welcomeMessage = `123`;
-    
-    await this.messageService.sendMessageWithKeyboard(chatId, welcomeMessage, {
-      inline_keyboard: [[
-        {
-          text: "🚀 Start",
-          callback_data: "start_flow"
-        }
-      ]]
-    }, dbUserId);
-  }
-
-
-
-
 
   // Method to check delayed messages (triggered by cron)
   async checkDelayedMessages(): Promise<void> {
@@ -614,62 +545,62 @@ All the opportunities are waiting for you on our website! Jump in, explore, and 
   }
 
 
-  private async handleVKLink(userId: number, vkLink: string): Promise<void> {
-    try {
-      // Normalize VK link
-      let normalizedLink = vkLink.trim();
-      if (normalizedLink.startsWith('@')) {
-        normalizedLink = `https://vk.com/${normalizedLink.substring(1)}`;
-      } else if (!normalizedLink.startsWith('http')) {
-        normalizedLink = `https://vk.com/${normalizedLink}`;
-      }
+//   private async handleVKLink(userId: number, vkLink: string): Promise<void> {
+//     try {
+//       // Normalize VK link
+//       let normalizedLink = vkLink.trim();
+//       if (normalizedLink.startsWith('@')) {
+//         normalizedLink = `https://vk.com/${normalizedLink.substring(1)}`;
+//       } else if (!normalizedLink.startsWith('http')) {
+//         normalizedLink = `https://vk.com/${normalizedLink}`;
+//       }
 
-      // Save VK link and reset waiting state
-      const user = await this.d1Storage.getUser(userId);
-      const userData = user?.data ? JSON.parse(user.data) : {};
-      userData.vk = normalizedLink;
-      delete userData.waitingForVK;
-      await this.d1Storage.updateUserData(userId, JSON.stringify(userData));
+//       // Save VK link and reset waiting state
+//       const user = await this.d1Storage.getUser(userId);
+//       const userData = user?.data ? JSON.parse(user.data) : {};
+//       userData.vk = normalizedLink;
+//       delete userData.waitingForVK;
+//       await this.d1Storage.updateUserData(userId, JSON.stringify(userData));
       
-      console.log(`VK link saved for user ${userId}: ${normalizedLink}`);
+//       console.log(`VK link saved for user ${userId}: ${normalizedLink}`);
 
-      // Send a checking message
-      const dbUserId = await this.getDbUserId(userId);
-      if (dbUserId) {
-        await this.messageService.sendMessage(userId, "Whoosh! 🔍 Checking...", dbUserId);
-      }
+//       // Send a checking message
+//       const dbUserId = await this.getDbUserId(userId);
+//       if (dbUserId) {
+//         await this.messageService.sendMessage(userId, "Whoosh! 🔍 Checking...", dbUserId);
+//       }
 
-      // Use previously fetched user data for topic
-      if (user && user.topicId) {
-        const currentDateTime = new Date().toLocaleString('en-US', {
-          timeZone: 'Europe/Moscow',
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit'
-        });
+//       // Use previously fetched user data for topic
+//       if (user && user.topicId) {
+//         const currentDateTime = new Date().toLocaleString('en-US', {
+//           timeZone: 'Europe/Moscow',
+//           year: 'numeric',
+//           month: '2-digit',
+//           day: '2-digit',
+//           hour: '2-digit',
+//           minute: '2-digit',
+//           second: '2-digit'
+//         });
 
-        const topicMessage = `The user requests to check subscriptions in groups
+//         const topicMessage = `The user requests to check subscriptions in groups
 
-ID: ${userId}
-Username: @${user.username || 'not specified'}
-Name: ${user.firstName || ''} ${user.lastName || ''}`.trim() + `
-VK: ${normalizedLink}
+// ID: ${userId}
+// Username: @${user.username || 'not specified'}
+// Name: ${user.firstName || ''} ${user.lastName || ''}`.trim() + `
+// VK: ${normalizedLink}
 
-Date and time: ${currentDateTime}`;
+// Date and time: ${currentDateTime}`;
 
-        const adminChatId = parseInt(this.env.ADMIN_CHAT_ID);
-        await this.messageService.sendMessageToTopic(adminChatId, user.topicId, topicMessage);
+//         const adminChatId = parseInt(this.env.ADMIN_CHAT_ID);
+//         await this.messageService.sendMessageToTopic(adminChatId, user.topicId, topicMessage);
         
-        console.log(`Check subscription request sent to topic ${user.topicId} for user ${userId}`);
-      }
+//         console.log(`Check subscription request sent to topic ${user.topicId} for user ${userId}`);
+//       }
 
-    } catch (error) {
-      console.error(`Error handling VK link for user ${userId}:`, error);
-    }
-  }
+//     } catch (error) {
+//       console.error(`Error handling VK link for user ${userId}:`, error);
+//     }
+//   }
 
 
   // Legacy handleCallbackData removed - all callbacks are now handled via FlowEngine
