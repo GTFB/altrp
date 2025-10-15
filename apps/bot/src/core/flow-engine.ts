@@ -424,8 +424,8 @@ export class FlowEngine {
           return;
           
         case 'go_to_step':
-          console.log(`📍 Going to step: ${callbackConfig.stepId}`);
-          await this.goToStepInternal(telegramId, callbackConfig.stepId!);
+          console.log(`📍 Going to step: ${callbackConfig.nextStepId}`);
+          await this.goToStepInternal(telegramId, callbackConfig.nextStepId!);
           return;
 
         case 'set_variable':
@@ -476,8 +476,8 @@ export class FlowEngine {
           break;
           
         case 'go_to_step':
-          if (data.stepId) {
-            await this.goToStepInternal(telegramId, data.stepId);
+          if (data.nextStepId) {
+            await this.goToStepInternal(telegramId, data.nextStepId);
           }
           break;
           

@@ -234,7 +234,7 @@ export const commands = {
 //   },
 //   "check_subscription": {
 //     action: "go_to_step", // Go to step
-//     stepId: "ask_vk_link"
+//     nextStepId: "ask_vk_link"
 //   }
 // } as const;
 // Unique actions for each context
@@ -271,7 +271,7 @@ export const callbackActions = {
   // Onboarding navigation
   "start_creating_company_step": {
     action: "go_to_step",
-    stepId: "ask_company_name"
+    nextStepId: "ask_company_name"
   },
 
   "consultation": {
@@ -286,11 +286,11 @@ export const callbackActions = {
 
   "get_payments": {
     action: "go_to_step",
-    stepId: "handle_get_payments"
+    nextStepId: "handle_get_payments"
   },
   "get_expenses": {
     action: "go_to_step",
-    stepId: "handle_get_expenses"
+    nextStepId: "handle_get_expenses"
   },
   
 
@@ -307,25 +307,25 @@ export const callbackActions = {
 
   "confirm_invoice_data": {
     action: "go_to_step",
-    stepId: "confirm_invoice_data"
+    nextStepId: "confirm_invoice_data"
   },
 
   "show_main_service": {
     action: "go_to_step",
-    stepId: "show_main_service"
+    nextStepId: "show_main_service"
   },
   "ask_to_invoice_service_name": {
     action: "go_to_step",
-    stepId: "ask_to_invoice_service_name"
+    nextStepId: "ask_to_invoice_service_name"
   },
   "ask_to_invoice_amount": {
     action: "go_to_step",
-    stepId: "ask_to_invoice_amount"
+    nextStepId: "ask_to_invoice_amount"
   },
 
   "add_new_expense": {
     action: "go_to_step",
-    stepId: "add_new_expense_amount"
+    nextStepId: "add_new_expense_amount"
   },
 
   "consultation_lawyer": {
@@ -390,11 +390,11 @@ export const callbackActions = {
 
   "edit_service_name": {
     action: "go_to_step",
-    stepId: "ask_to_edit_service_name"
+    nextStepId: "ask_to_edit_service_name"
   },
   "add_new_service_name": {
     action: "go_to_step",
-    stepId: "ask_to_new_service_name"
+    nextStepId: "ask_to_new_service_name"
   },
   
 
@@ -421,7 +421,7 @@ export type CallbackActionType = 'start_flow' | 'go_to_step' | 'go_to_flow' | 's
 export interface CallbackActionConfig {
   action: CallbackActionType;
   flowName?: string;    // For start_flow
-  stepId?: string;      // For go_to_step
+  nextStepId?: string;      // For go_to_step
   variable?: string;    // For set_variable
   value?: any;          // For set_variable
   nextFlow?: string;    // For transition to next flow after action
