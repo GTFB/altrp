@@ -1,4 +1,4 @@
-import type { BotFlow, FlowStepType } from '../core/flow-types';
+import type { BotFlow, FlowStepType } from '../../core/flow-types';
 
 export const flows: Record<string, BotFlow> = {
 

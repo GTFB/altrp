@@ -2,7 +2,7 @@ import { UserContextManager } from './user-context';
 import { MessageService } from './message-service';
 import { I18nService } from './i18n';
 import type { FlowStepType, MessageStep, WaitInputStep, CallbackStep, ConditionStep, HandlerStep, FlowStep, ForwardingControlStep, DynamicStep } from './flow-types';
-import { flows } from '../config/flows';
+import { flows } from '../config/flows/flows';
 import { callbackActions } from '../config/callbacks';
 //import { messages, keyboards } from '../config/callbacks';
 import { keyboards } from '../config/callbacks';
