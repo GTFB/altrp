@@ -37,6 +37,9 @@
       ],
       "@/settings": [
         "./settings.ts"
+      ],
+      "@/content/*": [
+        "./packages/content/*"
       ]
     }
   },
