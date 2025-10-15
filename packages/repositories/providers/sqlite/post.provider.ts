@@ -6,8 +6,8 @@ import type {
   PaginationOptions,
   PaginatedResult,
 } from "@/types/post";
-import { db } from "@/db/client";
-import { posts } from "@/db/schema";
+import { db } from "@/packages/db/cms/client";
+import { posts } from "@/packages/db/cms/schema";
 import { and, eq } from "drizzle-orm";
 import { parseMarkdown } from "@/lib/markdown";
 import { PROJECT_SETTINGS } from "@/settings";

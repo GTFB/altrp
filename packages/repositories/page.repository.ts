@@ -11,7 +11,6 @@ export class PageRepository {
   private readonly provider: PageDataProvider;
 
   private constructor() {
-    // Markdown configuration is handled in packages/lib/markdown.ts
     this.provider = createPageProvider();
   }
 
