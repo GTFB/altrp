@@ -4,7 +4,7 @@ import { dirname, join } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const dbFile = process.env.CMS_SQLITE_PATH || join(__dirname, '../../data/cms.database.sqlite');
+const dbFile = process.env.CMS_SQLITE_PATH || join(__dirname, '../../../data/cms.database.sqlite');
 
 // Auto-detect runtime and use appropriate SQLite driver
 let db: any;

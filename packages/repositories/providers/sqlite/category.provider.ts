@@ -1,7 +1,7 @@
 import type { CategoryDataProvider } from "@/types/providers";
 import type { Category } from "@/types/category";
-import { db } from "@/db/client";
-import { categories } from "@/db/schema";
+import { db } from "@/packages/db/cms/client";
+import { categories } from "@/packages/db/cms/schema";
 import { eq } from "drizzle-orm";
 
 export class SqliteCategoryProvider implements CategoryDataProvider {

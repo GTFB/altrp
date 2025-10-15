@@ -1,7 +1,7 @@
 import type { MediaDataProvider } from "@/types/providers";
 import type { Media, MediaFilters, MediaSortOptions } from "@/types/media";
-import { db } from "@/db/client";
-import { media } from "@/db/schema";
+import { db } from "@/packages/db/cms/client";
+import { media } from "@/packages/db/cms/schema";
 import { eq } from "drizzle-orm";
 
 export class SqliteMediaProvider implements MediaDataProvider {

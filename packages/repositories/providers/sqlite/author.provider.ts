@@ -1,7 +1,7 @@
 import type { AuthorDataProvider } from "@/types/providers";
 import type { Author } from "@/types/author";
-import { db } from "@/db/client";
-import { authors } from "@/db/schema";
+import { db } from "@/packages/db/cms/client";
+import { authors } from "@/packages/db/cms/schema";
 import { eq } from "drizzle-orm";
 
 export class SqliteAuthorProvider implements AuthorDataProvider {

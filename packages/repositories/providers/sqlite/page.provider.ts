@@ -1,7 +1,7 @@
 import type { PageDataProvider } from "@/types/providers";
 import type { Page, PageFilters, PageSortOptions } from "@/types/page";
-import { db } from "@/db/client";
-import { pages } from "@/db/schema";
+import { db } from "@/packages/db/cms/client";
+import { pages } from "@/packages/db/cms/schema";
 import { eq } from "drizzle-orm";
 import { parseMarkdown } from "@/lib/markdown";
 
