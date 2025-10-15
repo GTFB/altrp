@@ -9,13 +9,13 @@ export const editCompanyNameFlow: BotFlow = {
       id: 'edit_company_name',
       prompt: 'companyName',
       saveToVariable: 'company.name',
-      nextStep: 'edit_company_name_handler'
+      nextStepId: 'edit_company_name_handler'
     },
     {
       type: 'handler',
       id: 'edit_company_name_handler',
       handlerName: 'updateCompany',
-      nextStep: 'redirect_to_profile'
+      nextStepId: 'redirect_to_profile'
     },
     {
       type: 'flow',

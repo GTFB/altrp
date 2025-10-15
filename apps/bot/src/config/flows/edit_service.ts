@@ -15,26 +15,26 @@ export const editServiceFlow: BotFlow = {
       id: 'ask_to_new_service_name',
       prompt: 'ask_to_invoice_service_name',//
       saveToVariable: 'mainService.name',
-      nextStep: 'save_new_service'
+      nextStepId: 'save_new_service'
     },
     {
       type: 'handler',
       id: 'save_new_service',
       handlerName: 'createMainService',//
-      nextStep: 'redirect_to_profile'
+      nextStepId: 'redirect_to_profile'
     },
     {
       type: 'wait_input',
       id: 'ask_to_edit_service_name',
       prompt: 'ask_to_invoice_service_name',//
       saveToVariable: 'mainService.name',
-      nextStep: 'update_main_service'
+      nextStepId: 'update_main_service'
     },
     {
       type: 'handler',
       id: 'update_main_service',
       handlerName: 'updateMainService',//
-      nextStep: 'redirect_to_profile'
+      nextStepId: 'redirect_to_profile'
     },
     {
       type: 'flow',

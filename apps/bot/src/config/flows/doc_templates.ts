@@ -14,13 +14,13 @@ export const docTemplatesFlow: BotFlow = {
       type: 'handler',
       id: 'handle_get_template',
       handlerName: 'getTemplate',
-      nextStep: 'template_auto_answer'
+      nextStepId: 'template_auto_answer'
     },
     {
       type: 'message',
       id: 'template_auto_answer',
       messageKey: 'template_auto_answer',
-      nextStep: ''
+      nextStepId: ''
     },
   ]
 };

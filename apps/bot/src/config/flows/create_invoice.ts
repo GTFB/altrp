@@ -9,7 +9,7 @@ export const createInvoiceFlow: BotFlow = {
       id: 'ask_to_client_pib',
       prompt: 'ask_to_client_pib',
       saveToVariable: 'client.pib',
-      nextStep: 'searching_company_by_pib'
+      nextStepId: 'searching_company_by_pib'
     },
     {
       type: 'handler',
@@ -21,34 +21,34 @@ export const createInvoiceFlow: BotFlow = {
       id: 'ask_to_client_account',
       prompt: 'ask_to_client_account',
       saveToVariable: 'client.account_number',
-      nextStep: 'ask_to_client_name'
+      nextStepId: 'ask_to_client_name'
     },
     {
       type: 'wait_input',
       id: 'ask_to_client_name',
       prompt: 'ask_to_client_name',
       saveToVariable: 'client.name',
-      nextStep: 'ask_to_client_address'
+      nextStepId: 'ask_to_client_address'
     },
     {
       type: 'wait_input',
       id: 'ask_to_client_address',
       prompt: 'ask_to_client_address',
       saveToVariable: 'client.address',
-      nextStep: 'saveClientCompany'
+      nextStepId: 'saveClientCompany'
     },
     {
       type: 'handler',
       id: 'saveClientCompany',
       handlerName: 'saveClientCompany',
-      nextStep: 'show_client_card'
+      nextStepId: 'show_client_card'
     },
     {
       type: 'dynamic',
       id: 'show_client_card',
       handler: 'generateClientCard',
       keyboardKey: 'client_card_buttons',
-      //nextStep: 'show_main_service'
+      //nextStepId: 'show_main_service'
     },
     {
       type: 'dynamic',
@@ -61,20 +61,20 @@ export const createInvoiceFlow: BotFlow = {
       id: 'ask_to_invoice_service_name',
       prompt: 'ask_to_invoice_service_name',//
       saveToVariable: 'mainService.name',
-      nextStep: 'save_invoice_service'
+      nextStepId: 'save_invoice_service'
     },
     {
       type: 'handler',
       id: 'save_invoice_service',
       handlerName: 'createMainService',//
-      nextStep: 'show_main_service'
+      nextStepId: 'show_main_service'
     },
     {
       type: 'wait_input',
       id: 'ask_to_invoice_amount',
       prompt: 'ask_to_invoice_amount',
       saveToVariable: 'invoice.amount',
-      nextStep: 'show_invoice'
+      nextStepId: 'show_invoice'
     },
     {
       type: 'dynamic',
@@ -86,13 +86,13 @@ export const createInvoiceFlow: BotFlow = {
       type: 'handler',
       id: 'confirm_invoice_data',
       handlerName: 'createInvoice',//
-      nextStep: 'invoice_auto_answer'
+      nextStepId: 'invoice_auto_answer'
     },
     {
       type: 'message',
       id: 'invoice_auto_answer',
       messageKey: 'invoice_auto_answer',
-      nextStep: ''
+      nextStepId: ''
     },
   ]
 };

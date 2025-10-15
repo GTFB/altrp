@@ -9,13 +9,13 @@ export const editCompanyOkvedFlow: BotFlow = {
       id: 'edit_company_okved',
       prompt: 'okved',
       saveToVariable: 'company.okved',
-      nextStep: 'edit_company_okved_handler'
+      nextStepId: 'edit_company_okved_handler'
     },
     {
       type: 'handler',
       id: 'edit_company_okved_handler',
       handlerName: 'updateCompany',
-      nextStep: 'redirect_to_profile'
+      nextStepId: 'redirect_to_profile'
     },
     {
       type: 'flow',

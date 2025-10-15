@@ -245,27 +245,27 @@ export const callbackActions = {
     variable: "profile.language",
     value: "sr",
     //nextFlow: "onboarding"
-    nextStep: "save_language"
+    nextStepId: "save_language"
   },
   "lang_select_ru": {
     action: "set_variable", 
     variable: "profile.language",
     value: "ru",
     //nextFlow: "onboarding"
-    nextStep: "save_language"
+    nextStepId: "save_language"
   },
 
   "save_edited_language_sr": {
     action: "set_variable",
     variable: "profile.language",
     value: "sr",
-    nextStep: "save_edited_language"
+    nextStepId: "save_edited_language"
   },
   "save_edited_language_ru": {
     action: "set_variable", 
     variable: "profile.language",
     value: "ru",
-    nextStep: "save_edited_language"
+    nextStepId: "save_edited_language"
   },
 
   // Onboarding navigation
@@ -332,13 +332,13 @@ export const callbackActions = {
     action: "set_variable",
     variable: "consultation.type",
     value: "lawyer",
-    nextStep: "ask_to_lawyer"
+    nextStepId: "ask_to_lawyer"
   },
   "consultation_accountant": {
     action: "set_variable",
     variable: "consultation.type",
     value: "accountant", 
-    nextStep: "ask_to_accountant"
+    nextStepId: "ask_to_accountant"
   },
 
   //Template requests
@@ -346,14 +346,14 @@ export const callbackActions = {
     action: "set_variable",
     variable: "need_template.type",
     value: "contract", 
-    nextStep: "handle_get_template"
+    nextStepId: "handle_get_template"
   },
 
   "get_act_template": {
     action: "set_variable",
     variable: "need_template.type",
     value: "act", 
-    nextStep: "handle_get_template"
+    nextStepId: "handle_get_template"
   },
 
   //profile
@@ -425,5 +425,5 @@ export interface CallbackActionConfig {
   variable?: string;    // For set_variable
   value?: any;          // For set_variable
   nextFlow?: string;    // For transition to next flow after action
-  nextStep?: string;    // For transition to next step after action
+  nextStepId?: string;    // For transition to next step after action
 }

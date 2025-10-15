@@ -15,26 +15,26 @@ export const consultationFlow: BotFlow = {
       id: 'ask_to_lawyer',
       prompt: 'ask_to_lawyer',
       saveToVariable: 'consultation.request',
-      nextStep: 'consultation_auto_answer'
+      nextStepId: 'consultation_auto_answer'
     },
     {
       type: 'wait_input',
       id: 'ask_to_accountant',
       prompt: 'ask_to_accountant',
       saveToVariable: 'consultation.request',
-      nextStep: 'consultation_auto_answer'
+      nextStepId: 'consultation_auto_answer'
     },
     {
       type: 'message',
       id: 'consultation_auto_answer',
       messageKey: 'consultation_auto_answer',
-      nextStep: 'handle_consultation_request'
+      nextStepId: 'handle_consultation_request'
     },
     {
       type: 'handler',
       id: 'handle_consultation_request',
       handlerName: 'processConsultationRequest',
-      nextStep: ''
+      nextStepId: ''
     },
   ]
 };

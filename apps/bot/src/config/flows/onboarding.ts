@@ -21,54 +21,54 @@ export const onboardingFlow: BotFlow = {
       id: 'ask_company_name',
       prompt: 'companyName',
       saveToVariable: 'company.name',
-      nextStep: 'pib'
+      nextStepId: 'pib'
     },
     {
       type: 'wait_input',
       id: 'pib',
       prompt: 'pib',
       saveToVariable: 'company.pib',
-      nextStep: 'okved'
+      nextStepId: 'okved'
     },
     {
       type: 'wait_input',
       id: 'okved',
       prompt: 'okved',
       saveToVariable: 'company.okved',
-      nextStep: 'mainService'
+      nextStepId: 'mainService'
     },
     {
       type: 'wait_input',
       id: 'mainService',
       prompt: 'mainService',
       saveToVariable: 'mainService.name',
-      nextStep: 'phone'
+      nextStepId: 'phone'
     },
     {
       type: 'wait_input',
       id: 'phone',
       prompt: 'phone',
       saveToVariable: 'company.phone',
-      nextStep: 'email'
+      nextStepId: 'email'
     },
     {
       type: 'wait_input',
       id: 'email',
       prompt: 'email',
       saveToVariable: 'company.email',
-      nextStep: 'create_company_handler'
+      nextStepId: 'create_company_handler'
     },
     {
       type: 'handler',
       id: 'create_company_handler',
       handlerName: 'createCompanyAndMainService',
-      nextStep: 'onboardingThanks'
+      nextStepId: 'onboardingThanks'
     },
     {
       type: 'message',
       id: 'onboardingThanks',
       messageKey: 'onboardingThanks',
-      nextStep: 'redirect_to_main_menu'
+      nextStepId: 'redirect_to_main_menu'
     },
     {
       type: 'flow',

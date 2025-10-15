@@ -177,10 +177,10 @@ export class FlowEngine {
       await this.messageService.sendMessage(telegramId, message, context.userId);
       
       // If no keyboard, go to next step
-      if (step.nextStep) {
-        await this.goToStepInternal(telegramId, step.nextStep);
+      if (step.nextStepId) {
+        await this.goToStepInternal(telegramId, step.nextStepId);
       } else {
-        // If no nextStep - complete flow
+        // If no nextStepId - complete flow
         console.log(`🏁 No next step defined, completing flow for user ${telegramId}`);
         await this.completeFlow(telegramId);
       }
@@ -198,7 +198,7 @@ export class FlowEngine {
       stepId: step.id,
       saveToVariable: step.saveToVariable,
       validation: step.validation,
-      nextStep: step.nextStep
+      nextStepId: step.nextStepId
     });
 
     if (step.prompt) {
@@ -221,7 +221,7 @@ export class FlowEngine {
             stepId: step.id,
             value: button.value,
             saveToVariable: button.saveToVariable,
-            nextStep: button.nextStep,
+            nextStepId: button.nextStepId,
             nextFlow: button.nextFlow
           })
         }))
@@ -279,11 +279,11 @@ export class FlowEngine {
     }
 
     //TODO Add step type check?
-    if (step.nextStep) {
-      await this.goToStepInternal(telegramId, step.nextStep);
+    if (step.nextStepId) {
+      await this.goToStepInternal(telegramId, step.nextStepId);
     }
     // else {
-    //   // If no nextStep - complete flow
+    //   // If no nextStepId - complete flow
     //   console.log(`🏁 Handler step completed with no next step, completing flow for user ${telegramId}`);
     //   await this.completeFlow(telegramId);
     // }
@@ -303,8 +303,8 @@ export class FlowEngine {
       await this.userContextManager.disableMessageForwarding(telegramId);
     }
 
-    if (step.nextStep) {
-      await this.goToStepInternal(telegramId, step.nextStep);
+    if (step.nextStepId) {
+      await this.goToStepInternal(telegramId, step.nextStepId);
     }
   }
 
@@ -350,8 +350,8 @@ export class FlowEngine {
       await this.userContextManager.setVariable(telegramId, '_system.waitingForInput', null);
       
       // Go to next step
-      if (waitingState.nextStep) {
-        await this.goToStepInternal(telegramId, waitingState.nextStep);
+      if (waitingState.nextStepId) {
+        await this.goToStepInternal(telegramId, waitingState.nextStepId);
       }
     } else {
       console.log(`💬 User ${telegramId} not waiting for input, message ignored in flow context`);
@@ -384,10 +384,10 @@ export class FlowEngine {
           );
         }
 
-        if (step.nextStep) {
-          await this.goToStepInternal(telegramId, step.nextStep);
+        if (step.nextStepId) {
+          await this.goToStepInternal(telegramId, step.nextStepId);
         }
-        else if(step.nextStep === ''){
+        else if(step.nextStepId === ''){
           await this.completeFlow(telegramId);
         }
         //  else {
@@ -396,8 +396,8 @@ export class FlowEngine {
 
       } catch (error) {
         console.error(`❌ Error in dynamic step handler ${step.handler}:`, error);
-        if (step.nextStep) {
-          await this.goToStepInternal(telegramId, step.nextStep);
+        if (step.nextStepId) {
+          await this.goToStepInternal(telegramId, step.nextStepId);
         } else {
           await this.completeFlow(telegramId);
         }
@@ -437,9 +437,9 @@ export class FlowEngine {
           if (callbackConfig.nextFlow) {
             console.log(`🚀 Starting next flow: ${callbackConfig.nextFlow}`);
             await this.startFlow(telegramId, callbackConfig.nextFlow);
-          } else if (callbackConfig.nextStep) {
-            console.log(`📍 Going to next step: ${callbackConfig.nextStep}`);
-            await this.goToStepInternal(telegramId, callbackConfig.nextStep);
+          } else if (callbackConfig.nextStepId) {
+            console.log(`📍 Going to next step: ${callbackConfig.nextStepId}`);
+            await this.goToStepInternal(telegramId, callbackConfig.nextStepId);
           }
           return;
           
@@ -464,8 +464,8 @@ export class FlowEngine {
           if (data.nextFlow) {
             console.log(`🚀 Starting next flow: ${data.nextFlow}`);
             await this.startFlow(telegramId, data.nextFlow);
-          } else if (data.nextStep) {
-            await this.goToStepInternal(telegramId, data.nextStep);
+          } else if (data.nextStepId) {
+            await this.goToStepInternal(telegramId, data.nextStepId);
           }
           break;
           
@@ -489,8 +489,8 @@ export class FlowEngine {
           // Go to next step or flow
           if (data.nextFlow) {
             await this.startFlow(telegramId, data.nextFlow);
-          } else if (data.nextStep) {
-            await this.goToStepInternal(telegramId, data.nextStep);
+          } else if (data.nextStepId) {
+            await this.goToStepInternal(telegramId, data.nextStepId);
           }
       }
     } catch (error) {
@@ -530,7 +530,7 @@ export class FlowEngine {
     if (currentStep && currentStep.type === 'message' && (currentStep as MessageStep).keyboardKey) {
       console.log(`🎯 Processing keyboard callback for message step "${currentStep.id}"`);
       console.log(`  - Keyboard key: ${(currentStep as MessageStep).keyboardKey}`);
-      console.log(`  - Next step: ${(currentStep as MessageStep).nextStep}`);
+      console.log(`  - Next step: ${(currentStep as MessageStep).nextStepId}`);
       
       // Save callback data as variable 
       await this.userContextManager.setVariable(telegramId, `keyboard.${callbackData}`, callbackData);
@@ -538,9 +538,9 @@ export class FlowEngine {
       // Configuration already processed in handleIncomingCallback, here only fallback
       
       // Go to next step, if specified
-      if ((currentStep as MessageStep).nextStep) {
-        console.log(`🚀 Going to next step: ${(currentStep as MessageStep).nextStep}`);
-        await this.goToStepInternal(telegramId, (currentStep as MessageStep).nextStep!);
+      if ((currentStep as MessageStep).nextStepId) {
+        console.log(`🚀 Going to next step: ${(currentStep as MessageStep).nextStepId}`);
+        await this.goToStepInternal(telegramId, (currentStep as MessageStep).nextStepId!);
       } else {
         console.log(`⚠️ No next step defined for message step`);
       }

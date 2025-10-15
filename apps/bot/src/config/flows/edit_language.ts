@@ -14,7 +14,7 @@ export const editLanguageFlow: BotFlow = {
       type: 'handler',
       id: 'save_edited_language',
       handlerName: 'saveLang',
-      nextStep: 'redirect_to_profile'
+      nextStepId: 'redirect_to_profile'
     },
     {
       type: 'flow',

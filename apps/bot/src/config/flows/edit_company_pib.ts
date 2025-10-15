@@ -9,13 +9,13 @@ export const editCompanyPibFlow: BotFlow = {
       id: 'edit_company_pib',
       prompt: 'pib',
       saveToVariable: 'company.pib',
-      nextStep: 'edit_company_pib_handler'
+      nextStepId: 'edit_company_pib_handler'
     },
     {
       type: 'handler',
       id: 'edit_company_pib_handler',
       handlerName: 'updateCompany',
-      nextStep: 'redirect_to_profile'
+      nextStepId: 'redirect_to_profile'
     },
     {
       type: 'flow',

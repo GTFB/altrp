@@ -8,7 +8,7 @@ export const startRegistrationFlow: BotFlow = {
       type: 'handler',
       id: 'register_user',
       handlerName: 'registerUser',
-      nextStep: 'check_language_and_route'
+      nextStepId: 'check_language_and_route'
     },
     {
       type: 'handler',
@@ -28,7 +28,7 @@ export const startRegistrationFlow: BotFlow = {
       type: 'handler',
       id: 'save_language',
       handlerName: 'saveLang',
-      nextStep: 'redirect_to_onboarding'
+      nextStepId: 'redirect_to_onboarding'
     },
     {
       type: 'flow',

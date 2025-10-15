@@ -14,7 +14,7 @@ export const reportsFlow: BotFlow = {
       type: 'dynamic',
       id: 'handle_get_payments',
       handler: 'getPayments',//
-      nextStep: 'select_report'
+      nextStepId: 'select_report'
     },
     {
       type: 'dynamic',
@@ -27,20 +27,20 @@ export const reportsFlow: BotFlow = {
       id: 'add_new_expense_amount',
       prompt: 'add_new_expense_amount',
       saveToVariable: 'expense.amount',
-      nextStep: 'add_new_expense_description'
+      nextStepId: 'add_new_expense_description'
     },
     {
       type: 'wait_input',
       id: 'add_new_expense_description',
       prompt: 'add_new_expense_description',
       saveToVariable: 'expense.description',
-      nextStep: 'handle_create_expense'
+      nextStepId: 'handle_create_expense'
     },
     {
       type: 'handler',
       id: 'handle_create_expense',
       handlerName: 'createExpense',
-      nextStep: 'handle_get_expenses'
+      nextStepId: 'handle_get_expenses'
     },
   ]
 };
