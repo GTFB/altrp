@@ -3,3 +3,4 @@ dist-nodejs/
 .env
 .wrangler/
 wrangler.toml
+generated-content.ts

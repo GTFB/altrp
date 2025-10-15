@@ -89,7 +89,7 @@ database_id = "YOUR_DATABASE_ID_HERE"  # ← Вставьте ID из преды
 npx wrangler d1 execute YOUR_DATABASE_NAME --local --file=../../migrations/bot/sqlite/0000_schema.sql
 
 # Для продакшена
-npx wrangler d1 execute YOUR_DATABASE_NAME --file=../../migrations/bot/sqlite/0000_schema.sql
+npx wrangler d1 execute YOUR_DATABASE_NAME --file=../../migrations/bot/sqlite/0000_schema.sql --remote
 ```
 
 ## 💾 Шаг 3: Создание KV Namespace
