@@ -11,29 +11,45 @@
 4. **Аккаунт Cloudflare** с доступом к Workers
 5. **Telegram Bot Token** от @BotFather
 
+## Все команды выполняются из папки /apps/bot
+
 ## Необходимо создать файл wrangler.toml
 ## Для этого можно скопировать wrangler.toml.example
 
+## Авторизоваться в cloudflare
+
+```
+npx wrangler login
+```
+
 ## 🔧 Шаг 1: Настройка wrangler.toml
 
-### 1.1 Получите Account ID
-```bash
-wrangler whoami
-```
-Скопируйте `Account ID` из вывода команды.
-
-### 1.2 Заполните конфигурацию
+### 1.1 Заполните конфигурацию
 Откройте файл `wrangler.toml` и замените плейсхолдеры:
 
 ```toml
 name = "YOUR_WORKER_NAME"           # ← Замените на имя вашего бота
-account_id = "YOUR_ACCOUNT_ID_HERE" # ← Вставьте ваш Account ID
 ```
 
 **Пример:**
 ```toml
 name = "my-telegram-bot"
-account_id = "7f412ebe1901fb520bca3fbe424faf94"
+```
+
+### 1.2 Получите Account ID
+```bash
+npx wrangler whoami
+```
+Скопируйте `Account ID` из вывода команды.
+
+```
+account_id = "YOUR_ACCOUNT_ID_HERE" # ← Вставьте ваш Account ID
+```
+
+**Пример:**
+```toml
+account_id = "1234567890qwertyuioasdfghzxcvbn4"
+
 ```
 
 ### 1.3 Настройте окружения (опционально)
@@ -49,12 +65,12 @@ name = "YOUR_WORKER_NAME-prod"      # ← Для продакшена
 
 ### 2.1 Создайте базу данных
 ```bash
-wrangler d1 create YOUR_DATABASE_NAME
+npx wrangler d1 create YOUR_DATABASE_NAME
 ```
 
 **Пример:**
 ```bash
-wrangler d1 create my-bot-db
+npx wrangler d1 create my-bot-db
 ```
 
 ### 2.2 Обновите wrangler.toml
@@ -70,21 +86,43 @@ database_id = "YOUR_DATABASE_ID_HERE"  # ← Вставьте ID из преды
 ### 2.3 Примените схему базы данных
 ```bash
 # Для локальной разработки
-wrangler d1 execute YOUR_DATABASE_NAME --local --file=./schema.sql
+npx wrangler d1 execute YOUR_DATABASE_NAME --local --file=../../migrations/bot/sqlite/0000_schema.sql
 
 # Для продакшена
-wrangler d1 execute YOUR_DATABASE_NAME --remote --file=./schema.sql
+npx wrangler d1 execute YOUR_DATABASE_NAME --file=../../migrations/bot/sqlite/0000_schema.sql --remote
 ```
 
 ## 💾 Шаг 3: Создание KV Namespace
 
 ### 3.1 Создайте KV namespace
 ```bash
-wrangler kv namespace create "BOT_KV"
+npx wrangler kv namespace create "BOT_KV"
 ```
 
 ### 3.2 Обновите wrangler.toml
-Скопируйте `id` и `preview_id` из вывода команды:
+Скопируйте `id` из вывода команды:
+
+```toml
+[[kv_namespaces]]
+binding = "BOT_KV"
+id = "YOUR_KV_ID_HERE"              # ← Production ID
+```
+
+### 3.3 Создайте preview namespace:
+```bash
+   npx wrangler kv namespace create "BOT_KV" --preview
+```
+
+### 3.4 Обновите wrangler.toml:
+Скопируйте `preview_id` из вывода команды:
+
+```toml
+[[kv_namespaces]]
+binding = "BOT_KV"
+id = "YOUR_KV_ID_HERE"                     # ← Production ID
+preview_id = "ВАШ_PREVIEW_ID_ЗДЕСЬ"        # Preview ID из команды выше
+```
+
 
 ```toml
 [[kv_namespaces]]
@@ -93,57 +131,72 @@ id = "YOUR_KV_ID_HERE"              # ← Production ID
 preview_id = "YOUR_PREVIEW_KV_ID_HERE" # ← Preview ID
 ```
 
-## 🔐 Шаг 4: Настройка секретов
-
-Установите необходимые секреты для бота:
-
-```bash
-# Токен бота от @BotFather
-wrangler secret put BOT_TOKEN
-
-# ID админского чата (где бот будет отправлять уведомления)
-wrangler secret put ADMIN_CHAT_ID
-
-# Токен для API транскрипции (опционально)
-wrangler secret put TRANSCRIPTION_API_TOKEN
-```
-
-**Как получить ADMIN_CHAT_ID:**
-1. Добавьте бота в группу/канал
-2. Отправьте сообщение в группу
-3. Перейдите по ссылке: `https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates`
-4. Найдите `chat.id` в ответе
-
-## 📦 Шаг 5: Установка зависимостей
+## 📦 Шаг 4: Установка зависимостей
 
 ```bash
 npm install --ignore-scripts
 ```
 
-## 🚀 Шаг 6: Развертывание
 
-### 6.1 Развертывание в development
-```bash
-npm run deploy:dev
-# или
-wrangler deploy --env development
-```
+## 🚀 Шаг 5: Развертывание
 
-### 6.2 Развертывание в production
 ```bash
 npm run deploy
-# или
-wrangler deploy --env production
 ```
+
+## 🔐 Шаг 6: Настройка секретов
+
+Установите необходимые секреты для бота:
+
+```bash
+# Токен бота от @BotFather
+npx wrangler secret put BOT_TOKEN
+
+# ID админского чата (где бот будет отправлять уведомления)
+npx wrangler secret put ADMIN_CHAT_ID
+
+# Токен для API транскрипции (опционально)
+npx wrangler secret put TRANSCRIPTION_API_TOKEN
+```
+
+## либо зайти через web-интерфейс: Compute (Workers) -> "YOUR_WORKER_NAME" -> Settings -> Variables and Secrets -> +Add
+
+Type: Secret
+Variable name: BOT_TOKEN
+Value: <YOUR_BOT_TOKEN>
+
+## и
+
+Type: Secret
+Variable name: ADMIN_CHAT_ID
+Value: <YOUR_ADMIN_CHAT_ID>
+
+**Как получить ADMIN_CHAT_ID:**
+1. Добавьте бота в группу/канал
+2. Отправьте сообщение в группу
+3. Измените тип группы на группу с топиками
+4. Выдайте боту права администратора
+5. Перейдите по ссылке: `https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates`
+6. Найдите `chat.id` в ответе
+
+
 
 ## 🔗 Шаг 7: Настройка Webhook
 
-После успешного развертывания настройте webhook для получения обновлений от Telegram:
+После успешного развертывания настройте webhook для получения обновлений от Telegram.
+Посмотреть url Вашего воркера можно в web-интерфейсе, перейдя: Compute (Workers) -> "YOUR_WORKER_NAME" -> Settings -> Domains & Routes:
 
 ```bash
 curl -X POST "https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook" \
      -H "Content-Type: application/json" \
      -d '{"url": "https://YOUR_WORKER_NAME.YOUR_SUBDOMAIN.workers.dev"}'
+```
+
+Например
+```bash
+curl -X POST "https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook" \
+     -H "Content-Type: application/json" \
+     -d '{"url": "https://my-telegram-bot.altrp.workers.dev"}'
 ```
 
 **Замените:**

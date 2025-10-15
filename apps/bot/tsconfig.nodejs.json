@@ -30,7 +30,7 @@
   "include": [
     "src/config/bot-interface.ts",
     "src/config/handlers.ts",
-    "src/content/**/*",
+    "../../packages/content/mdxs/bot/**/*",
     "src/nodejs/**/*",
     "src/core/generate-content-nodejs.ts"
   ],

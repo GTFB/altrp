@@ -76,7 +76,7 @@ export const translations: Record<string, Record<string, string>> = ${JSON.strin
  * Основная функция
  */
 function main() {
-  const contentDir = path.join(__dirname, '..', 'content');
+  const contentDir = path.join(__dirname, '..', '..', '..', '..', 'packages', 'content', 'mdxs', 'bot');
   const outputFile = path.join(__dirname, '..', 'generated-content.ts');
 
   console.log('Читаем MDX файлы из:', contentDir);
