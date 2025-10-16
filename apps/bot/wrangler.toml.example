@@ -24,6 +24,11 @@ LOCALE = "ru"
 # database_name = "YOUR_DATABASE_NAME"
 # database_id = "YOUR_DATABASE_ID_HERE"
 
+# R2 Storage
+# [[r2_buckets]]
+# binding = "BOT_STORAGE"
+# bucket_name = "YOUR_BUCKET_NAME"
+
 # Cron triggers
 [triggers]
 crons = ["* * * * *"]

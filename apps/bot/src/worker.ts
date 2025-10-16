@@ -1,10 +1,11 @@
 import { TelegramBotWorker } from './worker/bot';
 import { KVStorageService } from './worker/kv-storage-service';
-import type { KVNamespace, D1Database, ExecutionContext } from '@cloudflare/workers-types';
+import type { KVNamespace, D1Database, R2Bucket, ExecutionContext } from '@cloudflare/workers-types';
 
 export interface Env {
   BZN_BOT_KV: KVNamespace;
   DB: D1Database;
+  BOT_STORAGE: R2Bucket;
   BOT_TOKEN: string;
   ADMIN_CHAT_ID: string;
   TRANSCRIPTION_API_TOKEN: string;
