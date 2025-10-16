@@ -7,7 +7,7 @@ export interface MessageStep extends BaseFlowStep {
   type: 'message';
   messageKey: string;
   keyboardKey?: string;
-  nextStep?: string | number; // Next step ID or number
+  nextStepId?: string | number; // Next step ID or number
 }
 
 export interface WaitInputStep extends BaseFlowStep {
@@ -19,7 +19,7 @@ export interface WaitInputStep extends BaseFlowStep {
     pattern?: string; // regex for validation
     errorMessage?: string;
   };
-  nextStep?: string | number;
+  nextStepId?: string | number;
 }
 
 export interface CallbackStep extends BaseFlowStep {
@@ -28,7 +28,7 @@ export interface CallbackStep extends BaseFlowStep {
     text: string;
     value: any; // Value that gets saved
     saveToVariable?: string; // Where to save value
-    nextStep?: string | number; // Next step for this button
+    nextStepId?: string | number; // Next step for this button
     nextFlow?: string; // Next flow for this button
   }>;
 }
@@ -45,7 +45,7 @@ export interface ConditionStep extends BaseFlowStep {
 export interface HandlerStep extends BaseFlowStep {
   type: 'handler';
   handlerName: string; // Custom handler name
-  nextStep?: string | number;
+  nextStepId?: string | number;
 }
 
 export interface FlowStep extends BaseFlowStep {
@@ -57,20 +57,20 @@ export interface FlowStep extends BaseFlowStep {
 export interface DelayStep extends BaseFlowStep {
   type: 'delay';
   duration: number; // Delay in milliseconds
-  nextStep?: string | number;
+  nextStepId?: string | number;
 }
 
 export interface ForwardingControlStep extends BaseFlowStep {
   type: 'forwarding_control';
   action: 'enable' | 'disable'; // Enable or disable forwarding
-  nextStep?: string | number;
+  nextStepId?: string | number;
 }
 
 export interface DynamicStep extends BaseFlowStep {
   type: 'dynamic';
   handler: string; // custom handler (from customHandlers)
   keyboardKey?: string;
-  nextStep?: string | number;
+  nextStepId?: string | number;
 }
 
 // FlowControlStep removed - now automatically managed at startFlow/completeFlow

@@ -1,26 +1,3 @@
-// Bot messages
-// export const messages = {
-//   selectLanguage: `Izaberite jezik / Choose language:`,
-//   welcome: `Welcome to bznrs! Your digital assistant for freelancers. Let's set up your profile.`,
-//   companyName: `Enter the full name of your company.`,
-//   pib: `Thank you. Now enter your PIB (tax number).`,
-//   okved: `Great. Now enter your activity code (OKVED).`,
-//   mainService: `Enter your main service (e.g., 'Programming services'). We will use it as a basis for quick invoice creation.`,
-//   phone: `Thank you. Now enter your contact phone number.`,
-//   email: `And finally, enter your email.`,
-//   onboardingThanks: `Great, your profile is set up! Now you can use the main menu.`,
-//   consultation_greeting: `Choose who to contact.`,
-//   ask_to_lawyer: `Describe your question to the lawyer.`,
-//   ask_to_accountant: `Describe your question to the accountant.`,
-//   consultation_auto_answer: `Thank you! Your question has been sent successfully.`,
-//   mainMenu: `Choose a menu section.`,
-
-//   help: `Available commands:
-// /start - start working
-// /help - help`,
-
-// };
-
 // Keyboards
 export const keyboards = {
   lang: {
@@ -257,7 +234,7 @@ export const commands = {
 //   },
 //   "check_subscription": {
 //     action: "go_to_step", // Go to step
-//     stepId: "ask_vk_link"
+//     nextStepId: "ask_vk_link"
 //   }
 // } as const;
 // Unique actions for each context
@@ -268,33 +245,33 @@ export const callbackActions = {
     variable: "profile.language",
     value: "sr",
     //nextFlow: "onboarding"
-    nextStep: "save_language"
+    nextStepId: "save_language"
   },
   "lang_select_ru": {
     action: "set_variable", 
     variable: "profile.language",
     value: "ru",
     //nextFlow: "onboarding"
-    nextStep: "save_language"
+    nextStepId: "save_language"
   },
 
   "save_edited_language_sr": {
     action: "set_variable",
     variable: "profile.language",
     value: "sr",
-    nextStep: "save_edited_language"
+    nextStepId: "save_edited_language"
   },
   "save_edited_language_ru": {
     action: "set_variable", 
     variable: "profile.language",
     value: "ru",
-    nextStep: "save_edited_language"
+    nextStepId: "save_edited_language"
   },
 
   // Onboarding navigation
   "start_creating_company_step": {
     action: "go_to_step",
-    stepId: "ask_company_name"
+    nextStepId: "ask_company_name"
   },
 
   "consultation": {
@@ -309,11 +286,11 @@ export const callbackActions = {
 
   "get_payments": {
     action: "go_to_step",
-    stepId: "handle_get_payments"
+    nextStepId: "handle_get_payments"
   },
   "get_expenses": {
     action: "go_to_step",
-    stepId: "handle_get_expenses"
+    nextStepId: "handle_get_expenses"
   },
   
 
@@ -330,38 +307,38 @@ export const callbackActions = {
 
   "confirm_invoice_data": {
     action: "go_to_step",
-    stepId: "confirm_invoice_data"
+    nextStepId: "confirm_invoice_data"
   },
 
   "show_main_service": {
     action: "go_to_step",
-    stepId: "show_main_service"
+    nextStepId: "show_main_service"
   },
   "ask_to_invoice_service_name": {
     action: "go_to_step",
-    stepId: "ask_to_invoice_service_name"
+    nextStepId: "ask_to_invoice_service_name"
   },
   "ask_to_invoice_amount": {
     action: "go_to_step",
-    stepId: "ask_to_invoice_amount"
+    nextStepId: "ask_to_invoice_amount"
   },
 
   "add_new_expense": {
     action: "go_to_step",
-    stepId: "add_new_expense_amount"
+    nextStepId: "add_new_expense_amount"
   },
 
   "consultation_lawyer": {
     action: "set_variable",
     variable: "consultation.type",
     value: "lawyer",
-    nextStep: "ask_to_lawyer"
+    nextStepId: "ask_to_lawyer"
   },
   "consultation_accountant": {
     action: "set_variable",
     variable: "consultation.type",
     value: "accountant", 
-    nextStep: "ask_to_accountant"
+    nextStepId: "ask_to_accountant"
   },
 
   //Template requests
@@ -369,14 +346,14 @@ export const callbackActions = {
     action: "set_variable",
     variable: "need_template.type",
     value: "contract", 
-    nextStep: "handle_get_template"
+    nextStepId: "handle_get_template"
   },
 
   "get_act_template": {
     action: "set_variable",
     variable: "need_template.type",
     value: "act", 
-    nextStep: "handle_get_template"
+    nextStepId: "handle_get_template"
   },
 
   //profile
@@ -413,11 +390,11 @@ export const callbackActions = {
 
   "edit_service_name": {
     action: "go_to_step",
-    stepId: "ask_to_edit_service_name"
+    nextStepId: "ask_to_edit_service_name"
   },
   "add_new_service_name": {
     action: "go_to_step",
-    stepId: "ask_to_new_service_name"
+    nextStepId: "ask_to_new_service_name"
   },
   
 
@@ -444,9 +421,9 @@ export type CallbackActionType = 'start_flow' | 'go_to_step' | 'go_to_flow' | 's
 export interface CallbackActionConfig {
   action: CallbackActionType;
   flowName?: string;    // For start_flow
-  stepId?: string;      // For go_to_step
+  nextStepId?: string;      // For go_to_step
   variable?: string;    // For set_variable
   value?: any;          // For set_variable
   nextFlow?: string;    // For transition to next flow after action
-  nextStep?: string;    // For transition to next step after action
+  nextStepId?: string;    // For transition to next step after action
 }
