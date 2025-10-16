@@ -1,7 +1,7 @@
 {
   "name": "telegram-bot",
   "version": "1.0.0",
-  "description": "Telegram bot for Maikloriss supporting both Cloudflare Workers and Node.js",
+  "description": "Altrp telegram bot",
   "main": "src/worker.ts",
   "scripts": {
     "build:worker": "tsc -p tsconfig.worker.json",
@@ -16,10 +16,10 @@
     "deploy": "npm run generate:content && npm run generate-flows-index && wrangler deploy",
     "deploy:dev": "npm run generate:content && npm run generate-flows-index && wrangler deploy --env development",
     "deploy:prod": "npm run generate:content && npm run generate-flows-index && wrangler deploy --env production",
-    "d1:create": "wrangler d1 create maikloriss-db",
-    "d1:migrate": "wrangler d1 migrations apply maikloriss-db",
-    "d1:local": "wrangler d1 execute maikloriss-db --local --file=./schema.sql",
-    "d1:remote": "wrangler d1 execute maikloriss-db --file=./schema.sql"
+    "d1:create": "wrangler d1 create altrp-db",
+    "d1:migrate": "wrangler d1 migrations apply altrp-db",
+    "d1:local": "wrangler d1 execute altrp-db --local --file=./schema.sql",
+    "d1:remote": "wrangler d1 execute altrp-db --file=./schema.sql"
   },
   "keywords": [
     "telegram",
