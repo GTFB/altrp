@@ -870,5 +870,208 @@ Choose action:`;
       }
     },
 
+    // Command handlers
+    handleStartCommandFlow: async (message: any, bot: any) => {
+      const userId = message.from.id;
+      const chatId = message.chat.id;
+
+      console.log(`🚀 Handling /start command via flow for user ${userId}`);
+
+      // Get or create user in database to get dbUserId
+      let existingUser = await handlerWorker.d1Storage.getUser(userId);
+      
+      if (!existingUser) {
+        // Create topic in admin group for new user
+        const topicId = await handlerWorker.topicService.createTopicInAdminGroup(userId, message.from);
+        
+        // Register user minimally to get dbUserId
+        const newUser = {
+          telegramId: userId,
+          firstName: message.from.first_name,
+          lastName: message.from.last_name || '',
+          username: message.from.username || '',
+          registeredAt: new Date().toISOString(),
+          topicId: topicId || 0
+        };
+
+        await handlerWorker.d1Storage.addUser(newUser);
+        console.log(`✅ New user ${userId} registered for start flow`);
+        
+        // Update user reference
+        existingUser = await handlerWorker.d1Storage.getUser(userId);
+      }
+
+      if (!existingUser || !existingUser.id) {
+        console.error(`Cannot start flow: user ${userId} registration failed`);
+        return;
+      }
+
+      // Get or create user context
+      await bot.userContextManager.getOrCreateContext(userId, existingUser.id);
+      
+      // Save info about the current message for handlers
+      await bot.userContextManager.setVariable(userId, '_system.currentMessage', message);
+
+      // Start registration flow
+      await handlerWorker.flowEngine.startFlow(userId, 'start_registration');
+
+      console.log(`✅ Start flow launched for user ${userId}`);
+    },
+
+    handleMenuCommandFlow: async (message: any, bot: any) => {
+      const userId = message.from.id;
+      const chatId = message.chat.id;
+
+      console.log(`🚀 Handling /menu command via flow for user ${userId}`);
+     
+      // Start menu flow
+      await handlerWorker.flowEngine.startFlow(userId, 'menu');
+
+      console.log(`✅ Menu flow launched for user ${userId}`);
+    },
+
+    handleHelpCommand: async (message: any, bot: any) => {
+      const userId = message.from.id;
+      const chatId = message.chat.id;
+
+      console.log(`🚀 Handling /help command for user ${userId}`);
+      
+      const dbUserId = await bot.getDbUserId(chatId);
+      if (dbUserId) {
+        const helpText = 'Available commands:\n/start - start working\n/menu - show main menu\n/help - help';
+        await handlerWorker.messageService.sendMessage(chatId, helpText, dbUserId);
+      }
+    },
+
+    handleConfirmedCommand: async (message: any, bot: any) => {
+      const userId = message.from.id;
+      const chatId = message.chat.id;
+      const adminChatId = parseInt(handlerWorker.env.ADMIN_CHAT_ID);
+      const topicId = (message as any).message_thread_id;
+
+      console.log(`Handling /confirmed command from user ${userId} in topic ${topicId}`);
+
+      // Ensure the command is executed in the admin group
+      if (chatId !== adminChatId) {
+        console.log(`/confirmed command ignored - not in admin group`);
+        return;
+      }
+
+      // Ensure the command is executed inside a topic
+      if (!topicId) {
+        console.log(`/confirmed command ignored - not in topic`);
+        return;
+      }
+
+      // Find user by topic_id
+      const targetUserId = await handlerWorker.d1Storage.getUserIdByTopic(topicId);
+      
+      if (!targetUserId) {
+        console.log(`No user found for topic ${topicId}`);
+        return;
+      }
+
+      console.log(`Found user ${targetUserId} for topic ${topicId}`);
+
+      // Get user data
+      const user = await handlerWorker.d1Storage.getUser(targetUserId);
+      
+      if (user) {
+        // Add subscription confirmation with time in UTC
+        const currentDateTime = new Date().toISOString();
+
+        // Update user data
+        const targetUser = await handlerWorker.d1Storage.getUser(targetUserId);
+        const targetUserData = targetUser?.data ? JSON.parse(targetUser.data) : {};
+        targetUserData.confirmation = {
+          tg: true,
+          vk: true,
+          date_time: currentDateTime
+        };
+        await handlerWorker.d1Storage.updateUserData(targetUserId, JSON.stringify(targetUserData));
+        
+        console.log(`User ${targetUserId} session updated with confirmation`);
+      }
+
+      // Send message to user
+      const messageText = `Yes! You're one of us! Subscriptions are confirmed!
+Now you're participating in the giveaway!
+
+We'll announce the results on our social networks — stay tuned and good luck! 🍀`;
+
+      const dbUserId3 = await bot.getDbUserId(targetUserId);
+      if (dbUserId3) {
+        await handlerWorker.messageService.sendMessage(targetUserId, messageText, dbUserId3);
+      }
+      console.log(`Confirmed message sent to user ${targetUserId}`);
+    },
+
+    handleNotConfirmedCommand: async (message: any, bot: any) => {
+      const userId = message.from.id;
+      const chatId = message.chat.id;
+      const adminChatId = parseInt(handlerWorker.env.ADMIN_CHAT_ID);
+      const topicId = (message as any).message_thread_id;
+
+      console.log(`Handling /not_confirmed command from user ${userId} in topic ${topicId}`);
+
+      // Ensure the command is executed in the admin group
+      if (chatId !== adminChatId) {
+        console.log(`/not_confirmed command ignored - not in admin group`);
+        return;
+      }
+
+      // Ensure the command is executed inside a topic
+      if (!topicId) {
+        console.log(`/not_confirmed command ignored - not in topic`);
+        return;
+      }
+
+      // Find user by topic_id
+      const targetUserId = await handlerWorker.d1Storage.getUserIdByTopic(topicId);
+      
+      if (!targetUserId) {
+        console.log(`No user found for topic ${topicId}`);
+        return;
+      }
+
+      console.log(`Found user ${targetUserId} for topic ${topicId}`);
+
+      // Send message to user
+      const messageText = `Hmm... Something doesn't add up! 😕
+
+I can't see your subscription in one of our communities (or both).
+
+Return, make sure you're subscribed to both, and press the "✨ Done! Check!" button again! We are waiting for you!`;
+
+      const keyboard = {
+        inline_keyboard: [
+          [
+            {
+              text: "👉 Our Telegram",
+              url: "https://t.me/ml_cosmetic"
+            }
+          ],
+          [
+            {
+              text: "👉 Our VK group",
+              url: "https://vk.com/public48764292"
+            }
+          ],
+          [
+            {
+              text: "✨Done! Check!",
+              callback_data: "check_subscription"
+            }
+          ]
+        ]
+      };
+
+      const dbUserId5 = await bot.getDbUserId(targetUserId);
+      if (dbUserId5) {
+        await handlerWorker.messageService.sendMessageWithKeyboard(targetUserId, messageText, keyboard, dbUserId5);
+      }
+      console.log(`Not confirmed message sent to user ${targetUserId}`);
+    }
+
   };
 };
