@@ -219,12 +219,12 @@ export const keyboards = {
 };
 
 // Commands and their handlers
-export const commands = {
-  "/start": "start",
-  "/help": "help", 
-  "/confirmed": "confirmed",
-  "/not_confirmed": "notConfirmed"
-} as const;
+// export const commands = {
+//   "/start": "start",
+//   "/help": "help", 
+//   "/confirmed": "confirmed",
+//   "/not_confirmed": "notConfirmed"
+// } as const;
 
 // Callback button configuration - what to do when pressed
 // export const callbackActions = {
@@ -415,7 +415,7 @@ export const callbackActions = {
 // Legacy callbacks removed - now only callbackActions is used
 
 // TypeScript types
-export type CommandHandler = keyof typeof commands;
+//export type CommandHandler = keyof typeof commands;
 export type CallbackActionType = 'start_flow' | 'go_to_step' | 'go_to_flow' | 'set_variable';
 
 export interface CallbackActionConfig {
