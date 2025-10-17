@@ -1,60 +1,43 @@
-import type { CollectionConfig } from 'payload'
-import { randomUUID } from 'node:crypto'
-
-import { authenticated } from '../access/authenticated'
-import { anyone } from '../access/anyone'
+import { CollectionConfig } from 'payload'
+import { generateUUID } from '../hooks/generateUUID'
+import { setCreatedAt, setUpdatedAt } from '../hooks/timestamps'
 
 export const Echelon: CollectionConfig = {
   slug: 'echelons',
-  access: {
-    create: authenticated,
-    delete: authenticated,
-    read: anyone,
-    update: authenticated,
-  },
-  admin: {
-    useAsTitle: 'position',
-  },
+  labels: { singular: 'Echelon', plural: 'Echelons' },
+  admin: { useAsTitle: 'position' },
   fields: [
-    {
-      name: 'uuid',
-      type: 'text',
+    { 
+      name: 'uuid', 
+      type: 'text', 
       required: true,
-      index: true,
-      unique: true,
-      validate: (val) => {
-        if (typeof val !== 'string') return 'uuid must be a string'
-        const re = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-        return re.test(val) || 'Invalid UUID v4 format'
-      },
+      admin: { readOnly: true },
+      hooks: { beforeChange: [generateUUID] },
     },
-    { name: 'eaid', type: 'text', index: true, unique: true },
-    { name: 'parent_eaid', type: 'text', index: true },
-    { name: 'department_id', type: 'text', index: true },
-    { name: 'position', type: 'text', required: true, index: true },
-    { name: 'city_name', type: 'text', index: true },
-    { name: 'status_name', type: 'text', index: true },
-    { name: 'order', type: 'number' },
-    { name: 'xaid', type: 'text', index: true },
-    { name: 'created_at', type: 'text' },
-    { name: 'updated_at', type: 'text' },
-    {
-      type: 'group',
-      name: 'system',
-      admin: { label: 'System', description: 'Technical fields', condition: () => false },
-      fields: [
-        { name: 'data_in', type: 'json' },
-      ],
+    { name: 'eaid', type: 'text', required: true },
+    { name: 'parent_eaid', type: 'text' },
+    { name: 'department_id', type: 'text' },
+    { name: 'position', type: 'text' },
+    { name: 'city_name', type: 'text' },
+    { name: 'status_name', type: 'text' },
+    { name: 'order', type: 'number', defaultValue: 0 },
+    { name: 'xaid', type: 'text' },
+    { 
+      name: 'updated_at', 
+      type: 'date',
+      admin: { hidden: true },
+      hooks: { beforeChange: [setCreatedAt] },
     },
+    { 
+      name: 'created_at', 
+      type: 'date',
+      admin: { hidden: true },
+      hooks: { beforeChange: [setUpdatedAt] },
+    },
+    { name: 'data_in', type: 'json' },
   ],
-  hooks: {
-    beforeValidate: [({ data }) => {
-      if (data && (!data.uuid || data.uuid === '')) {
-        data.uuid = randomUUID()
-      }
-      return data
-    }],
-  },
 }
+
+export default Echelon
 
 

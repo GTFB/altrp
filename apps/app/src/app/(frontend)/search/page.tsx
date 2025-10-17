@@ -24,7 +24,6 @@ export default async function Page({ searchParams: searchParamsPromise }: Args) 
     select: {
       title: true,
       slug: true,
-      categories: true,
       meta: true,
     },
     // pagination: false reduces overhead if you don't need totalDocs

@@ -7,33 +7,12 @@ import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
 import { fileURLToPath } from 'url'
 
-import { Categories } from './collections/Categories'
-import { Archieve } from './collections/Archieve'
-import { ArchieveVariant } from './collections/ArchieveVariant'
-import { Base } from './collections/Base'
-import { BaseMove } from './collections/BaseMove'
-import { BaseMoveRout } from './collections/BaseMoveRout'
-import { Contractor } from './collections/Contractor'
-import { Deal } from './collections/Deal'
-import { DealProduct } from './collections/DealProduct'
-import { Echelon } from './collections/Echelon'
-import { EchelonEmployee } from './collections/EchelonEmployee'
-import { Finance } from './collections/Finance'
-import { Goal } from './collections/Goal'
-import { Human } from './collections/Human'
-import { Identity } from './collections/Identity'
-import { JournalActivity } from './collections/JournalActivity'
-import { JournalConnection } from './collections/JournalConnection'
-import { JournalGeneration } from './collections/JournalGeneration'
-import { JournalSystem } from './collections/JournalSystem'
-import { Key } from './collections/Key'
-import { Location } from './collections/Location'
-import { Relation } from './collections/Relation'
+import { Setting } from './collections/Setting'
 import { Taxonomy } from './collections/Taxonomy'
+import { User } from './collections/User'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
-import { Users } from './collections/Users'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
 import { plugins } from './plugins'
@@ -56,7 +35,7 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
-    user: Users.slug,
+    user: User.slug,
     livePreview: {
       breakpoints: [
         {
@@ -90,10 +69,17 @@ export default buildConfig({
       })
     : sqliteAdapter({
         client: {
-          url: process.env.DATABASE_URL || 'file:../../packages/data/app.database.sqlite',
+          url: process.env.DATABASE_URL || 'file:../../data/app.database.sqlite',
         },
       }),
-  collections: [Pages, Posts, Media, Categories, Archieve, ArchieveVariant, Base, BaseMove, BaseMoveRout, Contractor, Deal, DealProduct, Echelon, EchelonEmployee, Finance, Goal, Human, Identity, JournalActivity, JournalConnection, JournalGeneration, JournalSystem, Key, Location, Relation, Taxonomy, Users],
+  collections: [
+    Setting,
+    Taxonomy,
+    Media,
+    Pages,
+    Posts,
+    User,
+  ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
   plugins: [
