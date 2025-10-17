@@ -2,7 +2,7 @@ import { CollectionConfig } from 'payload'
 import { generateUUID } from '../hooks/generateUUID'
 import { setCreatedAt } from '../hooks/timestamps'
 
-export const JournalActivity: CollectionConfig = {
+export const Journal: CollectionConfig = {
   slug: 'journals',
   labels: { singular: 'Journal', plural: 'Journals' },
   admin: { useAsTitle: 'action' },
@@ -26,6 +26,6 @@ export const JournalActivity: CollectionConfig = {
   ],
 }
 
-export default JournalActivity
+export default Journal
 
 
