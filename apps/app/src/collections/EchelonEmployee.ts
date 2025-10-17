@@ -5,7 +5,8 @@ import { setCreatedAt, setUpdatedAt } from '../hooks/timestamps'
 export const EchelonEmployee: CollectionConfig = {
   slug: 'echelon_employees',
   labels: { singular: 'Echelon Employee', plural: 'Echelon Employees' },
-  admin: { useAsTitle: 'email' },
+  admin: { useAsTitle: 'email'  ,
+    hidden: true, },
   fields: [
     { 
       name: 'uuid', 

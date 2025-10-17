@@ -5,7 +5,8 @@ import { setCreatedAt } from '../hooks/timestamps'
 export const EmployeeTimesheet: CollectionConfig = {
   slug: 'employee_timesheets',
   labels: { singular: 'Employee Timesheet', plural: 'Employee Timesheets' },
-  admin: { useAsTitle: 'uuid' },
+  admin: { useAsTitle: 'uuid'  ,
+    hidden: true, },
   fields: [
     { 
       name: 'uuid', 

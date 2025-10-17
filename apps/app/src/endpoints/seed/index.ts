@@ -84,13 +84,6 @@ export const seed = async ({
   // Mark as seeded so it doesn't run again
   await markAsSeeded(payload)
   
-  await logInfo(payload, 'Seed completed successfully', {
-    userId,
-    details: {
-      changes: 'none',
-      message: 'No changes made to database',
-    },
-  })
 
   payload.logger.info('Seed completed successfully (no changes made)')
 }

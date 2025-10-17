@@ -5,7 +5,8 @@ import { setCreatedAt, setUpdatedAt } from '../hooks/timestamps'
 export const Segment: CollectionConfig = {
   slug: 'segments',
   labels: { singular: 'Segment', plural: 'Segments' },
-  admin: { useAsTitle: 'title' },
+  admin: { useAsTitle: 'title'  ,
+    hidden: true, },
   fields: [
     { 
       name: 'uuid', 

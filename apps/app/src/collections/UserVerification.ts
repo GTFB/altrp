@@ -5,7 +5,8 @@ import { setCreatedAt } from '../hooks/timestamps'
 export const UserVerification: CollectionConfig = {
   slug: 'user_verifications',
   labels: { singular: 'User Verification', plural: 'User Verifications' },
-  admin: { useAsTitle: 'uuid' },
+  admin: { useAsTitle: 'uuid'  ,
+    hidden: true, },
   fields: [
     { 
       name: 'uuid', 

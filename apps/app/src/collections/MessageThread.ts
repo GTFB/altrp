@@ -5,7 +5,8 @@ import { setCreatedAt, setUpdatedAt } from '../hooks/timestamps'
 export const MessageThread: CollectionConfig = {
   slug: 'message_threads',
   labels: { singular: 'Message Thread', plural: 'Message Threads' },
-  admin: { useAsTitle: 'title' },
+  admin: { useAsTitle: 'title'  ,
+    hidden: true, },
   fields: [
     { 
       name: 'uuid', 

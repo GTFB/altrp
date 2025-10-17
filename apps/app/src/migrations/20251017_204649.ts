@@ -564,6 +564,907 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   `)
   await db.run(sql`CREATE INDEX \`journals_updated_at_idx\` ON \`journals\` (\`updated_at\`);`)
   await db.run(sql`CREATE INDEX \`journals_created_at_idx\` ON \`journals\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`assets\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text NOT NULL,
+  	\`aaid\` text NOT NULL,
+  	\`owner_aid\` text,
+  	\`number\` text,
+  	\`title\` text,
+  	\`url\` text,
+  	\`type_name\` text,
+  	\`status_name\` text,
+  	\`version\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`gin\` text,
+  	\`fts\` text,
+  	\`data_in\` text,
+  	\`data_out\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`assets_updated_at_idx\` ON \`assets\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`assets_created_at_idx\` ON \`assets\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`asset_variants\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text NOT NULL,
+  	\`full_aaid\` text NOT NULL,
+  	\`number\` text,
+  	\`title\` text,
+  	\`media_id\` text,
+  	\`version\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`gin\` text,
+  	\`fts\` text,
+  	\`data_in\` text,
+  	\`data_out\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`asset_variants_updated_at_idx\` ON \`asset_variants\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`asset_variants_created_at_idx\` ON \`asset_variants\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`bases\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text NOT NULL,
+  	\`baid\` text NOT NULL,
+  	\`full_baid\` text,
+  	\`number\` text,
+  	\`title\` text,
+  	\`laid_from\` text,
+  	\`laid_to\` text,
+  	\`cycle\` text,
+  	\`status_name\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`gin\` text,
+  	\`fts\` text,
+  	\`data_in\` text,
+  	\`data_out\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`bases_updated_at_idx\` ON \`bases\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`bases_created_at_idx\` ON \`bases\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`base_moves\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text NOT NULL,
+  	\`baid\` text,
+  	\`full_baid\` text,
+  	\`full_daid\` text,
+  	\`number\` text,
+  	\`title\` text,
+  	\`laid_from\` text,
+  	\`laid_to\` text,
+  	\`cycle\` text,
+  	\`status_name\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`gin\` text,
+  	\`fts\` text,
+  	\`data_in\` text,
+  	\`data_out\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`base_moves_updated_at_idx\` ON \`base_moves\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`base_moves_created_at_idx\` ON \`base_moves\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`base_move_routes\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text NOT NULL,
+  	\`full_baid\` text NOT NULL,
+  	\`index\` text,
+  	\`city\` text,
+  	\`laid_id\` text,
+  	\`status_name\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`data_in\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`base_move_routes_updated_at_idx\` ON \`base_move_routes\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`base_move_routes_created_at_idx\` ON \`base_move_routes\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`contractors\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text NOT NULL,
+  	\`caid\` text NOT NULL,
+  	\`title\` text NOT NULL,
+  	\`reg\` text,
+  	\`tin\` text,
+  	\`status_name\` text,
+  	\`type\` text,
+  	\`city_name\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`media_id\` text,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`gin\` text,
+  	\`fts\` text,
+  	\`data_in\` text,
+  	\`data_out\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`contractors_updated_at_idx\` ON \`contractors\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`contractors_created_at_idx\` ON \`contractors\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`deals\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text NOT NULL,
+  	\`daid\` text NOT NULL,
+  	\`full_daid\` text,
+  	\`client_aid\` text,
+  	\`title\` text,
+  	\`cycle\` text,
+  	\`status_name\` text,
+  	\`xaid\` text,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`gin\` text,
+  	\`fts\` text,
+  	\`data_in\` text,
+  	\`data_out\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`deals_updated_at_idx\` ON \`deals\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`deals_created_at_idx\` ON \`deals\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`deal_products\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text,
+  	\`full_daid\` text NOT NULL,
+  	\`full_paid\` text NOT NULL,
+  	\`quantity\` numeric DEFAULT 1 NOT NULL,
+  	\`status_name\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`data_in\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`deal_products_updated_at_idx\` ON \`deal_products\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`deal_products_created_at_idx\` ON \`deal_products\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`echelons\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text NOT NULL,
+  	\`eaid\` text NOT NULL,
+  	\`parent_eaid\` text,
+  	\`department_id\` text,
+  	\`position\` text,
+  	\`city_name\` text,
+  	\`status_name\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`data_in\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`echelons_updated_at_idx\` ON \`echelons\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`echelons_created_at_idx\` ON \`echelons\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`echelon_employees\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text NOT NULL,
+  	\`eaid\` text NOT NULL,
+  	\`full_eaid\` text,
+  	\`haid\` text NOT NULL,
+  	\`email\` text,
+  	\`status_name\` text,
+  	\`is_public\` integer DEFAULT true,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`media_id\` text,
+  	\`gin\` text,
+  	\`fts\` text,
+  	\`data_in\` text,
+  	\`data_out\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`echelon_employees_updated_at_idx\` ON \`echelon_employees\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`echelon_employees_created_at_idx\` ON \`echelon_employees\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`employee_leaves\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text,
+  	\`elaid\` text,
+  	\`full_eaid\` text,
+  	\`type\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`started_at\` text,
+  	\`ended_at\` text,
+  	\`duration\` numeric,
+  	\`data_in\` text,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`employee_leaves_updated_at_idx\` ON \`employee_leaves\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`employee_leaves_created_at_idx\` ON \`employee_leaves\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`employee_timesheets\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text,
+  	\`etaid\` text,
+  	\`full_eaid\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`started_at\` text,
+  	\`ended_at\` text,
+  	\`duration\` numeric,
+  	\`data_in\` text,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`employee_timesheets_updated_at_idx\` ON \`employee_timesheets\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`employee_timesheets_created_at_idx\` ON \`employee_timesheets\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`expanses\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text,
+  	\`xaid\` text,
+  	\`title\` text,
+  	\`status_name\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`data_in\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`expanses_updated_at_idx\` ON \`expanses\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`expanses_created_at_idx\` ON \`expanses\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`finances\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text NOT NULL,
+  	\`faid\` text NOT NULL,
+  	\`full_daid\` text,
+  	\`title\` text,
+  	\`sum\` numeric,
+  	\`currency_id\` text,
+  	\`cycle\` text,
+  	\`type\` text,
+  	\`status_name\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`gin\` text,
+  	\`fts\` text,
+  	\`data_in\` text,
+  	\`data_out\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`finances_updated_at_idx\` ON \`finances\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`finances_created_at_idx\` ON \`finances\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`goals\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text NOT NULL,
+  	\`gaid\` text NOT NULL,
+  	\`full_gaid\` text,
+  	\`parent_full_gaid\` text,
+  	\`title\` text,
+  	\`cycle\` text,
+  	\`type\` text,
+  	\`status_name\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`is_public\` integer DEFAULT true,
+  	\`xaid\` text,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`gin\` text,
+  	\`fts\` text,
+  	\`data_in\` text,
+  	\`data_out\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`goals_updated_at_idx\` ON \`goals\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`goals_created_at_idx\` ON \`goals\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`humans\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text NOT NULL,
+  	\`haid\` text NOT NULL,
+  	\`full_name\` text NOT NULL,
+  	\`birthday\` text,
+  	\`email\` text,
+  	\`sex\` text,
+  	\`status_name\` text,
+  	\`type\` text,
+  	\`city_name\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`media_id\` text,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`gin\` text,
+  	\`fts\` text,
+  	\`data_in\` text,
+  	\`data_out\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`humans_updated_at_idx\` ON \`humans\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`humans_created_at_idx\` ON \`humans\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`identities\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text NOT NULL,
+  	\`iaid\` text NOT NULL,
+  	\`entity_aid\` text NOT NULL,
+  	\`identity_aid\` text NOT NULL,
+  	\`permission\` text,
+  	\`xaid\` text,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`data_in\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`identities_updated_at_idx\` ON \`identities\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`identities_created_at_idx\` ON \`identities\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`journal_connections\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text,
+  	\`source_user_id\` numeric,
+  	\`target_user_id\` numeric,
+  	\`relationship_name\` text,
+  	\`status\` text,
+  	\`details\` text,
+  	\`xaid\` text,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`journal_connections_updated_at_idx\` ON \`journal_connections\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`journal_connections_created_at_idx\` ON \`journal_connections\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`journal_generations\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text,
+  	\`full_maid\` text,
+  	\`user_id\` numeric,
+  	\`model_name\` text,
+  	\`status\` text,
+  	\`token_in\` numeric,
+  	\`token_out\` numeric,
+  	\`total_token\` numeric,
+  	\`details\` text,
+  	\`xaid\` text,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`journal_generations_updated_at_idx\` ON \`journal_generations\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`journal_generations_created_at_idx\` ON \`journal_generations\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`journal_system\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text,
+  	\`entity_aid\` text,
+  	\`user_id\` numeric,
+  	\`details\` text,
+  	\`xaid\` text,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`journal_system_updated_at_idx\` ON \`journal_system\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`journal_system_created_at_idx\` ON \`journal_system\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`keys\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text,
+  	\`kaid\` text NOT NULL,
+  	\`key_prefix\` text,
+  	\`key_hash\` text NOT NULL,
+  	\`title\` text,
+  	\`is_active\` integer DEFAULT true,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`permission_id\` numeric,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`data_in\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`keys_updated_at_idx\` ON \`keys\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`keys_created_at_idx\` ON \`keys\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`locations\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text NOT NULL,
+  	\`laid\` text NOT NULL,
+  	\`full_laid\` text,
+  	\`title\` text,
+  	\`city\` text,
+  	\`type\` text,
+  	\`status_name\` text,
+  	\`is_public\` integer DEFAULT true,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`gin\` text,
+  	\`fts\` text,
+  	\`data_in\` text,
+  	\`data_out\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`locations_updated_at_idx\` ON \`locations\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`locations_created_at_idx\` ON \`locations\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`messages\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text NOT NULL,
+  	\`maid\` text NOT NULL,
+  	\`full_maid\` text,
+  	\`title\` text,
+  	\`status_name\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`gin\` text,
+  	\`fts\` text,
+  	\`data_in\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`messages_updated_at_idx\` ON \`messages\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`messages_created_at_idx\` ON \`messages\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`message_threads\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text NOT NULL,
+  	\`maid\` text NOT NULL,
+  	\`parent_maid\` text,
+  	\`title\` text,
+  	\`status_name\` text,
+  	\`type\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`gin\` text,
+  	\`data_in\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`message_threads_updated_at_idx\` ON \`message_threads\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`message_threads_created_at_idx\` ON \`message_threads\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`notices\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text,
+  	\`naid\` text,
+  	\`target_aid\` text,
+  	\`title\` text,
+  	\`is_read\` integer DEFAULT false,
+  	\`type_name\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`data_in\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`notices_updated_at_idx\` ON \`notices\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`notices_created_at_idx\` ON \`notices\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`outreaches\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text NOT NULL,
+  	\`oaid\` text NOT NULL,
+  	\`said\` text,
+  	\`title\` text,
+  	\`strategy_type\` text,
+  	\`mechanic_type\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`gin\` text,
+  	\`fts\` text,
+  	\`data_in\` text,
+  	\`data_out\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`outreaches_updated_at_idx\` ON \`outreaches\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`outreaches_created_at_idx\` ON \`outreaches\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`outreach_referrals\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text,
+  	\`oaid\` text NOT NULL,
+  	\`title\` text,
+  	\`depth\` numeric DEFAULT 0,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`gin\` text,
+  	\`fts\` text,
+  	\`data_in\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`outreach_referrals_updated_at_idx\` ON \`outreach_referrals\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`outreach_referrals_created_at_idx\` ON \`outreach_referrals\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`permissions\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text,
+  	\`prm_aid\` text,
+  	\`action_key\` text NOT NULL,
+  	\`title\` text,
+  	\`group_name\` text,
+  	\`description\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`data_in\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`permissions_updated_at_idx\` ON \`permissions\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`permissions_created_at_idx\` ON \`permissions\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`products\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text NOT NULL,
+  	\`paid\` text NOT NULL,
+  	\`title\` text,
+  	\`category\` text,
+  	\`type\` text,
+  	\`status_name\` text,
+  	\`is_public\` integer DEFAULT true,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`gin\` text,
+  	\`fts\` text,
+  	\`data_in\` text,
+  	\`data_out\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`products_updated_at_idx\` ON \`products\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`products_created_at_idx\` ON \`products\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`product_variants\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text NOT NULL,
+  	\`pvaid\` text NOT NULL,
+  	\`full_paid\` text NOT NULL,
+  	\`vendor_aid\` text,
+  	\`sku\` text,
+  	\`title\` text,
+  	\`status_name\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`gin\` text,
+  	\`fts\` text,
+  	\`data_in\` text,
+  	\`data_out\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`product_variants_updated_at_idx\` ON \`product_variants\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`product_variants_created_at_idx\` ON \`product_variants\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`qualifications\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text,
+  	\`qaid\` text,
+  	\`haid\` text,
+  	\`title\` text,
+  	\`category\` text,
+  	\`type\` text,
+  	\`status_name\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`gin\` text,
+  	\`fts\` text,
+  	\`data_in\` text,
+  	\`data_out\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`qualifications_updated_at_idx\` ON \`qualifications\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`qualifications_created_at_idx\` ON \`qualifications\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`relations\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text,
+  	\`source_entity\` text NOT NULL,
+  	\`target_entity\` text NOT NULL,
+  	\`type\` text,
+  	\`status_name\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`gin\` text,
+  	\`fts\` text,
+  	\`data_in\` text,
+  	\`data_out\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`relations_updated_at_idx\` ON \`relations\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`relations_created_at_idx\` ON \`relations\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`roles\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text,
+  	\`raid\` text,
+  	\`title\` text,
+  	\`description\` text,
+  	\`is_system\` integer DEFAULT false,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`data_in\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`roles_updated_at_idx\` ON \`roles\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`roles_created_at_idx\` ON \`roles\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`role_permissions\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`role_uuid\` text NOT NULL,
+  	\`permission_uuid\` text NOT NULL,
+  	\`uuid\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`role_permissions_updated_at_idx\` ON \`role_permissions\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`role_permissions_created_at_idx\` ON \`role_permissions\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`segments\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text,
+  	\`said\` text,
+  	\`title\` text,
+  	\`status_name\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`gin\` text,
+  	\`fts\` text,
+  	\`data_in\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`segments_updated_at_idx\` ON \`segments\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`segments_created_at_idx\` ON \`segments\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`texts\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text,
+  	\`taid\` text,
+  	\`title\` text,
+  	\`type\` text,
+  	\`status_name\` text,
+  	\`is_public\` integer DEFAULT true,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`gin\` text,
+  	\`fts\` text,
+  	\`data_in\` text,
+  	\`data_out\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`texts_updated_at_idx\` ON \`texts\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`texts_created_at_idx\` ON \`texts\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`text_variants\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text,
+  	\`taid\` text,
+  	\`full_taid\` text,
+  	\`title\` text,
+  	\`type\` text,
+  	\`status_name\` text,
+  	\`version\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`gin\` text,
+  	\`fts\` text,
+  	\`data_in\` text,
+  	\`data_out\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`text_variants_updated_at_idx\` ON \`text_variants\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`text_variants_created_at_idx\` ON \`text_variants\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`universities\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text,
+  	\`uaid\` text,
+  	\`parent_uaid\` text,
+  	\`full_uaid\` text,
+  	\`title\` text,
+  	\`status_name\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`gin\` text,
+  	\`fts\` text,
+  	\`data_in\` text,
+  	\`data_out\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`universities_updated_at_idx\` ON \`universities\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`universities_created_at_idx\` ON \`universities\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`user_bans\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text,
+  	\`user_uuid\` text NOT NULL,
+  	\`banned_by_aid\` text,
+  	\`reason\` text,
+  	\`type\` text,
+  	\`expires_at\` text,
+  	\`revoked_at\` text,
+  	\`revoked_by_aid\` text,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`data_in\` text,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`user_bans_updated_at_idx\` ON \`user_bans\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`user_bans_created_at_idx\` ON \`user_bans\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`user_sessions\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text,
+  	\`user_uuid\` text NOT NULL,
+  	\`token_hash\` text NOT NULL,
+  	\`ip_address\` text,
+  	\`user_agent\` text,
+  	\`last_active_at\` text,
+  	\`expires_at\` text,
+  	\`xaid\` text,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`data_in\` text,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`user_sessions_updated_at_idx\` ON \`user_sessions\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`user_sessions_created_at_idx\` ON \`user_sessions\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`user_verifications\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text,
+  	\`user_uuid\` text NOT NULL,
+  	\`type\` text,
+  	\`token_hash\` text NOT NULL,
+  	\`expires_at\` text,
+  	\`verified_at\` text,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`data_in\` text,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`user_verifications_updated_at_idx\` ON \`user_verifications\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`user_verifications_created_at_idx\` ON \`user_verifications\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`votes\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text,
+  	\`vaid\` text,
+  	\`full_vaid\` text,
+  	\`haid\` text,
+  	\`title\` text,
+  	\`status_name\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`gin\` text,
+  	\`fts\` text,
+  	\`data_in\` text,
+  	\`data_out\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`votes_updated_at_idx\` ON \`votes\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`votes_created_at_idx\` ON \`votes\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`wallets\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text,
+  	\`waid\` text,
+  	\`full_waid\` text,
+  	\`target_aid\` text,
+  	\`title\` text,
+  	\`status_name\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`gin\` text,
+  	\`fts\` text,
+  	\`data_in\` text,
+  	\`data_out\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`wallets_updated_at_idx\` ON \`wallets\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`wallets_created_at_idx\` ON \`wallets\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`wallet_transactions\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text,
+  	\`wcaid\` text NOT NULL,
+  	\`full_waid\` text,
+  	\`target_aid\` text,
+  	\`amount\` numeric NOT NULL,
+  	\`status_name\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`data_in\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`wallet_transactions_updated_at_idx\` ON \`wallet_transactions\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`wallet_transactions_created_at_idx\` ON \`wallet_transactions\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`yields\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text,
+  	\`yaid\` text,
+  	\`parent_yaid\` text,
+  	\`full_yaid\` text,
+  	\`haid\` text,
+  	\`title\` text,
+  	\`status_name\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`gin\` text,
+  	\`fts\` text,
+  	\`data_in\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`yields_updated_at_idx\` ON \`yields\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`yields_created_at_idx\` ON \`yields\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`zoos\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`uuid\` text,
+  	\`zaid\` text,
+  	\`parent_zaid\` text,
+  	\`name\` text,
+  	\`birthday\` text,
+  	\`sex\` text,
+  	\`status_name\` text,
+  	\`city_name\` text,
+  	\`order\` numeric DEFAULT 0,
+  	\`xaid\` text,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`deleted_at\` numeric,
+  	\`media_id\` text,
+  	\`gin\` text,
+  	\`fts\` text,
+  	\`data_in\` text,
+  	\`data_out\` text
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`zoos_updated_at_idx\` ON \`zoos\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`zoos_created_at_idx\` ON \`zoos\` (\`created_at\`);`)
   await db.run(sql`CREATE TABLE \`redirects\` (
   	\`id\` integer PRIMARY KEY NOT NULL,
   	\`from\` text NOT NULL,
@@ -908,6 +1809,52 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	\`posts_id\` integer,
   	\`users_id\` integer,
   	\`journals_id\` integer,
+  	\`assets_id\` integer,
+  	\`asset_variants_id\` integer,
+  	\`bases_id\` integer,
+  	\`base_moves_id\` integer,
+  	\`base_move_routes_id\` integer,
+  	\`contractors_id\` integer,
+  	\`deals_id\` integer,
+  	\`deal_products_id\` integer,
+  	\`echelons_id\` integer,
+  	\`echelon_employees_id\` integer,
+  	\`employee_leaves_id\` integer,
+  	\`employee_timesheets_id\` integer,
+  	\`expanses_id\` integer,
+  	\`finances_id\` integer,
+  	\`goals_id\` integer,
+  	\`humans_id\` integer,
+  	\`identities_id\` integer,
+  	\`journal_connections_id\` integer,
+  	\`journal_generations_id\` integer,
+  	\`journal_system_id\` integer,
+  	\`keys_id\` integer,
+  	\`locations_id\` integer,
+  	\`messages_id\` integer,
+  	\`message_threads_id\` integer,
+  	\`notices_id\` integer,
+  	\`outreaches_id\` integer,
+  	\`outreach_referrals_id\` integer,
+  	\`permissions_id\` integer,
+  	\`products_id\` integer,
+  	\`product_variants_id\` integer,
+  	\`qualifications_id\` integer,
+  	\`relations_id\` integer,
+  	\`roles_id\` integer,
+  	\`role_permissions_id\` integer,
+  	\`segments_id\` integer,
+  	\`texts_id\` integer,
+  	\`text_variants_id\` integer,
+  	\`universities_id\` integer,
+  	\`user_bans_id\` integer,
+  	\`user_sessions_id\` integer,
+  	\`user_verifications_id\` integer,
+  	\`votes_id\` integer,
+  	\`wallets_id\` integer,
+  	\`wallet_transactions_id\` integer,
+  	\`yields_id\` integer,
+  	\`zoos_id\` integer,
   	\`redirects_id\` integer,
   	\`forms_id\` integer,
   	\`form_submissions_id\` integer,
@@ -921,6 +1868,52 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	FOREIGN KEY (\`posts_id\`) REFERENCES \`posts\`(\`id\`) ON UPDATE no action ON DELETE cascade,
   	FOREIGN KEY (\`users_id\`) REFERENCES \`users\`(\`id\`) ON UPDATE no action ON DELETE cascade,
   	FOREIGN KEY (\`journals_id\`) REFERENCES \`journals\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`assets_id\`) REFERENCES \`assets\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`asset_variants_id\`) REFERENCES \`asset_variants\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`bases_id\`) REFERENCES \`bases\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`base_moves_id\`) REFERENCES \`base_moves\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`base_move_routes_id\`) REFERENCES \`base_move_routes\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`contractors_id\`) REFERENCES \`contractors\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`deals_id\`) REFERENCES \`deals\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`deal_products_id\`) REFERENCES \`deal_products\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`echelons_id\`) REFERENCES \`echelons\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`echelon_employees_id\`) REFERENCES \`echelon_employees\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`employee_leaves_id\`) REFERENCES \`employee_leaves\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`employee_timesheets_id\`) REFERENCES \`employee_timesheets\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`expanses_id\`) REFERENCES \`expanses\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`finances_id\`) REFERENCES \`finances\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`goals_id\`) REFERENCES \`goals\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`humans_id\`) REFERENCES \`humans\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`identities_id\`) REFERENCES \`identities\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`journal_connections_id\`) REFERENCES \`journal_connections\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`journal_generations_id\`) REFERENCES \`journal_generations\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`journal_system_id\`) REFERENCES \`journal_system\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`keys_id\`) REFERENCES \`keys\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`locations_id\`) REFERENCES \`locations\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`messages_id\`) REFERENCES \`messages\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`message_threads_id\`) REFERENCES \`message_threads\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`notices_id\`) REFERENCES \`notices\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`outreaches_id\`) REFERENCES \`outreaches\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`outreach_referrals_id\`) REFERENCES \`outreach_referrals\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`permissions_id\`) REFERENCES \`permissions\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`products_id\`) REFERENCES \`products\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`product_variants_id\`) REFERENCES \`product_variants\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`qualifications_id\`) REFERENCES \`qualifications\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`relations_id\`) REFERENCES \`relations\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`roles_id\`) REFERENCES \`roles\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`role_permissions_id\`) REFERENCES \`role_permissions\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`segments_id\`) REFERENCES \`segments\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`texts_id\`) REFERENCES \`texts\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`text_variants_id\`) REFERENCES \`text_variants\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`universities_id\`) REFERENCES \`universities\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`user_bans_id\`) REFERENCES \`user_bans\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`user_sessions_id\`) REFERENCES \`user_sessions\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`user_verifications_id\`) REFERENCES \`user_verifications\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`votes_id\`) REFERENCES \`votes\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`wallets_id\`) REFERENCES \`wallets\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`wallet_transactions_id\`) REFERENCES \`wallet_transactions\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`yields_id\`) REFERENCES \`yields\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`zoos_id\`) REFERENCES \`zoos\`(\`id\`) ON UPDATE no action ON DELETE cascade,
   	FOREIGN KEY (\`redirects_id\`) REFERENCES \`redirects\`(\`id\`) ON UPDATE no action ON DELETE cascade,
   	FOREIGN KEY (\`forms_id\`) REFERENCES \`forms\`(\`id\`) ON UPDATE no action ON DELETE cascade,
   	FOREIGN KEY (\`form_submissions_id\`) REFERENCES \`form_submissions\`(\`id\`) ON UPDATE no action ON DELETE cascade,
@@ -938,6 +1931,52 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_posts_id_idx\` ON \`payload_locked_documents_rels\` (\`posts_id\`);`)
   await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_users_id_idx\` ON \`payload_locked_documents_rels\` (\`users_id\`);`)
   await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_journals_id_idx\` ON \`payload_locked_documents_rels\` (\`journals_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_assets_id_idx\` ON \`payload_locked_documents_rels\` (\`assets_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_asset_variants_id_idx\` ON \`payload_locked_documents_rels\` (\`asset_variants_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_bases_id_idx\` ON \`payload_locked_documents_rels\` (\`bases_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_base_moves_id_idx\` ON \`payload_locked_documents_rels\` (\`base_moves_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_base_move_routes_id_idx\` ON \`payload_locked_documents_rels\` (\`base_move_routes_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_contractors_id_idx\` ON \`payload_locked_documents_rels\` (\`contractors_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_deals_id_idx\` ON \`payload_locked_documents_rels\` (\`deals_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_deal_products_id_idx\` ON \`payload_locked_documents_rels\` (\`deal_products_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_echelons_id_idx\` ON \`payload_locked_documents_rels\` (\`echelons_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_echelon_employees_id_idx\` ON \`payload_locked_documents_rels\` (\`echelon_employees_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_employee_leaves_id_idx\` ON \`payload_locked_documents_rels\` (\`employee_leaves_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_employee_timesheets_id_idx\` ON \`payload_locked_documents_rels\` (\`employee_timesheets_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_expanses_id_idx\` ON \`payload_locked_documents_rels\` (\`expanses_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_finances_id_idx\` ON \`payload_locked_documents_rels\` (\`finances_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_goals_id_idx\` ON \`payload_locked_documents_rels\` (\`goals_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_humans_id_idx\` ON \`payload_locked_documents_rels\` (\`humans_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_identities_id_idx\` ON \`payload_locked_documents_rels\` (\`identities_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_journal_connections_id_idx\` ON \`payload_locked_documents_rels\` (\`journal_connections_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_journal_generations_id_idx\` ON \`payload_locked_documents_rels\` (\`journal_generations_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_journal_system_id_idx\` ON \`payload_locked_documents_rels\` (\`journal_system_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_keys_id_idx\` ON \`payload_locked_documents_rels\` (\`keys_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_locations_id_idx\` ON \`payload_locked_documents_rels\` (\`locations_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_messages_id_idx\` ON \`payload_locked_documents_rels\` (\`messages_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_message_threads_id_idx\` ON \`payload_locked_documents_rels\` (\`message_threads_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_notices_id_idx\` ON \`payload_locked_documents_rels\` (\`notices_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_outreaches_id_idx\` ON \`payload_locked_documents_rels\` (\`outreaches_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_outreach_referrals_id_idx\` ON \`payload_locked_documents_rels\` (\`outreach_referrals_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_permissions_id_idx\` ON \`payload_locked_documents_rels\` (\`permissions_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_products_id_idx\` ON \`payload_locked_documents_rels\` (\`products_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_product_variants_id_idx\` ON \`payload_locked_documents_rels\` (\`product_variants_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_qualifications_id_idx\` ON \`payload_locked_documents_rels\` (\`qualifications_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_relations_id_idx\` ON \`payload_locked_documents_rels\` (\`relations_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_roles_id_idx\` ON \`payload_locked_documents_rels\` (\`roles_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_role_permissions_id_idx\` ON \`payload_locked_documents_rels\` (\`role_permissions_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_segments_id_idx\` ON \`payload_locked_documents_rels\` (\`segments_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_texts_id_idx\` ON \`payload_locked_documents_rels\` (\`texts_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_text_variants_id_idx\` ON \`payload_locked_documents_rels\` (\`text_variants_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_universities_id_idx\` ON \`payload_locked_documents_rels\` (\`universities_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_user_bans_id_idx\` ON \`payload_locked_documents_rels\` (\`user_bans_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_user_sessions_id_idx\` ON \`payload_locked_documents_rels\` (\`user_sessions_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_user_verifications_id_idx\` ON \`payload_locked_documents_rels\` (\`user_verifications_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_votes_id_idx\` ON \`payload_locked_documents_rels\` (\`votes_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_wallets_id_idx\` ON \`payload_locked_documents_rels\` (\`wallets_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_wallet_transactions_id_idx\` ON \`payload_locked_documents_rels\` (\`wallet_transactions_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_yields_id_idx\` ON \`payload_locked_documents_rels\` (\`yields_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_zoos_id_idx\` ON \`payload_locked_documents_rels\` (\`zoos_id\`);`)
   await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_redirects_id_idx\` ON \`payload_locked_documents_rels\` (\`redirects_id\`);`)
   await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_forms_id_idx\` ON \`payload_locked_documents_rels\` (\`forms_id\`);`)
   await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_form_submissions_id_idx\` ON \`payload_locked_documents_rels\` (\`form_submissions_id\`);`)
@@ -1085,6 +2124,52 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   await db.run(sql`DROP TABLE \`users_sessions\`;`)
   await db.run(sql`DROP TABLE \`users\`;`)
   await db.run(sql`DROP TABLE \`journals\`;`)
+  await db.run(sql`DROP TABLE \`assets\`;`)
+  await db.run(sql`DROP TABLE \`asset_variants\`;`)
+  await db.run(sql`DROP TABLE \`bases\`;`)
+  await db.run(sql`DROP TABLE \`base_moves\`;`)
+  await db.run(sql`DROP TABLE \`base_move_routes\`;`)
+  await db.run(sql`DROP TABLE \`contractors\`;`)
+  await db.run(sql`DROP TABLE \`deals\`;`)
+  await db.run(sql`DROP TABLE \`deal_products\`;`)
+  await db.run(sql`DROP TABLE \`echelons\`;`)
+  await db.run(sql`DROP TABLE \`echelon_employees\`;`)
+  await db.run(sql`DROP TABLE \`employee_leaves\`;`)
+  await db.run(sql`DROP TABLE \`employee_timesheets\`;`)
+  await db.run(sql`DROP TABLE \`expanses\`;`)
+  await db.run(sql`DROP TABLE \`finances\`;`)
+  await db.run(sql`DROP TABLE \`goals\`;`)
+  await db.run(sql`DROP TABLE \`humans\`;`)
+  await db.run(sql`DROP TABLE \`identities\`;`)
+  await db.run(sql`DROP TABLE \`journal_connections\`;`)
+  await db.run(sql`DROP TABLE \`journal_generations\`;`)
+  await db.run(sql`DROP TABLE \`journal_system\`;`)
+  await db.run(sql`DROP TABLE \`keys\`;`)
+  await db.run(sql`DROP TABLE \`locations\`;`)
+  await db.run(sql`DROP TABLE \`messages\`;`)
+  await db.run(sql`DROP TABLE \`message_threads\`;`)
+  await db.run(sql`DROP TABLE \`notices\`;`)
+  await db.run(sql`DROP TABLE \`outreaches\`;`)
+  await db.run(sql`DROP TABLE \`outreach_referrals\`;`)
+  await db.run(sql`DROP TABLE \`permissions\`;`)
+  await db.run(sql`DROP TABLE \`products\`;`)
+  await db.run(sql`DROP TABLE \`product_variants\`;`)
+  await db.run(sql`DROP TABLE \`qualifications\`;`)
+  await db.run(sql`DROP TABLE \`relations\`;`)
+  await db.run(sql`DROP TABLE \`roles\`;`)
+  await db.run(sql`DROP TABLE \`role_permissions\`;`)
+  await db.run(sql`DROP TABLE \`segments\`;`)
+  await db.run(sql`DROP TABLE \`texts\`;`)
+  await db.run(sql`DROP TABLE \`text_variants\`;`)
+  await db.run(sql`DROP TABLE \`universities\`;`)
+  await db.run(sql`DROP TABLE \`user_bans\`;`)
+  await db.run(sql`DROP TABLE \`user_sessions\`;`)
+  await db.run(sql`DROP TABLE \`user_verifications\`;`)
+  await db.run(sql`DROP TABLE \`votes\`;`)
+  await db.run(sql`DROP TABLE \`wallets\`;`)
+  await db.run(sql`DROP TABLE \`wallet_transactions\`;`)
+  await db.run(sql`DROP TABLE \`yields\`;`)
+  await db.run(sql`DROP TABLE \`zoos\`;`)
   await db.run(sql`DROP TABLE \`redirects\`;`)
   await db.run(sql`DROP TABLE \`redirects_rels\`;`)
   await db.run(sql`DROP TABLE \`forms_blocks_checkbox\`;`)

@@ -5,7 +5,8 @@ import { setCreatedAt, setUpdatedAt } from '../hooks/timestamps'
 export const AssetVariant: CollectionConfig = {
   slug: 'asset_variants',
   labels: { singular: 'Asset Variant', plural: 'Asset Variants' },
-  admin: { useAsTitle: 'title' },
+  admin: { useAsTitle: 'title',
+     hidden: true, },
   fields: [
     { 
       name: 'uuid', 

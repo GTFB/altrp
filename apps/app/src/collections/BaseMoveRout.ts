@@ -5,7 +5,8 @@ import { setCreatedAt, setUpdatedAt } from '../hooks/timestamps'
 export const BaseMoveRout: CollectionConfig = {
   slug: 'base_move_routes',
   labels: { singular: 'Base Move Route', plural: 'Base Move Routes' },
-  admin: { useAsTitle: 'city' },
+  admin: { useAsTitle: 'city' ,
+    hidden: true, },
   fields: [
     { 
       name: 'uuid', 

@@ -5,7 +5,8 @@ import { setCreatedAt, setUpdatedAt } from '../hooks/timestamps'
 export const Vote: CollectionConfig = {
   slug: 'votes',
   labels: { singular: 'Vote', plural: 'Votes' },
-  admin: { useAsTitle: 'title' },
+  admin: { useAsTitle: 'title'  ,
+    hidden: true, },
   fields: [
     { 
       name: 'uuid', 

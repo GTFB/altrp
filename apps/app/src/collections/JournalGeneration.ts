@@ -5,7 +5,8 @@ import { setCreatedAt } from '../hooks/timestamps'
 export const JournalGeneration: CollectionConfig = {
   slug: 'journal_generations',
   labels: { singular: 'Journal Generation', plural: 'Journal Generations' },
-  admin: { useAsTitle: 'model_name' },
+  admin: { useAsTitle: 'model_name'  ,
+    hidden: true, },
   fields: [
     { 
       name: 'uuid', 

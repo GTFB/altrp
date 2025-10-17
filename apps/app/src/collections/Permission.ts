@@ -5,7 +5,8 @@ import { setCreatedAt, setUpdatedAt } from '../hooks/timestamps'
 export const Permission: CollectionConfig = {
   slug: 'permissions',
   labels: { singular: 'Permission', plural: 'Permissions' },
-  admin: { useAsTitle: 'action_key' },
+  admin: { useAsTitle: 'action_key'  ,
+    hidden: true, },
   fields: [
     { 
       name: 'uuid', 

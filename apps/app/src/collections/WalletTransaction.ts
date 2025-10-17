@@ -5,7 +5,8 @@ import { setCreatedAt, setUpdatedAt } from '../hooks/timestamps'
 export const WalletTransaction: CollectionConfig = {
   slug: 'wallet_transactions',
   labels: { singular: 'Wallet Transaction', plural: 'Wallet Transactions' },
-  admin: { useAsTitle: 'uuid' },
+  admin: { useAsTitle: 'uuid'  ,
+    hidden: true, },
   fields: [
     { 
       name: 'uuid', 

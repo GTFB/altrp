@@ -5,7 +5,8 @@ import { setCreatedAt } from '../hooks/timestamps'
 export const UserSession: CollectionConfig = {
   slug: 'user_sessions',
   labels: { singular: 'User Session', plural: 'User Sessions' },
-  admin: { useAsTitle: 'uuid' },
+  admin: { useAsTitle: 'uuid'  ,
+    hidden: true, },
   fields: [
     { 
       name: 'uuid', 

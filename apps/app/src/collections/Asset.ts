@@ -5,7 +5,10 @@ import { setCreatedAt, setUpdatedAt } from '../hooks/timestamps'
 export const Asset: CollectionConfig = {
   slug: 'assets',
   labels: { singular: 'Asset', plural: 'Assets' },
-  admin: { useAsTitle: 'title' },
+  admin: {
+     useAsTitle: 'title',
+     hidden: true,
+  },
   fields: [
     { 
       name: 'uuid', 
@@ -31,7 +34,7 @@ export const Asset: CollectionConfig = {
       hooks: { beforeChange: [setCreatedAt] },
     },
     { 
-      name: 'created_at', 
+      name: 'updated_at', 
       type: 'date',
       admin: { hidden: true },
       hooks: { beforeChange: [setUpdatedAt] },
