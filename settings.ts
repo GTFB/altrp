@@ -64,3 +64,5 @@ export const LANGUAGES = [
 export const SUPPORTED_LANGUAGES: string[] = LANGUAGES.map(lang => lang.code);
 
 export const CMS_PROVIDER: 'mdx' | 'sqlite' = 'sqlite'
+
+export const APP_DB_CLIENT: 'sqlite' | 'postgres' = 'sqlite'

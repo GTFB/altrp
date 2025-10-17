@@ -1,12 +1,13 @@
-import { Button, type ButtonProps } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { cn } from '@/utilities/ui'
 import Link from 'next/link'
 import React from 'react'
+import type { VariantProps } from 'class-variance-authority'
 
 import type { Page, Post } from '@/payload-types'
 
 type CMSLinkType = {
-  appearance?: 'inline' | ButtonProps['variant']
+  appearance?: 'inline' | VariantProps<typeof buttonVariants>['variant']
   children?: React.ReactNode
   className?: string
   label?: string | null
@@ -15,7 +16,7 @@ type CMSLinkType = {
     relationTo: 'pages' | 'posts'
     value: Page | Post | string | number
   } | null
-  size?: ButtonProps['size'] | null
+  size?: VariantProps<typeof buttonVariants>['size'] | null
   type?: 'custom' | 'reference' | null
   url?: string | null
 }

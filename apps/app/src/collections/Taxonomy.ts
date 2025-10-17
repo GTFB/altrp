@@ -1,46 +1,20 @@
-import type { CollectionConfig } from 'payload'
-import { randomUUID } from 'node:crypto'
-
-import { authenticated } from '../access/authenticated'
-import { anyone } from '../access/anyone'
+import { CollectionConfig } from 'payload'
 
 export const Taxonomy: CollectionConfig = {
-  slug: 'taxonomies',
-  access: {
-    create: authenticated,
-    delete: authenticated,
-    read: anyone,
-    update: authenticated,
-  },
-  admin: {
-    useAsTitle: 'title',
-  },
+  slug: 'taxonomy',
+  labels: { singular: 'Taxonomy', plural: 'Taxonomies' },
+  admin: { useAsTitle: 'name' },
   fields: [
-    {
-      name: 'uuid',
-      type: 'text',
-      required: true,
-      index: true,
-      unique: true,
-      validate: (val) => {
-        if (typeof val !== 'string') return 'uuid must be a string'
-        const re = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-        return re.test(val) || 'Invalid UUID v4 format'
-      },
-    },
-    { name: 'entity', type: 'text', index: true },
-    { name: 'name', type: 'text', required: true, index: true },
-    { name: 'title', type: 'text', index: true },
-    { name: 'order', type: 'number' },
+    { name: 'entity', type: 'text', required: true },
+    { name: 'name', type: 'text', required: true },
+    { name: 'title', type: 'text' },
+    { name: 'sort_order', type: 'number', defaultValue: 0 },
+    { name: 'created_at', type: 'number' },
+    { name: 'updated_at', type: 'number' },
+    { name: 'deleted_at', type: 'number' },
   ],
-  hooks: {
-    beforeValidate: [({ data }) => {
-      if (data && (!data.uuid || data.uuid === '')) {
-        data.uuid = randomUUID()
-      }
-      return data
-    }],
-  },
 }
+
+export default Taxonomy
 
 
