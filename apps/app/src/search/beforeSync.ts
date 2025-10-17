@@ -32,7 +32,7 @@ export const beforeSyncWithSearch: BeforeSync = async ({ req, originalDoc, searc
       }
 
       const doc = await req.payload.findByID({
-        collection: 'categories',
+        collection: 'taxonomy',
         id: category,
         disableErrors: true,
         depth: 0,
@@ -40,8 +40,8 @@ export const beforeSyncWithSearch: BeforeSync = async ({ req, originalDoc, searc
         req,
       })
 
-      if (doc !== null) {
-        populatedCategories.push(doc)
+      if (doc !== null && doc.title) {
+        populatedCategories.push({ id: doc.id, title: doc.title })
       } else {
         console.error(
           `Failed. Category not found when syncing collection '${collection}' with id: '${id}' to search.`,
@@ -50,7 +50,7 @@ export const beforeSyncWithSearch: BeforeSync = async ({ req, originalDoc, searc
     }
 
     modifiedDoc.categories = populatedCategories.map((each) => ({
-      relationTo: 'categories',
+      relationTo: 'taxonomy',
       categoryID: String(each.id),
       title: each.title,
     }))

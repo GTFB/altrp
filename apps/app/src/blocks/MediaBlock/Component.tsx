@@ -59,7 +59,7 @@ export const MediaBlock: React.FC<Props> = (props) => {
             captionClassName,
           )}
         >
-          <RichText data={caption} enableGutter={false} />
+          <RichText data={caption as any} enableGutter={false} />
         </div>
       )}
     </div>

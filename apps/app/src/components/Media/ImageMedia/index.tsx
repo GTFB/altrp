@@ -36,11 +36,11 @@ export const ImageMedia: React.FC<MediaProps> = (props) => {
   let src: StaticImageData | string = srcFromProps || ''
 
   if (!src && resource && typeof resource === 'object') {
-    const { alt: altFromResource, height: fullHeight, url, width: fullWidth } = resource
+    const { alt_text: altFromResource, height: fullHeight, url, width: fullWidth } = resource
 
     width = fullWidth!
     height = fullHeight!
-    alt = altFromResource || ''
+    alt = altFromResource as string || ''
 
     const cacheTag = resource.updatedAt
 
