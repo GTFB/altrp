@@ -1,5 +1,5 @@
 export interface BaseFlowStep {
-  type: 'message' | 'wait_input' | 'callback' | 'condition' | 'handler' | 'flow' | 'delay' | 'forwarding_control' | 'dynamic';
+  type: 'message' | 'wait_input' | 'callback' | 'condition' | 'handler' | 'flow' | 'delay' | 'forwarding_control' | 'dynamic' | 'dynamic_callback';
   id?: string; // Unique step ID for navigation
 }
 
@@ -73,10 +73,19 @@ export interface DynamicStep extends BaseFlowStep {
   nextStepId?: string | number;
 }
 
+export interface DynamicCallbackStep extends BaseFlowStep {
+  type: 'dynamic_callback';
+  handler: string; // custom handler for generating buttons
+  saveToVariable: string; // where to save selected value
+  nextStepId?: string | number; // next step after selection
+  nextFlow?: string; // next flow after selection
+  callbackPrefix?: string; // custom prefix for callback_data (optional)
+}
+
 // FlowControlStep removed - now automatically managed at startFlow/completeFlow
 
 export type FlowStepType = MessageStep | WaitInputStep | CallbackStep | ConditionStep | 
-                          HandlerStep | FlowStep | DelayStep | ForwardingControlStep | DynamicStep;
+                          HandlerStep | FlowStep | DelayStep | ForwardingControlStep | DynamicStep | DynamicCallbackStep;
 
 export interface BotFlow {
   name: string;

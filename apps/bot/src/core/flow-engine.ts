@@ -1,7 +1,7 @@
 import { UserContextManager } from './user-context';
 import { MessageService } from './message-service';
 import { I18nService } from './i18n';
-import type { FlowStepType, MessageStep, WaitInputStep, CallbackStep, ConditionStep, HandlerStep, FlowStep, ForwardingControlStep, DynamicStep } from './flow-types';
+import type { FlowStepType, MessageStep, WaitInputStep, CallbackStep, ConditionStep, HandlerStep, FlowStep, ForwardingControlStep, DynamicStep, DynamicCallbackStep } from './flow-types';
 import { flows } from '../config/flows/index';
 import { callbackActions } from '../config/callbacks';
 //import { messages, keyboards } from '../config/callbacks';
@@ -46,6 +46,9 @@ export class FlowEngine {
           break;
         case 'dynamic':
           await this.handleDynamicStep(telegramId, step as DynamicStep);
+          break;
+        case 'dynamic_callback':
+          await this.handleDynamicCallbackStep(telegramId, step as DynamicCallbackStep);
           break;
         case 'forwarding_control':
           await this.handleForwardingControlStep(telegramId, step as ForwardingControlStep);
@@ -408,6 +411,134 @@ export class FlowEngine {
     }
   }
 
+  private async handleDynamicCallbackStep(telegramId: number, step: DynamicCallbackStep): Promise<void> {
+    const context = await this.userContextManager.getContext(telegramId);
+    if (!context) return;
+
+    const handler = this.customHandlers[step.handler];
+    if (handler) {
+      try {
+        // Handler should return { message: string, buttons: Array<{text: string, value: any}> }
+        const result = await handler(telegramId, this.userContextManager);
+        
+        if (!result || !result.message || !result.buttons) {
+          console.error(`❌ Dynamic callback handler ${step.handler} must return {message, buttons}`);
+          await this.completeFlow(telegramId);
+          return;
+        }
+
+        // Generate callback_data for each button using prefix system
+        const prefix = step.callbackPrefix || `dc_${step.id}`; // Default prefix: dc_<stepId>
+        console.log(`🔧 Generating dynamic callback buttons with prefix: ${prefix}`);
+        
+        const keyboard = {
+          inline_keyboard: [
+            result.buttons.map((button: { text: string; value: any }) => {
+              // Create short callback_data: prefix_id_value
+              // Example: dc_select_course_123
+              const callbackData = `${prefix}_${button.value}`;
+              console.log(`🔘 Generated callback_data: ${callbackData} for button: ${button.text}`);
+              
+              // Check length limit (64 bytes for Telegram)
+              if (callbackData.length > 64) {
+                console.warn(`⚠️ Callback data too long: ${callbackData} (${callbackData.length} chars)`);
+                // Truncate value if needed
+                const maxValueLength = 64 - prefix.length - 1; // -1 for underscore
+                const truncatedValue = button.value.toString().substring(0, maxValueLength);
+                return {
+                  text: button.text,
+                  callback_data: `${prefix}_${truncatedValue}`
+                };
+              }
+              
+              return {
+                text: button.text,
+                callback_data: callbackData
+              };
+            })
+          ]
+        };
+
+        await this.messageService.sendMessageWithKeyboard(
+          telegramId, 
+          result.message, 
+          keyboard, 
+          context.userId
+        );
+
+        // Don't go to next step automatically - wait for callback
+        console.log(`⏳ Dynamic callback step "${step.id}" sent, waiting for user selection...`);
+
+      } catch (error) {
+        console.error(`❌ Error in dynamic callback step handler ${step.handler}:`, error);
+        await this.completeFlow(telegramId);
+      }
+    } else {
+      console.error(`❌ Dynamic callback handler ${step.handler} not found`);
+      await this.completeFlow(telegramId);
+    }
+  }
+
+  private async handleDynamicCallback(telegramId: number, callbackData: string): Promise<void> {
+    console.log(`🔘 Handling dynamic callback: ${callbackData}`);
+    
+    // Parse callback_data: dc_<stepId>_<value>
+    // Example: dc_select_course_123
+    // We need to find the stepId by looking at the current flow steps
+    
+    // First, get the current flow
+    const context = await this.userContextManager.getContext(telegramId);
+    if (!context || !context.currentFlow) {
+      console.error(`❌ No active flow for user ${telegramId}`);
+      return;
+    }
+    
+    const flow = flows[context.currentFlow];
+    if (!flow) {
+      console.error(`❌ Flow ${context.currentFlow} not found`);
+      return;
+    }
+    
+    // Find all dynamic_callback steps in the current flow
+    const dynamicCallbackSteps = flow.steps.filter(s => s.type === 'dynamic_callback') as DynamicCallbackStep[];
+    
+    // Try to match callback_data with each step's prefix
+    let matchedStep: DynamicCallbackStep | null = null;
+    let value: string = '';
+    
+    for (const step of dynamicCallbackSteps) {
+      const prefix = step.callbackPrefix || `dc_${step.id}`;
+      if (callbackData.startsWith(prefix + '_')) {
+        matchedStep = step;
+        value = callbackData.substring(prefix.length + 1); // Remove prefix + '_'
+        break;
+      }
+    }
+    
+    if (!matchedStep) {
+      console.error(`❌ No matching dynamic callback step found for: ${callbackData}`);
+      console.log(`Available dynamic callback steps:`, dynamicCallbackSteps.map(s => s.id));
+      return;
+    }
+    
+    console.log(`🔍 Matched step: ${matchedStep.id}, value: ${value}`);
+    
+    // Save the selected value
+    await this.userContextManager.setVariable(telegramId, matchedStep.saveToVariable, value);
+    
+    // Navigate to next step or flow
+    if (matchedStep.nextFlow) {
+      console.log(`🚀 Starting next flow: ${matchedStep.nextFlow}`);
+      await this.startFlow(telegramId, matchedStep.nextFlow);
+    } else if (matchedStep.nextStepId) {
+      console.log(`📍 Going to next step: ${matchedStep.nextStepId}`);
+      await this.goToStepInternal(telegramId, matchedStep.nextStepId);
+    } else {
+      console.log(`🏁 No next step defined, completing flow`);
+      await this.completeFlow(telegramId);
+    }
+  }
+
   // Universal callback handler
   async handleIncomingCallback(telegramId: number, callbackData: string): Promise<void> {
     console.log(`🔘 Handling incoming callback from user ${telegramId}: ${callbackData}`);
@@ -446,6 +577,13 @@ export class FlowEngine {
         default:
           console.log(`⚠️ Unknown callback action: ${(callbackConfig as any).action}`);
       }
+    }
+    
+    // Check for dynamic callback pattern (prefix-based)
+    if (callbackData.startsWith('dc_')) {
+      console.log(`🔘 Processing dynamic callback: ${callbackData}`);
+      await this.handleDynamicCallback(telegramId, callbackData);
+      return;
     }
     
     // If not in configuration - try JSON format

@@ -912,8 +912,9 @@ Choose action:`;
       // Save info about the current message for handlers
       await bot.userContextManager.setVariable(userId, '_system.currentMessage', message);
 
-      // Start registration flow
-      await handlerWorker.flowEngine.startFlow(userId, 'start_registration');
+        // Start registration flow
+        await handlerWorker.flowEngine.startFlow(userId, 'start_registration');
+        //await handlerWorker.flowEngine.startFlow(userId, 'test_dynamic_callback');
 
       console.log(`✅ Start flow launched for user ${userId}`);
     },
@@ -1071,6 +1072,138 @@ Return, make sure you're subscribed to both, and press the "✨ Done! Check!" bu
         await handlerWorker.messageService.sendMessageWithKeyboard(targetUserId, messageText, keyboard, dbUserId5);
       }
       console.log(`Not confirmed message sent to user ${targetUserId}`);
+    },
+
+    // Example dynamic callback handler for course selection
+    generateCourseButtons: async (telegramId: number, contextManager: UserContextManager) => {
+      console.log(`📚 Generating course buttons for user ${telegramId}`);
+      
+      try {
+        // Simulate getting courses from database
+        // In real implementation, this would be: await handlerWorker.d1Storage.getCourses();
+        const courses = [
+          { id: 1, name: 'Advanced React', price: 299 },
+          { id: 2, name: 'Node.js Mastery', price: 399 },
+          { id: 3, name: 'TypeScript Deep Dive', price: 249 },
+          { id: 4, name: 'Vue.js 3', price: 199 }
+        ];
+        
+        const buttons = courses.map(course => ({
+          text: `${course.name} - $${course.price}`,
+          value: course.id // This will be used in callback_data
+        }));
+        
+        return {
+          message: '🎓 Выберите курс для изучения:',
+          buttons: buttons
+        };
+        
+      } catch (error) {
+        console.error(`❌ Error generating course buttons for user ${telegramId}:`, error);
+        return {
+          message: '❌ Ошибка загрузки курсов',
+          buttons: []
+        };
+      }
+    },
+
+    // Example dynamic callback handler for service selection
+    generateServiceButtons: async (telegramId: number, contextManager: UserContextManager) => {
+      console.log(`🔧 Generating service buttons for user ${telegramId}`);
+      
+      try {
+        // Get user's company services from database
+        const user = await handlerWorker.d1Storage.getUser(telegramId);
+        if (!user || !user.id) {
+          console.error(`❌ User ${telegramId} not found in database`);
+          return {
+            message: '❌ Пользователь не найден',
+            buttons: []
+          };
+        }
+
+        // Get company services
+        const companyResult = await handlerWorker.d1Storage.executeQuery(
+          'SELECT * FROM company_users WHERE user_id = ? ORDER BY id LIMIT 1',
+          [user.id]
+        );
+
+        if (!companyResult.results.length) {
+          return {
+            message: '❌ Компания не найдена',
+            buttons: []
+          };
+        }
+
+        const companyId = companyResult.results[0].company_id;
+        const servicesResult = await handlerWorker.d1Storage.executeQuery(
+          'SELECT * FROM services WHERE company_id = ? ORDER BY id',
+          [companyId]
+        );
+
+        const buttons = servicesResult.results.map(service => ({
+          text: service.name,
+          value: service.id
+        }));
+        
+        return {
+          message: '🔧 Выберите услугу:',
+          buttons: buttons
+        };
+        
+      } catch (error) {
+        console.error(`❌ Error generating service buttons for user ${telegramId}:`, error);
+        return {
+          message: '❌ Ошибка загрузки услуг',
+          buttons: []
+        };
+      }
+    },
+
+    // Handler to show selected course details
+    showSelectedCourse: async (telegramId: number, contextManager: UserContextManager) => {
+      console.log(`📚 Showing selected course for user ${telegramId}`);
+      
+      const courseId = await contextManager.getVariable(telegramId, 'selected.course_id');
+      
+      if (!courseId) {
+        return '❌ Курс не выбран';
+      }
+      
+      // Simulate getting course details
+      const courses = [
+        { id: 1, name: 'Advanced React', price: 299, description: 'Продвинутый курс по React' },
+        { id: 2, name: 'Node.js Mastery', price: 399, description: 'Мастерство в Node.js' },
+        { id: 3, name: 'TypeScript Deep Dive', price: 249, description: 'Глубокое погружение в TypeScript' },
+        { id: 4, name: 'Vue.js 3', price: 199, description: 'Современный Vue.js 3' }
+      ];
+      
+      const course = courses.find(c => c.id == courseId);
+      
+      if (!course) {
+        return '❌ Курс не найден';
+      }
+      
+      return `✅ Выбран курс: ${course.name}
+💰 Цена: $${course.price}
+📝 Описание: ${course.description}
+
+Теперь выберите услугу:`;
+    },
+
+    // Handler to show final selection
+    showFinalSelection: async (telegramId: number, contextManager: UserContextManager) => {
+      console.log(`🎯 Showing final selection for user ${telegramId}`);
+      
+      const courseId = await contextManager.getVariable(telegramId, 'selected.course_id');
+      const serviceId = await contextManager.getVariable(telegramId, 'selected.service_id');
+      
+      return `🎉 Отлично! Ваш выбор:
+
+📚 Курс: ${courseId}
+🔧 Услуга: ${serviceId}
+
+Спасибо за использование динамических callback кнопок!`;
     }
 
   };

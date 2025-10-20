@@ -65,6 +65,12 @@ export const keyboards = {
           callback_data: "profile"
         },
       ],
+      [
+        {
+          text: "🧪 Test Dynamic Callback",
+          callback_data: "test_dynamic_callback"
+        },
+      ],
     ]
   },
   consultation: {
@@ -406,6 +412,11 @@ export const callbackActions = {
     flowName: "start_registration"
   },
 
+  // Test dynamic callback functionality
+  "test_dynamic_callback": {
+    action: "start_flow",
+    flowName: "test_dynamic_callback"
+  },
 
   
 
