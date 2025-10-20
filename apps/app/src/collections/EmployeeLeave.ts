@@ -4,7 +4,8 @@ import { generateUUID } from '../hooks/generateUUID'
 export const EmployeeLeave: CollectionConfig = {
   slug: 'employee_leaves',
   labels: { singular: 'Employee Leave', plural: 'Employee Leaves' },
-  admin: { useAsTitle: 'uuid' },
+  admin: { useAsTitle: 'uuid'  ,
+    hidden: true, },
   fields: [
     { 
       name: 'uuid', 

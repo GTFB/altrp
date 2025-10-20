@@ -5,7 +5,8 @@ import { setCreatedAt, setUpdatedAt } from '../hooks/timestamps'
 export const OutreachReferral: CollectionConfig = {
   slug: 'outreach_referrals',
   labels: { singular: 'Outreach Referral', plural: 'Outreach Referrals' },
-  admin: { useAsTitle: 'title' },
+  admin: { useAsTitle: 'title'  ,
+    hidden: true, },
   fields: [
     { 
       name: 'uuid', 

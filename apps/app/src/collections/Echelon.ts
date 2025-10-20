@@ -5,7 +5,8 @@ import { setCreatedAt, setUpdatedAt } from '../hooks/timestamps'
 export const Echelon: CollectionConfig = {
   slug: 'echelons',
   labels: { singular: 'Echelon', plural: 'Echelons' },
-  admin: { useAsTitle: 'position' },
+  admin: { useAsTitle: 'position'  ,
+    hidden: true, },
   fields: [
     { 
       name: 'uuid', 

@@ -5,7 +5,8 @@ import { setCreatedAt, setUpdatedAt } from '../hooks/timestamps'
 export const Zoo: CollectionConfig = {
   slug: 'zoos',
   labels: { singular: 'Zoo', plural: 'Zoos' },
-  admin: { useAsTitle: 'name' },
+  admin: { useAsTitle: 'name'  ,
+    hidden: true, },
   fields: [
     { 
       name: 'uuid', 

@@ -5,7 +5,8 @@ import { setCreatedAt, setUpdatedAt } from '../hooks/timestamps'
 export const JournalConnection: CollectionConfig = {
   slug: 'journal_connections',
   labels: { singular: 'Journal Connection', plural: 'Journal Connections' },
-  admin: { useAsTitle: 'relationship_name' },
+  admin: { useAsTitle: 'relationship_name'  ,
+    hidden: true, },
   fields: [
     { 
       name: 'uuid', 

@@ -67,33 +67,59 @@ export interface Config {
   };
   blocks: {};
   collections: {
+    settings: Setting;
+    taxonomy: Taxonomy;
+    media: Media;
     pages: Page;
     posts: Post;
-    media: Media;
-    categories: Category;
-    archieve: Archieve;
-    'archieve-variant': ArchieveVariant;
-    base: Base;
-    'base-move': BaseMove;
-    'base-move-rout': BaseMoveRout;
+    users: User;
+    journals: Journal;
+    assets: Asset;
+    asset_variants: AssetVariant;
+    bases: Base;
+    base_moves: BaseMove;
+    base_move_routes: BaseMoveRoute;
     contractors: Contractor;
     deals: Deal;
-    'deal-products': DealProduct;
+    deal_products: DealProduct;
     echelons: Echelon;
-    'echelon-employees': EchelonEmployee;
+    echelon_employees: EchelonEmployee;
+    employee_leaves: EmployeeLeaf;
+    employee_timesheets: EmployeeTimesheet;
+    expanses: Expanse;
     finances: Finance;
     goals: Goal;
     humans: Human;
     identities: Identity;
-    'journal-activities': JournalActivity;
-    'journal-connections': JournalConnection;
-    'journal-generations': JournalGeneration;
-    'journal-systems': JournalSystem;
+    journal_connections: JournalConnection;
+    journal_generations: JournalGeneration;
+    journal_system: JournalSystem;
     keys: Key;
     locations: Location;
+    messages: Message;
+    message_threads: MessageThread;
+    notices: Notice;
+    outreaches: Outreach;
+    outreach_referrals: OutreachReferral;
+    permissions: Permission;
+    products: Product;
+    product_variants: ProductVariant;
+    qualifications: Qualification;
     relations: Relation;
-    taxonomies: Taxonomy;
-    users: User;
+    roles: Role;
+    role_permissions: RolePermission;
+    segments: Segment;
+    texts: Text;
+    text_variants: TextVariant;
+    universities: University;
+    user_bans: UserBan;
+    user_sessions: UserSession;
+    user_verifications: UserVerification;
+    votes: Vote;
+    wallets: Wallet;
+    wallet_transactions: WalletTransaction;
+    yields: Yield;
+    zoos: Zoo;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -105,33 +131,59 @@ export interface Config {
   };
   collectionsJoins: {};
   collectionsSelect: {
+    settings: SettingsSelect<false> | SettingsSelect<true>;
+    taxonomy: TaxonomySelect<false> | TaxonomySelect<true>;
+    media: MediaSelect<false> | MediaSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
-    media: MediaSelect<false> | MediaSelect<true>;
-    categories: CategoriesSelect<false> | CategoriesSelect<true>;
-    archieve: ArchieveSelect<false> | ArchieveSelect<true>;
-    'archieve-variant': ArchieveVariantSelect<false> | ArchieveVariantSelect<true>;
-    base: BaseSelect<false> | BaseSelect<true>;
-    'base-move': BaseMoveSelect<false> | BaseMoveSelect<true>;
-    'base-move-rout': BaseMoveRoutSelect<false> | BaseMoveRoutSelect<true>;
+    users: UsersSelect<false> | UsersSelect<true>;
+    journals: JournalsSelect<false> | JournalsSelect<true>;
+    assets: AssetsSelect<false> | AssetsSelect<true>;
+    asset_variants: AssetVariantsSelect<false> | AssetVariantsSelect<true>;
+    bases: BasesSelect<false> | BasesSelect<true>;
+    base_moves: BaseMovesSelect<false> | BaseMovesSelect<true>;
+    base_move_routes: BaseMoveRoutesSelect<false> | BaseMoveRoutesSelect<true>;
     contractors: ContractorsSelect<false> | ContractorsSelect<true>;
     deals: DealsSelect<false> | DealsSelect<true>;
-    'deal-products': DealProductsSelect<false> | DealProductsSelect<true>;
+    deal_products: DealProductsSelect<false> | DealProductsSelect<true>;
     echelons: EchelonsSelect<false> | EchelonsSelect<true>;
-    'echelon-employees': EchelonEmployeesSelect<false> | EchelonEmployeesSelect<true>;
+    echelon_employees: EchelonEmployeesSelect<false> | EchelonEmployeesSelect<true>;
+    employee_leaves: EmployeeLeavesSelect<false> | EmployeeLeavesSelect<true>;
+    employee_timesheets: EmployeeTimesheetsSelect<false> | EmployeeTimesheetsSelect<true>;
+    expanses: ExpansesSelect<false> | ExpansesSelect<true>;
     finances: FinancesSelect<false> | FinancesSelect<true>;
     goals: GoalsSelect<false> | GoalsSelect<true>;
     humans: HumansSelect<false> | HumansSelect<true>;
     identities: IdentitiesSelect<false> | IdentitiesSelect<true>;
-    'journal-activities': JournalActivitiesSelect<false> | JournalActivitiesSelect<true>;
-    'journal-connections': JournalConnectionsSelect<false> | JournalConnectionsSelect<true>;
-    'journal-generations': JournalGenerationsSelect<false> | JournalGenerationsSelect<true>;
-    'journal-systems': JournalSystemsSelect<false> | JournalSystemsSelect<true>;
+    journal_connections: JournalConnectionsSelect<false> | JournalConnectionsSelect<true>;
+    journal_generations: JournalGenerationsSelect<false> | JournalGenerationsSelect<true>;
+    journal_system: JournalSystemSelect<false> | JournalSystemSelect<true>;
     keys: KeysSelect<false> | KeysSelect<true>;
     locations: LocationsSelect<false> | LocationsSelect<true>;
+    messages: MessagesSelect<false> | MessagesSelect<true>;
+    message_threads: MessageThreadsSelect<false> | MessageThreadsSelect<true>;
+    notices: NoticesSelect<false> | NoticesSelect<true>;
+    outreaches: OutreachesSelect<false> | OutreachesSelect<true>;
+    outreach_referrals: OutreachReferralsSelect<false> | OutreachReferralsSelect<true>;
+    permissions: PermissionsSelect<false> | PermissionsSelect<true>;
+    products: ProductsSelect<false> | ProductsSelect<true>;
+    product_variants: ProductVariantsSelect<false> | ProductVariantsSelect<true>;
+    qualifications: QualificationsSelect<false> | QualificationsSelect<true>;
     relations: RelationsSelect<false> | RelationsSelect<true>;
-    taxonomies: TaxonomiesSelect<false> | TaxonomiesSelect<true>;
-    users: UsersSelect<false> | UsersSelect<true>;
+    roles: RolesSelect<false> | RolesSelect<true>;
+    role_permissions: RolePermissionsSelect<false> | RolePermissionsSelect<true>;
+    segments: SegmentsSelect<false> | SegmentsSelect<true>;
+    texts: TextsSelect<false> | TextsSelect<true>;
+    text_variants: TextVariantsSelect<false> | TextVariantsSelect<true>;
+    universities: UniversitiesSelect<false> | UniversitiesSelect<true>;
+    user_bans: UserBansSelect<false> | UserBansSelect<true>;
+    user_sessions: UserSessionsSelect<false> | UserSessionsSelect<true>;
+    user_verifications: UserVerificationsSelect<false> | UserVerificationsSelect<true>;
+    votes: VotesSelect<false> | VotesSelect<true>;
+    wallets: WalletsSelect<false> | WalletsSelect<true>;
+    wallet_transactions: WalletTransactionsSelect<false> | WalletTransactionsSelect<true>;
+    yields: YieldsSelect<false> | YieldsSelect<true>;
+    zoos: ZoosSelect<false> | ZoosSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -184,6 +236,116 @@ export interface UserAuthOperations {
     email: string;
     password: string;
   };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "settings".
+ */
+export interface Setting {
+  id: number;
+  uuid?: string | null;
+  attribute: string;
+  value?: string | null;
+  type?: string | null;
+  order?: number | null;
+  xaid?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "taxonomy".
+ */
+export interface Taxonomy {
+  id: number;
+  entity: string;
+  name: string;
+  title?: string | null;
+  sort_order?: number | null;
+  created_at?: number | null;
+  updated_at?: number | null;
+  deleted_at?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: number;
+  uuid: string;
+  maid?: string | null;
+  title?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  alt_text?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  caption?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  file_name?: string | null;
+  file_path?: string | null;
+  mime_type?: string | null;
+  size_bytes?: number | null;
+  is_public?: boolean | null;
+  type?: string | null;
+  uploader_aid?: string | null;
+  order?: number | null;
+  xaid?: string | null;
+  updated_at?: string | null;
+  created_at?: string | null;
+  deleted_at?: number | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -275,7 +437,6 @@ export interface Post {
     [k: string]: unknown;
   };
   relatedPosts?: (number | Post)[] | null;
-  categories?: (number | Category)[] | null;
   meta?: {
     title?: string | null;
     /**
@@ -300,124 +461,29 @@ export interface Post {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
- */
-export interface Media {
-  id: number;
-  alt?: string | null;
-  caption?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-  sizes?: {
-    thumbnail?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    square?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    small?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    medium?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    large?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    xlarge?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    og?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-  };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "categories".
- */
-export interface Category {
-  id: number;
-  title: string;
-  slug?: string | null;
-  slugLock?: boolean | null;
-  parent?: (number | null) | Category;
-  breadcrumbs?:
-    | {
-        doc?: (number | null) | Category;
-        url?: string | null;
-        label?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
 export interface User {
   id: number;
-  name?: string | null;
+  uuid?: string | null;
+  human_aid?: string | null;
+  role_uuid?: string | null;
+  password_hash?: string | null;
+  is_active?: boolean | null;
+  last_login_at?: string | null;
+  email_verified_at?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  deleted_at?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -566,7 +632,6 @@ export interface ArchiveBlock {
   } | null;
   populateBy?: ('collection' | 'selection') | null;
   relationTo?: 'posts' | null;
-  categories?: (number | Category)[] | null;
   limit?: number | null;
   selectedDocs?:
     | {
@@ -779,16 +844,42 @@ export interface Form {
   createdAt: string;
 }
 /**
+ * System activity log. Records are created automatically.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "archieve".
+ * via the `definition` "journals".
  */
-export interface Archieve {
+export interface Journal {
+  id: number;
+  uuid?: string | null;
+  user_id?: number | null;
+  action?: string | null;
+  details?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  xaid?: string | null;
+  created_at?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "assets".
+ */
+export interface Asset {
   id: number;
   uuid: string;
-  aaid?: string | null;
+  aaid: string;
+  owner_aid?: string | null;
   number?: string | null;
-  title: string;
-  media?: (number | null) | Media;
+  title?: string | null;
+  url?: string | null;
   type_name?: string | null;
   status_name?: string | null;
   version?: string | null;
@@ -796,107 +887,96 @@ export interface Archieve {
   xaid?: string | null;
   created_at?: string | null;
   updated_at?: string | null;
-  deleted_at?: string | null;
-  /**
-   * Technical fields
-   */
-  system?: {
-    gin?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    fts?: string | null;
-    data_in?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    data_out?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-  };
+  deleted_at?: number | null;
+  gin?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  fts?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  data_out?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "archieve-variant".
+ * via the `definition` "asset_variants".
  */
-export interface ArchieveVariant {
+export interface AssetVariant {
   id: number;
   uuid: string;
-  aaid?: string | null;
-  full_aaid?: string | null;
+  full_aaid: string;
   number?: string | null;
-  title: string;
-  media?: (number | null) | Media;
+  title?: string | null;
+  media_id?: string | null;
   version?: string | null;
   order?: number | null;
   xaid?: string | null;
-  created_at?: string | null;
   updated_at?: string | null;
-  /**
-   * Technical fields
-   */
-  system?: {
-    gin?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    fts?: string | null;
-    data_in?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    data_out?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-  };
+  created_at?: string | null;
+  gin?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  fts?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  data_out?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "base".
+ * via the `definition` "bases".
  */
 export interface Base {
   id: number;
   uuid: string;
-  baid?: string | null;
+  baid: string;
   full_baid?: string | null;
   number?: string | null;
-  title: string;
+  title?: string | null;
   laid_from?: string | null;
   laid_to?: string | null;
   cycle?:
@@ -911,48 +991,43 @@ export interface Base {
   status_name?: string | null;
   order?: number | null;
   xaid?: string | null;
-  created_at?: string | null;
   updated_at?: string | null;
-  deleted_at?: string | null;
-  /**
-   * Technical fields
-   */
-  system?: {
-    gin?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    fts?: string | null;
-    data_in?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    data_out?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-  };
+  created_at?: string | null;
+  deleted_at?: number | null;
+  gin?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  fts?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  data_out?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "base-move".
+ * via the `definition` "base_moves".
  */
 export interface BaseMove {
   id: number;
@@ -961,7 +1036,7 @@ export interface BaseMove {
   full_baid?: string | null;
   full_daid?: string | null;
   number?: string | null;
-  title: string;
+  title?: string | null;
   laid_from?: string | null;
   laid_to?: string | null;
   cycle?:
@@ -976,75 +1051,65 @@ export interface BaseMove {
   status_name?: string | null;
   order?: number | null;
   xaid?: string | null;
-  created_at?: string | null;
   updated_at?: string | null;
-  deleted_at?: string | null;
-  /**
-   * Technical fields
-   */
-  system?: {
-    gin?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    fts?: string | null;
-    data_in?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    data_out?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-  };
+  created_at?: string | null;
+  deleted_at?: number | null;
+  gin?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  fts?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  data_out?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "base-move-rout".
+ * via the `definition` "base_move_routes".
  */
-export interface BaseMoveRout {
+export interface BaseMoveRoute {
   id: number;
   uuid: string;
-  full_baid?: string | null;
+  full_baid: string;
   index?: string | null;
   city?: string | null;
   laid_id?: string | null;
   status_name?: string | null;
   order?: number | null;
-  created_at?: string | null;
   updated_at?: string | null;
-  deleted_at?: string | null;
-  /**
-   * Technical fields
-   */
-  system?: {
-    data_in?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-  };
+  created_at?: string | null;
+  deleted_at?: number | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1055,7 +1120,7 @@ export interface BaseMoveRout {
 export interface Contractor {
   id: number;
   uuid: string;
-  caid?: string | null;
+  caid: string;
   title: string;
   reg?: string | null;
   tin?: string | null;
@@ -1064,43 +1129,38 @@ export interface Contractor {
   city_name?: string | null;
   order?: number | null;
   xaid?: string | null;
-  created_at?: string | null;
+  media_id?: string | null;
   updated_at?: string | null;
-  deleted_at?: string | null;
-  media?: (number | null) | Media;
-  /**
-   * Technical fields
-   */
-  system?: {
-    gin?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    fts?: string | null;
-    data_in?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    data_out?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-  };
+  created_at?: string | null;
+  deleted_at?: number | null;
+  gin?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  fts?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  data_out?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1111,10 +1171,10 @@ export interface Contractor {
 export interface Deal {
   id: number;
   uuid: string;
-  daid?: string | null;
+  daid: string;
   full_daid?: string | null;
   client_aid?: string | null;
-  title: string;
+  title?: string | null;
   cycle?:
     | {
         [k: string]: unknown;
@@ -1126,73 +1186,63 @@ export interface Deal {
     | null;
   status_name?: string | null;
   xaid?: string | null;
-  created_at?: string | null;
   updated_at?: string | null;
-  deleted_at?: string | null;
-  /**
-   * Technical fields
-   */
-  system?: {
-    gin?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    fts?: string | null;
-    data_in?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    data_out?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-  };
+  created_at?: string | null;
+  deleted_at?: number | null;
+  gin?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  fts?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  data_out?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "deal-products".
+ * via the `definition` "deal_products".
  */
 export interface DealProduct {
   id: number;
-  uuid: string;
-  full_daid?: string | null;
-  full_paid?: string | null;
-  quantity?: number | null;
+  uuid?: string | null;
+  full_daid: string;
+  full_paid: string;
+  quantity: number;
   status_name?: string | null;
   order?: number | null;
-  created_at?: string | null;
   updated_at?: string | null;
-  /**
-   * Technical fields
-   */
-  system?: {
-    data_in?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-  };
+  created_at?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1203,84 +1253,162 @@ export interface DealProduct {
 export interface Echelon {
   id: number;
   uuid: string;
-  eaid?: string | null;
+  eaid: string;
   parent_eaid?: string | null;
   department_id?: string | null;
-  position: string;
+  position?: string | null;
   city_name?: string | null;
   status_name?: string | null;
   order?: number | null;
   xaid?: string | null;
-  created_at?: string | null;
   updated_at?: string | null;
-  /**
-   * Technical fields
-   */
-  system?: {
-    data_in?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-  };
+  created_at?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "echelon-employees".
+ * via the `definition` "echelon_employees".
  */
 export interface EchelonEmployee {
   id: number;
   uuid: string;
-  eaid?: string | null;
+  eaid: string;
   full_eaid?: string | null;
-  haid?: string | null;
+  haid: string;
   email?: string | null;
   status_name?: string | null;
+  is_public?: boolean | null;
   order?: number | null;
   xaid?: string | null;
-  created_at?: string | null;
   updated_at?: string | null;
-  deleted_at?: string | null;
-  media?: (number | null) | Media;
-  /**
-   * Technical fields
-   */
-  system?: {
-    gin?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    fts?: string | null;
-    data_in?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    data_out?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-  };
+  created_at?: string | null;
+  deleted_at?: number | null;
+  media_id?: string | null;
+  gin?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  fts?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  data_out?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "employee_leaves".
+ */
+export interface EmployeeLeaf {
+  id: number;
+  uuid?: string | null;
+  elaid?: string | null;
+  full_eaid?: string | null;
+  type?: string | null;
+  order?: number | null;
+  xaid?: string | null;
+  started_at?: string | null;
+  ended_at?: string | null;
+  duration?: number | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "employee_timesheets".
+ */
+export interface EmployeeTimesheet {
+  id: number;
+  uuid?: string | null;
+  etaid?: string | null;
+  full_eaid?: string | null;
+  order?: number | null;
+  xaid?: string | null;
+  started_at?: string | null;
+  ended_at?: string | null;
+  duration?: number | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "expanses".
+ */
+export interface Expanse {
+  id: number;
+  uuid?: string | null;
+  xaid?: string | null;
+  title?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  status_name?: string | null;
+  order?: number | null;
+  updated_at?: string | null;
+  created_at?: string | null;
+  deleted_at?: number | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1291,9 +1419,9 @@ export interface EchelonEmployee {
 export interface Finance {
   id: number;
   uuid: string;
-  faid?: string | null;
+  faid: string;
   full_daid?: string | null;
-  title: string;
+  title?: string | null;
   sum?: number | null;
   currency_id?: string | null;
   cycle?:
@@ -1309,42 +1437,37 @@ export interface Finance {
   status_name?: string | null;
   order?: number | null;
   xaid?: string | null;
-  created_at?: string | null;
   updated_at?: string | null;
-  deleted_at?: string | null;
-  /**
-   * Technical fields
-   */
-  system?: {
-    gin?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    fts?: string | null;
-    data_in?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    data_out?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-  };
+  created_at?: string | null;
+  deleted_at?: number | null;
+  gin?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  fts?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  data_out?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1355,10 +1478,10 @@ export interface Finance {
 export interface Goal {
   id: number;
   uuid: string;
-  gaid?: string | null;
+  gaid: string;
   full_gaid?: string | null;
   parent_full_gaid?: string | null;
-  title: string;
+  title?: string | null;
   cycle?:
     | {
         [k: string]: unknown;
@@ -1371,43 +1494,39 @@ export interface Goal {
   type?: string | null;
   status_name?: string | null;
   order?: number | null;
+  is_public?: boolean | null;
   xaid?: string | null;
-  created_at?: string | null;
   updated_at?: string | null;
-  deleted_at?: string | null;
-  /**
-   * Technical fields
-   */
-  system?: {
-    gin?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    fts?: string | null;
-    data_in?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    data_out?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-  };
+  created_at?: string | null;
+  deleted_at?: number | null;
+  gin?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  fts?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  data_out?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1418,52 +1537,48 @@ export interface Goal {
 export interface Human {
   id: number;
   uuid: string;
-  haid?: string | null;
+  haid: string;
   full_name: string;
   birthday?: string | null;
   email?: string | null;
+  sex?: string | null;
   status_name?: string | null;
   type?: string | null;
   city_name?: string | null;
   order?: number | null;
   xaid?: string | null;
-  created_at?: string | null;
+  media_id?: string | null;
   updated_at?: string | null;
-  deleted_at?: string | null;
-  media?: (number | null) | Media;
-  /**
-   * Technical fields
-   */
-  system?: {
-    gin?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    fts?: string | null;
-    data_in?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    data_out?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-  };
+  created_at?: string | null;
+  deleted_at?: number | null;
+  gin?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  fts?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  data_out?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1474,40 +1589,14 @@ export interface Human {
 export interface Identity {
   id: number;
   uuid: string;
-  iaid?: string | null;
-  identity_aid?: string | null;
-  entity_aid?: string | null;
+  iaid: string;
+  entity_aid: string;
+  identity_aid: string;
   permission?: string | null;
   xaid?: string | null;
-  created_at?: string | null;
   updated_at?: string | null;
-  /**
-   * Technical fields
-   */
-  system?: {
-    data_in?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-  };
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "journal-activities".
- */
-export interface JournalActivity {
-  id: number;
-  uuid: string;
-  user: number | User;
-  action: string;
-  details?:
+  created_at?: string | null;
+  data_in?:
     | {
         [k: string]: unknown;
       }
@@ -1516,21 +1605,19 @@ export interface JournalActivity {
     | number
     | boolean
     | null;
-  xaid?: string | null;
-  created_at?: string | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "journal-connections".
+ * via the `definition` "journal_connections".
  */
 export interface JournalConnection {
   id: number;
-  uuid: string;
-  source_user: number | User;
-  target_user: number | User;
-  relationship_name: string;
+  uuid?: string | null;
+  source_user_id?: number | null;
+  target_user_id?: number | null;
+  relationship_name?: string | null;
   status?: string | null;
   details?:
     | {
@@ -1542,21 +1629,21 @@ export interface JournalConnection {
     | boolean
     | null;
   xaid?: string | null;
-  created_at?: string | null;
   updated_at?: string | null;
+  created_at?: string | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "journal-generations".
+ * via the `definition` "journal_generations".
  */
 export interface JournalGeneration {
   id: number;
-  uuid: string;
+  uuid?: string | null;
   full_maid?: string | null;
-  user: number | User;
-  model_name: string;
+  user_id?: number | null;
+  model_name?: string | null;
   status?: string | null;
   token_in?: number | null;
   token_out?: number | null;
@@ -1577,13 +1664,13 @@ export interface JournalGeneration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "journal-systems".
+ * via the `definition` "journal_system".
  */
 export interface JournalSystem {
   id: number;
-  uuid: string;
+  uuid?: string | null;
   entity_aid?: string | null;
-  user: number | User;
+  user_id?: number | null;
   details?:
     | {
         [k: string]: unknown;
@@ -1604,30 +1691,26 @@ export interface JournalSystem {
  */
 export interface Key {
   id: number;
-  uuid: string;
-  kaid?: string | null;
+  uuid?: string | null;
+  kaid: string;
   key_prefix?: string | null;
-  key_hash?: string | null;
-  title: string;
+  key_hash: string;
+  title?: string | null;
   is_active?: boolean | null;
   order?: number | null;
   xaid?: string | null;
-  created_at?: string | null;
+  permission_id?: number | null;
   updated_at?: string | null;
-  /**
-   * Technical fields
-   */
-  system?: {
-    data_in?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-  };
+  created_at?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1638,50 +1721,460 @@ export interface Key {
 export interface Location {
   id: number;
   uuid: string;
-  laid?: string | null;
+  laid: string;
   full_laid?: string | null;
-  title: string;
+  title?: string | null;
   city?: string | null;
+  type?: string | null;
+  status_name?: string | null;
+  is_public?: boolean | null;
+  order?: number | null;
+  xaid?: string | null;
+  updated_at?: string | null;
+  created_at?: string | null;
+  deleted_at?: number | null;
+  gin?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  fts?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  data_out?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "messages".
+ */
+export interface Message {
+  id: number;
+  uuid: string;
+  maid: string;
+  full_maid?: string | null;
+  title?: string | null;
+  status_name?: string | null;
+  order?: number | null;
+  xaid?: string | null;
+  updated_at?: string | null;
+  created_at?: string | null;
+  deleted_at?: number | null;
+  gin?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  fts?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "message_threads".
+ */
+export interface MessageThread {
+  id: number;
+  uuid: string;
+  maid: string;
+  parent_maid?: string | null;
+  title?: string | null;
+  status_name?: string | null;
+  type?: string | null;
+  order?: number | null;
+  xaid?: string | null;
+  updated_at?: string | null;
+  created_at?: string | null;
+  deleted_at?: number | null;
+  gin?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notices".
+ */
+export interface Notice {
+  id: number;
+  uuid?: string | null;
+  naid?: string | null;
+  target_aid?: string | null;
+  title?: string | null;
+  is_read?: boolean | null;
+  type_name?: string | null;
+  order?: number | null;
+  xaid?: string | null;
+  updated_at?: string | null;
+  created_at?: string | null;
+  deleted_at?: number | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "outreaches".
+ */
+export interface Outreach {
+  id: number;
+  uuid: string;
+  oaid: string;
+  said?: string | null;
+  title?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  strategy_type?: string | null;
+  mechanic_type?: string | null;
+  order?: number | null;
+  xaid?: string | null;
+  updated_at?: string | null;
+  created_at?: string | null;
+  deleted_at?: number | null;
+  gin?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  fts?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  data_out?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "outreach_referrals".
+ */
+export interface OutreachReferral {
+  id: number;
+  uuid?: string | null;
+  oaid: string;
+  title?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  depth?: number | null;
+  order?: number | null;
+  xaid?: string | null;
+  updated_at?: string | null;
+  created_at?: string | null;
+  deleted_at?: number | null;
+  gin?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  fts?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "permissions".
+ */
+export interface Permission {
+  id: number;
+  uuid?: string | null;
+  prm_aid?: string | null;
+  action_key: string;
+  title?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  group_name?: string | null;
+  description?: string | null;
+  order?: number | null;
+  xaid?: string | null;
+  updated_at?: string | null;
+  created_at?: string | null;
+  deleted_at?: number | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: number;
+  uuid: string;
+  paid: string;
+  title?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  category?: string | null;
+  type?: string | null;
+  status_name?: string | null;
+  is_public?: boolean | null;
+  order?: number | null;
+  xaid?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  deleted_at?: number | null;
+  gin?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  fts?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  data_out?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product_variants".
+ */
+export interface ProductVariant {
+  id: number;
+  uuid: string;
+  pvaid: string;
+  full_paid: string;
+  vendor_aid?: string | null;
+  sku?: string | null;
+  title?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  status_name?: string | null;
+  order?: number | null;
+  xaid?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  deleted_at?: number | null;
+  gin?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  fts?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  data_out?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "qualifications".
+ */
+export interface Qualification {
+  id: number;
+  uuid?: string | null;
+  qaid?: string | null;
+  haid?: string | null;
+  title?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  category?: string | null;
   type?: string | null;
   status_name?: string | null;
   order?: number | null;
   xaid?: string | null;
   created_at?: string | null;
   updated_at?: string | null;
-  deleted_at?: string | null;
-  /**
-   * Technical fields
-   */
-  system?: {
-    gin?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    fts?: string | null;
-    data_in?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    data_out?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-  };
+  deleted_at?: number | null;
+  gin?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  fts?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  data_out?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1691,62 +2184,636 @@ export interface Location {
  */
 export interface Relation {
   id: number;
-  uuid: string;
-  source_aid?: string | null;
-  target_aid?: string | null;
+  uuid?: string | null;
+  source_entity: string;
+  target_entity: string;
+  type?: string | null;
   status_name?: string | null;
   order?: number | null;
   xaid?: string | null;
   created_at?: string | null;
   updated_at?: string | null;
-  deleted_at?: string | null;
-  /**
-   * Technical fields
-   */
-  system?: {
-    gin?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    fts?: string | null;
-    data_in?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-    data_out?:
-      | {
-          [k: string]: unknown;
-        }
-      | unknown[]
-      | string
-      | number
-      | boolean
-      | null;
-  };
+  deleted_at?: number | null;
+  gin?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  fts?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  data_out?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "taxonomies".
+ * via the `definition` "roles".
  */
-export interface Taxonomy {
+export interface Role {
   id: number;
-  uuid: string;
-  entity?: string | null;
-  name: string;
-  title?: string | null;
+  uuid?: string | null;
+  raid?: string | null;
+  title?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  description?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  is_system?: boolean | null;
   order?: number | null;
+  xaid?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  deleted_at?: number | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "role_permissions".
+ */
+export interface RolePermission {
+  id: number;
+  role_uuid: string;
+  permission_uuid: string;
+  uuid?: string | null;
+  order?: number | null;
+  xaid?: string | null;
+  created_at?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "segments".
+ */
+export interface Segment {
+  id: number;
+  uuid?: string | null;
+  said?: string | null;
+  title?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  status_name?: string | null;
+  order?: number | null;
+  xaid?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  deleted_at?: number | null;
+  gin?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  fts?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "texts".
+ */
+export interface Text {
+  id: number;
+  uuid?: string | null;
+  taid?: string | null;
+  title?: string | null;
+  type?: string | null;
+  status_name?: string | null;
+  is_public?: boolean | null;
+  order?: number | null;
+  xaid?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  deleted_at?: number | null;
+  gin?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  fts?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  data_out?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "text_variants".
+ */
+export interface TextVariant {
+  id: number;
+  uuid?: string | null;
+  taid?: string | null;
+  full_taid?: string | null;
+  title?: string | null;
+  type?: string | null;
+  status_name?: string | null;
+  version?: string | null;
+  order?: number | null;
+  xaid?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  deleted_at?: number | null;
+  gin?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  fts?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  data_out?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "universities".
+ */
+export interface University {
+  id: number;
+  uuid?: string | null;
+  uaid?: string | null;
+  parent_uaid?: string | null;
+  full_uaid?: string | null;
+  title?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  status_name?: string | null;
+  order?: number | null;
+  xaid?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  deleted_at?: number | null;
+  gin?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  fts?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  data_out?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "user_bans".
+ */
+export interface UserBan {
+  id: number;
+  uuid?: string | null;
+  user_uuid: string;
+  banned_by_aid?: string | null;
+  reason?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  type?: string | null;
+  expires_at?: string | null;
+  revoked_at?: string | null;
+  revoked_by_aid?: string | null;
+  created_at?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "user_sessions".
+ */
+export interface UserSession {
+  id: number;
+  uuid?: string | null;
+  user_uuid: string;
+  token_hash: string;
+  ip_address?: string | null;
+  user_agent?: string | null;
+  last_active_at?: string | null;
+  expires_at?: string | null;
+  xaid?: string | null;
+  created_at?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "user_verifications".
+ */
+export interface UserVerification {
+  id: number;
+  uuid?: string | null;
+  user_uuid: string;
+  type?: string | null;
+  token_hash: string;
+  expires_at?: string | null;
+  verified_at?: string | null;
+  created_at?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "votes".
+ */
+export interface Vote {
+  id: number;
+  uuid?: string | null;
+  vaid?: string | null;
+  full_vaid?: string | null;
+  haid?: string | null;
+  title?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  status_name?: string | null;
+  order?: number | null;
+  xaid?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  deleted_at?: number | null;
+  gin?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  fts?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  data_out?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wallets".
+ */
+export interface Wallet {
+  id: number;
+  uuid?: string | null;
+  waid?: string | null;
+  full_waid?: string | null;
+  target_aid?: string | null;
+  title?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  status_name?: string | null;
+  order?: number | null;
+  xaid?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  deleted_at?: number | null;
+  gin?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  fts?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  data_out?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wallet_transactions".
+ */
+export interface WalletTransaction {
+  id: number;
+  uuid?: string | null;
+  wcaid: string;
+  full_waid?: string | null;
+  target_aid?: string | null;
+  amount: number;
+  status_name?: string | null;
+  order?: number | null;
+  xaid?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  deleted_at?: number | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "yields".
+ */
+export interface Yield {
+  id: number;
+  uuid?: string | null;
+  yaid?: string | null;
+  parent_yaid?: string | null;
+  full_yaid?: string | null;
+  haid?: string | null;
+  title?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  status_name?: string | null;
+  order?: number | null;
+  xaid?: string | null;
+  updated_at?: string | null;
+  created_at?: string | null;
+  deleted_at?: number | null;
+  gin?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  fts?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "zoos".
+ */
+export interface Zoo {
+  id: number;
+  uuid?: string | null;
+  zaid?: string | null;
+  parent_zaid?: string | null;
+  name?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  birthday?: string | null;
+  sex?: string | null;
+  status_name?: string | null;
+  city_name?: string | null;
+  order?: number | null;
+  xaid?: string | null;
+  updated_at?: string | null;
+  created_at?: string | null;
+  deleted_at?: number | null;
+  media_id?: string | null;
+  gin?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  fts?: string | null;
+  data_in?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  data_out?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1924,6 +2991,18 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
+        relationTo: 'settings';
+        value: number | Setting;
+      } | null)
+    | ({
+        relationTo: 'taxonomy';
+        value: number | Taxonomy;
+      } | null)
+    | ({
+        relationTo: 'media';
+        value: number | Media;
+      } | null)
+    | ({
         relationTo: 'pages';
         value: number | Page;
       } | null)
@@ -1932,32 +3011,32 @@ export interface PayloadLockedDocument {
         value: number | Post;
       } | null)
     | ({
-        relationTo: 'media';
-        value: number | Media;
+        relationTo: 'users';
+        value: number | User;
       } | null)
     | ({
-        relationTo: 'categories';
-        value: number | Category;
+        relationTo: 'journals';
+        value: number | Journal;
       } | null)
     | ({
-        relationTo: 'archieve';
-        value: number | Archieve;
+        relationTo: 'assets';
+        value: number | Asset;
       } | null)
     | ({
-        relationTo: 'archieve-variant';
-        value: number | ArchieveVariant;
+        relationTo: 'asset_variants';
+        value: number | AssetVariant;
       } | null)
     | ({
-        relationTo: 'base';
+        relationTo: 'bases';
         value: number | Base;
       } | null)
     | ({
-        relationTo: 'base-move';
+        relationTo: 'base_moves';
         value: number | BaseMove;
       } | null)
     | ({
-        relationTo: 'base-move-rout';
-        value: number | BaseMoveRout;
+        relationTo: 'base_move_routes';
+        value: number | BaseMoveRoute;
       } | null)
     | ({
         relationTo: 'contractors';
@@ -1968,7 +3047,7 @@ export interface PayloadLockedDocument {
         value: number | Deal;
       } | null)
     | ({
-        relationTo: 'deal-products';
+        relationTo: 'deal_products';
         value: number | DealProduct;
       } | null)
     | ({
@@ -1976,8 +3055,20 @@ export interface PayloadLockedDocument {
         value: number | Echelon;
       } | null)
     | ({
-        relationTo: 'echelon-employees';
+        relationTo: 'echelon_employees';
         value: number | EchelonEmployee;
+      } | null)
+    | ({
+        relationTo: 'employee_leaves';
+        value: number | EmployeeLeaf;
+      } | null)
+    | ({
+        relationTo: 'employee_timesheets';
+        value: number | EmployeeTimesheet;
+      } | null)
+    | ({
+        relationTo: 'expanses';
+        value: number | Expanse;
       } | null)
     | ({
         relationTo: 'finances';
@@ -1996,19 +3087,15 @@ export interface PayloadLockedDocument {
         value: number | Identity;
       } | null)
     | ({
-        relationTo: 'journal-activities';
-        value: number | JournalActivity;
-      } | null)
-    | ({
-        relationTo: 'journal-connections';
+        relationTo: 'journal_connections';
         value: number | JournalConnection;
       } | null)
     | ({
-        relationTo: 'journal-generations';
+        relationTo: 'journal_generations';
         value: number | JournalGeneration;
       } | null)
     | ({
-        relationTo: 'journal-systems';
+        relationTo: 'journal_system';
         value: number | JournalSystem;
       } | null)
     | ({
@@ -2020,16 +3107,100 @@ export interface PayloadLockedDocument {
         value: number | Location;
       } | null)
     | ({
+        relationTo: 'messages';
+        value: number | Message;
+      } | null)
+    | ({
+        relationTo: 'message_threads';
+        value: number | MessageThread;
+      } | null)
+    | ({
+        relationTo: 'notices';
+        value: number | Notice;
+      } | null)
+    | ({
+        relationTo: 'outreaches';
+        value: number | Outreach;
+      } | null)
+    | ({
+        relationTo: 'outreach_referrals';
+        value: number | OutreachReferral;
+      } | null)
+    | ({
+        relationTo: 'permissions';
+        value: number | Permission;
+      } | null)
+    | ({
+        relationTo: 'products';
+        value: number | Product;
+      } | null)
+    | ({
+        relationTo: 'product_variants';
+        value: number | ProductVariant;
+      } | null)
+    | ({
+        relationTo: 'qualifications';
+        value: number | Qualification;
+      } | null)
+    | ({
         relationTo: 'relations';
         value: number | Relation;
       } | null)
     | ({
-        relationTo: 'taxonomies';
-        value: number | Taxonomy;
+        relationTo: 'roles';
+        value: number | Role;
       } | null)
     | ({
-        relationTo: 'users';
-        value: number | User;
+        relationTo: 'role_permissions';
+        value: number | RolePermission;
+      } | null)
+    | ({
+        relationTo: 'segments';
+        value: number | Segment;
+      } | null)
+    | ({
+        relationTo: 'texts';
+        value: number | Text;
+      } | null)
+    | ({
+        relationTo: 'text_variants';
+        value: number | TextVariant;
+      } | null)
+    | ({
+        relationTo: 'universities';
+        value: number | University;
+      } | null)
+    | ({
+        relationTo: 'user_bans';
+        value: number | UserBan;
+      } | null)
+    | ({
+        relationTo: 'user_sessions';
+        value: number | UserSession;
+      } | null)
+    | ({
+        relationTo: 'user_verifications';
+        value: number | UserVerification;
+      } | null)
+    | ({
+        relationTo: 'votes';
+        value: number | Vote;
+      } | null)
+    | ({
+        relationTo: 'wallets';
+        value: number | Wallet;
+      } | null)
+    | ({
+        relationTo: 'wallet_transactions';
+        value: number | WalletTransaction;
+      } | null)
+    | ({
+        relationTo: 'yields';
+        value: number | Yield;
+      } | null)
+    | ({
+        relationTo: 'zoos';
+        value: number | Zoo;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -2092,6 +3263,73 @@ export interface PayloadMigration {
   batch?: number | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "settings_select".
+ */
+export interface SettingsSelect<T extends boolean = true> {
+  uuid?: T;
+  attribute?: T;
+  value?: T;
+  type?: T;
+  order?: T;
+  xaid?: T;
+  created_at?: T;
+  updated_at?: T;
+  data_in?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "taxonomy_select".
+ */
+export interface TaxonomySelect<T extends boolean = true> {
+  entity?: T;
+  name?: T;
+  title?: T;
+  sort_order?: T;
+  created_at?: T;
+  updated_at?: T;
+  deleted_at?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media_select".
+ */
+export interface MediaSelect<T extends boolean = true> {
+  uuid?: T;
+  maid?: T;
+  title?: T;
+  alt_text?: T;
+  caption?: T;
+  file_name?: T;
+  file_path?: T;
+  mime_type?: T;
+  size_bytes?: T;
+  is_public?: T;
+  type?: T;
+  uploader_aid?: T;
+  order?: T;
+  xaid?: T;
+  updated_at?: T;
+  created_at?: T;
+  deleted_at?: T;
+  data_in?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -2211,7 +3449,6 @@ export interface ArchiveBlockSelect<T extends boolean = true> {
   introContent?: T;
   populateBy?: T;
   relationTo?: T;
-  categories?: T;
   limit?: T;
   selectedDocs?: T;
   id?: T;
@@ -2237,7 +3474,6 @@ export interface PostsSelect<T extends boolean = true> {
   heroImage?: T;
   content?: T;
   relatedPosts?: T;
-  categories?: T;
   meta?:
     | T
     | {
@@ -2261,127 +3497,62 @@ export interface PostsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media_select".
+ * via the `definition` "users_select".
  */
-export interface MediaSelect<T extends boolean = true> {
-  alt?: T;
-  caption?: T;
+export interface UsersSelect<T extends boolean = true> {
+  uuid?: T;
+  human_aid?: T;
+  role_uuid?: T;
+  password_hash?: T;
+  is_active?: T;
+  last_login_at?: T;
+  email_verified_at?: T;
+  created_at?: T;
+  updated_at?: T;
+  deleted_at?: T;
+  data_in?: T;
   updatedAt?: T;
   createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
-  sizes?:
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
     | T
     | {
-        thumbnail?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        square?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        small?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        medium?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        large?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        xlarge?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-        og?:
-          | T
-          | {
-              url?: T;
-              width?: T;
-              height?: T;
-              mimeType?: T;
-              filesize?: T;
-              filename?: T;
-            };
-      };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "categories_select".
- */
-export interface CategoriesSelect<T extends boolean = true> {
-  title?: T;
-  slug?: T;
-  slugLock?: T;
-  parent?: T;
-  breadcrumbs?:
-    | T
-    | {
-        doc?: T;
-        url?: T;
-        label?: T;
         id?: T;
+        createdAt?: T;
+        expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "journals_select".
+ */
+export interface JournalsSelect<T extends boolean = true> {
+  uuid?: T;
+  user_id?: T;
+  action?: T;
+  details?: T;
+  xaid?: T;
+  created_at?: T;
   updatedAt?: T;
   createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "archieve_select".
+ * via the `definition` "assets_select".
  */
-export interface ArchieveSelect<T extends boolean = true> {
+export interface AssetsSelect<T extends boolean = true> {
   uuid?: T;
   aaid?: T;
+  owner_aid?: T;
   number?: T;
   title?: T;
-  media?: T;
+  url?: T;
   type_name?: T;
   status_name?: T;
   version?: T;
@@ -2390,49 +3561,40 @@ export interface ArchieveSelect<T extends boolean = true> {
   created_at?: T;
   updated_at?: T;
   deleted_at?: T;
-  system?:
-    | T
-    | {
-        gin?: T;
-        fts?: T;
-        data_in?: T;
-        data_out?: T;
-      };
+  gin?: T;
+  fts?: T;
+  data_in?: T;
+  data_out?: T;
   updatedAt?: T;
   createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "archieve-variant_select".
+ * via the `definition` "asset_variants_select".
  */
-export interface ArchieveVariantSelect<T extends boolean = true> {
+export interface AssetVariantsSelect<T extends boolean = true> {
   uuid?: T;
-  aaid?: T;
   full_aaid?: T;
   number?: T;
   title?: T;
-  media?: T;
+  media_id?: T;
   version?: T;
   order?: T;
   xaid?: T;
-  created_at?: T;
   updated_at?: T;
-  system?:
-    | T
-    | {
-        gin?: T;
-        fts?: T;
-        data_in?: T;
-        data_out?: T;
-      };
+  created_at?: T;
+  gin?: T;
+  fts?: T;
+  data_in?: T;
+  data_out?: T;
   updatedAt?: T;
   createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "base_select".
+ * via the `definition` "bases_select".
  */
-export interface BaseSelect<T extends boolean = true> {
+export interface BasesSelect<T extends boolean = true> {
   uuid?: T;
   baid?: T;
   full_baid?: T;
@@ -2444,25 +3606,21 @@ export interface BaseSelect<T extends boolean = true> {
   status_name?: T;
   order?: T;
   xaid?: T;
-  created_at?: T;
   updated_at?: T;
+  created_at?: T;
   deleted_at?: T;
-  system?:
-    | T
-    | {
-        gin?: T;
-        fts?: T;
-        data_in?: T;
-        data_out?: T;
-      };
+  gin?: T;
+  fts?: T;
+  data_in?: T;
+  data_out?: T;
   updatedAt?: T;
   createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "base-move_select".
+ * via the `definition` "base_moves_select".
  */
-export interface BaseMoveSelect<T extends boolean = true> {
+export interface BaseMovesSelect<T extends boolean = true> {
   uuid?: T;
   baid?: T;
   full_baid?: T;
@@ -2475,25 +3633,21 @@ export interface BaseMoveSelect<T extends boolean = true> {
   status_name?: T;
   order?: T;
   xaid?: T;
-  created_at?: T;
   updated_at?: T;
+  created_at?: T;
   deleted_at?: T;
-  system?:
-    | T
-    | {
-        gin?: T;
-        fts?: T;
-        data_in?: T;
-        data_out?: T;
-      };
+  gin?: T;
+  fts?: T;
+  data_in?: T;
+  data_out?: T;
   updatedAt?: T;
   createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "base-move-rout_select".
+ * via the `definition` "base_move_routes_select".
  */
-export interface BaseMoveRoutSelect<T extends boolean = true> {
+export interface BaseMoveRoutesSelect<T extends boolean = true> {
   uuid?: T;
   full_baid?: T;
   index?: T;
@@ -2501,14 +3655,10 @@ export interface BaseMoveRoutSelect<T extends boolean = true> {
   laid_id?: T;
   status_name?: T;
   order?: T;
-  created_at?: T;
   updated_at?: T;
+  created_at?: T;
   deleted_at?: T;
-  system?:
-    | T
-    | {
-        data_in?: T;
-      };
+  data_in?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2527,18 +3677,14 @@ export interface ContractorsSelect<T extends boolean = true> {
   city_name?: T;
   order?: T;
   xaid?: T;
-  created_at?: T;
+  media_id?: T;
   updated_at?: T;
+  created_at?: T;
   deleted_at?: T;
-  media?: T;
-  system?:
-    | T
-    | {
-        gin?: T;
-        fts?: T;
-        data_in?: T;
-        data_out?: T;
-      };
+  gin?: T;
+  fts?: T;
+  data_in?: T;
+  data_out?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2555,23 +3701,19 @@ export interface DealsSelect<T extends boolean = true> {
   cycle?: T;
   status_name?: T;
   xaid?: T;
-  created_at?: T;
   updated_at?: T;
+  created_at?: T;
   deleted_at?: T;
-  system?:
-    | T
-    | {
-        gin?: T;
-        fts?: T;
-        data_in?: T;
-        data_out?: T;
-      };
+  gin?: T;
+  fts?: T;
+  data_in?: T;
+  data_out?: T;
   updatedAt?: T;
   createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "deal-products_select".
+ * via the `definition` "deal_products_select".
  */
 export interface DealProductsSelect<T extends boolean = true> {
   uuid?: T;
@@ -2580,13 +3722,9 @@ export interface DealProductsSelect<T extends boolean = true> {
   quantity?: T;
   status_name?: T;
   order?: T;
-  created_at?: T;
   updated_at?: T;
-  system?:
-    | T
-    | {
-        data_in?: T;
-      };
+  created_at?: T;
+  data_in?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2604,19 +3742,15 @@ export interface EchelonsSelect<T extends boolean = true> {
   status_name?: T;
   order?: T;
   xaid?: T;
-  created_at?: T;
   updated_at?: T;
-  system?:
-    | T
-    | {
-        data_in?: T;
-      };
+  created_at?: T;
+  data_in?: T;
   updatedAt?: T;
   createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "echelon-employees_select".
+ * via the `definition` "echelon_employees_select".
  */
 export interface EchelonEmployeesSelect<T extends boolean = true> {
   uuid?: T;
@@ -2625,20 +3759,69 @@ export interface EchelonEmployeesSelect<T extends boolean = true> {
   haid?: T;
   email?: T;
   status_name?: T;
+  is_public?: T;
   order?: T;
   xaid?: T;
-  created_at?: T;
   updated_at?: T;
+  created_at?: T;
   deleted_at?: T;
-  media?: T;
-  system?:
-    | T
-    | {
-        gin?: T;
-        fts?: T;
-        data_in?: T;
-        data_out?: T;
-      };
+  media_id?: T;
+  gin?: T;
+  fts?: T;
+  data_in?: T;
+  data_out?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "employee_leaves_select".
+ */
+export interface EmployeeLeavesSelect<T extends boolean = true> {
+  uuid?: T;
+  elaid?: T;
+  full_eaid?: T;
+  type?: T;
+  order?: T;
+  xaid?: T;
+  started_at?: T;
+  ended_at?: T;
+  duration?: T;
+  data_in?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "employee_timesheets_select".
+ */
+export interface EmployeeTimesheetsSelect<T extends boolean = true> {
+  uuid?: T;
+  etaid?: T;
+  full_eaid?: T;
+  order?: T;
+  xaid?: T;
+  started_at?: T;
+  ended_at?: T;
+  duration?: T;
+  data_in?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "expanses_select".
+ */
+export interface ExpansesSelect<T extends boolean = true> {
+  uuid?: T;
+  xaid?: T;
+  title?: T;
+  status_name?: T;
+  order?: T;
+  updated_at?: T;
+  created_at?: T;
+  deleted_at?: T;
+  data_in?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2658,17 +3841,13 @@ export interface FinancesSelect<T extends boolean = true> {
   status_name?: T;
   order?: T;
   xaid?: T;
-  created_at?: T;
   updated_at?: T;
+  created_at?: T;
   deleted_at?: T;
-  system?:
-    | T
-    | {
-        gin?: T;
-        fts?: T;
-        data_in?: T;
-        data_out?: T;
-      };
+  gin?: T;
+  fts?: T;
+  data_in?: T;
+  data_out?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2686,18 +3865,15 @@ export interface GoalsSelect<T extends boolean = true> {
   type?: T;
   status_name?: T;
   order?: T;
+  is_public?: T;
   xaid?: T;
-  created_at?: T;
   updated_at?: T;
+  created_at?: T;
   deleted_at?: T;
-  system?:
-    | T
-    | {
-        gin?: T;
-        fts?: T;
-        data_in?: T;
-        data_out?: T;
-      };
+  gin?: T;
+  fts?: T;
+  data_in?: T;
+  data_out?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2711,23 +3887,20 @@ export interface HumansSelect<T extends boolean = true> {
   full_name?: T;
   birthday?: T;
   email?: T;
+  sex?: T;
   status_name?: T;
   type?: T;
   city_name?: T;
   order?: T;
   xaid?: T;
-  created_at?: T;
+  media_id?: T;
   updated_at?: T;
+  created_at?: T;
   deleted_at?: T;
-  media?: T;
-  system?:
-    | T
-    | {
-        gin?: T;
-        fts?: T;
-        data_in?: T;
-        data_out?: T;
-      };
+  gin?: T;
+  fts?: T;
+  data_in?: T;
+  data_out?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2738,59 +3911,41 @@ export interface HumansSelect<T extends boolean = true> {
 export interface IdentitiesSelect<T extends boolean = true> {
   uuid?: T;
   iaid?: T;
-  identity_aid?: T;
   entity_aid?: T;
+  identity_aid?: T;
   permission?: T;
   xaid?: T;
-  created_at?: T;
   updated_at?: T;
-  system?:
-    | T
-    | {
-        data_in?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "journal-activities_select".
- */
-export interface JournalActivitiesSelect<T extends boolean = true> {
-  uuid?: T;
-  user?: T;
-  action?: T;
-  details?: T;
-  xaid?: T;
   created_at?: T;
+  data_in?: T;
   updatedAt?: T;
   createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "journal-connections_select".
+ * via the `definition` "journal_connections_select".
  */
 export interface JournalConnectionsSelect<T extends boolean = true> {
   uuid?: T;
-  source_user?: T;
-  target_user?: T;
+  source_user_id?: T;
+  target_user_id?: T;
   relationship_name?: T;
   status?: T;
   details?: T;
   xaid?: T;
-  created_at?: T;
   updated_at?: T;
+  created_at?: T;
   updatedAt?: T;
   createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "journal-generations_select".
+ * via the `definition` "journal_generations_select".
  */
 export interface JournalGenerationsSelect<T extends boolean = true> {
   uuid?: T;
   full_maid?: T;
-  user?: T;
+  user_id?: T;
   model_name?: T;
   status?: T;
   token_in?: T;
@@ -2804,12 +3959,12 @@ export interface JournalGenerationsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "journal-systems_select".
+ * via the `definition` "journal_system_select".
  */
-export interface JournalSystemsSelect<T extends boolean = true> {
+export interface JournalSystemSelect<T extends boolean = true> {
   uuid?: T;
   entity_aid?: T;
-  user?: T;
+  user_id?: T;
   details?: T;
   xaid?: T;
   created_at?: T;
@@ -2829,13 +3984,10 @@ export interface KeysSelect<T extends boolean = true> {
   is_active?: T;
   order?: T;
   xaid?: T;
-  created_at?: T;
+  permission_id?: T;
   updated_at?: T;
-  system?:
-    | T
-    | {
-        data_in?: T;
-      };
+  created_at?: T;
+  data_in?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2851,19 +4003,213 @@ export interface LocationsSelect<T extends boolean = true> {
   city?: T;
   type?: T;
   status_name?: T;
+  is_public?: T;
+  order?: T;
+  xaid?: T;
+  updated_at?: T;
+  created_at?: T;
+  deleted_at?: T;
+  gin?: T;
+  fts?: T;
+  data_in?: T;
+  data_out?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "messages_select".
+ */
+export interface MessagesSelect<T extends boolean = true> {
+  uuid?: T;
+  maid?: T;
+  full_maid?: T;
+  title?: T;
+  status_name?: T;
+  order?: T;
+  xaid?: T;
+  updated_at?: T;
+  created_at?: T;
+  deleted_at?: T;
+  gin?: T;
+  fts?: T;
+  data_in?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "message_threads_select".
+ */
+export interface MessageThreadsSelect<T extends boolean = true> {
+  uuid?: T;
+  maid?: T;
+  parent_maid?: T;
+  title?: T;
+  status_name?: T;
+  type?: T;
+  order?: T;
+  xaid?: T;
+  updated_at?: T;
+  created_at?: T;
+  deleted_at?: T;
+  gin?: T;
+  data_in?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notices_select".
+ */
+export interface NoticesSelect<T extends boolean = true> {
+  uuid?: T;
+  naid?: T;
+  target_aid?: T;
+  title?: T;
+  is_read?: T;
+  type_name?: T;
+  order?: T;
+  xaid?: T;
+  updated_at?: T;
+  created_at?: T;
+  deleted_at?: T;
+  data_in?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "outreaches_select".
+ */
+export interface OutreachesSelect<T extends boolean = true> {
+  uuid?: T;
+  oaid?: T;
+  said?: T;
+  title?: T;
+  strategy_type?: T;
+  mechanic_type?: T;
+  order?: T;
+  xaid?: T;
+  updated_at?: T;
+  created_at?: T;
+  deleted_at?: T;
+  gin?: T;
+  fts?: T;
+  data_in?: T;
+  data_out?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "outreach_referrals_select".
+ */
+export interface OutreachReferralsSelect<T extends boolean = true> {
+  uuid?: T;
+  oaid?: T;
+  title?: T;
+  depth?: T;
+  order?: T;
+  xaid?: T;
+  updated_at?: T;
+  created_at?: T;
+  deleted_at?: T;
+  gin?: T;
+  fts?: T;
+  data_in?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "permissions_select".
+ */
+export interface PermissionsSelect<T extends boolean = true> {
+  uuid?: T;
+  prm_aid?: T;
+  action_key?: T;
+  title?: T;
+  group_name?: T;
+  description?: T;
+  order?: T;
+  xaid?: T;
+  updated_at?: T;
+  created_at?: T;
+  deleted_at?: T;
+  data_in?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products_select".
+ */
+export interface ProductsSelect<T extends boolean = true> {
+  uuid?: T;
+  paid?: T;
+  title?: T;
+  category?: T;
+  type?: T;
+  status_name?: T;
+  is_public?: T;
   order?: T;
   xaid?: T;
   created_at?: T;
   updated_at?: T;
   deleted_at?: T;
-  system?:
-    | T
-    | {
-        gin?: T;
-        fts?: T;
-        data_in?: T;
-        data_out?: T;
-      };
+  gin?: T;
+  fts?: T;
+  data_in?: T;
+  data_out?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product_variants_select".
+ */
+export interface ProductVariantsSelect<T extends boolean = true> {
+  uuid?: T;
+  pvaid?: T;
+  full_paid?: T;
+  vendor_aid?: T;
+  sku?: T;
+  title?: T;
+  status_name?: T;
+  order?: T;
+  xaid?: T;
+  created_at?: T;
+  updated_at?: T;
+  deleted_at?: T;
+  gin?: T;
+  fts?: T;
+  data_in?: T;
+  data_out?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "qualifications_select".
+ */
+export interface QualificationsSelect<T extends boolean = true> {
+  uuid?: T;
+  qaid?: T;
+  haid?: T;
+  title?: T;
+  category?: T;
+  type?: T;
+  status_name?: T;
+  order?: T;
+  xaid?: T;
+  created_at?: T;
+  updated_at?: T;
+  deleted_at?: T;
+  gin?: T;
+  fts?: T;
+  data_in?: T;
+  data_out?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2873,60 +4219,311 @@ export interface LocationsSelect<T extends boolean = true> {
  */
 export interface RelationsSelect<T extends boolean = true> {
   uuid?: T;
-  source_aid?: T;
-  target_aid?: T;
+  source_entity?: T;
+  target_entity?: T;
+  type?: T;
   status_name?: T;
   order?: T;
   xaid?: T;
   created_at?: T;
   updated_at?: T;
   deleted_at?: T;
-  system?:
-    | T
-    | {
-        gin?: T;
-        fts?: T;
-        data_in?: T;
-        data_out?: T;
-      };
+  gin?: T;
+  fts?: T;
+  data_in?: T;
+  data_out?: T;
   updatedAt?: T;
   createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "taxonomies_select".
+ * via the `definition` "roles_select".
  */
-export interface TaxonomiesSelect<T extends boolean = true> {
+export interface RolesSelect<T extends boolean = true> {
   uuid?: T;
-  entity?: T;
-  name?: T;
+  raid?: T;
   title?: T;
+  description?: T;
+  is_system?: T;
   order?: T;
+  xaid?: T;
+  created_at?: T;
+  updated_at?: T;
+  deleted_at?: T;
+  data_in?: T;
   updatedAt?: T;
   createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users_select".
+ * via the `definition` "role_permissions_select".
  */
-export interface UsersSelect<T extends boolean = true> {
-  name?: T;
+export interface RolePermissionsSelect<T extends boolean = true> {
+  role_uuid?: T;
+  permission_uuid?: T;
+  uuid?: T;
+  order?: T;
+  xaid?: T;
+  created_at?: T;
   updatedAt?: T;
   createdAt?: T;
-  email?: T;
-  resetPasswordToken?: T;
-  resetPasswordExpiration?: T;
-  salt?: T;
-  hash?: T;
-  loginAttempts?: T;
-  lockUntil?: T;
-  sessions?:
-    | T
-    | {
-        id?: T;
-        createdAt?: T;
-        expiresAt?: T;
-      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "segments_select".
+ */
+export interface SegmentsSelect<T extends boolean = true> {
+  uuid?: T;
+  said?: T;
+  title?: T;
+  status_name?: T;
+  order?: T;
+  xaid?: T;
+  created_at?: T;
+  updated_at?: T;
+  deleted_at?: T;
+  gin?: T;
+  fts?: T;
+  data_in?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "texts_select".
+ */
+export interface TextsSelect<T extends boolean = true> {
+  uuid?: T;
+  taid?: T;
+  title?: T;
+  type?: T;
+  status_name?: T;
+  is_public?: T;
+  order?: T;
+  xaid?: T;
+  created_at?: T;
+  updated_at?: T;
+  deleted_at?: T;
+  gin?: T;
+  fts?: T;
+  data_in?: T;
+  data_out?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "text_variants_select".
+ */
+export interface TextVariantsSelect<T extends boolean = true> {
+  uuid?: T;
+  taid?: T;
+  full_taid?: T;
+  title?: T;
+  type?: T;
+  status_name?: T;
+  version?: T;
+  order?: T;
+  xaid?: T;
+  created_at?: T;
+  updated_at?: T;
+  deleted_at?: T;
+  gin?: T;
+  fts?: T;
+  data_in?: T;
+  data_out?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "universities_select".
+ */
+export interface UniversitiesSelect<T extends boolean = true> {
+  uuid?: T;
+  uaid?: T;
+  parent_uaid?: T;
+  full_uaid?: T;
+  title?: T;
+  status_name?: T;
+  order?: T;
+  xaid?: T;
+  created_at?: T;
+  updated_at?: T;
+  deleted_at?: T;
+  gin?: T;
+  fts?: T;
+  data_in?: T;
+  data_out?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "user_bans_select".
+ */
+export interface UserBansSelect<T extends boolean = true> {
+  uuid?: T;
+  user_uuid?: T;
+  banned_by_aid?: T;
+  reason?: T;
+  type?: T;
+  expires_at?: T;
+  revoked_at?: T;
+  revoked_by_aid?: T;
+  created_at?: T;
+  data_in?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "user_sessions_select".
+ */
+export interface UserSessionsSelect<T extends boolean = true> {
+  uuid?: T;
+  user_uuid?: T;
+  token_hash?: T;
+  ip_address?: T;
+  user_agent?: T;
+  last_active_at?: T;
+  expires_at?: T;
+  xaid?: T;
+  created_at?: T;
+  data_in?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "user_verifications_select".
+ */
+export interface UserVerificationsSelect<T extends boolean = true> {
+  uuid?: T;
+  user_uuid?: T;
+  type?: T;
+  token_hash?: T;
+  expires_at?: T;
+  verified_at?: T;
+  created_at?: T;
+  data_in?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "votes_select".
+ */
+export interface VotesSelect<T extends boolean = true> {
+  uuid?: T;
+  vaid?: T;
+  full_vaid?: T;
+  haid?: T;
+  title?: T;
+  status_name?: T;
+  order?: T;
+  xaid?: T;
+  created_at?: T;
+  updated_at?: T;
+  deleted_at?: T;
+  gin?: T;
+  fts?: T;
+  data_in?: T;
+  data_out?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wallets_select".
+ */
+export interface WalletsSelect<T extends boolean = true> {
+  uuid?: T;
+  waid?: T;
+  full_waid?: T;
+  target_aid?: T;
+  title?: T;
+  status_name?: T;
+  order?: T;
+  xaid?: T;
+  created_at?: T;
+  updated_at?: T;
+  deleted_at?: T;
+  gin?: T;
+  fts?: T;
+  data_in?: T;
+  data_out?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wallet_transactions_select".
+ */
+export interface WalletTransactionsSelect<T extends boolean = true> {
+  uuid?: T;
+  wcaid?: T;
+  full_waid?: T;
+  target_aid?: T;
+  amount?: T;
+  status_name?: T;
+  order?: T;
+  xaid?: T;
+  created_at?: T;
+  updated_at?: T;
+  deleted_at?: T;
+  data_in?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "yields_select".
+ */
+export interface YieldsSelect<T extends boolean = true> {
+  uuid?: T;
+  yaid?: T;
+  parent_yaid?: T;
+  full_yaid?: T;
+  haid?: T;
+  title?: T;
+  status_name?: T;
+  order?: T;
+  xaid?: T;
+  updated_at?: T;
+  created_at?: T;
+  deleted_at?: T;
+  gin?: T;
+  fts?: T;
+  data_in?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "zoos_select".
+ */
+export interface ZoosSelect<T extends boolean = true> {
+  uuid?: T;
+  zaid?: T;
+  parent_zaid?: T;
+  name?: T;
+  birthday?: T;
+  sex?: T;
+  status_name?: T;
+  city_name?: T;
+  order?: T;
+  xaid?: T;
+  updated_at?: T;
+  created_at?: T;
+  deleted_at?: T;
+  media_id?: T;
+  gin?: T;
+  fts?: T;
+  data_in?: T;
+  data_out?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

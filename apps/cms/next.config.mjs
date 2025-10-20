@@ -10,6 +10,16 @@ const nextConfig = {
   experimental: {
     externalDir: true,
   },
+  
+  webpack: (config, { isServer }) => {
+    // Exclude bun:sqlite from webpack bundling
+    config.externals = config.externals || [];
+    config.externals.push({
+      'bun:sqlite': 'bun:sqlite',
+    });
+    
+    return config;
+  },
 };
 
 export default withNextIntl(nextConfig)

@@ -13,6 +13,53 @@ import { User } from './collections/User'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
+import { Journal } from './collections/Journal'
+import { Asset } from './collections/Asset'
+import { AssetVariant } from './collections/AssetVariant'
+import { Base } from './collections/Base'
+import { BaseMove } from './collections/BaseMove'
+import { BaseMoveRout } from './collections/BaseMoveRout'
+import { Contractor } from './collections/Contractor'
+import { Deal } from './collections/Deal'
+import { DealProduct } from './collections/DealProduct'
+import { Echelon } from './collections/Echelon'
+import { EchelonEmployee } from './collections/EchelonEmployee'
+import { EmployeeLeave } from './collections/EmployeeLeave'
+import { EmployeeTimesheet } from './collections/EmployeeTimesheet'
+import { Expanse } from './collections/Expanse'
+import { Finance } from './collections/Finance'
+import { Goal } from './collections/Goal'
+import { Human } from './collections/Human'
+import { Identity } from './collections/Identity'
+import { JournalConnection } from './collections/JournalConnection'
+import { JournalGeneration } from './collections/JournalGeneration'
+import { JournalSystem } from './collections/JournalSystem'
+import { Key } from './collections/Key'
+import { Location } from './collections/Location'
+import { Message } from './collections/Message'
+import { MessageThread } from './collections/MessageThread'
+import { Notice } from './collections/Notice'
+import { Outreach } from './collections/Outreach'
+import { OutreachReferral } from './collections/OutreachReferral'
+import { Permission } from './collections/Permission'
+import { Product } from './collections/Product'
+import { ProductVariant } from './collections/ProductVariant'
+import { Qualification } from './collections/Qualification'
+import { Relation } from './collections/Relation'
+import { Role } from './collections/Role'
+import { RolePermission } from './collections/RolePermission'
+import { Segment } from './collections/Segment'
+import { Text } from './collections/Text'
+import { TextVariant } from './collections/TextVariant'
+import { University } from './collections/University'
+import { UserBan } from './collections/UserBan'
+import { UserSession } from './collections/UserSession'
+import { UserVerification } from './collections/UserVerification'
+import { Vote } from './collections/Vote'
+import { Wallet } from './collections/Wallet'
+import { WalletTransaction } from './collections/WalletTransaction'
+import { Yield } from './collections/Yield'
+import { Zoo } from './collections/Zoo'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
 import { plugins } from './plugins'
@@ -79,6 +126,53 @@ export default buildConfig({
     Pages,
     Posts,
     User,
+    Journal,
+    Asset,
+    AssetVariant,
+    Base,
+    BaseMove,
+    BaseMoveRout,
+    Contractor,
+    Deal,
+    DealProduct,
+    Echelon,
+    EchelonEmployee,
+    EmployeeLeave,
+    EmployeeTimesheet,
+    Expanse,
+    Finance,
+    Goal,
+    Human,
+    Identity,
+    JournalConnection,
+    JournalGeneration,
+    JournalSystem,
+    Key,
+    Location,
+    Message,
+    MessageThread,
+    Notice,
+    Outreach,
+    OutreachReferral,
+    Permission,
+    Product,
+    ProductVariant,
+    Qualification,
+    Relation,
+    Role,
+    RolePermission,
+    Segment,
+    Text,
+    TextVariant,
+    University,
+    UserBan,
+    UserSession,
+    UserVerification,
+    Vote,
+    Wallet,
+    WalletTransaction,
+    Yield,
+    Zoo,
   ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],

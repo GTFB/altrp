@@ -5,7 +5,8 @@ import { setCreatedAt, setUpdatedAt } from '../hooks/timestamps'
 export const Contractor: CollectionConfig = {
   slug: 'contractors',
   labels: { singular: 'Contractor', plural: 'Contractors' },
-  admin: { useAsTitle: 'title' },
+  admin: { useAsTitle: 'title' ,
+    hidden: true, },
   fields: [
     { 
       name: 'uuid', 

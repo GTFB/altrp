@@ -5,8 +5,9 @@ import { setCreatedAt, setUpdatedAt } from '../hooks/timestamps'
 export const ProductVariant: CollectionConfig = {
   slug: 'product_variants',
   labels: { singular: 'Product Variant', plural: 'Product Variants' },
-  admin: { useAsTitle: 'sku' },
-  fields: [
+  admin: { useAsTitle: 'sku'  ,
+    hidden: true, },
+  fields: [ 
     { 
       name: 'uuid', 
       type: 'text', 

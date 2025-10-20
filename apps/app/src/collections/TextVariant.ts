@@ -5,7 +5,8 @@ import { setCreatedAt, setUpdatedAt } from '../hooks/timestamps'
 export const TextVariant: CollectionConfig = {
   slug: 'text_variants',
   labels: { singular: 'Text Variant', plural: 'Text Variants' },
-  admin: { useAsTitle: 'title' },
+  admin: { useAsTitle: 'title'  ,
+    hidden: true, },
   fields: [
     { 
       name: 'uuid', 
