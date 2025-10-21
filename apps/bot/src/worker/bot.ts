@@ -249,16 +249,6 @@ export class TelegramBotWorker {
       return;
     }
 
-    // Check if user is waiting for VK link (legacy logic)
-    // if (message.text) {
-    //   const userData = user?.data ? JSON.parse(user.data) : {};
-    //   if (userData.waitingForVK) {
-    //     // User in VK link waiting state - process as VK link
-    //     await this.handleVKLink(message.from.id, message.text);
-    //     return;
-    //   }
-    // }
-
     // Process all message types (considering forwarding settings)
     await this.handleAllMessages(message);
   }
@@ -356,7 +346,6 @@ export class TelegramBotWorker {
       console.error(`❌ Command handler "${handlerName}" not found`);
     }
   }
-
 
 
   // Method to check delayed messages (triggered by cron)
@@ -484,71 +473,5 @@ All the opportunities are waiting for you on our website! Jump in, explore, and 
       console.log(`📪 Message forwarding disabled for user ${userId} - not forwarding to topic`);
     }
   }
-
-
-//   private async handleVKLink(userId: number, vkLink: string): Promise<void> {
-//     try {
-//       // Normalize VK link
-//       let normalizedLink = vkLink.trim();
-//       if (normalizedLink.startsWith('@')) {
-//         normalizedLink = `https://vk.com/${normalizedLink.substring(1)}`;
-//       } else if (!normalizedLink.startsWith('http')) {
-//         normalizedLink = `https://vk.com/${normalizedLink}`;
-//       }
-
-//       // Save VK link and reset waiting state
-//       const user = await this.d1Storage.getUser(userId);
-//       const userData = user?.data ? JSON.parse(user.data) : {};
-//       userData.vk = normalizedLink;
-//       delete userData.waitingForVK;
-//       await this.d1Storage.updateUserData(userId, JSON.stringify(userData));
-      
-//       console.log(`VK link saved for user ${userId}: ${normalizedLink}`);
-
-//       // Send a checking message
-//       const dbUserId = await this.getDbUserId(userId);
-//       if (dbUserId) {
-//         await this.messageService.sendMessage(userId, "Whoosh! 🔍 Checking...", dbUserId);
-//       }
-
-//       // Use previously fetched user data for topic
-//       if (user && user.topicId) {
-//         const currentDateTime = new Date().toLocaleString('en-US', {
-//           timeZone: 'Europe/Moscow',
-//           year: 'numeric',
-//           month: '2-digit',
-//           day: '2-digit',
-//           hour: '2-digit',
-//           minute: '2-digit',
-//           second: '2-digit'
-//         });
-
-//         const topicMessage = `The user requests to check subscriptions in groups
-
-// ID: ${userId}
-// Username: @${user.username || 'not specified'}
-// Name: ${user.firstName || ''} ${user.lastName || ''}`.trim() + `
-// VK: ${normalizedLink}
-
-// Date and time: ${currentDateTime}`;
-
-//         const adminChatId = parseInt(this.env.ADMIN_CHAT_ID);
-//         await this.messageService.sendMessageToTopic(adminChatId, user.topicId, topicMessage);
-        
-//         console.log(`Check subscription request sent to topic ${user.topicId} for user ${userId}`);
-//       }
-
-//     } catch (error) {
-//       console.error(`Error handling VK link for user ${userId}:`, error);
-//     }
-//   }
-
-
-  // Legacy handleCallbackData removed - all callbacks are now handled via FlowEngine
-
-  // Legacy handleStartFlowCallback removed - FlowEngine is used now
-
-  // Legacy handleCheckSubscriptionCallback removed - FlowEngine is used now
-
 
 }

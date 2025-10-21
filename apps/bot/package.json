@@ -31,7 +31,7 @@
     "postgresql",
     "redis"
   ],
-  "author": "Maikloriss",
+  "author": "Altrp",
   "license": "MIT",
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20231218.0",

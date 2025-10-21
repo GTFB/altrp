@@ -1,11 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 
-// Путь к папке с флоу
+// The path to the flow folder
 const flowsDir = path.join(__dirname, '../src/config/flows');
 const indexPath = path.join(flowsDir, 'index.ts');
 
-// Получаем все .ts файлы в папке flows (кроме index.ts)
+// We get everything .ts files in the flows folder (except index.ts)
 const files = fs.readdirSync(flowsDir)
   .filter(file => file.endsWith('.ts') && file !== 'index.ts')
   .map(file => file.replace('.ts', ''))
@@ -13,7 +13,7 @@ const files = fs.readdirSync(flowsDir)
 
 console.log('🔍 Found flow files:', files);
 
-// Генерируем содержимое index.ts
+// Generating the content index.ts
 const generateIndexContent = (flowFiles) => {
   const imports = flowFiles.map(fileName => {
     const flowName = fileName.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
@@ -34,24 +34,24 @@ const generateIndexContent = (flowFiles) => {
 
   return `import type { BotFlow } from '../../core/flow-types';
 
-// Автоматически сгенерированный файл - НЕ РЕДАКТИРОВАТЬ ВРУЧНУЮ!
-// Для регенерации запустите: npm run generate-flows-index
+// Automatically generated file - DO NOT EDIT IT MANUALLY!
+// To regenerate, run: npm run generate-flows-index
 
 ${imports}
 
-// Объект со всеми флоу для совместимости с flow-engine.ts
+// An object with all the flows for compatibility with flow-engine.ts
 export const flows: Record<string, BotFlow> = {
 ${flowsObject}
 };
 
-// Экспорт отдельных флоу для удобства
+// Export individual flows for convenience
 export {
   ${exports}
 };
 `;
 };
 
-// Генерируем и записываем файл
+// Generating and writing a file
 const content = generateIndexContent(files);
 fs.writeFileSync(indexPath, content, 'utf8');
 
