@@ -39,7 +39,6 @@
     "dist",
     "dist-nodejs",
     "src/worker/**/*",
-    "src/worker.ts",
     "src/core/generate-content.ts",
     "wrangler.toml",
     "**/*.test.ts",

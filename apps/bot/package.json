@@ -2,7 +2,7 @@
   "name": "telegram-bot",
   "version": "1.0.0",
   "description": "Altrp telegram bot",
-  "main": "src/worker.ts",
+  "main": "src/worker/worker.ts",
   "scripts": {
     "build:worker": "tsc -p tsconfig.worker.json",
     "build:nodejs": "tsc -p tsconfig.nodejs.json",

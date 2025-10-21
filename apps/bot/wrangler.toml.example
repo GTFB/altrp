@@ -1,5 +1,5 @@
 name = "YOUR_WORKER_NAME"
-main = "src/worker.ts"
+main = "src/worker/worker.ts"
 compatibility_date = "2024-01-01"
 workers_dev = true
 account_id = "YOUR_ACCOUNT_ID_HERE"

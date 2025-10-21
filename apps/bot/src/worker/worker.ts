@@ -1,5 +1,5 @@
-import { TelegramBotWorker } from './worker/bot';
-import { KVStorageService } from './worker/kv-storage-service';
+import { TelegramBotWorker } from './bot';
+import { KVStorageService } from './kv-storage-service';
 import type { KVNamespace, D1Database, R2Bucket, ExecutionContext } from '@cloudflare/workers-types';
 
 export interface Env {

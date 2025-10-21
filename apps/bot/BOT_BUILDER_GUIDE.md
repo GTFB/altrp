@@ -444,7 +444,7 @@ handleFileUpload: async (telegramId, contextManager) => {
 
 ```toml
 name = "my-bot"
-main = "src/worker.ts"
+main = "src/worker/worker.ts"
 compatibility_date = "2024-01-01"
 
 # D1 Database
