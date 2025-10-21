@@ -1,5 +1,5 @@
 // handlers.ts
-import { BotInterface } from './bot-interface';
+import { BotInterface } from '../core/bot-interface';
 import { UserContextManager } from '../core/user-context';
 import { normalizeVKLink } from '../core/helpers';
 
@@ -1141,7 +1141,7 @@ Return, make sure you're subscribed to both, and press the "✨ Done! Check!" bu
           [companyId]
         );
 
-        const buttons = servicesResult.results.map(service => ({
+        const buttons = servicesResult.results.map((service: any) => ({
           text: service.name,
           value: service.id
         }));
