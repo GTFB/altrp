@@ -28,9 +28,9 @@
     "types": ["node"]
   },
   "include": [
-    "src/config/bot-interface.ts",
+    "src/core/bot-interface.ts",
     "src/config/handlers.ts",
-    "../../packages/content/mdxs/bot/**/*",
+    "../../../packages/content/mdxs/bot/**/*",
     "src/nodejs/**/*",
     "src/core/generate-content-nodejs.ts"
   ],
