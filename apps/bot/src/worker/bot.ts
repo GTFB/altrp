@@ -1,5 +1,5 @@
 // bot.ts (updated, without customHandlers inside constructor)
-import type { Env } from '../worker';
+import type { Env } from './worker';
 import { KVStorageService } from './kv-storage-service';
 import { D1StorageService } from './d1-storage-service';
 import { MessageService } from '../core/message-service';
