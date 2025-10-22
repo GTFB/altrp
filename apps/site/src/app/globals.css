@@ -187,3 +187,57 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  .font-heading {
+    font-family: var(--font-inter-tight), "Playfair Display", ui-serif, serif, Georgia !important;
+  }
+  button:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  button:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  button:active {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  [role="button"]:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  [role="button"]:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  [role="button"]:active {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  a:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  a:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  a:active {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  *:focus-visible {
+    outline: none !important;
+  }
+  *:focus {
+    outline: none !important;
+  }
+}
