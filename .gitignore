@@ -138,7 +138,6 @@ temp/
 
 # Cloudflare Wrangler
 .wrangler/
-apps/site/wrangler.toml
 
 # Build outputs
 build/

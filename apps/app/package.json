@@ -25,7 +25,8 @@
     "db:push": "payload migrate",
     "db:push:d1": "payload migrate --config=payload.d1.config.ts",
     "db:generate:package": "payload migrate:create",
-    "db:reset": "rm -f ../../data/app.database.sqlite && bun run db:push"
+    "db:reset": "rm -f ../../data/app.database.sqlite && bun run db:push",
+    "deploy": "wrangler deploy"
   },
   "dependencies": {
     "@payloadcms/admin-bar": "3.58.0",
