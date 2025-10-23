@@ -73,7 +73,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru" suppressHydrationWarning>
+    <html lang="ru" suppressHydrationWarning className={PROJECT_SETTINGS.defaultTheme === 'light' ? 'light' : 'dark'}>
       <head>
         <link rel="preload" href="/images/tanya.png" as="image" type="image/png" />
         <link rel="preload" href="/images/element.svg" as="image" type="image/svg+xml" />
@@ -92,9 +92,7 @@ export default function RootLayout({
         <AccessibilityEnhancer />
         <PerformanceMonitor />
         <ThemeProvider attribute="class" defaultTheme={PROJECT_SETTINGS.defaultTheme} enableSystem={false}>
-          <PageTransition>
             {children}
-          </PageTransition>
         </ThemeProvider>
       </body>
     </html>

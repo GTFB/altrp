@@ -1,6 +1,9 @@
+/// <reference types="@cloudflare/workers-types" />
+
 export interface Env {
   TELEGRAM_BOT_TOKEN: string
   TELEGRAM_CHAT_ID: string
+  DB: D1Database // D1 Database binding
 }
 
 type RequestBody = {
@@ -52,6 +55,18 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
         status: 400,
         headers: { "content-type": "application/json" },
       })
+    }
+
+    // Save to D1 Database
+    try {
+      await env.DB.prepare(
+        `INSERT INTO requests (name, email, project_type, description) VALUES (?, ?, ?, ?)`
+      )
+        .bind(name, email, projectType || null, description || null)
+        .run()
+    } catch (dbError) {
+      console.error("Database error:", dbError)
+      // Continue even if DB save fails
     }
 
     const message = [

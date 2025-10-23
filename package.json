@@ -10,7 +10,7 @@
   },
   "scripts": {
     "dev:site": "bun run --filter=altrp-site dev",
-    "dev:wrangler:site": "bun run --filter=altrp-site dev:wrangler",
+    "dev:wrangler:site": "bun run --filter=altrp-site dev:all",
     "build:site": "bun run --filter=altrp-site build:static",
     "start:site": "bun run --filter=altrp-site start",
     "dev:cms": "bun run --filter=altrp-cms dev",
@@ -27,7 +27,13 @@
     "db:cms:push": "bun run --filter=altrp-cms db:push",
     "db:cms:reset": "bun run --filter=altrp-cms db:reset",
     "db:app:push": "bun run --filter=altrp-app db:push",
+    "db:app:d1:push": "bun run --filter=altrp-app db:push:d1",
+    "db:app:generate:package": "bun run --filter=altrp-app db:generate:package",
     "db:app:reset": "bun run --filter=altrp-app db:reset",
+    "db:export:app": "bun scripts/export-sqlite-schema.js data/app.database.sqlite migrations/site/app-schema.sql",
+    "db:export:cms": "bun scripts/export-sqlite-schema.js data/cms.database.sqlite migrations/site/cms-schema.sql",
+    "db:site:d1:migrate:local": "bun run --filter=altrp-site d1:migrate:local",
+    "db:site:d1:migrate:remote": "bun run --filter=altrp-site d1:migrate:remote",
     "cms:up": "node scripts/cms-sqlite-up.js",
     "dev:kill": "taskkill /F /IM node.exe",
     "prepare": "husky"

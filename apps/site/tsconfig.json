@@ -34,6 +34,10 @@
       "@/lib/*": [
         "./lib/*",
         "../../packages/lib/*"
+      ],
+      "@/repositories/*": [
+        "./repositories/*",
+        "../../packages/repositories/*"
       ]
     }
   },

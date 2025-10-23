@@ -47,7 +47,7 @@ const Hero01 = () => {
         body: JSON.stringify(body),
       });
       if (!resp.ok) {
-        const details = await resp.json().catch(() => ({}));
+        const details = await resp.json().catch(() => ({})) as { error?: string };
         throw new Error(details?.error || "Failed to send request");
       }
       form.reset();

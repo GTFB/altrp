@@ -7,12 +7,20 @@
   },
   "scripts": {
     "dev": "next dev -p 3100",
-    "dev:wrangler": "wrangler pages dev dist --port 3300",
+    "dev:wrangler": "wrangler pages dev --port 3300",
+    "dev:all": "cross-env NEXT_PORT=3100 WRANGLER_PORT=3300 node scripts/dev-server.mjs",
     "build": "next build --experimental-build-mode compile",
     "build:static": "cross-env STATIC_EXPORT=true next build",
     "start": "next start -p 3100",
-    "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "d1:create": "wrangler d1 create altrp-site-db",
+    "d1:migrate:local": "wrangler d1 execute altrp-site-db --local --file=../../migrations/site/app-schema.sql",
+    "d1:migrate:remote": "wrangler d1 execute altrp-site-db --remote --file=../../migrations/site/app-schema.sql",
+    "d1:migrate:users:local": "wrangler d1 execute altrp-site-db --local --file=../../migrations/site/users-table.sql",
+    "d1:migrate:users:remote": "wrangler d1 execute altrp-site-db --remote --file=../../migrations/site/users-table.sql",
+    "d1:query:local": "wrangler d1 execute altrp-site-db --local",
+    "d1:query:remote": "wrangler d1 execute altrp-site-db --remote",
+    "hash-password": "node scripts/hash-password.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -73,6 +81,7 @@
     "zod": "^4.1.11"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241127.0",
     "@types/node": "^20.14.11",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -80,6 +89,7 @@
     "cssnano": "^7.0.6",
     "eslint": "^8.0.0",
     "eslint-config-next": "^15.0.0",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "wrangler": "4"
   }
 }
