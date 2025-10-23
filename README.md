@@ -93,13 +93,13 @@ This is a **monorepo** with 4 main applications:
 altrp/
 ├── apps/
 │   ├── site/             # Static website (port 3100)
-│   ├── cms/              # Admin panel (port 3101)
-│   ├── bot/              # AI bots (port 3102)
-│   └── app/              # Payload CMS (port 3103)
+│   ├── cms/              # MDX or SQLlite Admin panel (port 3200)
+│   ├── bot/              # AI bots (port 3300)
+│   └── app/              # Payload CMS (port 3000)
 ├── packages/
 │   ├── components/       # Shared UI components
 │   ├── lib/              # Shared utilities
-│   └── types/            # Shared TypeScript types
+│   └── content/          # Shared content (MDX, locales)
 └── settings.ts           # Global configuration
 ```
 
@@ -145,7 +145,7 @@ git push -u origin main
 2. Go to **Pages** → **Create a project**
 3. Connect GitHub and select `<YOUR_PROJECT>`
 4. Configure build settings:
-   - **Build command**: `bun run build`
+   - **Build command**: `bun run build:static`
    - **Build output**: `dist`
    - **Root directory**: `apps/site`
    - **Build comments**: `Enabled`
