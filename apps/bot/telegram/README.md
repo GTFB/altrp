@@ -1,66 +1,66 @@
-# 🤖 Конструктор Telegram Ботов
+# 🤖 Telegram Bot Builder
 
-**Мощный конструктор для создания Telegram ботов с модульной архитектурой на Cloudflare Workers.**
+**A powerful builder for creating Telegram bots with modular architecture on Cloudflare Workers.**
 
-Это не просто бот, а полноценный **конструктор ботов** - инструмент, который позволяет сборщикам ботов легко создавать, настраивать и развертывать собственных ботов без глубоких знаний программирования.
+This is not just a bot, but a full-featured **bot builder** - a tool that allows bot builders to easily create, configure, and deploy their own bots without deep programming knowledge.
 
-## 🎯 Что это такое?
+## 🎯 What is this?
 
-**Конструктор ботов** - это платформа, которая предоставляет:
+**Bot Builder** is a platform that provides:
 
-- **Готовую архитектуру** для создания ботов
-- **Модульную систему** флоу (диалогов)
-- **Автоматическую генерацию** кода
-- **Готовые компоненты** (команды, хэндлеры, хранилища)
-- **Простое развертывание** в Cloudflare
+- **Ready-made architecture** for creating bots
+- **Modular flow system** (dialogs)
+- **Automatic code generation**
+- **Ready-made components** (commands, handlers, storage)
+- **Simple deployment** to Cloudflare
 
-## 🏗️ Архитектура конструктора
+## 🏗️ Builder Architecture
 
-### 📁 Структура проекта
+### 📁 Project Structure
 
 ```
 /apps/bot
 ├── /src
-│   ├── /core                         # Ядро системы
-│   │   ├── flow-engine.ts            # Движок флоу
-│   │   ├── message-service.ts        # Сервис сообщений
-│   │   ├── user-context.ts           # Контекст пользователей
-│   │   └── i18n.ts                   # Интернационализация
+│   ├── /core                         # System core
+│   │   ├── flow-engine.ts            # Flow engine
+│   │   ├── message-service.ts        # Message service
+│   │   ├── user-context.ts           # User context
+│   │   └── i18n.ts                   # Internationalization
 │   │
-│   ├── /config                       # Конфигурация (настраивается сборщиком)
-│   │   ├── /flows                    # Флоу бота (автогенерация)
-│   │   │   ├── index.ts              # Автоматически генерируется
+│   ├── /config                       # Configuration (configured by builder)
+│   │   ├── /flows                    # Bot flows (auto-generated)
+│   │   │   ├── index.ts              # Automatically generated
 │   │   │   ├── start_registration.ts
 │   │   │   ├── onboarding.ts
-│   │   │   └── ...                   # Другие флоу
-│   │   ├── commands.ts               # Команды бота
-│   │   ├── callbacks.ts              # Callback кнопки
-│   │   └── handlers.ts               # Хэндлеры логики
+│   │   │   └── ...                   # Other flows
+│   │   ├── commands.ts               # Bot commands
+│   │   ├── callbacks.ts              # Callback buttons
+│   │   └── handlers.ts               # Logic handlers
 │   │
-│   ├── /worker                       # Слой работы с внешними сервисами
-│   │   ├── bot.ts                    # Основной контроллер
+│   ├── /worker                       # External services layer
+│   │   ├── bot.ts                    # Main controller
 │   │   ├── d1-storage-service.ts
 │   │   └── kv-storage-service.ts
 │   │
-│   └── /scripts                      # Инструменты сборщика
-│       └── generate-flows-index.js   # Автогенерация флоу
+│   └── /scripts                      # Builder tools
+│       └── generate-flows-index.js   # Flow auto-generation
 │
-├── wrangler.toml                     # Конфигурация Cloudflare
-├── DEPLOYMENT.md                     # Инструкция по развертыванию
-└── README.md                         # Этот файл
+├── wrangler.toml                     # Cloudflare configuration
+├── DEPLOYMENT.md                     # Deployment instructions
+└── README.md                         # This file
 ```
 
-## 🎨 Как работает конструктор
+## 🎨 How the builder works
 
-### 1. **Модульная система флоу**
+### 1. **Modular flow system**
 
-Сборщик создает флоу в отдельных файлах:
+The builder creates flows in separate files:
 
 ```typescript
 // apps/bot/src/config/flows/onboarding.ts
 export const onboardingFlow: BotFlow = {
   name: 'onboarding',
-  description: 'Процесс регистрации',
+  description: 'Registration process',
   steps: [
     {
       type: 'message',
@@ -74,27 +74,27 @@ export const onboardingFlow: BotFlow = {
       prompt: 'enter_name',
       saveToVariable: 'user.name'
     }
-    // ... другие шаги
+    // ... other steps
   ]
 };
 ```
 
-### 2. **Автоматическая генерация**
+### 2. **Automatic generation**
 
-Конструктор автоматически:
-- **Находит все флоу** в папке `flows/`
-- **Генерирует `index.ts`** с импортами
-- **Подключает флоу** к движку
-- **Обновляет конфигурацию** при добавлении новых флоу
+The builder automatically:
+- **Finds all flows** in the `flows/` folder
+- **Generates `index.ts`** with imports
+- **Connects flows** to the engine
+- **Updates configuration** when adding new flows
 
 ```bash
 npm run generate-flows-index
-# ✅ Автоматически находит и подключает все флоу
+# ✅ Automatically finds and connects all flows
 ```
 
-### 3. **Готовые компоненты**
+### 3. **Ready-made components**
 
-#### Команды бота (`commands.ts`)
+#### Bot commands (`commands.ts`)
 ```typescript
 export const commands = [
   { name: "/start", handlerName: "handleStartCommand" },
@@ -103,67 +103,67 @@ export const commands = [
 ];
 ```
 
-#### Callback кнопки (`callbacks.ts`)
+#### Callback buttons (`callbacks.ts`)
 ```typescript
 export const keyboards = {
   main_menu: {
     inline_keyboard: [[
-      { text: "📄 Создать счет", callback_data: "create_invoice" },
-      { text: "📊 Отчеты", callback_data: "reports" }
+      { text: "📄 Create Invoice", callback_data: "create_invoice" },
+      { text: "📊 Reports", callback_data: "reports" }
     ]]
   }
 };
 ```
 
-#### Хэндлеры логики (`handlers.ts`)
+#### Logic handlers (`handlers.ts`)
 ```typescript
 export const createCustomHandlers = (worker: BotInterface) => ({
   handleStartCommand: async (message, bot) => {
-    // Логика команды /start
+    // /start command logic
   },
   createInvoice: async (telegramId, contextManager) => {
-    // Логика создания счета
+    // Invoice creation logic
   }
 });
 ```
 
-## 🚀 Возможности для сборщика
+## 🚀 Features for builders
 
-### ✅ **Простое добавление флоу**
-1. Создать файл `new_flow.ts` в папке `flows/`
-2. Запустить `npm run generate-flows-index`
-3. Флоу автоматически подключится!
+### ✅ **Easy flow addition**
+1. Create `new_flow.ts` file in `flows/` folder
+2. Run `npm run generate-flows-index`
+3. Flow automatically connects!
 
-### ✅ **Готовые типы шагов**
-- `message` - отправка сообщения
-- `wait_input` - ожидание ввода
-- `handler` - выполнение логики
-- `flow` - переход к другому флоу
-- `dynamic` - динамический контент
-- `condition` - условные переходы
+### ✅ **Ready-made step types**
+- `message` - send message
+- `wait_input` - wait for input
+- `handler` - execute logic
+- `flow` - transition to another flow
+- `dynamic` - dynamic content
+- `condition` - conditional transitions
 
-### ✅ **Система переменных**
+### ✅ **Variable system**
 ```typescript
-// Сохранение данных пользователя
-await contextManager.setVariable(telegramId, 'user.name', 'Иван');
-await contextManager.setVariable(telegramId, 'company.pib', '123456789');
+// Save user data
+await contextManager.setVariable(telegramId, 'user.name', 'John');
+await contextManager.setVariable(telegramId, 'company.tax_id', '123456789');
 
-// Получение данных
+// Get data
 const userName = await contextManager.getVariable(telegramId, 'user.name');
 ```
 
-### ✅ **Интернационализация**
+### ✅ **Internationalization**
 ```typescript
-// Поддержка множества языков
-const message = await i18nService.getMessage('welcome_message', 'ru');
+// Multi-language support
+const message = await i18nService.getMessage('welcome_message', 'en');
 ```
 
-### ✅ **Хранилища данных**
-- **D1 Database** - основная база данных
-- **KV Storage** - кэш и сессии
-- **R2 Storage** - файлы и документы
+### ✅ **Data storage**
+- **D1 Database** - main database
+- **KV Storage** - cache and sessions
+- **R2 Storage** - files and documents
 
-## 🛠️ Технический стек
+## 🛠️ Tech stack
 
 - **Runtime**: Cloudflare Workers (V8 Isolates)
 - **Database**: SQLite (Cloudflare D1)
@@ -172,67 +172,67 @@ const message = await i18nService.getMessage('welcome_message', 'ru');
 - **Language**: TypeScript
 - **Build**: Wrangler CLI
 
-## 📋 Быстрый старт для сборщика
+## 📋 Quick start for builders
 
-### 1. **Клонирование и настройка**
+### 1. **Clone and setup**
 ```bash
 git clone <repository>
 cd apps/bot
 npm install
 ```
 
-### 2. **Создание первого флоу**
+### 2. **Create first flow**
 ```bash
-# Создать файл flows/my_flow.ts
-# Запустить автогенерацию
+# Create flows/my_flow.ts file
+# Run auto-generation
 npm run generate-flows-index
 ```
 
-### 3. **Добавление команды**
+### 3. **Add command**
 ```typescript
-// В commands.ts
+// In commands.ts
 { name: "/my_command", handlerName: "handleMyCommand" }
 
-// В handlers.ts
+// In handlers.ts
 handleMyCommand: async (message, bot) => {
-  // Ваша логика
+  // Your logic
 }
 ```
 
-### 4. **Развертывание**
+### 4. **Deploy**
 ```bash
 npm run deploy
 ```
 
-## 🎯 Преимущества конструктора
+## 🎯 Builder advantages
 
-### Для сборщика ботов:
-- ✅ **Быстрая разработка** - готовые компоненты
-- ✅ **Модульность** - легко добавлять функции
-- ✅ **Автогенерация** - минимум ручной работы
-- ✅ **Готовое развертывание** - один клик
-- ✅ **Масштабируемость** - легко расширять
+### For bot builders:
+- ✅ **Fast development** - ready-made components
+- ✅ **Modularity** - easy to add features
+- ✅ **Auto-generation** - minimal manual work
+- ✅ **Ready deployment** - one click
+- ✅ **Scalability** - easy to extend
 
-### Для пользователей ботов:
-- ✅ **Надежность** - Cloudflare инфраструктура
-- ✅ **Скорость** - глобальная сеть
-- ✅ **Безопасность** - изоляция и защита
-- ✅ **Производительность** - оптимизированный код
+### For bot users:
+- ✅ **Reliability** - Cloudflare infrastructure
+- ✅ **Speed** - global network
+- ✅ **Security** - isolation and protection
+- ✅ **Performance** - optimized code
 
-## 📚 Документация
+## 📚 Documentation
 
-- **[DEPLOYMENT.md](./DEPLOYMENT.md)** - Подробная инструкция по развертыванию
-- **[Архитектура флоу](./src/core/flow-types.ts)** - Типы и интерфейсы
-- **[Примеры флоу](./src/config/flows/)** - Готовые примеры
+- **[DEPLOYMENT.md](./DEPLOYMENT.md)** - Detailed deployment instructions
+- **[Flow Architecture](./src/core/flow-types.ts)** - Types and interfaces
+- **[Flow Examples](./src/config/flows/)** - Ready-made examples
 
-## 🤝 Вклад в развитие
+## 🤝 Contributing
 
-Конструктор открыт для улучшений! Вы можете:
-- Добавлять новые типы шагов
-- Создавать готовые флоу-шаблоны
-- Улучшать автогенерацию
-- Расширять функциональность
+The builder is open for improvements! You can:
+- Add new step types
+- Create ready-made flow templates
+- Improve auto-generation
+- Extend functionality
 
 ---
 
-**🎉 Создавайте своих ботов легко и быстро!**
+**🎉 Create your bots easily and quickly!**
