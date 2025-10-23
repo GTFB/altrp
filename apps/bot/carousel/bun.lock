@@ -1,0 +1,22 @@
+{
+  "lockfileVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "ai-gateway",
+      "dependencies": {
+        "hono": "^4.5.7",
+      },
+      "devDependencies": {
+        "@cloudflare/workers-types": "^4.20240925.0",
+        "typescript": "^5.6.2",
+      },
+    },
+  },
+  "packages": {
+    "@cloudflare/workers-types": ["@cloudflare/workers-types@4.20250911.0", "", {}, "sha512-Ardq4aDdNOfnvU/qC8anznZYSsMlfZnMgLAdwxESf3bMdgkb+GV01LpY8NzridFe7cFeprfiDNANBZoeUeEDlg=="],
+
+    "hono": ["hono@4.9.6", "", {}, "sha512-doVjXhSFvYZ7y0dNokjwwSahcrAfdz+/BCLvAMa/vHLzjj8+CFyV5xteThGUsKdkaasgN+gF2mUxao+SGLpUeA=="],
+
+    "typescript": ["typescript@5.9.2", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-CWBzXQrc/qOkhidw1OzBTQuYRbfyxDXJMVJ1XNwUHGROVmuaeiEm3OslpZ1RV96d7SKKjZKrSJu3+t/xlw3R9A=="],
+  }
+}

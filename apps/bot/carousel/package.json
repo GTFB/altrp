@@ -1,0 +1,21 @@
+{
+  "name": "ai-gateway",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bunx wrangler dev",
+    "deploy": "bunx wrangler deploy",
+    "typecheck": "bunx tsc --noEmit",
+    "test": "bun test",
+    "test:watch": "bun test --watch",
+    "test:coverage": "bun test --coverage"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240925.0",
+    "typescript": "^5.6.2"
+  },
+  "dependencies": {
+    "hono": "^4.5.7"
+  }
+}
+

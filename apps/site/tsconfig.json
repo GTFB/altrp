@@ -28,7 +28,7 @@
         "../../*"
       ],
       "@/components/*": [
-        "./components/*",
+        "./src/components/*",
         "../../packages/components/*"
       ],
       "@/lib/*": [

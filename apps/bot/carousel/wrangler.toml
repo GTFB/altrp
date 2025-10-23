@@ -1,0 +1,32 @@
+name = "ai-gateway"
+main = "src/gate.ts"
+compatibility_date = "2024-09-01"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "1fc258b15ebc4cbca7c15fb5829bc715"
+preview_id = "825680700856494385c97d0f3b0873aa"
+
+[[kv_namespaces]]
+binding = "PROVIDERS_CONFIG"
+id = "da0e3a5e4e16438aaf0f365dc7e7db34"
+preview_id = "3e013ff76bd04ab0aef130b584f83cfb"
+
+[[kv_namespaces]]
+binding = "RATE_LIMITS"
+id = "0ff9941a8b40424b8caf39e683e0621d"
+preview_id = "2dc8c27030494f7cbe26f1b01511e105"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "ai_gateway_dev"
+database_id = "4adbc6e3-116a-4300-a3fa-9ea4503f8c7b"
+
+[vars]
+# non-secret constants here
+USE_LOCAL_ASYNC = "true"
+
+[triggers]
+crons = ["0 8 * * *"]
+
+
