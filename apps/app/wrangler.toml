@@ -1,6 +1,7 @@
 name = "altrp-app"
 compatibility_date = "2025-10-13"
 compatibility_flags = ["nodejs_compat"]
+ main = "./woker.ts"
 
 # D1 Database binding
 [[d1_databases]]

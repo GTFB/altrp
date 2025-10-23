@@ -1,5 +1,3 @@
-// storage-adapter-import-placeholder
-import { postgresAdapter } from '@payloadcms/db-postgres'
 import { sqliteD1Adapter } from '@payloadcms/db-d1-sqlite'
 
 import sharp from 'sharp' // sharp-import
@@ -66,6 +64,10 @@ import { Header } from './Header/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
+
+import { getCloudflareContext } from '@opennextjs/cloudflare';
+
+const cloudflare = await getCloudflareContext({ async: true });
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
