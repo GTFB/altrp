@@ -1,0 +1,12 @@
+# Cloudflare Pages Functions Environment Variables (Local Development)
+# Copy this file to .dev.vars and fill in your actual values
+
+# Telegram Bot Configuration (optional)
+TELEGRAM_BOT_TOKEN=your_telegram_bot_token_here
+TELEGRAM_CHAT_ID=your_telegram_chat_id_here
+
+# Authentication Secret (REQUIRED)
+# Generate a secure random string (at least 32 characters)
+# You can use: openssl rand -base64 32
+AUTH_SECRET=your_secure_random_string_here
+

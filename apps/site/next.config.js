@@ -26,9 +26,7 @@ const nextConfig = {
     externalDir: true,
     inlineCss: true,
     // Exclude Cloudflare Pages Functions from tracing/bundle
-    outputFileTracingExcludes: {
-      '*': ['**/functions/**'],
-    },
+    
 
   },
   //  
