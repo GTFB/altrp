@@ -23,8 +23,8 @@
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --no-experimental-strip-types\" pnpm exec playwright test --config=playwright.config.ts",
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
     "db:push": "payload migrate",
-    "db:push:d1": "payload migrate --config=payload.d1.config.ts",
-    "db:generate:package": "payload migrate:create",
+    "db:generate": "payload migrate:create",
+    "db:push:d1": "bun run migrate-d1.mjs",
     "db:reset": "rm -f ../../data/app.database.sqlite && bun run db:push",
     "deploy": "wrangler deploy"
   },

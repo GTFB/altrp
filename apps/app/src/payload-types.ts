@@ -108,6 +108,7 @@ export interface Config {
     relations: Relation;
     roles: Role;
     role_permissions: RolePermission;
+    user_roles: UserRole;
     segments: Segment;
     texts: Text;
     text_variants: TextVariant;
@@ -172,6 +173,7 @@ export interface Config {
     relations: RelationsSelect<false> | RelationsSelect<true>;
     roles: RolesSelect<false> | RolesSelect<true>;
     role_permissions: RolePermissionsSelect<false> | RolePermissionsSelect<true>;
+    user_roles: UserRolesSelect<false> | UserRolesSelect<true>;
     segments: SegmentsSelect<false> | SegmentsSelect<true>;
     texts: TextsSelect<false> | TextsSelect<true>;
     text_variants: TextVariantsSelect<false> | TextVariantsSelect<true>;
@@ -2286,6 +2288,19 @@ export interface RolePermission {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "user_roles".
+ */
+export interface UserRole {
+  id: number;
+  user_uuid: string;
+  role_uuid: string;
+  order?: number | null;
+  created_at?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "segments".
  */
 export interface Segment {
@@ -3153,6 +3168,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'role_permissions';
         value: number | RolePermission;
+      } | null)
+    | ({
+        relationTo: 'user_roles';
+        value: number | UserRole;
       } | null)
     | ({
         relationTo: 'segments';
@@ -4264,6 +4283,18 @@ export interface RolePermissionsSelect<T extends boolean = true> {
   uuid?: T;
   order?: T;
   xaid?: T;
+  created_at?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "user_roles_select".
+ */
+export interface UserRolesSelect<T extends boolean = true> {
+  user_uuid?: T;
+  role_uuid?: T;
+  order?: T;
   created_at?: T;
   updatedAt?: T;
   createdAt?: T;

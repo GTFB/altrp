@@ -1,7 +1,7 @@
 name = "altrp-app"
 compatibility_date = "2025-10-13"
 compatibility_flags = ["nodejs_compat"]
- main = "./worker.ts"
+main = "./worker.ts"
 
 # D1 Database binding
 [[d1_databases]]
@@ -15,4 +15,3 @@ PAYLOAD_SECRET = "your-payload-secret-here"
 NEXT_PUBLIC_SERVER_URL = "https://your-app-domain.com"
 CRON_SECRET = "your-cron-secret-here"
 PREVIEW_SECRET = "your-preview-secret-here"
-

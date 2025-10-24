@@ -1229,6 +1229,17 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   `)
   await db.run(sql`CREATE INDEX \`role_permissions_updated_at_idx\` ON \`role_permissions\` (\`updated_at\`);`)
   await db.run(sql`CREATE INDEX \`role_permissions_created_at_idx\` ON \`role_permissions\` (\`created_at\`);`)
+  await db.run(sql`CREATE TABLE \`user_roles\` (
+  	\`id\` integer PRIMARY KEY NOT NULL,
+  	\`user_uuid\` text NOT NULL,
+  	\`role_uuid\` text NOT NULL,
+  	\`order\` numeric DEFAULT 0,
+  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
+  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL
+  );
+  `)
+  await db.run(sql`CREATE INDEX \`user_roles_updated_at_idx\` ON \`user_roles\` (\`updated_at\`);`)
+  await db.run(sql`CREATE INDEX \`user_roles_created_at_idx\` ON \`user_roles\` (\`created_at\`);`)
   await db.run(sql`CREATE TABLE \`segments\` (
   	\`id\` integer PRIMARY KEY NOT NULL,
   	\`uuid\` text,
@@ -1843,6 +1854,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	\`relations_id\` integer,
   	\`roles_id\` integer,
   	\`role_permissions_id\` integer,
+  	\`user_roles_id\` integer,
   	\`segments_id\` integer,
   	\`texts_id\` integer,
   	\`text_variants_id\` integer,
@@ -1902,6 +1914,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	FOREIGN KEY (\`relations_id\`) REFERENCES \`relations\`(\`id\`) ON UPDATE no action ON DELETE cascade,
   	FOREIGN KEY (\`roles_id\`) REFERENCES \`roles\`(\`id\`) ON UPDATE no action ON DELETE cascade,
   	FOREIGN KEY (\`role_permissions_id\`) REFERENCES \`role_permissions\`(\`id\`) ON UPDATE no action ON DELETE cascade,
+  	FOREIGN KEY (\`user_roles_id\`) REFERENCES \`user_roles\`(\`id\`) ON UPDATE no action ON DELETE cascade,
   	FOREIGN KEY (\`segments_id\`) REFERENCES \`segments\`(\`id\`) ON UPDATE no action ON DELETE cascade,
   	FOREIGN KEY (\`texts_id\`) REFERENCES \`texts\`(\`id\`) ON UPDATE no action ON DELETE cascade,
   	FOREIGN KEY (\`text_variants_id\`) REFERENCES \`text_variants\`(\`id\`) ON UPDATE no action ON DELETE cascade,
@@ -1965,6 +1978,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_relations_id_idx\` ON \`payload_locked_documents_rels\` (\`relations_id\`);`)
   await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_roles_id_idx\` ON \`payload_locked_documents_rels\` (\`roles_id\`);`)
   await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_role_permissions_id_idx\` ON \`payload_locked_documents_rels\` (\`role_permissions_id\`);`)
+  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_user_roles_id_idx\` ON \`payload_locked_documents_rels\` (\`user_roles_id\`);`)
   await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_segments_id_idx\` ON \`payload_locked_documents_rels\` (\`segments_id\`);`)
   await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_texts_id_idx\` ON \`payload_locked_documents_rels\` (\`texts_id\`);`)
   await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_text_variants_id_idx\` ON \`payload_locked_documents_rels\` (\`text_variants_id\`);`)
@@ -2158,6 +2172,7 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   await db.run(sql`DROP TABLE \`relations\`;`)
   await db.run(sql`DROP TABLE \`roles\`;`)
   await db.run(sql`DROP TABLE \`role_permissions\`;`)
+  await db.run(sql`DROP TABLE \`user_roles\`;`)
   await db.run(sql`DROP TABLE \`segments\`;`)
   await db.run(sql`DROP TABLE \`texts\`;`)
   await db.run(sql`DROP TABLE \`text_variants\`;`)
