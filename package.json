@@ -32,8 +32,10 @@
     "db:app:reset": "bun run --filter=altrp-app db:reset",
     "db:export:app": "bun scripts/export-sqlite-schema.js data/app.database.sqlite migrations/site/app-schema.sql",
     "db:export:cms": "bun scripts/export-sqlite-schema.js data/cms.database.sqlite migrations/site/cms-schema.sql",
-    "db:site:d1:migrate:local": "bun run --filter=altrp-site d1:migrate:local",
-    "db:site:d1:migrate:remote": "bun run --filter=altrp-site d1:migrate:remote",
+    "db:site:reset": "node scripts/reset-d1-local.js",
+    "db:site:reset-migrate": "node scripts/reset-d1-local.js && node scripts/migrate-site.js --local",
+    "db:site:migrate:local": "node scripts/migrate-site.js --local",
+    "db:site:migrate:remote": "node scripts/migrate-site.js --remote",
     "cms:up": "node scripts/cms-sqlite-up.js",
     "dev:kill": "taskkill /F /IM node.exe",
     "prepare": "husky"
