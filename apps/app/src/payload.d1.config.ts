@@ -106,7 +106,7 @@ export const createD1Config = (d1Binding) => {
     cors: [getServerSideURL()].filter(Boolean),
     globals: [Header, Footer],
     plugins: [...plugins],
-    secret: process.env.PAYLOAD_SECRET,
+    secret: 'process.env.PAYLOAD_SECRET',
     sharp,
     typescript: {
       outputFile: path.resolve(dirname, 'payload-types.ts'),

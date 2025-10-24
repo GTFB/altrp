@@ -27,7 +27,6 @@ const migrate = async () => {
     console.log('Config:',  proxy.env.D1);
     console.log('Starting database migration...');
     await payload.init({
-      secret: process.env.PAYLOAD_SECRET,
       config: config,
       local: true,
     });
