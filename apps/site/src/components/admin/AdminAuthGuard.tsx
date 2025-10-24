@@ -52,8 +52,8 @@ export default function AdminAuthGuard({ children }: AdminAuthGuardProps) {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // If on create-new-user page, skip auth checks
-        if (pathname === '/admin/create-new-user') {
+        // If on create-new-user page, skip auth checks (with or without trailing slash)
+        if (pathname === '/admin/create-new-user' || pathname === '/admin/create-new-user/') {
           setChecking(false)
           return
         }
@@ -86,7 +86,7 @@ export default function AdminAuthGuard({ children }: AdminAuthGuardProps) {
 
   // Periodic auth check (every minute) - skip for create-new-user page
   useEffect(() => {
-    if (pathname === '/admin/create-new-user') {
+    if (pathname === '/admin/create-new-user' || pathname === '/admin/create-new-user/') {
       return
     }
 
