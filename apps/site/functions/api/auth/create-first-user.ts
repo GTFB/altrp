@@ -2,6 +2,7 @@
 
 import { createSession, jsonWithSession } from '../../_shared/session'
 import type { Env } from '../../_shared/middleware'
+import { generateAid } from '../../_shared/generate-aid'
 
 interface CreateUserRequest {
   email: string
@@ -94,20 +95,76 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
     const hashArray = Array.from(new Uint8Array(hashBuffer))
     const passwordHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
 
-    // Generate user ID
-    const userId = crypto.randomUUID()
+    // Generate UUIDs and AIDs
+    const userUuid = crypto.randomUUID()
+    const humanUuid = crypto.randomUUID()
+    const humanAid = generateAid('h')
+    
+    // Create Human first
+    await env.DB.prepare(
+      `INSERT INTO humans (uuid, haid, full_name, email, created_at, updated_at) 
+       VALUES (?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`
+    )
+      .bind(humanUuid, humanAid, name, email)
+      .run()
+
+    // Check if admin role exists, if not create it
+    let adminRole = await env.DB.prepare(
+      `SELECT uuid, raid FROM roles WHERE raid LIKE 'r-%' AND is_system = 1 LIMIT 1`
+    ).first<{ uuid: string; raid: string }>()
+
+    if (!adminRole) {
+      const roleUuid = crypto.randomUUID()
+      const roleAid = generateAid('r')
+      
+      await env.DB.prepare(
+        `INSERT INTO roles (uuid, raid, name, title, is_system, "order", created_at, updated_at) 
+         VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`
+      )
+        .bind(
+          roleUuid, 
+          roleAid,
+          'Administrator',
+          'Administrator', 
+          1, 
+          0
+        )
+        .run()
+      
+      adminRole = { uuid: roleUuid, raid: roleAid }
+    }
 
     // Insert user into database
     await env.DB.prepare(
-      'INSERT INTO users (id, email, name, password_hash, role, created_at, updated_at) VALUES (?, ?, ?, ?, ?, datetime("now"), datetime("now"))'
+      `INSERT INTO users (uuid, human_aid, role_uuid, email, password_hash, is_active, created_at, updated_at) 
+       VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`
     )
-      .bind(userId, email, name, passwordHash, 'admin')
+      .bind(userUuid, humanAid, adminRole.uuid, email, passwordHash, 1)
       .run()
+
+    // Create user_role relationship
+    await env.DB.prepare(
+      `INSERT INTO user_roles (user_uuid, role_uuid, "order", created_at, updated_at) 
+       VALUES (?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`
+    )
+      .bind(userUuid, adminRole.uuid, 0)
+      .run()
+
+    // Get the user ID for session
+    const createdUser = await env.DB.prepare(
+      'SELECT id FROM users WHERE uuid = ? LIMIT 1'
+    )
+      .bind(userUuid)
+      .first<{ id: number }>()
+
+    if (!createdUser) {
+      throw new Error('Failed to retrieve created user')
+    }
 
     // Create session for the new user
     const sessionCookie = await createSession(
       {
-        id: userId,
+        id: String(createdUser.id),
         email,
         name,
         role: 'admin',
@@ -119,7 +176,8 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
       {
         success: true,
         user: {
-          id: userId,
+          id: createdUser.id,
+          uuid: userUuid,
           email,
           name,
           role: 'admin',

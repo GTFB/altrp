@@ -33,17 +33,31 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
       })
     }
 
-    // Query user from database
+    // Query user from database with human and role information
     const user = await env.DB.prepare(
-      'SELECT id, email, name, password_hash, role FROM users WHERE email = ?'
+      `SELECT 
+        u.id, 
+        u.uuid,
+        u.email, 
+        u.password_hash,
+        h.full_name as name,
+        r.raid as role,
+        r.is_system as is_admin
+      FROM users u
+      LEFT JOIN humans h ON u.human_aid = h.haid
+      LEFT JOIN roles r ON u.role_uuid = r.uuid
+      WHERE u.email = ?
+      LIMIT 1`
     )
       .bind(email)
       .first<{
-        id: string
+        id: number
+        uuid: string
         email: string
-        name: string
+        name: string | null
         password_hash: string
-        role: 'admin' | 'user'
+        role: string | null
+        is_admin: number | null
       }>()
 
     if (!user) {
@@ -70,10 +84,10 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
     // Create session
     const sessionCookie = await createSession(
       {
-        id: user.id,
+        id: String(user.id),
         email: user.email,
-        name: user.name,
-        role: user.role,
+        name: user.name || email,
+        role: user.is_admin ? 'admin' : 'user',
       },
       env.AUTH_SECRET
     )
@@ -83,9 +97,11 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
         success: true,
         user: {
           id: user.id,
+          uuid: user.uuid,
           email: user.email,
-          name: user.name,
-          role: user.role,
+          name: user.name || email,
+          role: user.is_admin ? 'admin' : 'user',
+          raid: user.role,
         },
       },
       sessionCookie

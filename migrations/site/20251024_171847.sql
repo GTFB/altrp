@@ -1383,6 +1383,7 @@ CREATE TABLE `roles` (
   	`uuid` text,
   	`raid` text,
   	`title` text,
+  	`name` text,
   	`description` text,
   	`is_system` integer DEFAULT false,
   	`order` numeric DEFAULT 0,

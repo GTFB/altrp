@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "next dev -p 3100",
     "dev:wrangler": "wrangler pages dev --port 3300",
-    "dev:all": "cross-env NEXT_PORT=3100 WRANGLER_PORT=3300 node scripts/dev-server.mjs",
+    "dev:all": "cross-env NEXT_PORT=3100 WRANGLER_PORT=3300 PROXY_PORT=3400 node scripts/dev-server.mjs",
     "build": "next build --experimental-build-mode compile",
     "build:static": "cross-env STATIC_EXPORT=true next build",
     "start": "next start -p 3100",
@@ -23,6 +23,7 @@
     "hash-password": "node scripts/hash-password.mjs"
   },
   "dependencies": {
+    "@dnd-kit/modifiers": "^9.0.0",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -51,6 +52,7 @@
     "@radix-ui/react-toggle-group": "^1.1.11",
     "@radix-ui/react-tooltip": "^1.2.8",
     "@radix-ui/react-visually-hidden": "^1.2.3",
+    "@tabler/icons-react": "^3.35.0",
     "@tailwindcss/postcss": "4.1.13",
     "@tanstack/react-table": "^8.21.3",
     "class-variance-authority": "^0.7.1",

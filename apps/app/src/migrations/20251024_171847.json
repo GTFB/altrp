@@ -8229,6 +8229,13 @@
           "notNull": false,
           "autoincrement": false
         },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "description": {
           "name": "description",
           "type": "text",
@@ -14703,6 +14710,6 @@
   "internal": {
     "indexes": {}
   },
-  "id": "2c4b012b-c5b1-4bb2-b6e9-a17f600ae813",
+  "id": "ae4ebe54-a156-46ed-b17e-5fc2259e6e15",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }

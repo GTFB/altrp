@@ -27,6 +27,9 @@
         "./src/*",
         "../../*"
       ],
+      "@/packages/*": [
+        "../../packages/*"
+      ],
       "@/components/*": [
         "./src/components/*",
         "../../packages/components/*"
@@ -38,6 +41,10 @@
       "@/repositories/*": [
         "./repositories/*",
         "../../packages/repositories/*"
+      ],
+      "@/hooks/*": [
+        "./src/hooks/*",
+        "../../packages/hooks/*"
       ]
     }
   },

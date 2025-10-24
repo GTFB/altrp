@@ -171,12 +171,12 @@ async function ensureMigrationsTable(mode) {
   
   try {
     // Execute using the static SQL file
-    const command = `wrangler d1 execute altrp-app-db --file=${initSqlPath} --config=${WRANGLER_CONFIG} ${mode}`;
+    const command = `wrangler d1 execute altrp-site-db --file=${initSqlPath} --config=${WRANGLER_CONFIG} ${mode}`;
     
     await execAsync(command);
     
     // Verify table was created
-    const verifyCommand = `wrangler d1 execute altrp-app-db --command="SELECT name FROM sqlite_master WHERE type='table' AND name='_migrations';" --config=${WRANGLER_CONFIG} ${mode} --json`;
+    const verifyCommand = `wrangler d1 execute altrp-site-db --command="SELECT name FROM sqlite_master WHERE type='table' AND name='_migrations';" --config=${WRANGLER_CONFIG} ${mode} --json`;
     const { stdout } = await execAsync(verifyCommand);
     const result = JSON.parse(stdout);
     
@@ -200,7 +200,7 @@ async function ensureMigrationsTable(mode) {
  */
 async function isMigrationExecuted(migrationName, mode) {
   const checkSQL = `SELECT name FROM _migrations WHERE name = '${migrationName}';`;
-  const command = `wrangler d1 execute altrp-app-db --command="${checkSQL}" --config=${WRANGLER_CONFIG} ${mode} --json`;
+  const command = `wrangler d1 execute altrp-site-db --command="${checkSQL}" --config=${WRANGLER_CONFIG} ${mode} --json`;
   
   try {
     const { stdout } = await execAsync(command);
@@ -224,7 +224,7 @@ async function isMigrationExecuted(migrationName, mode) {
 async function recordMigration(migrationName, mode) {
   // First, verify that migrations table exists
   try {
-    const checkTableCommand = `wrangler d1 execute altrp-app-db --command="SELECT 1 FROM _migrations LIMIT 1;" --config=${WRANGLER_CONFIG} ${mode} --json`;
+    const checkTableCommand = `wrangler d1 execute altrp-site-db --command="SELECT 1 FROM _migrations LIMIT 1;" --config=${WRANGLER_CONFIG} ${mode} --json`;
     await execAsync(checkTableCommand);
   } catch (error) {
     console.error('\n⚠️  Warning: _migrations table does not exist. Cannot record migration.');
@@ -234,7 +234,7 @@ async function recordMigration(migrationName, mode) {
   }
   
   const insertSQL = `INSERT OR IGNORE INTO _migrations (name) VALUES ('${migrationName}');`;
-  const command = `wrangler d1 execute altrp-app-db --command="${insertSQL}" --config=${WRANGLER_CONFIG} ${mode}`;
+  const command = `wrangler d1 execute altrp-site-db --command="${insertSQL}" --config=${WRANGLER_CONFIG} ${mode}`;
   
   try {
     await execAsync(command);
@@ -263,7 +263,7 @@ async function executeMigration(sqlPath, mode) {
   }
   
   // Execute migration file
-  const command = `wrangler d1 execute altrp-app-db --file=${sqlPath} --config=${WRANGLER_CONFIG} ${mode}`;
+  const command = `wrangler d1 execute altrp-site-db --file=${sqlPath} --config=${WRANGLER_CONFIG} ${mode}`;
   
   console.log(`\n📝 Executing ${fileName} (${mode})...`);
   console.log(`Command: ${command}\n`);

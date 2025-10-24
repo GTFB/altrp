@@ -6,6 +6,6 @@ pages_build_output_dir = "dist"
 
 # D1 Database binding
 [[d1_databases]]
-binding = "D1"
-database_name = "altrp-app-db"
-database_id = "7254b146-5242-4957-8656-e1f176855ee8"
+binding = "DB"
+database_name = "altrp-site-db"
+database_id = "04965f0f-7ee3-4ad9-9ee1-665899cdc39e"

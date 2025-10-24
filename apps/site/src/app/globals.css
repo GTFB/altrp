@@ -5,7 +5,6 @@
 @source "../src/**/*.{ts,tsx,mdx}";
 @source "../../../../packages/**/*.{ts,tsx,mdx}";
 
-@custom-variant dark (&:is(.dark *));
 
 :root {
   --background: hsl(0 0% 98.0392%);
@@ -40,7 +39,7 @@
   --sidebar-accent-foreground: hsl(25.7143 13.7255% 10%);
   --sidebar-border: hsl(240 9.8039% 90.0000%);
   --sidebar-ring: hsl(240 9.8039% 90.0000%);
-  --font-sans: var(--font-geist-sans), ui-sans-serif, sans-serif, system-ui;
+  --font-sans: Inter, ui-sans-serif, sans-serif, system-ui;
   --font-serif: Playfair, ui-serif, serif;
   --font-mono: Geist Mono, ui-monospace, monospace;
   --radius: 0.675rem;
@@ -95,7 +94,7 @@
   --sidebar-accent-foreground: hsl(0 0% 98.0392%);
   --sidebar-border: hsl(0 0% 15.6863%);
   --sidebar-ring: hsl(0 0% 32.1569%);
-  --font-sans: var(--font-geist-sans), ui-sans-serif, sans-serif, system-ui;
+  --font-sans: Inter, ui-sans-serif, sans-serif, system-ui;
   --font-serif: Playfair, ui-serif, serif;
   --font-mono: Geist Mono, ui-monospace, monospace;
   --radius: 0.675rem;
@@ -152,6 +151,7 @@
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
   --font-serif: var(--font-serif);
+  --font-heading: var(--font-heading);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -185,6 +185,9 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+  }
+  .font-heading {
+    font-family: var(--font-playfair-display), "Playfair Display", ui-serif, serif, Georgia !important;
   }
 }
 

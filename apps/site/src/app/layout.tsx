@@ -75,8 +75,6 @@ export default function RootLayout({
   return (
     <html lang="ru" suppressHydrationWarning className={PROJECT_SETTINGS.defaultTheme === 'light' ? 'light' : 'dark'}>
       <head>
-        <link rel="preload" href="/images/tanya.png" as="image" type="image/png" />
-        <link rel="preload" href="/images/element.svg" as="image" type="image/svg+xml" />
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
         <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
