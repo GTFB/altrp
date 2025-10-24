@@ -76,6 +76,104 @@ const app = new Hono<{ Bindings: Env }>();
 
 app.get('/health', (c) => c.json({ ok: true }));
 
+// Get result by requestId
+app.get('/result/:requestId', async (c) => {
+	const requestId = c.req.param('requestId');
+	if (!requestId) return c.json({ error: 'RequestId required' }, 400);
+
+	// Auth
+	const auth = c.req.header('authorization') || '';
+	const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
+	if (!token) return c.json({ error: 'Unauthorized' }, 401);
+	const tokenHash = await sha256Base64(token);
+	const project = await c.env.DB.prepare(
+		'SELECT id FROM projects WHERE apiKeyHash = ? LIMIT 1'
+	).bind(tokenHash).first<{ id: string }>();
+	if (!project) return c.json({ error: 'Unauthorized' }, 401);
+
+	// Get result from database
+	const result = await c.env.DB.prepare(
+		'SELECT status, provider, model, cost, promptTokens, completionTokens, latencyMs, requestBody, responseBody, createdAt FROM logs WHERE id = ? AND projectId = ? LIMIT 1'
+	).bind(requestId, project.id).first<{
+		status: string;
+		provider: string;
+		model: string;
+		cost: number;
+		promptTokens: number;
+		completionTokens: number;
+		latencyMs: number;
+		requestBody: string;
+		responseBody: string;
+		createdAt: number;
+	}>();
+
+	if (!result) {
+		return c.json({ error: 'Request not found' }, 404);
+	}
+
+	// Parse response body
+	let responseData;
+	try {
+		responseData = JSON.parse(result.responseBody);
+	} catch {
+		responseData = { content: result.responseBody };
+	}
+
+	return c.json({
+		requestId,
+		status: result.status,
+		provider: result.provider,
+		model: result.model,
+		cost: result.cost,
+		promptTokens: result.promptTokens,
+		completionTokens: result.completionTokens,
+		latencyMs: result.latencyMs,
+		createdAt: result.createdAt,
+		content: responseData.content || responseData.text || '',
+		error: result.status === 'ERROR' ? responseData.error || responseData.content : null
+	});
+});
+
+// Get request status by requestId
+app.get('/status/:requestId', async (c) => {
+	const requestId = c.req.param('requestId');
+	if (!requestId) return c.json({ error: 'RequestId required' }, 400);
+
+	// Auth
+	const auth = c.req.header('authorization') || '';
+	const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
+	if (!token) return c.json({ error: 'Unauthorized' }, 401);
+	const tokenHash = await sha256Base64(token);
+	const project = await c.env.DB.prepare(
+		'SELECT id FROM projects WHERE apiKeyHash = ? LIMIT 1'
+	).bind(tokenHash).first<{ id: string }>();
+	if (!project) return c.json({ error: 'Unauthorized' }, 401);
+
+	// Check if request exists in database
+	const result = await c.env.DB.prepare(
+		'SELECT status, createdAt FROM logs WHERE id = ? AND projectId = ? LIMIT 1'
+	).bind(requestId, project.id).first<{
+		status: string;
+		createdAt: number;
+	}>();
+
+	if (!result) {
+		return c.json({ 
+			requestId,
+			status: 'PENDING',
+			message: 'Request is being processed or not found'
+		});
+	}
+
+	return c.json({
+		requestId,
+		status: result.status,
+		createdAt: result.createdAt,
+		message: result.status === 'SUCCESS' ? 'Request completed successfully' : 
+		         result.status === 'ERROR' ? 'Request failed' : 'Request is being processed'
+	});
+});
+
 // Key rotation status endpoint
 app.get('/keys/status', async (c) => {
 	// Auth

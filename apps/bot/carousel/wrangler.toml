@@ -1,6 +1,7 @@
-name = "ai-gateway"
+name = "api-gateway-dev"
 main = "src/gate.ts"
 compatibility_date = "2024-09-01"
+account_id = "7f412ebe1901fb520bca3fbe424faf94"
 
 [[kv_namespaces]]
 binding = "CACHE"
@@ -19,14 +20,14 @@ preview_id = "2dc8c27030494f7cbe26f1b01511e105"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "ai_gateway_dev"
+database_name = "api_gateway_dev"
 database_id = "4adbc6e3-116a-4300-a3fa-9ea4503f8c7b"
 
 [vars]
 # non-secret constants here
 USE_LOCAL_ASYNC = "true"
 
-[triggers]
-crons = ["0 8 * * *"]
+#[triggers]
+#crons = ["* * * * *"]
 
 
