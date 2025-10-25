@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS keys (
 	keyType TEXT NOT NULL DEFAULT 'api_key',
 	models TEXT NOT NULL, -- JSON array of supported models (e.g., ["gemini-*", "gpt-*"])
 	isActive BOOLEAN DEFAULT 1,
+	isValid BOOLEAN DEFAULT 1, -- Key validity status (0 = invalid, 1 = valid)
 	lastUsed INTEGER,
 	usageCount INTEGER DEFAULT 0,
 	createdAt INTEGER DEFAULT (strftime('%s', 'now')),

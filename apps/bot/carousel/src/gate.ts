@@ -16,7 +16,7 @@ import {
 import { KeyManagerService } from './services/keyManager';
 
 // Enhanced key rotation functions with new centralized system and fallback
-async function getNextGoogleKey(env: Env, projectId: string): Promise<string> {
+async function getNextGoogleKey(env: Env, projectId: string): Promise<{ key: string; keyId?: string }> {
 	// Try new centralized key management system first
 	if (KEY_MANAGEMENT.ENABLED) {
 		try {
@@ -46,7 +46,7 @@ async function getNextGoogleKey(env: Env, projectId: string): Promise<string> {
 	// Rotate to next key
 	await env.RATE_LIMITS.put(keyIndexKey, String((index + 1) % googleKeys.length), { expirationTtl: 86400 });
 	
-	return selectedKey;
+	return { key: selectedKey };
 }
 
 async function getNextGroqKey(env: Env, projectId: string): Promise<string> {
@@ -464,6 +464,42 @@ async function callGemini(model: string, inputText: string, apiKey: string) {
 	return { text };
 }
 
+async function callGeminiWithKeyRotation(env: Env, projectId: string, model: string, inputText: string): Promise<{ text: string }> {
+	const keyManager = new KeyManagerService(env);
+	
+	// Try to get a valid key and make the API call
+	const { key, keyId } = await keyManager.getNextValidKey(PROVIDERS.GOOGLE, model);
+	
+	try {
+		console.log(`[KeyRotation] Trying key ${keyId} for Gemini API call`);
+		const result = await callGemini(model, inputText, key);
+		
+		// Mark key as valid if API call succeeds
+		await keyManager.markKeyAsValid(keyId);
+		console.log(`[KeyRotation] Key ${keyId} is valid, API call successful`);
+		
+		return result;
+	} catch (error) {
+		console.error(`[KeyRotation] Key ${keyId} failed:`, error);
+		
+		// Check if it's an authentication error
+		const errorMessage = String(error);
+		if (errorMessage.includes('API key not valid') || 
+			errorMessage.includes('API_KEY_INVALID') ||
+			errorMessage.includes('INVALID_ARGUMENT')) {
+			
+			console.log(`[KeyRotation] Marking key ${keyId} as invalid due to auth error`);
+			await keyManager.markKeyAsInvalid(keyId);
+			
+			// Try with the next key
+			return await callGeminiWithKeyRotation(env, projectId, model, inputText);
+		}
+		
+		// If it's not an auth error, re-throw
+		throw error;
+	}
+}
+
 async function callGroq(model: string, inputText: string, messages: any[], apiKey: string) {
 	const url = 'https://api.groq.com/openai/v1/chat/completions';
 	const groqReq = {
@@ -529,9 +565,8 @@ async function processTask(message: { id: string; body: any }, env: Env) {
 		let out: { text: string };
 		
 		if (provider === PROVIDERS.GOOGLE) {
-			// Use key rotation for Google
-			const apiKey = await getNextGoogleKey(env, projectId);
-			out = await callGemini(model, inputText, apiKey);
+			// Use key rotation for Google with automatic retry on invalid keys
+			out = await callGeminiWithKeyRotation(env, projectId, model, inputText);
 		} else if (provider === PROVIDERS.GROQ) {
 			// Use key rotation for Groq
 			const groqKey = await getNextGroqKey(env, projectId);
