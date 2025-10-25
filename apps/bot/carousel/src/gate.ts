@@ -49,12 +49,13 @@ async function getNextGoogleKey(env: Env, projectId: string): Promise<{ key: str
 	return { key: selectedKey };
 }
 
-async function getNextGroqKey(env: Env, projectId: string): Promise<string> {
+async function getNextGroqKey(env: Env, projectId: string, model: string = 'whisper-large-v3'): Promise<string> {
 	// Try new centralized key management system first
 	if (KEY_MANAGEMENT.ENABLED) {
 		try {
 			const keyManager = new KeyManagerService(env);
-			return await keyManager.getNextKey(PROVIDERS.GROQ, 'gpt-*');
+			const result = await keyManager.getNextKey(PROVIDERS.GROQ, model);
+			return result.key;
 		} catch (error) {
 			console.warn('New key management failed, falling back to legacy system:', error);
 			if (!KEY_MANAGEMENT.FALLBACK_TO_LEGACY) {
@@ -299,8 +300,7 @@ app.post('/upload', async (c) => {
 		
 		try {
 			// Call Whisper with key rotation
-			const groqKey = await getNextGroqKey(c.env, project.id);
-			const out = await callWhisper(base64, fileExt, groqKey);
+			const out = await callWhisperWithKeyRotation(c.env, project.id, base64, fileExt);
 			text = out.text;
 			
 			// Calculate cost (Whisper pricing is per minute)
@@ -482,12 +482,61 @@ async function callGeminiWithKeyRotation(env: Env, projectId: string, model: str
 	} catch (error) {
 		console.error(`[KeyRotation] Key ${keyId} failed:`, error);
 		
-		// Check if it's an authentication error
-		const errorMessage = String(error);
-		if (errorMessage.includes('API key not valid') || 
-			errorMessage.includes('API_KEY_INVALID') ||
-			errorMessage.includes('INVALID_ARGUMENT')) {
-			
+		// Parse error message - it might be JSON
+		let errorMessage = String(error).toLowerCase();
+		let isAuthError = false;
+		
+		// Try to parse as JSON first
+		try {
+			const errorText = String(error);
+			const jsonMatch = errorText.match(/\{.*\}/);
+			if (jsonMatch) {
+				const errorJson = JSON.parse(jsonMatch[0]);
+				console.log(`[KeyRotation] Parsed JSON error:`, errorJson);
+				
+				if (errorJson.error) {
+					const errorObj = errorJson.error;
+					if (errorObj.message && (
+						errorObj.message.toLowerCase().includes('invalid api key') ||
+						errorObj.message.toLowerCase().includes('api key not valid') ||
+						errorObj.message.toLowerCase().includes('authentication') ||
+						errorObj.message.toLowerCase().includes('unauthorized')
+					)) {
+						isAuthError = true;
+					}
+					if (errorObj.type && (
+						errorObj.type.toLowerCase().includes('invalid_request_error') ||
+						errorObj.type.toLowerCase().includes('authentication_error')
+					)) {
+						isAuthError = true;
+					}
+					if (errorObj.code && (
+						errorObj.code.toLowerCase().includes('invalid_api_key') ||
+						errorObj.code.toLowerCase().includes('api_key_invalid')
+					)) {
+						isAuthError = true;
+					}
+				}
+			}
+		} catch (parseError) {
+			console.log(`[KeyRotation] Could not parse error as JSON, using string matching`);
+		}
+		
+		// Also check plain text patterns
+		if (!isAuthError) {
+			if (errorMessage.includes('api key not valid') || 
+				errorMessage.includes('api_key_invalid') ||
+				errorMessage.includes('invalid_argument') ||
+				errorMessage.includes('invalid api key') ||
+				errorMessage.includes('authentication') ||
+				errorMessage.includes('unauthorized')) {
+				isAuthError = true;
+			}
+		}
+		
+		console.log(`[KeyRotation] Is auth error: ${isAuthError}`);
+		
+		if (isAuthError) {
 			console.log(`[KeyRotation] Marking key ${keyId} as invalid due to auth error`);
 			await keyManager.markKeyAsInvalid(keyId);
 			
@@ -496,6 +545,100 @@ async function callGeminiWithKeyRotation(env: Env, projectId: string, model: str
 		}
 		
 		// If it's not an auth error, re-throw
+		throw error;
+	}
+}
+
+async function callWhisperWithKeyRotation(env: Env, projectId: string, audioBase64: string, audioFormat: string): Promise<{ text: string }> {
+	const keyManager = new KeyManagerService(env);
+	
+	// Try to get a valid key and make the API call
+	const { key, keyId } = await keyManager.getNextValidKey(PROVIDERS.GROQ, 'whisper-large-v3');
+	
+	try {
+		console.log(`[KeyRotation] Trying key ${keyId} for Whisper API call`);
+		const result = await callWhisper(audioBase64, audioFormat, key);
+		
+		// Mark key as valid if API call succeeds
+		await keyManager.markKeyAsValid(keyId);
+		console.log(`[KeyRotation] Key ${keyId} is valid, API call successful`);
+		
+		return result;
+	} catch (error) {
+		console.error(`[KeyRotation] Key ${keyId} failed:`, error);
+		console.error(`[KeyRotation] Error type:`, typeof error);
+		console.error(`[KeyRotation] Error string:`, String(error));
+		
+		// Parse error message - it might be JSON
+		let errorMessage = String(error).toLowerCase();
+		let isAuthError = false;
+		
+		// Try to parse as JSON first
+		try {
+			const errorText = String(error);
+			// Look for JSON pattern in error message
+			const jsonMatch = errorText.match(/\{.*\}/);
+			if (jsonMatch) {
+				const errorJson = JSON.parse(jsonMatch[0]);
+				console.log(`[KeyRotation] Parsed JSON error:`, errorJson);
+				
+				// Check JSON error fields
+				if (errorJson.error) {
+					const errorObj = errorJson.error;
+					if (errorObj.message && (
+						errorObj.message.toLowerCase().includes('invalid api key') ||
+						errorObj.message.toLowerCase().includes('api key not valid') ||
+						errorObj.message.toLowerCase().includes('authentication') ||
+						errorObj.message.toLowerCase().includes('unauthorized')
+					)) {
+						isAuthError = true;
+					}
+					if (errorObj.type && (
+						errorObj.type.toLowerCase().includes('invalid_request_error') ||
+						errorObj.type.toLowerCase().includes('authentication_error')
+					)) {
+						isAuthError = true;
+					}
+					if (errorObj.code && (
+						errorObj.code.toLowerCase().includes('invalid_api_key') ||
+						errorObj.code.toLowerCase().includes('api_key_invalid')
+					)) {
+						isAuthError = true;
+					}
+				}
+			}
+		} catch (parseError) {
+			console.log(`[KeyRotation] Could not parse error as JSON, using string matching`);
+		}
+		
+		// Also check plain text patterns
+		if (!isAuthError) {
+			if (errorMessage.includes('api key not valid') || 
+				errorMessage.includes('api_key_invalid') ||
+				errorMessage.includes('invalid_argument') ||
+				errorMessage.includes('invalid api key') ||
+				errorMessage.includes('authentication') ||
+				errorMessage.includes('unauthorized') ||
+				errorMessage.includes('budget exceeded') ||
+				errorMessage.includes('insufficient_quota') ||
+				errorMessage.includes('quota_exceeded') ||
+				errorMessage.includes('billing') ||
+				errorMessage.includes('payment')) {
+				isAuthError = true;
+			}
+		}
+		
+		console.log(`[KeyRotation] Is auth error: ${isAuthError}`);
+		
+		if (isAuthError) {
+			console.log(`[KeyRotation] Marking key ${keyId} as invalid due to auth/budget error`);
+			await keyManager.markKeyAsInvalid(keyId);
+			
+			// Try with the next key
+			return await callWhisperWithKeyRotation(env, projectId, audioBase64, audioFormat);
+		}
+		
+		// If it's not an auth/budget error, re-throw
 		throw error;
 	}
 }
@@ -569,11 +712,11 @@ async function processTask(message: { id: string; body: any }, env: Env) {
 			out = await callGeminiWithKeyRotation(env, projectId, model, inputText);
 		} else if (provider === PROVIDERS.GROQ) {
 			// Use key rotation for Groq
-			const groqKey = await getNextGroqKey(env, projectId);
 			// Check if this is a Whisper request (audio transcription)
 			if (audio && MODEL_PATTERNS.WHISPER.some(pattern => matchesModel(model, pattern))) {
-				out = await callWhisper(audio, audioFormat || 'mp3', groqKey);
+				out = await callWhisperWithKeyRotation(env, projectId, audio, audioFormat || 'mp3');
 			} else {
+				const groqKey = await getNextGroqKey(env, projectId, model);
 				out = await callGroq(model, inputText, messages, groqKey);
 			}
 		} else {
