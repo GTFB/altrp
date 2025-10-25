@@ -13,6 +13,9 @@ help:
 	@echo "  test:watch       - Run tests in watch mode"
 	@echo "  typecheck        - Run TypeScript type checking"
 	@echo "  secret-gemini    - Set GOOGLE_API_KEY secret"
+	@echo "  keys-migrate     - Migrate existing keys to new system"
+	@echo "  keys-verify      - Verify key migration status"
+	@echo "  keys-rollback    - Rollback key migration"
 	@echo "  d1-prepare       - Prepare D1 schema (placeholder)"
 	@echo "  kv-create        - Create KV namespaces (CACHE/PROVIDERS_CONFIG/RATE_LIMITS)"
 	@echo "  project-create   - Create new project with template"
@@ -36,6 +39,18 @@ deploy:
 
 secret-gemini:
 	bunx wrangler secret put GOOGLE_API_KEY
+
+keys-migrate:
+	bunx wrangler dev --x-remote-bindings --command "import('./src/scripts/migrateKeys.ts').then(m => m.runMigration(globalThis, 'migrate'))"
+
+keys-verify:
+	bunx wrangler dev --x-remote-bindings --command "import('./src/scripts/migrateKeys.ts').then(m => m.runMigration(globalThis, 'verify'))"
+
+keys-rollback:
+	bunx wrangler dev --x-remote-bindings --command "import('./src/scripts/migrateKeys.ts').then(m => m.runMigration(globalThis, 'rollback'))"
+
+hash-key:
+	@if (-not $$env:KEY) { echo "Usage: make hash-key KEY=your-api-key"; exit 1 } ; bun run src/utils/hashKey.ts "$$env:KEY"
 
 d1-prepare:
 	@echo "TODO: Add D1 schema migrations via wrangler d1 commands"

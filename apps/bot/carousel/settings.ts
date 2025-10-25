@@ -38,9 +38,56 @@ export const PROVIDER_ROUTING = {
 	}
 } as const;
 
+// Legacy API keys configuration (for backward compatibility)
 export const API_KEYS = {
 	GOOGLE: ['GOOGLE_API_KEY', 'GOOGLE_API_KEY_ORBININ'],
 	GROQ: ['GROQ_API_KEY', 'GROQ_API_KEY_POSTOV']
+} as const;
+
+// New centralized key management configuration
+export const KEY_MANAGEMENT = {
+	// Enable new key management system
+	ENABLED: true,
+	
+	// Fallback to legacy system if new system fails
+	FALLBACK_TO_LEGACY: true,
+	
+	// Key rotation strategy
+	ROTATION_STRATEGY: 'round_robin', // 'round_robin' | 'least_used' | 'random'
+	
+	// Model patterns for different providers
+	MODEL_PATTERNS: {
+		[PROVIDERS.GOOGLE]: [
+			'gemini-1.5-flash',
+			'gemini-1.5-pro', 
+			'gemini-2.0-flash',
+			'gemini-2.0-pro',
+			'gemini-*'
+		],
+		[PROVIDERS.GROQ]: [
+			'gpt-3.5-turbo',
+			'gpt-4',
+			'gpt-4-turbo',
+			'whisper-large-v3',
+			'gpt-*',
+			'whisper-*',
+			'openai/gpt-*',
+			'openai/whisper-*'
+		]
+	},
+	
+	// Key types supported
+	KEY_TYPES: {
+		API_KEY: 'api_key',
+		BEARER_TOKEN: 'bearer_token'
+	} as const,
+	
+	// Default key configuration for new keys
+	DEFAULTS: {
+		KEY_TYPE: 'api_key',
+		IS_ACTIVE: true,
+		USAGE_COUNT: 0
+	}
 } as const;
 
 export const PRICING = {

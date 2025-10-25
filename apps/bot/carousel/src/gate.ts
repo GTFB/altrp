@@ -8,20 +8,38 @@ import {
 	MODEL_PATTERNS, 
 	PROVIDER_ROUTING, 
 	API_KEYS, 
+	KEY_MANAGEMENT,
 	PRICING, 
 	RATE_LIMITS, 
 	CACHE_SETTINGS 
 } from '../settings';
+import { KeyManagerService } from './services/keyManager';
 
-// Key rotation functions
+// Enhanced key rotation functions with new centralized system and fallback
 async function getNextGoogleKey(env: Env, projectId: string): Promise<string> {
-	// Get current key index from KV
+	// Try new centralized key management system first
+	if (KEY_MANAGEMENT.ENABLED) {
+		try {
+			const keyManager = new KeyManagerService(env);
+			return await keyManager.getNextKey(PROVIDERS.GOOGLE, 'gemini-*');
+		} catch (error) {
+			console.warn('New key management failed, falling back to legacy system:', error);
+			if (!KEY_MANAGEMENT.FALLBACK_TO_LEGACY) {
+				throw error;
+			}
+		}
+	}
+
+	// Legacy key rotation system (fallback)
 	const keyIndexKey = `key_rotation:${projectId}:google`;
 	const currentIndex = await env.RATE_LIMITS.get(keyIndexKey) || '0';
 	const index = parseInt(currentIndex, 10);
 	
-	// Available Google keys from settings
 	const googleKeys = API_KEYS.GOOGLE.map(keyName => (env as any)[keyName]).filter(Boolean);
+	
+	if (googleKeys.length === 0) {
+		throw new Error('No Google API keys available');
+	}
 	
 	const selectedKey = googleKeys[index % googleKeys.length];
 	
@@ -32,13 +50,29 @@ async function getNextGoogleKey(env: Env, projectId: string): Promise<string> {
 }
 
 async function getNextGroqKey(env: Env, projectId: string): Promise<string> {
-	// Get current key index from KV
+	// Try new centralized key management system first
+	if (KEY_MANAGEMENT.ENABLED) {
+		try {
+			const keyManager = new KeyManagerService(env);
+			return await keyManager.getNextKey(PROVIDERS.GROQ, 'gpt-*');
+		} catch (error) {
+			console.warn('New key management failed, falling back to legacy system:', error);
+			if (!KEY_MANAGEMENT.FALLBACK_TO_LEGACY) {
+				throw error;
+			}
+		}
+	}
+
+	// Legacy key rotation system (fallback)
 	const keyIndexKey = `key_rotation:${projectId}:groq`;
 	const currentIndex = await env.RATE_LIMITS.get(keyIndexKey) || '0';
 	const index = parseInt(currentIndex, 10);
 	
-	// Available Groq keys from settings
 	const groqKeys = API_KEYS.GROQ.map(keyName => (env as any)[keyName]).filter(Boolean);
+	
+	if (groqKeys.length === 0) {
+		throw new Error('No Groq API keys available');
+	}
 	
 	const selectedKey = groqKeys[index % groqKeys.length];
 	

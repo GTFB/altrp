@@ -30,4 +30,8 @@ USE_LOCAL_ASYNC = "true"
 #[triggers]
 #crons = ["* * * * *"]
 
-
+[observability]
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
