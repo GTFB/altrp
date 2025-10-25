@@ -106,14 +106,14 @@ export class KeyManagerService {
 		console.log(`[KeyManager] Raw DB result:`, result);
 		
 		const allKeys = result.results.map(this.mapDbRowToApiKey);
-		console.log(`[KeyManager] All keys:`, allKeys.map(k => ({ id: k.id, name: k.name, provider: k.provider, isActive: k.isActive, isValid: k.isValid, models: k.models })));
+		console.log(`[KeyManager] All keys:`, allKeys.map((k: ApiKey) => ({ id: k.id, name: k.name, provider: k.provider, isActive: k.isActive, isValid: k.isValid, models: k.models })));
 		
 		// Filter keys that support the requested model AND are valid
-		const supportedKeys = allKeys.filter(key => 
+		const supportedKeys = allKeys.filter((key: ApiKey) => 
 			key.isValid && key.models.some(pattern => this.matchesModel(model, pattern))
 		);
 		
-		console.log(`[KeyManager] Valid keys supporting model ${model}:`, supportedKeys.map(k => ({ id: k.id, name: k.name, provider: k.provider, isActive: k.isActive, isValid: k.isValid, models: k.models })));
+		console.log(`[KeyManager] Valid keys supporting model ${model}:`, supportedKeys.map((k: ApiKey) => ({ id: k.id, name: k.name, provider: k.provider, isActive: k.isActive, isValid: k.isValid, models: k.models })));
 		
 		return supportedKeys;
 	}
@@ -279,29 +279,8 @@ export class KeyManagerService {
 	async getNextValidKey(provider: string, model: string): Promise<{ key: string; keyId: string }> {
 		console.log(`[KeyManager] Getting next valid key for model: ${model}`);
 		
-		// Get all valid keys that support the model
-		const supportedKeys = await this.getKeysForModel(provider, model);
-		console.log(`[KeyManager] Found ${supportedKeys.length} valid keys:`, supportedKeys.map(k => ({ id: k.id, name: k.name, isValid: k.isValid })));
-		
-		if (supportedKeys.length === 0) {
-			throw new Error(`No valid keys support model: ${model}`);
-		}
-
-		// Try each key in rotation order
-		for (let i = 0; i < supportedKeys.length; i++) {
-			const key = supportedKeys[i];
-			console.log(`[KeyManager] Trying key ${key.id} (${key.name})`);
-			
-			// Mark this key as active
-			await this.rotateToKey(key.id, supportedKeys);
-			await this.updateKeyUsage(key.id);
-			
-			const keyValue = await this.getKeyValueFromDatabase(key);
-			
-			return { key: keyValue, keyId: key.id };
-		}
-		
-		throw new Error(`No valid keys available for model: ${model}`);
+		// Use the regular getNextKey method which handles rotation properly
+		return await this.getNextKey(provider, model);
 	}
 
 	/**
