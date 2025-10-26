@@ -1,0 +1,37 @@
+name = "api-gateway-dev"
+main = "src/gate.ts"
+compatibility_date = "2024-09-01"
+account_id = "YOUR_ACCOUNT_ID_HERE"
+
+# [[kv_namespaces]]
+# binding = "CACHE"
+# id = "YOUR_KV_CACHE_ID_HERE"
+# preview_id = "YOUR_PREVIEW_KV_CACHE_ID_HERE"
+
+# [[kv_namespaces]]
+# binding = "PROVIDERS_CONFIG"
+# id = "YOUR_KV_PROVIDERS_CONFIG_ID_HERE"
+# preview_id = "YOUR_PREVIEW_KV_PROVIDERS_CONFIG_ID_HERE"
+
+# [[kv_namespaces]]
+# binding = "RATE_LIMITS"
+# id = "YOUR_KV_RATE_LIMITS_ID_HERE"
+# preview_id = "YOUR_PREVIEW_KV_RATE_LIMITS_ID_HERE"
+
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "YOUR_DATABASE_NAME"
+# database_id = "YOUR_DATABASE_ID_HERE"
+
+[vars]
+# non-secret constants here
+USE_LOCAL_ASYNC = "true"
+
+#[triggers]
+#crons = ["* * * * *"]
+
+[observability]
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
