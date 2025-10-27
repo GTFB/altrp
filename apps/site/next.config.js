@@ -22,9 +22,9 @@ const nextConfig = {
   experimental: {
     // optimizeCss: true, 
     optimizePackageImports: ['lucide-react'],
-    optimizeCss: true,
+    optimizeCss: false,
     externalDir: true,
-    inlineCss: true,
+    // inlineCss: true,
     // Exclude Cloudflare Pages Functions from tracing/bundle
     
 
