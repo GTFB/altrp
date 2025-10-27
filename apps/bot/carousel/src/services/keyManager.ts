@@ -82,8 +82,8 @@ export class KeyManagerService {
 	async getActiveKeysForProvider(provider: string): Promise<ApiKey[]> {
 		const stmt = this.env.DB.prepare(`
 			SELECT * FROM keys 
-			WHERE provider = ? AND isActive = 1 
-			ORDER BY usageCount ASC, lastUsed ASC
+			WHERE JSON_EXTRACT(data_in, '$.provider') = ? AND is_active = 1 
+			ORDER BY JSON_EXTRACT(data_in, '$.usageCount') ASC, JSON_EXTRACT(data_in, '$.lastUsed') ASC
 		`);
 		
 		const result = await stmt.bind(provider).all();
@@ -99,10 +99,11 @@ export class KeyManagerService {
 		// Get ALL keys (not just active ones) and filter by model support
 		const stmt = this.env.DB.prepare(`
 			SELECT * FROM keys 
-			ORDER BY createdAt ASC
+			WHERE JSON_EXTRACT(data_in, '$.provider') = ?
+			ORDER BY created_at ASC
 		`);
 		
-		const result = await stmt.all();
+		const result = await stmt.bind(provider).all();
 		console.log(`[KeyManager] Raw DB result:`, result);
 		
 		const allKeys = result.results.map(this.mapDbRowToApiKey);
@@ -157,11 +158,16 @@ export class KeyManagerService {
 		const now = Math.floor(Date.now() / 1000);
 		const stmt = this.env.DB.prepare(`
 			UPDATE keys 
-			SET usageCount = usageCount + 1, lastUsed = ?, updatedAt = ?
-			WHERE id = ?
+			SET data_in = json_set(
+				data_in, 
+				'$.usageCount', COALESCE(JSON_EXTRACT(data_in, '$.usageCount'), 0) + 1,
+				'$.lastUsed', ?
+			),
+			updated_at = datetime('now')
+			WHERE id = ? OR kaid = ?
 		`);
 		
-		await stmt.bind(now, now, keyId).run();
+		await stmt.bind(now, keyId, keyId).run();
 	}
 
 	/**
@@ -176,23 +182,21 @@ export class KeyManagerService {
 			const placeholders = allKeyIds.map(() => '?').join(',');
 			const stmt = this.env.DB.prepare(`
 				UPDATE keys 
-				SET isActive = 0, updatedAt = ?
-				WHERE id IN (${placeholders})
+				SET is_active = 0, updated_at = datetime('now')
+				WHERE id IN (${placeholders}) OR kaid IN (${placeholders})
 			`);
 			
-			const now = Math.floor(Date.now() / 1000);
-			await stmt.bind(now, ...allKeyIds).run();
+			await stmt.bind(...allKeyIds, ...allKeyIds).run();
 		}
 		
 		// Set the selected key as active
-		const now = Math.floor(Date.now() / 1000);
 		const stmt = this.env.DB.prepare(`
 			UPDATE keys 
-			SET isActive = 1, updatedAt = ?
-			WHERE id = ?
+			SET is_active = 1, updated_at = datetime('now')
+			WHERE id = ? OR kaid = ?
 		`);
 		
-		await stmt.bind(now, activeKeyId).run();
+		await stmt.bind(activeKeyId, activeKeyId).run();
 		
 		console.log(`[KeyManager] Key ${activeKeyId} is now active, others are inactive`);
 	}
@@ -247,11 +251,14 @@ export class KeyManagerService {
 		console.log(`[KeyManager] Marking key ${keyId} as invalid`);
 		
 		const stmt = this.env.DB.prepare(`
-			UPDATE keys SET isValid = 0, isActive = 0, updatedAt = ? WHERE id = ?
+			UPDATE keys 
+			SET data_in = json_set(data_in, '$.isValid', 0),
+				is_active = 0,
+				updated_at = datetime('now')
+			WHERE id = ? OR kaid = ?
 		`);
 		
-		const now = Math.floor(Date.now() / 1000);
-		await stmt.bind(now, keyId).run();
+		await stmt.bind(keyId, keyId).run();
 		
 		console.log(`[KeyManager] Key ${keyId} marked as invalid`);
 	}
@@ -263,11 +270,13 @@ export class KeyManagerService {
 		console.log(`[KeyManager] Marking key ${keyId} as valid`);
 		
 		const stmt = this.env.DB.prepare(`
-			UPDATE keys SET isValid = 1, updatedAt = ? WHERE id = ?
+			UPDATE keys 
+			SET data_in = json_set(data_in, '$.isValid', 1),
+				updated_at = datetime('now')
+			WHERE id = ? OR kaid = ?
 		`);
 		
-		const now = Math.floor(Date.now() / 1000);
-		await stmt.bind(now, keyId).run();
+		await stmt.bind(keyId, keyId).run();
 		
 		console.log(`[KeyManager] Key ${keyId} marked as valid`);
 	}
@@ -311,19 +320,27 @@ export class KeyManagerService {
 	private mapDbRowToApiKey(row: any): ApiKey {
 		console.log(`[KeyManager] Mapping DB row:`, row);
 		
+		// Parse data_in JSON
+		let dataIn = {};
+		try {
+			dataIn = JSON.parse(row.data_in || '{}');
+		} catch (e) {
+			console.error('Failed to parse data_in:', e);
+		}
+		
 		return {
-			id: row.id,
-			name: row.name,
-			provider: row.provider,
-			keyValue: row.keyValue,
-			keyType: row.keyType,
-			models: JSON.parse(row.models),
-			isActive: Boolean(row.isActive),
-			isValid: Boolean(row.isValid),
-			lastUsed: row.lastUsed,
-			usageCount: row.usageCount,
-			createdAt: row.createdAt,
-			updatedAt: row.updatedAt
+			id: row.id?.toString() || row.kaid,
+			name: row.title || '',
+			provider: dataIn['provider'] || '',
+			keyValue: dataIn['keyValue'] || '',
+			keyType: dataIn['keyType'] || 'api_key',
+			models: JSON.parse(dataIn['models'] || '[]'),
+			isActive: Boolean(row.is_active),
+			isValid: Boolean(dataIn['isValid']),
+			lastUsed: dataIn['lastUsed'],
+			usageCount: dataIn['usageCount'] || 0,
+			createdAt: new Date(row.created_at).getTime() / 1000,
+			updatedAt: new Date(row.updated_at).getTime() / 1000
 		};
 	}
 

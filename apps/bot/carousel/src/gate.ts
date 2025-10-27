@@ -122,13 +122,26 @@ app.get('/result/:requestId', async (c) => {
 	if (!token) return c.json({ error: 'Unauthorized' }, 401);
 	const tokenHash = await sha256Base64(token);
 	const project = await c.env.DB.prepare(
-		'SELECT id FROM projects WHERE apiKeyHash = ? LIMIT 1'
+		`SELECT daid as id FROM deals WHERE JSON_EXTRACT(data_in, '$.apiKeyHash') = ? LIMIT 1`
 	).bind(tokenHash).first<{ id: string }>();
 	if (!project) return c.json({ error: 'Unauthorized' }, 401);
 
 	// Get result from database
 	const result = await c.env.DB.prepare(
-		'SELECT status, provider, model, cost, promptTokens, completionTokens, latencyMs, requestBody, responseBody, createdAt FROM logs WHERE id = ? AND projectId = ? LIMIT 1'
+		`SELECT 
+			JSON_EXTRACT(details, '$.status') as status,
+			JSON_EXTRACT(details, '$.provider') as provider,
+			model_name as model,
+			JSON_EXTRACT(details, '$.cost') as cost,
+			JSON_EXTRACT(details, '$.promptTokens') as promptTokens,
+			JSON_EXTRACT(details, '$.completionTokens') as completionTokens,
+			JSON_EXTRACT(details, '$.latencyMs') as latencyMs,
+			JSON_EXTRACT(details, '$.requestBody') as requestBody,
+			JSON_EXTRACT(details, '$.responseBody') as responseBody,
+			created_at as createdAt
+		FROM journal_generations 
+		WHERE full_maid = ? AND JSON_EXTRACT(details, '$.original_projectId') = ? 
+		LIMIT 1`
 	).bind(requestId, project.id).first<{
 		status: string;
 		provider: string;
@@ -180,13 +193,18 @@ app.get('/status/:requestId', async (c) => {
 	if (!token) return c.json({ error: 'Unauthorized' }, 401);
 	const tokenHash = await sha256Base64(token);
 	const project = await c.env.DB.prepare(
-		'SELECT id FROM projects WHERE apiKeyHash = ? LIMIT 1'
+		`SELECT daid as id FROM deals WHERE JSON_EXTRACT(data_in, '$.apiKeyHash') = ? LIMIT 1`
 	).bind(tokenHash).first<{ id: string }>();
 	if (!project) return c.json({ error: 'Unauthorized' }, 401);
 
 	// Check if request exists in database
 	const result = await c.env.DB.prepare(
-		'SELECT status, createdAt FROM logs WHERE id = ? AND projectId = ? LIMIT 1'
+		`SELECT 
+			JSON_EXTRACT(details, '$.status') as status,
+			created_at as createdAt
+		FROM journal_generations 
+		WHERE full_maid = ? AND JSON_EXTRACT(details, '$.original_projectId') = ? 
+		LIMIT 1`
 	).bind(requestId, project.id).first<{
 		status: string;
 		createdAt: number;
@@ -217,7 +235,7 @@ app.get('/keys/status', async (c) => {
 	if (!token) return c.json({ error: 'Unauthorized' }, 401);
 	const tokenHash = await sha256Base64(token);
 	const project = await c.env.DB.prepare(
-		'SELECT id FROM projects WHERE apiKeyHash = ? LIMIT 1'
+		`SELECT daid as id FROM deals WHERE JSON_EXTRACT(data_in, '$.apiKeyHash') = ? LIMIT 1`
 	).bind(tokenHash).first<{ id: string }>();
 	if (!project) return c.json({ error: 'Unauthorized' }, 401);
 
@@ -250,7 +268,11 @@ app.post('/upload', async (c) => {
 	if (!token) return c.json({ error: 'Unauthorized' }, 401);
 	const tokenHash = await sha256Base64(token);
 	const project = await c.env.DB.prepare(
-		'SELECT id, monthlyBudget, currentUsage FROM projects WHERE apiKeyHash = ? LIMIT 1'
+		`SELECT 
+			daid as id,
+			JSON_EXTRACT(data_in, '$.monthlyBudget') as monthlyBudget,
+			JSON_EXTRACT(data_in, '$.currentUsage') as currentUsage
+		FROM deals WHERE JSON_EXTRACT(data_in, '$.apiKeyHash') = ? LIMIT 1`
 	).bind(tokenHash).first<{ id: string; monthlyBudget: number; currentUsage: number }>();
 	if (!project) return c.json({ error: 'Unauthorized' }, 401);
 
@@ -259,7 +281,9 @@ app.post('/upload', async (c) => {
 	
 	// Check permissions
 	const perm = await c.env.DB.prepare(
-		'SELECT 1 FROM project_permissions WHERE projectId = ? AND ? LIKE REPLACE(modelPattern, "*", "%") LIMIT 1'
+		`SELECT 1 FROM identities 
+		WHERE entity_aid = ? AND ? LIKE REPLACE(permission, "*", "%") 
+		LIMIT 1`
 	).bind(project.id, model).first();
 	if (!perm) return c.json({ error: 'Forbidden' }, 403);
 
@@ -291,8 +315,23 @@ app.post('/upload', async (c) => {
 		const fileName = file.name || 'audio';
 		const fileExt = fileName.split('.').pop()?.toLowerCase() || 'mp3';
 
-		// Process synchronously for immediate response
+		// Check cache by file hash
+		const fileHash = await sha256Base64(base64);
+		const cacheKey = `resp:${model}:${fileHash}`;
+		const cached = await c.env.CACHE.get(cacheKey);
+		
+		if (cached) {
+			const cachedData = JSON.parse(cached);
+			return c.json({
+				requestId: cachedData.requestId,
+				content: cachedData.content
+			});
+		}
+
+		// Generate requestId
 		const requestId = genId('req');
+		
+		// Process synchronously
 		const t0 = Date.now();
 		let status = 'SUCCESS';
 		let text = '';
@@ -316,41 +355,52 @@ app.post('/upload', async (c) => {
 		const latency = Date.now() - t0;
 		
 		// Log to database
-		await c.env.DB.prepare(
-			'INSERT INTO logs (id, projectId, status, provider, model, cost, promptTokens, completionTokens, latencyMs, requestBody, responseBody, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)' 
-		).bind(
-			requestId,
-			project.id,
+		const detailsJson = JSON.stringify({
 			status,
-			'groq',
-			model,
+			provider: 'groq',
 			cost,
-			0, // promptTokens for audio
-			text.split(/\s+/).length, // completionTokens
-			latency,
-			JSON.stringify({ model, audioFormat: fileExt }),
-			JSON.stringify({ content: text }),
-			Math.floor(Date.now() / 1000)
+			promptTokens: 0, // audio
+			completionTokens: text.split(/\s+/).length,
+			latencyMs: latency,
+			requestBody: { model, audioFormat: fileExt },
+			responseBody: { content: text },
+			original_log_id: requestId,
+			original_projectId: project.id
+		});
+		
+		await c.env.DB.prepare(
+			`INSERT INTO journal_generations 
+			(uuid, full_maid, model_name, status, token_in, token_out, total_token, details, created_at, updated_at) 
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
+		).bind(
+			crypto.randomUUID(), // uuid
+			requestId, // full_maid
+			model,
+			status,
+			0,
+			text.split(/\s+/).length,
+			text.split(/\s+/).length,
+			detailsJson
 		).run();
 
 		// Update project usage
-		await c.env.DB.prepare('UPDATE projects SET currentUsage = currentUsage + ? WHERE id = ?').bind(cost, project.id).run();
+		await c.env.DB.prepare(
+			`UPDATE deals 
+			SET data_in = json_set(data_in, '$.currentUsage', CAST(JSON_EXTRACT(data_in, '$.currentUsage') AS REAL) + ?)
+			WHERE daid = ?`
+		).bind(cost, project.id).run();
 
 		console.log('Processed audio file', requestId, 'status', status, 'latency', latency);
 
-		// Return result immediately
+		// Cache the result
 		if (status === 'SUCCESS') {
-			return c.json({ 
-				content: text,
-				requestId: requestId,
-				cached: false
-			});
-		} else {
-			return c.json({ 
-				error: text,
-				requestId: requestId
-			}, 500);
+			await c.env.CACHE.put(cacheKey, JSON.stringify({ requestId, model, content: text }), { expirationTtl: CACHE_SETTINGS.TTL_SECONDS });
 		}
+		
+		// Return with requestId only
+		return c.json({ 
+			requestId: requestId
+		});
 
 	} catch (error) {
 		console.error('File upload error:', error);
@@ -377,7 +427,11 @@ app.post('/ask', async (c) => {
 	if (!token) return c.json({ error: 'Unauthorized' }, 401);
 	const tokenHash = await sha256Base64(token);
 	const project = await c.env.DB.prepare(
-		'SELECT id, monthlyBudget, currentUsage FROM projects WHERE apiKeyHash = ? LIMIT 1'
+		`SELECT 
+			daid as id,
+			JSON_EXTRACT(data_in, '$.monthlyBudget') as monthlyBudget,
+			JSON_EXTRACT(data_in, '$.currentUsage') as currentUsage
+		FROM deals WHERE JSON_EXTRACT(data_in, '$.apiKeyHash') = ? LIMIT 1`
 	).bind(tokenHash).first<{ id: string; monthlyBudget: number; currentUsage: number }>();
 	if (!project) return c.json({ error: 'Unauthorized' }, 401);
 
@@ -385,7 +439,9 @@ app.post('/ask', async (c) => {
 
 	// Permissions
 	const perm = await c.env.DB.prepare(
-		'SELECT 1 FROM project_permissions WHERE projectId = ? AND ? LIKE REPLACE(modelPattern, "*", "%") LIMIT 1'
+		`SELECT 1 FROM identities 
+		WHERE entity_aid = ? AND ? LIKE REPLACE(permission, "*", "%") 
+		LIMIT 1`
 	).bind(project.id, model).first();
 	if (!perm) return c.json({ error: 'Forbidden' }, 403);
 
@@ -754,28 +810,44 @@ async function processTask(message: { id: string; body: any }, env: Env) {
 		}
 	}
 
-	await env.DB.prepare(
-		'INSERT INTO logs (id, projectId, status, provider, model, cost, promptTokens, completionTokens, latencyMs, requestBody, responseBody, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)' 
-	).bind(
-		requestId,
-		projectId,
+	// Log to database using journal_generations
+	const detailsJson = JSON.stringify({
 		status,
 		provider,
-		model,
 		cost,
 		promptTokens,
 		completionTokens,
-		latency,
-		JSON.stringify({ model, input, messages }),
-		JSON.stringify({ content: text }),
-		Math.floor(Date.now() / 1000)
+		latencyMs: latency,
+		requestBody: { model, input, messages },
+		responseBody: { content: text },
+		original_log_id: requestId,
+		original_projectId: projectId
+	});
+	
+	await env.DB.prepare(
+		`INSERT INTO journal_generations 
+		(uuid, full_maid, model_name, status, token_in, token_out, total_token, details, created_at, updated_at) 
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
+	).bind(
+		crypto.randomUUID(), // uuid
+		requestId, // full_maid
+		model,
+		status,
+		promptTokens,
+		completionTokens,
+		promptTokens + completionTokens,
+		detailsJson
 	).run();
 
 	if (status === 'SUCCESS') {
 		await env.CACHE.put(`resp:${model}:${await sha256(inputText)}`, JSON.stringify({ requestId, model, content: text }), { expirationTtl: CACHE_SETTINGS.TTL_SECONDS });
 	}
 
-	await env.DB.prepare('UPDATE projects SET currentUsage = currentUsage + ? WHERE id = ?').bind(cost, projectId).run();
+	await env.DB.prepare(
+		`UPDATE deals 
+		SET data_in = json_set(data_in, '$.currentUsage', CAST(JSON_EXTRACT(data_in, '$.currentUsage') AS REAL) + ?)
+		WHERE daid = ?`
+	).bind(cost, projectId).run();
 
 	console.log('Processed message', message.id, 'requestId', requestId, 'status', status, 'latency', latency);
 }
