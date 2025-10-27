@@ -1,7 +1,6 @@
 "use client";
 
-import { type Post } from "@/types/post";
-import Link from "next/link";
+import { type Post } from "@/packages/types/post";
 import { useLocale } from "next-intl";
 import { PostTags } from "@/components/blocks-app/blog/PostTags";
 import { PostMeta } from "@/components/blocks-app/blog/PostMeta";
@@ -18,14 +17,12 @@ export function PostCard({ post }: PostCardProps) {
     <article className="border rounded-lg p-6 hover:shadow-md transition-shadow">
       <header className="mb-4">
         <h2 className="text-xl font-semibold mb-2">
-          <Link
-            href={{
-              pathname: `${localePath}/blog/${post.slug}`,
-            }}
+          <a
+            href={`${localePath}/blog/${post.slug}`}
             className="hover:text-primary"
           >
             {post.title}
-          </Link>
+          </a>
         </h2>
         <PostMeta
           date={post.date}

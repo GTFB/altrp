@@ -4,8 +4,8 @@ import matter from "gray-matter";
 import { parseMarkdown } from "@/lib/markdown";
 import { z } from "zod";
 import { getContentDir } from "@/lib/content-path";
-import type { CategoryDataProvider } from "@/types/providers";
-import type { Category } from "@/types/category";
+import type { CategoryDataProvider } from "@/packages/types/providers";
+import type { Category } from "@/packages/types/category";
 
 const categorySchema = z.object({
   title: z.string(),

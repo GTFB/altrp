@@ -1,6 +1,6 @@
 import { getContentDir } from "@/lib/content-path";
-import type { Category } from "@/types/category";
-import type { CategoryDataProvider } from "@/types/providers";
+import type { Category } from "@/packages/types/category";
+import type { CategoryDataProvider } from "@/packages/types/providers";
 import { createCategoryProvider } from "@/repositories/providers/factory";
 
 // const categorySchema = z.object({

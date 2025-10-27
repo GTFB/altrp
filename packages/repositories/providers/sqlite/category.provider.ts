@@ -1,5 +1,5 @@
-import type { CategoryDataProvider } from "@/types/providers";
-import type { Category } from "@/types/category";
+import type { CategoryDataProvider } from "@/packages/types/providers";
+import type { Category } from "@/packages/types/category";
 import { db } from "@/packages/db/cms/client";
 import { categories } from "@/packages/db/cms/schema";
 import { eq } from "drizzle-orm";
@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
 export class SqliteCategoryProvider implements CategoryDataProvider {
   async findAll(): Promise<Category[]> {
     const rows = await db.select().from(categories);
-    return rows.map((r) => ({
+    return rows.map((r: typeof rows[0]) => ({
       slug: r.slug!,
       title: r.title!,
       date: r.date ?? undefined,

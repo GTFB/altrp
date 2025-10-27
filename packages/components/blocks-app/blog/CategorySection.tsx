@@ -6,7 +6,7 @@ import { Loader2, ArrowRight, Tag } from "lucide-react";
 import Link from "next/link";
 import { useLocale } from "next-intl";
 import { useEffect, useState } from "react";
-import { type Category } from "@/types/category";
+import { type Category } from "@/packages/types/category";
 
 interface CategorySectionProps {
   limit?: number;

@@ -45,7 +45,7 @@ export function VideoPlayer({
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const controlsTimeoutRef = useRef<NodeJS.Timeout>();
+  const controlsTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   // Generate embed URLs based on type
   const getEmbedUrl = (url: string, type: string) => {

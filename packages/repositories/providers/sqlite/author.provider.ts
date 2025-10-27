@@ -1,5 +1,5 @@
-import type { AuthorDataProvider } from "@/types/providers";
-import type { Author } from "@/types/author";
+import type { AuthorDataProvider } from "@/packages/types/providers";
+import type { Author } from "@/packages/types/author";
 import { db } from "@/packages/db/cms/client";
 import { authors } from "@/packages/db/cms/schema";
 import { eq } from "drizzle-orm";
@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
 export class SqliteAuthorProvider implements AuthorDataProvider {
   async findAll(): Promise<Author[]> {
     const rows = await db.select().from(authors);
-    return rows.map((r) => ({
+    return rows.map((r: typeof rows[0]) => ({
       slug: r.slug!,
       name: r.name!,
       avatar: r.avatar ?? undefined,

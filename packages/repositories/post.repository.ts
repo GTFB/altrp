@@ -5,7 +5,7 @@ import {
   SearchOptions,
 } from "./base.repository";
 import { PROJECT_SETTINGS, SUPPORTED_LANGUAGES } from "@/settings";
-import type { PostDataProvider } from "@/types/providers";
+import type { PostDataProvider } from "@/packages/types/providers";
 import { createPostProvider } from "@/repositories/providers/factory";
 import type {
   Post,
@@ -13,7 +13,7 @@ import type {
   PostSortOptions,
   PaginationOptions,
   PaginatedResult,
-} from "@/types/post";
+} from "@/packages/types/post";
 
 // types are imported from '@/types/post'
 

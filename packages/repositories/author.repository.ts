@@ -1,6 +1,6 @@
 import { getContentDir } from "@/lib/content-path";
-import type { AuthorDataProvider } from "@/types/providers";
-import type { Author } from "@/types/author";
+import type { AuthorDataProvider } from "@/packages/types/providers";
+import type { Author } from "@/packages/types/author";
 import { createAuthorProvider } from "@/repositories/providers/factory";
 
 // const authorSchema = z.object({

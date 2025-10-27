@@ -1,6 +1,6 @@
 "use client";
 
-import { type Author } from "@/types/author";
+import { type Author } from "@/packages/types/author";
 import Link from "next/link";
 import { useLocale } from "next-intl";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

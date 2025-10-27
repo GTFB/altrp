@@ -5,14 +5,14 @@ import Fuse from "fuse.js";
 import { parseMarkdown } from "@/lib/markdown";
 import { frontmatterSchema } from "@/lib/validators/content.schema";
 import { getContentDir } from "@/lib/content-path";
-import type { PostDataProvider } from "@/types/providers";
+import type { PostDataProvider } from "@/packages/types/providers";
 import type {
   Post,
   PostFilters,
   PostSortOptions,
   PaginationOptions,
   PaginatedResult,
-} from "@/types/post";
+} from "@/packages/types/post";
 import { i18nConfig } from "../../../../apps/cms/src/config/i18n";
 
 export class MdxPostProvider implements PostDataProvider {

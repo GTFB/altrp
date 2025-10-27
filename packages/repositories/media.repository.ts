@@ -1,6 +1,6 @@
 import { getContentDir } from "@/lib/content-path";
-import type { Media, MediaFilters, MediaSortOptions } from "@/types/media";
-import type { MediaDataProvider } from "@/types/providers";
+import type { Media, MediaFilters, MediaSortOptions } from "@/packages/types/media";
+import type { MediaDataProvider } from "@/packages/types/providers";
 import { createMediaProvider } from "./providers/factory";
 
 // const mediaSchema = z.object({

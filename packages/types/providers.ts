@@ -8,11 +8,11 @@ import type {
   PostSortOptions,
   PaginationOptions,
   PaginatedResult,
-} from "@/types/post";
-import type { Page, PageFilters, PageSortOptions } from "@/types/page";
-import type { Category } from "@/types/category";
-import type { Author } from "@/types/author";
-import type { Media, MediaFilters, MediaSortOptions } from "@/types/media";
+} from "@/packages/types/post";
+import type { Page, PageFilters, PageSortOptions } from "@/packages/types/page";
+import type { Category } from "@/packages/types/category";
+import type { Author } from "@/packages/types/author";
+import type { Media, MediaFilters, MediaSortOptions } from "@/packages/types/media";
 
 export interface AuthorDataProvider {
   findAll(): Promise<Author[]>;
