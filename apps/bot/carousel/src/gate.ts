@@ -315,8 +315,23 @@ app.post('/upload', async (c) => {
 		const fileName = file.name || 'audio';
 		const fileExt = fileName.split('.').pop()?.toLowerCase() || 'mp3';
 
-		// Process synchronously for immediate response
+		// Check cache by file hash
+		const fileHash = await sha256Base64(base64);
+		const cacheKey = `resp:${model}:${fileHash}`;
+		const cached = await c.env.CACHE.get(cacheKey);
+		
+		if (cached) {
+			const cachedData = JSON.parse(cached);
+			return c.json({
+				requestId: cachedData.requestId,
+				content: cachedData.content
+			});
+		}
+
+		// Generate requestId
 		const requestId = genId('req');
+		
+		// Process synchronously
 		const t0 = Date.now();
 		let status = 'SUCCESS';
 		let text = '';
@@ -377,19 +392,15 @@ app.post('/upload', async (c) => {
 
 		console.log('Processed audio file', requestId, 'status', status, 'latency', latency);
 
-		// Return result immediately
+		// Cache the result
 		if (status === 'SUCCESS') {
-			return c.json({ 
-				content: text,
-				requestId: requestId,
-				cached: false
-			});
-		} else {
-			return c.json({ 
-				error: text,
-				requestId: requestId
-			}, 500);
+			await c.env.CACHE.put(cacheKey, JSON.stringify({ requestId, model, content: text }), { expirationTtl: CACHE_SETTINGS.TTL_SECONDS });
 		}
+		
+		// Return with requestId only
+		return c.json({ 
+			requestId: requestId
+		});
 
 	} catch (error) {
 		console.error('File upload error:', error);
