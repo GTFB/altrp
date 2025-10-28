@@ -5,8 +5,8 @@ import { useCallback, useEffect, useState } from "react";
 
 type Theme = "light" | "dark";
 
-export function useTheme(): { theme: Theme; setTheme: (theme: Theme) => void } {
-  const { theme, setTheme } = useNextTheme();
+export function useTheme(): { theme: Theme; setTheme: (theme: Theme, sync?: boolean) => void } {
+  const { theme = "light", setTheme } = useNextTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -14,8 +14,11 @@ export function useTheme(): { theme: Theme; setTheme: (theme: Theme) => void } {
   }, []);
 
   const _setTheme = useCallback(
-    (theme: Theme) => {
+    (theme: Theme, sync: boolean = true) => {
       setTheme(theme);
+      if (! sync) {
+        return;
+      }
       fetch(`/api/state`, {
         method: "PATCH",
         body: JSON.stringify({ theme }),

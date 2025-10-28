@@ -13,11 +13,13 @@ import {
   IconPlus,
   IconCheck,
   IconX,
+  IconSearch,
 } from "@tabler/icons-react"
 import { getCollection } from "../../../functions/_shared/collections/getCollection"
 import { useLocale } from "@/packages/hooks/use-locale"
 import { DateTimePicker } from "@/packages/components/ui/date-time-picker"
 import { PhoneInput } from "@/packages/components/ui/phone-input"
+import qs from "qs"
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -101,7 +103,7 @@ type ColumnSchemaExtended = ColumnSchema & {
   virtual?: boolean
   defaultCell?: any
   format?: (value: any, locale?: string) => string
-  fieldType?: 'text' | 'number' | 'email' | 'phone' | 'boolean' | 'date' | 'time' | 'datetime' | 'json' | 'array' | 'object'
+  fieldType?: 'text' | 'number' | 'email' | 'phone' | 'password' | 'boolean' | 'date' | 'time' | 'datetime' | 'json' | 'array' | 'object'
   relation?: RelationConfig
 }
 
@@ -158,12 +160,13 @@ function RelationSelect({
     const loadOptions = async () => {
       setLoading(true)
       try {
-        const params = new URLSearchParams()
-        params.set("c", relation.collection)
-        params.set("p", "1")
-        params.set("ps", "1000") // Load more items for select
+        const queryParams = qs.stringify({
+          c: relation.collection,
+          p: 1,
+          ps: 1000, // Load more items for select
+        })
 
-        const res = await fetch(`/api/admin/state?${params.toString()}`, {
+        const res = await fetch(`/api/admin/state?${queryParams}`, {
           credentials: "include",
         })
         if (!res.ok) throw new Error(`Failed to load: ${res.status}`)
@@ -327,6 +330,9 @@ export function DataTable() {
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
   const [relationData, setRelationData] = React.useState<Record<string, Record<any, string>>>({})
+  
+  // Local search state for input (debounced before updating global state)
+  const [searchInput, setSearchInput] = React.useState(state.search)
 
   const primaryKey = React.useMemo(() => schema.find((c) => c.primary)?.name || "id", [schema])
 
@@ -334,13 +340,15 @@ export function DataTable() {
     setLoading(true)
     setError(null)
     try {
-      const params = new URLSearchParams()
-      params.set("c", state.collection)
-      params.set("p", String(state.page))
-      params.set("ps", String(state.pageSize))
-      if (state.filters.length) params.set("f", JSON.stringify(state.filters))
+      const queryParams = qs.stringify({
+        c: state.collection,
+        p: state.page,
+        ps: state.pageSize,
+        ...(state.search && { s: state.search }),
+        ...(state.filters.length > 0 && { filters: state.filters }),
+      })
 
-      const res = await fetch(`/api/admin/state?${params.toString()}`, {
+      const res = await fetch(`/api/admin/state?${queryParams}`, {
         signal: abortSignal,
         credentials: "include",
       })
@@ -378,12 +386,13 @@ export function DataTable() {
         if (!col.relation) continue
         
         try {
-          const params = new URLSearchParams()
-          params.set("c", col.relation.collection)
-          params.set("p", "1")
-          params.set("ps", "1000")
+          const queryParams = qs.stringify({
+            c: col.relation.collection,
+            p: 1,
+            ps: 1000,
+          })
           
-          const relRes = await fetch(`/api/admin/state?${params.toString()}`, {
+          const relRes = await fetch(`/api/admin/state?${queryParams}`, {
             credentials: "include",
           })
           
@@ -408,8 +417,8 @@ export function DataTable() {
       
       setRelationData(relationDataMap)
       
-      // Update local state
-      setState(() => json.state)
+      // Update local state (preserve search from current state)
+      setState((prev) => ({ ...prev, ...json.state }))
       setSchema(extendedColumns)
       setTotal(json.schema.total)
       setTotalPages(json.schema.totalPages)
@@ -421,13 +430,33 @@ export function DataTable() {
     } finally {
       setLoading(false)
     }
-  }, [state.collection, state.page, state.pageSize, JSON.stringify(state.filters), setState])
+  }, [state.collection, state.page, state.pageSize, state.search, JSON.stringify(state.filters), setState])
 
   React.useEffect(() => {
     const controller = new AbortController()
     fetchData(controller.signal)
     return () => controller.abort()
   }, [fetchData])
+
+  // Sync searchInput with state.search when collection changes
+  React.useEffect(() => {
+    setSearchInput(state.search)
+  }, [state.collection])
+
+  // Debounce search input and update state
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchInput !== state.search) {
+        setState((prev) => ({
+          ...prev,
+          search: searchInput,
+          page: 1, // Reset to first page when search changes
+        }))
+      }
+    }, 500) // 500ms debounce
+
+    return () => clearTimeout(timer)
+  }, [searchInput, state.search, setState])
 
   // pagination sync with admin state
   const [pagination, setPagination] = React.useState({
@@ -647,7 +676,19 @@ export function DataTable() {
       defaultValue="outline"
       className="w-full flex-col justify-start gap-6"
     >
-      <div className="flex items-center justify-end px-4 lg:px-6">
+      <div className="flex items-center justify-between px-4 lg:px-6">
+        {/* Search Field */}
+        <div className="relative w-full max-w-sm">
+          <IconSearch className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        
         <Label htmlFor="view-selector" className="sr-only">
           View
         </Label>
@@ -867,7 +908,6 @@ export function DataTable() {
                       id={`field-${field.name}`}
                       checked={formData[field.name] === true}
                       onCheckedChange={(checked) => handleFieldChange(field.name, checked === true)}
-                      disabled={field.readOnly}
                     />
                     <Label htmlFor={`field-${field.name}`} className="text-sm font-medium cursor-pointer">
                       {field.title || field.name}
@@ -884,7 +924,6 @@ export function DataTable() {
                       value={formData[field.name] || null}
                       onChange={(date) => handleFieldChange(field.name, date)}
                       placeholder={`Select ${field.title || field.name}`}
-                      disabled={field.readOnly}
                     />
                   </>
                 ) : field.fieldType === 'phone' ? (
@@ -897,8 +936,39 @@ export function DataTable() {
                       value={formData[field.name] || ''}
                       onChange={(value) => handleFieldChange(field.name, value || '')}
                       placeholder={`Enter ${field.title || field.name}`}
-                      disabled={field.readOnly}
                     />
+                  </>
+                ) : field.fieldType === 'password' ? (
+                  <>
+                    <Label htmlFor={`field-${field.name}`} className="text-sm font-medium">
+                      {field.title || field.name}
+                      {!field.nullable && <span className="text-destructive ml-1">*</span>}
+                    </Label>
+                    <Input
+                      id={`field-${field.name}`}
+                      type="password"
+                      required={!field.nullable}
+                      value={formData[field.name] || ""}
+                      onChange={(e) => handleFieldChange(field.name, e.target.value)}
+                      placeholder={`Enter ${field.title || field.name}`}
+                      minLength={8}
+                    />
+                    <Label htmlFor={`field-${field.name}-confirm`} className="text-sm font-medium">
+                      Confirm {field.title || field.name}
+                      {!field.nullable && <span className="text-destructive ml-1">*</span>}
+                    </Label>
+                    <Input
+                      id={`field-${field.name}-confirm`}
+                      type="password"
+                      required={!field.nullable}
+                      value={formData[`${field.name}_confirm`] || ""}
+                      onChange={(e) => handleFieldChange(`${field.name}_confirm`, e.target.value)}
+                      placeholder={`Confirm ${field.title || field.name}`}
+                      minLength={8}
+                    />
+                    {formData[field.name] && formData[`${field.name}_confirm`] && formData[field.name] !== formData[`${field.name}_confirm`] && (
+                      <p className="text-sm text-destructive">Passwords do not match</p>
+                    )}
                   </>
                 ) : field.relation ? (
                   <>
@@ -911,7 +981,6 @@ export function DataTable() {
                       value={formData[field.name]}
                       onChange={(value) => handleFieldChange(field.name, value)}
                       required={!field.nullable}
-                      disabled={field.readOnly}
                     />
                   </>
                 ) : (
@@ -927,7 +996,6 @@ export function DataTable() {
                       value={formData[field.name] || ""}
                       onChange={(e) => handleFieldChange(field.name, e.target.value)}
                       placeholder={`Enter ${field.title || field.name}`}
-                      disabled={field.readOnly}
                     />
                   </>
                 )}
@@ -998,6 +1066,36 @@ export function DataTable() {
                       placeholder={`Enter ${field.title || field.name}`}
                       disabled={field.readOnly}
                     />
+                  </>
+                ) : field.fieldType === 'password' ? (
+                  <>
+                    <Label htmlFor={`edit-field-${field.name}`} className="text-sm font-medium">
+                      {field.title || field.name} (leave empty to keep current)
+                    </Label>
+                    <Input
+                      id={`edit-field-${field.name}`}
+                      type="password"
+                      value={editData[field.name] || ""}
+                      onChange={(e) => handleEditFieldChange(field.name, e.target.value)}
+                      placeholder={`Enter new ${field.title || field.name}`}
+                      disabled={field.readOnly}
+                      minLength={8}
+                    />
+                    <Label htmlFor={`edit-field-${field.name}-confirm`} className="text-sm font-medium">
+                      Confirm {field.title || field.name}
+                    </Label>
+                    <Input
+                      id={`edit-field-${field.name}-confirm`}
+                      type="password"
+                      value={editData[`${field.name}_confirm`] || ""}
+                      onChange={(e) => handleEditFieldChange(`${field.name}_confirm`, e.target.value)}
+                      placeholder={`Confirm new ${field.title || field.name}`}
+                      disabled={field.readOnly}
+                      minLength={8}
+                    />
+                    {editData[field.name] && editData[`${field.name}_confirm`] && editData[field.name] !== editData[`${field.name}_confirm`] && (
+                      <p className="text-sm text-destructive">Passwords do not match</p>
+                    )}
                   </>
                 ) : field.relation ? (
                   <>

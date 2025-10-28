@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/sidebar"
 import { useTheme } from "@/packages/hooks/use-theme"
 import { useRouter } from "next/navigation"
+import { useCallback } from "react"
 
 export function NavUser({
   user,
@@ -47,9 +48,9 @@ export function NavUser({
   const { theme, setTheme } = useTheme()
   const router = useRouter()
 
-  const toggleTheme = () => {
-    setTheme(theme === "light" ? "dark" : "light")
-  }
+  const toggleTheme = useCallback(() => {
+    setTheme(theme === "light" ? "dark" : "light", false)
+  }, [theme, setTheme])
 
   const handleLogout = async () => {
     try {

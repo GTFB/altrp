@@ -2,6 +2,7 @@
 
 import { createSession, jsonWithSession } from '../../_shared/session'
 import type { Env } from '../../_shared/middleware'
+import { verifyPassword } from '../../_shared/password'
 
 interface LoginRequest {
   email: string
@@ -68,14 +69,9 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
       })
     }
 
-    // Verify password using Web Crypto API
-    const encoder = new TextEncoder()
-    const passwordData = encoder.encode(password)
-    const hashBuffer = await crypto.subtle.digest('SHA-256', passwordData)
-    const hashArray = Array.from(new Uint8Array(hashBuffer))
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
-
-    if (hashHex !== user.password_hash) {
+    // Verify password
+    const isValidPassword = await verifyPassword(password, user.password_hash)
+    if (!isValidPassword) {
       return new Response(JSON.stringify({ error: 'Invalid credentials' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },

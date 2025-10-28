@@ -72,7 +72,9 @@ export default class Users extends Base {
     });
     
     password_hash = new BaseColumn({ 
-        hiddenTable: true  
+        hiddenTable: true  ,
+        title: 'Password',
+        type: 'password',
     });
     hash = new BaseColumn({ hidden: true });
     salt = new BaseColumn({ hidden: true });

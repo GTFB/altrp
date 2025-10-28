@@ -3,6 +3,7 @@
 import type { Env } from "../../_shared/middleware"
 import { COLLECTION_GROUPS } from "../../_shared/collections"
 import { getCollection } from "../../_shared/collections/getCollection"
+import qs from "qs"
 
 interface AdminFilter {
   field: string
@@ -15,6 +16,7 @@ interface AdminState {
   page: number
   pageSize: number
   filters: AdminFilter[]
+  search: string
 }
 
 interface ColumnInfo {
@@ -31,6 +33,7 @@ const DEFAULT_STATE: AdminState = {
   page: 1,
   pageSize: 20,
   filters: [],
+  search: "",
 }
 
 function q(name: string): string {
@@ -44,20 +47,20 @@ function isValidCollection(name: string): boolean {
 }
 
 function parseStateFromUrl(url: URL): AdminState {
-  const collection = url.searchParams.get("c") || DEFAULT_STATE.collection
-  const page = Math.max(1, Number(url.searchParams.get("p") || DEFAULT_STATE.page))
-  const pageSize = Math.max(1, Number(url.searchParams.get("ps") || DEFAULT_STATE.pageSize))
-  const f = url.searchParams.get("f")
+  // Parse query string with qs
+  const parsed = qs.parse(url.search.slice(1))
+  
+  const collection = (parsed.c as string) || DEFAULT_STATE.collection
+  const page = Math.max(1, Number(parsed.p) || DEFAULT_STATE.page)
+  const pageSize = Math.max(1, Number(parsed.ps) || DEFAULT_STATE.pageSize)
+  const search = (parsed.s as string) || DEFAULT_STATE.search
+  
   let filters: AdminFilter[] = []
-  if (f) {
-    try {
-      const parsed = JSON.parse(f)
-      if (Array.isArray(parsed)) {
-        filters = parsed.filter((item) => item && typeof item.field === "string")
-      }
-    } catch {}
+  if (parsed.filters && Array.isArray(parsed.filters)) {
+    filters = parsed.filters.filter((item: any) => item && typeof item.field === "string") as unknown as AdminFilter[]
   }
-  return { collection, page, pageSize, filters }
+  
+  return { collection, page, pageSize, filters, search }
 }
 
 export const onRequestGet = async (context: { request: Request; env: Env }) => {
@@ -122,12 +125,37 @@ export const onRequestGet = async (context: { request: Request; env: Env }) => {
     const allColumns = [...columns, ...virtualFields]
 
     const hasDeletedAt = schemaResult.results.some((c) => c.name.toLowerCase() === 'deleted_at')
-    const where = hasDeletedAt ? `WHERE ${q('deleted_at')} IS NULL` : ''
+    
+    // Build WHERE clause
+    const whereParts: string[] = []
+    const bindings: any[] = []
+    
+    if (hasDeletedAt) {
+      whereParts.push(`${q('deleted_at')} IS NULL`)
+    }
+    
+    // Add search condition if search is provided
+    if (state.search) {
+      // Get all TEXT columns for search
+      const searchableColumns = columns.filter(col => col.type === 'TEXT' || col.type === 'INTEGER')
+      if (searchableColumns.length > 0) {
+        const searchConditions = searchableColumns.map(col => 
+          `${q(col.name)} LIKE ?`
+        ).join(' OR ')
+        whereParts.push(`(${searchConditions})`)
+        // Add search pattern for each searchable column
+        searchableColumns.forEach(() => {
+          bindings.push(`%${state.search}%`)
+        })
+      }
+    }
+    
+    const where = whereParts.length > 0 ? `WHERE ${whereParts.join(' AND ')}` : ''
 
     // Get total count
     const countResult = await env.DB.prepare(
       `SELECT COUNT(*) as total FROM ${state.collection} ${where}`
-    ).first<{ total: number }>()
+    ).bind(...bindings).first<{ total: number }>()
 
     const total = countResult?.total || 0
 
@@ -136,7 +164,7 @@ export const onRequestGet = async (context: { request: Request; env: Env }) => {
     const dataResult = await env.DB.prepare(
       `SELECT * FROM ${state.collection} ${where} LIMIT ? OFFSET ?`
     )
-      .bind(state.pageSize, offset)
+      .bind(...bindings, state.pageSize, offset)
       .all()
 
     // Process data: parse JSON fields and compute virtual fields
@@ -168,6 +196,14 @@ export const onRequestGet = async (context: { request: Request; env: Env }) => {
               console.error(`Error computing virtual field ${vField.name}:`, error)
               processed[vField.name] = null
             }
+          }
+        }
+        
+        // Remove password fields from response
+        for (const key in collectionConfig) {
+          const fieldConfig = (collectionConfig as any)[key]
+          if (fieldConfig?.options?.type === 'password') {
+            delete processed[key]
           }
         }
         

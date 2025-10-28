@@ -4,6 +4,7 @@ import { requireAdmin, type Context, type AuthenticatedContext } from '../../../
 import { COLLECTION_GROUPS } from '../../../_shared/collections'
 import { generateAid } from '../../../_shared/generate-aid'
 import { getCollection } from '../../../_shared/collections/getCollection'
+import { hashPassword, validatePassword, validatePasswordMatch } from '../../../_shared/password'
 
 function isAllowedCollection(name: string): boolean {
   const all = Object.values(COLLECTION_GROUPS).flat()
@@ -36,6 +37,52 @@ function validateEmailFields(collection: string, data: Record<string, any>): str
   }
   
   return null
+}
+
+async function validatePasswordFields(collection: string, data: Record<string, any>): Promise<string | null> {
+  const collectionConfig = getCollection(collection)
+  
+  for (const [fieldName, value] of Object.entries(data)) {
+    const columnConfig = (collectionConfig as any)[fieldName]
+    if (columnConfig?.options?.type === 'password' && value != null && value !== '') {
+      // Check password requirements
+      const validation = validatePassword(String(value))
+      if (!validation.valid) {
+        return `${fieldName}: ${validation.error}`
+      }
+      
+      // Check for confirmation field
+      const confirmFieldName = `${fieldName}_confirm`
+      const confirmValue = data[confirmFieldName]
+      
+      if (!confirmValue) {
+        return `${fieldName}: Password confirmation is required`
+      }
+      
+      // Check passwords match
+      const matchValidation = validatePasswordMatch(String(value), String(confirmValue))
+      if (!matchValidation.valid) {
+        return `${fieldName}: ${matchValidation.error}`
+      }
+    }
+  }
+  
+  return null
+}
+
+async function hashPasswordFields(collection: string, data: Record<string, any>): Promise<void> {
+  const collectionConfig = getCollection(collection)
+  
+  for (const [fieldName, value] of Object.entries(data)) {
+    const columnConfig = (collectionConfig as any)[fieldName]
+    if (columnConfig?.options?.type === 'password' && value != null && value !== '') {
+      // Hash the password
+      data[fieldName] = await hashPassword(String(value))
+      
+      // Remove confirmation field from data (it shouldn't be saved to DB)
+      delete data[`${fieldName}_confirm`]
+    }
+  }
 }
 
 async function handleGet(context: AuthenticatedContext): Promise<Response> {
@@ -112,6 +159,18 @@ async function handlePost(context: AuthenticatedContext): Promise<Response> {
         headers: { 'Content-Type': 'application/json' },
       })
     }
+
+    // Validate password fields
+    const passwordError = await validatePasswordFields(collection, body)
+    if (passwordError) {
+      return new Response(JSON.stringify({ error: passwordError }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+
+    // Hash password fields
+    await hashPasswordFields(collection, body)
 
     // Process hooks and virtual fields
     const collectionConfig = getCollection(collection)

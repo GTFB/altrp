@@ -3,6 +3,7 @@
 import { requireAdmin, type Context, type AuthenticatedContext } from '../../../_shared/middleware'
 import { COLLECTION_GROUPS } from '../../../_shared/collections'
 import { getCollection } from '../../../_shared/collections/getCollection'
+import { hashPassword, validatePassword, validatePasswordMatch } from '../../../_shared/password'
 
 function isAllowedCollection(name: string): boolean {
   const all = Object.values(COLLECTION_GROUPS).flat()
@@ -31,6 +32,68 @@ function validateEmailFields(collection: string, data: Record<string, any>): str
   }
   
   return null
+}
+
+async function validatePasswordFields(collection: string, data: Record<string, any>, isUpdate: boolean = false): Promise<string | null> {
+  const collectionConfig = getCollection(collection)
+  
+  for (const [fieldName, value] of Object.entries(data)) {
+    const columnConfig = (collectionConfig as any)[fieldName]
+    if (columnConfig?.options?.type === 'password') {
+      // For updates: if password is empty, skip validation (user doesn't want to change it)
+      if (isUpdate && (value == null || value === '')) {
+        continue
+      }
+      
+      // For creates or non-empty updates: validate
+      if (value != null && value !== '') {
+        // Check password requirements
+        const validation = validatePassword(String(value))
+        if (!validation.valid) {
+          return `${fieldName}: ${validation.error}`
+        }
+        
+        // Check for confirmation field
+        const confirmFieldName = `${fieldName}_confirm`
+        const confirmValue = data[confirmFieldName]
+        
+        if (!confirmValue) {
+          return `${fieldName}: Password confirmation is required`
+        }
+        
+        // Check passwords match
+        const matchValidation = validatePasswordMatch(String(value), String(confirmValue))
+        if (!matchValidation.valid) {
+          return `${fieldName}: ${matchValidation.error}`
+        }
+      }
+    }
+  }
+  
+  return null
+}
+
+async function hashPasswordFields(collection: string, data: Record<string, any>, isUpdate: boolean = false): Promise<void> {
+  const collectionConfig = getCollection(collection)
+  
+  for (const [fieldName, value] of Object.entries(data)) {
+    const columnConfig = (collectionConfig as any)[fieldName]
+    if (columnConfig?.options?.type === 'password') {
+      // For updates: if password is empty, remove it from data (don't update)
+      if (isUpdate && (value == null || value === '')) {
+        delete data[fieldName]
+        delete data[`${fieldName}_confirm`]
+        continue
+      }
+      
+      // Hash the password if it's provided
+      if (value != null && value !== '') {
+        data[fieldName] = await hashPassword(String(value))
+        // Remove confirmation field from data (it shouldn't be saved to DB)
+        delete data[`${fieldName}_confirm`]
+      }
+    }
+  }
 }
 
 async function handleDelete(context: AuthenticatedContext): Promise<Response> {
@@ -118,6 +181,18 @@ async function handlePut(context: AuthenticatedContext): Promise<Response> {
         headers: { 'Content-Type': 'application/json' },
       })
     }
+
+    // Validate password fields (for update mode)
+    const passwordError = await validatePasswordFields(collection, body, true)
+    if (passwordError) {
+      return new Response(JSON.stringify({ error: passwordError }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+
+    // Hash password fields (for update mode)
+    await hashPasswordFields(collection, body, true)
 
     // Process hooks and virtual fields
     const collectionConfig = getCollection(collection)

@@ -3,6 +3,7 @@
 import { createSession, jsonWithSession } from '../../_shared/session'
 import type { Env } from '../../_shared/middleware'
 import { generateAid } from '../../_shared/generate-aid'
+import { hashPassword, validatePassword, validatePasswordMatch } from '../../_shared/password'
 
 interface CreateUserRequest {
   email: string
@@ -40,10 +41,11 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
       )
     }
 
-    // Check password match
-    if (password !== confirmPassword) {
+    // Validate password requirements
+    const passwordValidation = validatePassword(password)
+    if (!passwordValidation.valid) {
       return new Response(
-        JSON.stringify({ error: 'Passwords do not match' }),
+        JSON.stringify({ error: passwordValidation.error }),
         {
           status: 400,
           headers: { 'Content-Type': 'application/json' },
@@ -51,10 +53,11 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
       )
     }
 
-    // Validate password length
-    if (password.length < 8) {
+    // Check password match
+    const matchValidation = validatePasswordMatch(password, confirmPassword)
+    if (!matchValidation.valid) {
       return new Response(
-        JSON.stringify({ error: 'Password must be at least 8 characters' }),
+        JSON.stringify({ error: matchValidation.error }),
         {
           status: 400,
           headers: { 'Content-Type': 'application/json' },
@@ -88,12 +91,8 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
       )
     }
 
-    // Hash password using SHA-256
-    const encoder = new TextEncoder()
-    const passwordData = encoder.encode(password)
-    const hashBuffer = await crypto.subtle.digest('SHA-256', passwordData)
-    const hashArray = Array.from(new Uint8Array(hashBuffer))
-    const passwordHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+    // Hash password
+    const passwordHash = await hashPassword(password)
 
     // Generate UUIDs and AIDs
     const userUuid = crypto.randomUUID()

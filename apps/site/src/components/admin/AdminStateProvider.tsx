@@ -14,6 +14,7 @@ export type AdminState = {
   page: number
   pageSize: number
   filters: AdminFilter[]
+  search: string
 }
 
 const DEFAULT_STATE: AdminState = {
@@ -21,6 +22,7 @@ const DEFAULT_STATE: AdminState = {
   page: 1,
   pageSize: 20,
   filters: [],
+  search: "",
 }
 
 const AdminStateContext = createContext<{
@@ -44,6 +46,7 @@ export function AdminStateProvider({ children }: { children: ReactNode }) {
     const collection = searchParams.get("c") || DEFAULT_STATE.collection
     const page = Math.max(1, Number(searchParams.get("p") || DEFAULT_STATE.page))
     const pageSize = Math.max(1, Number(searchParams.get("ps") || DEFAULT_STATE.pageSize))
+    const search = searchParams.get("s") || DEFAULT_STATE.search
     const filtersParam = searchParams.get("f")
     let filters: AdminFilter[] = []
     if (filtersParam) {
@@ -54,7 +57,7 @@ export function AdminStateProvider({ children }: { children: ReactNode }) {
         }
       } catch {}
     }
-    return { collection, page, pageSize, filters }
+    return { collection, page, pageSize, filters, search }
   }, [searchParams])
 
   const [state, _setState] = useState<AdminState>(() => parseStateFromSearch())
@@ -81,6 +84,7 @@ export function AdminStateProvider({ children }: { children: ReactNode }) {
       params.set("c", next.collection)
       params.set("p", String(next.page))
       params.set("ps", String(next.pageSize))
+      if (next.search) params.set("s", next.search)
       if (next.filters.length) params.set("f", JSON.stringify(next.filters))
       router.replace(`${pathname}?${params.toString()}`)
       return next
@@ -96,6 +100,7 @@ export function AdminStateProvider({ children }: { children: ReactNode }) {
       params.set("c", next.collection)
       params.set("p", String(next.page))
       params.set("ps", String(next.pageSize))
+      if (next.search) params.set("s", next.search)
       if (next.filters.length) params.set("f", JSON.stringify(next.filters))
       router.push(`${pathname}?${params.toString()}`)
       return next
