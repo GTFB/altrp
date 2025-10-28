@@ -8,7 +8,7 @@ export default class BaseCollection {
     data_out = new BaseColumn({ hidden: true, type: 'json' });
     uuid = new BaseColumn({ hidden: true });
     id = new BaseColumn({ hidden: true });
-    xaid = new BaseColumn({ hidden: true });
+    said = new BaseColumn({ hidden: true });
     order = new BaseColumn({ hidden: true });
     constructor(public name: string = 'base') {}
   }
