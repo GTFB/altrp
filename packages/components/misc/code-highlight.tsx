@@ -1,8 +1,14 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { highlightCode } from "../../lib/shiki-config";
 import { useTheme } from "../../hooks/use-theme";
+
+// Temporary highlight function - returns plain code
+async function highlightCode(code: string, lang: string, theme: string): Promise<string> {
+  // Escape HTML
+  const escapedCode = code.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return `<pre><code class="language-${lang}">${escapedCode}</code></pre>`;
+}
 
 interface CodeHighlightProps {
   code: string;

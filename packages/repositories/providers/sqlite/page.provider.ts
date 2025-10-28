@@ -1,5 +1,5 @@
-import type { PageDataProvider } from "@/types/providers";
-import type { Page, PageFilters, PageSortOptions } from "@/types/page";
+import type { PageDataProvider } from "@/packages/types/providers";
+import type { Page, PageFilters, PageSortOptions } from "@/packages/types/page";
 import { db } from "@/packages/db/cms/client";
 import { pages } from "@/packages/db/cms/schema";
 import { eq } from "drizzle-orm";
@@ -9,7 +9,7 @@ export class SqlitePageProvider implements PageDataProvider {
   async findAll(): Promise<Page[]> {
     const rows = await db.select().from(pages);
     return Promise.all(
-      rows.map(async (r) => ({
+      rows.map(async (r: typeof rows[0]) => ({
         slug: r.slug!,
         title: r.title!,
         description: r.description ?? undefined,
@@ -63,7 +63,7 @@ export class SqlitePageProvider implements PageDataProvider {
   async findAllTags(): Promise<string[]> {
     const rows = await db.select({ tagsJson: pages.tagsJson }).from(pages);
     const set = new Set<string>();
-    rows.forEach((r) => {
+    rows.forEach((r: typeof rows[0]) => {
       if (r.tagsJson) JSON.parse(r.tagsJson).forEach((t: string) => set.add(t));
     });
     return Array.from(set).sort();

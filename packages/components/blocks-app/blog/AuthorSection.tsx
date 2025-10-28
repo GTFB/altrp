@@ -6,7 +6,7 @@ import { Loader2, ArrowRight, Users } from "lucide-react";
 import Link from "next/link";
 import { useLocale } from "next-intl";
 import { useEffect, useState } from "react";
-import { type Author } from "@/types/author";
+import { type Author } from "@/packages/types/author";
 
 interface AuthorSectionProps {
   limit?: number;

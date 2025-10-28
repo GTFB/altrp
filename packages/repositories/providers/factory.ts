@@ -16,7 +16,7 @@ import type {
   MediaDataProvider,
   PageDataProvider,
   PostDataProvider,
-} from "@/types/providers";
+} from "@/packages/types/providers";
 import { CMS_PROVIDER as SETTINGS_PROVIDER } from "@/settings";
 
 function getCmsProvider(): 'mdx' | 'sqlite' {

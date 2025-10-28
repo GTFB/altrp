@@ -1,6 +1,6 @@
 "use client";
 
-import { type Category } from "@/types/category";
+import { type Category } from "@/packages/types/category";
 import Link from "next/link";
 import { useLocale } from "next-intl";
 import {

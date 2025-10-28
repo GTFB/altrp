@@ -1,0 +1,17 @@
+[phases.setup]
+nixPkgs = ['nodejs_20', 'bun', 'openssl']
+aptPkgs = ['curl', 'wget', 'build-essential', 'python3', 'rustc', 'cargo']
+
+[phases.install]
+cmds = [
+  'npm cache clean --force',
+  'npm ci',
+  'npm install lightningcss --force',
+  'npm rebuild'
+]
+
+[phases.build]
+cmds = [
+  'bun run build:site'
+]
+

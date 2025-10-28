@@ -1,6 +1,6 @@
 import { getContentDir } from "@/lib/content-path";
-import type { Page, PageFilters, PageSortOptions } from "@/types/page";
-import type { PageDataProvider } from "@/types/providers";
+import type { Page, PageFilters, PageSortOptions } from "@/packages/types/page";
+import type { PageDataProvider } from "@/packages/types/providers";
 import { createPageProvider } from "./providers/factory";
 
 // types are imported from '@/types/page'

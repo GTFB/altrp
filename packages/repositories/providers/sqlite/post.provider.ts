@@ -1,11 +1,11 @@
-import type { PostDataProvider } from "@/types/providers";
+import type { PostDataProvider } from "@/packages/types/providers";
 import type {
   Post,
   PostFilters,
   PostSortOptions,
   PaginationOptions,
   PaginatedResult,
-} from "@/types/post";
+} from "@/packages/types/post";
 import { db } from "@/packages/db/cms/client";
 import { posts } from "@/packages/db/cms/schema";
 import { and, eq } from "drizzle-orm";
@@ -16,7 +16,7 @@ export class SqlitePostProvider implements PostDataProvider {
   async findAll(): Promise<Post[]> {
     const rows = await db.select().from(posts);
     return Promise.all(
-      rows.map(async (r) => ({
+      rows.map(async (r: typeof rows[0]) => ({
         slug: r.slug!,
         title: r.title!,
         description: r.description ?? undefined,
@@ -114,7 +114,7 @@ export class SqlitePostProvider implements PostDataProvider {
   async findAllCategories(): Promise<string[]> {
     const rows = await db.select({ category: posts.category }).from(posts);
     const set = new Set<string>();
-    rows.forEach((r) => {
+    rows.forEach((r: typeof rows[0]) => {
       if (r.category) set.add(r.category);
     });
     return Array.from(set).sort();
@@ -123,7 +123,7 @@ export class SqlitePostProvider implements PostDataProvider {
   async findAllAuthors(): Promise<string[]> {
     const rows = await db.select({ author: posts.author }).from(posts);
     const set = new Set<string>();
-    rows.forEach((r) => {
+    rows.forEach((r: typeof rows[0]) => {
       if (r.author) set.add(r.author);
     });
     return Array.from(set).sort();
@@ -147,7 +147,7 @@ export class SqlitePostProvider implements PostDataProvider {
   async findAllTags(): Promise<Array<{ tag: string; count: number }>> {
     const rows = await db.select({ tagsJson: posts.tagsJson }).from(posts);
     const counts = new Map<string, number>();
-    rows.forEach((r) => {
+    rows.forEach((r: typeof rows[0]) => {
       if (r.tagsJson)
         JSON.parse(r.tagsJson).forEach((t: string) =>
           counts.set(t, (counts.get(t) || 0) + 1),

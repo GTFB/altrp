@@ -1,5 +1,5 @@
-import type { MediaDataProvider } from "@/types/providers";
-import type { Media, MediaFilters, MediaSortOptions } from "@/types/media";
+import type { MediaDataProvider } from "@/packages/types/providers";
+import type { Media, MediaFilters, MediaSortOptions } from "@/packages/types/media";
 import { db } from "@/packages/db/cms/client";
 import { media } from "@/packages/db/cms/schema";
 import { eq } from "drizzle-orm";
@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
 export class SqliteMediaProvider implements MediaDataProvider {
   async findAll(): Promise<Media[]> {
     const rows = await db.select().from(media);
-    return rows.map((r) => ({
+    return rows.map((r: typeof rows[0]) => ({
       slug: r.slug!,
       title: r.title!,
       description: r.description ?? undefined,
@@ -76,7 +76,7 @@ export class SqliteMediaProvider implements MediaDataProvider {
   async findAllTypes(): Promise<string[]> {
     const rows = await db.select({ type: media.type }).from(media);
     const set = new Set<string>();
-    rows.forEach((r) => {
+    rows.forEach((r: typeof rows[0]) => {
       if (r.type) set.add(r.type);
     });
     return Array.from(set).sort();
@@ -85,7 +85,7 @@ export class SqliteMediaProvider implements MediaDataProvider {
   async findAllTags(): Promise<string[]> {
     const rows = await db.select({ tagsJson: media.tagsJson }).from(media);
     const set = new Set<string>();
-    rows.forEach((r) => {
+    rows.forEach((r: typeof rows[0]) => {
       if (r.tagsJson) JSON.parse(r.tagsJson).forEach((t: string) => set.add(t));
     });
     return Array.from(set).sort();
@@ -97,7 +97,7 @@ export class SqliteMediaProvider implements MediaDataProvider {
       .from(media)
       .where(eq(media.type, type))
       .limit(1000);
-    return rows.map((r) => ({
+    return rows.map((r: typeof rows[0]) => ({
       slug: r.slug!,
       title: r.title!,
       url: r.url!,

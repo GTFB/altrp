@@ -1,5 +1,6 @@
-import { siteConfig } from "@/config/site";
+import { PROJECT_SETTINGS } from "@/settings";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 interface LogoProps {
   className?: string;
@@ -8,10 +9,13 @@ interface LogoProps {
 export function Logo({ className }: LogoProps) {
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-        <span className="text-primary-foreground font-bold text-sm">J</span>
-      </div>
-      <span className="font-bold text-lg">{siteConfig.name}</span>
+      <Image 
+        src="/images/logo.svg" 
+        alt="Sun Day Logo" 
+        width={90} 
+        height={32}
+        className="-mt-4 w-40 h-auto"
+      />
     </div>
   );
 }

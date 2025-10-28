@@ -8,37 +8,72 @@ import {
 	MODEL_PATTERNS, 
 	PROVIDER_ROUTING, 
 	API_KEYS, 
+	KEY_MANAGEMENT,
 	PRICING, 
 	RATE_LIMITS, 
 	CACHE_SETTINGS 
 } from '../settings';
+import { KeyManagerService } from './services/keyManager';
 
-// Key rotation functions
-async function getNextGoogleKey(env: Env, projectId: string): Promise<string> {
-	// Get current key index from KV
+// Enhanced key rotation functions with new centralized system and fallback
+async function getNextGoogleKey(env: Env, projectId: string): Promise<{ key: string; keyId?: string }> {
+	// Try new centralized key management system first
+	if (KEY_MANAGEMENT.ENABLED) {
+		try {
+			const keyManager = new KeyManagerService(env);
+			return await keyManager.getNextKey(PROVIDERS.GOOGLE, 'gemini-*');
+		} catch (error) {
+			console.warn('New key management failed, falling back to legacy system:', error);
+			if (!KEY_MANAGEMENT.FALLBACK_TO_LEGACY) {
+				throw error;
+			}
+		}
+	}
+
+	// Legacy key rotation system (fallback)
 	const keyIndexKey = `key_rotation:${projectId}:google`;
 	const currentIndex = await env.RATE_LIMITS.get(keyIndexKey) || '0';
 	const index = parseInt(currentIndex, 10);
 	
-	// Available Google keys from settings
 	const googleKeys = API_KEYS.GOOGLE.map(keyName => (env as any)[keyName]).filter(Boolean);
+	
+	if (googleKeys.length === 0) {
+		throw new Error('No Google API keys available');
+	}
 	
 	const selectedKey = googleKeys[index % googleKeys.length];
 	
 	// Rotate to next key
 	await env.RATE_LIMITS.put(keyIndexKey, String((index + 1) % googleKeys.length), { expirationTtl: 86400 });
 	
-	return selectedKey;
+	return { key: selectedKey };
 }
 
-async function getNextGroqKey(env: Env, projectId: string): Promise<string> {
-	// Get current key index from KV
+async function getNextGroqKey(env: Env, projectId: string, model: string = 'whisper-large-v3'): Promise<string> {
+	// Try new centralized key management system first
+	if (KEY_MANAGEMENT.ENABLED) {
+		try {
+			const keyManager = new KeyManagerService(env);
+			const result = await keyManager.getNextKey(PROVIDERS.GROQ, model);
+			return result.key;
+		} catch (error) {
+			console.warn('New key management failed, falling back to legacy system:', error);
+			if (!KEY_MANAGEMENT.FALLBACK_TO_LEGACY) {
+				throw error;
+			}
+		}
+	}
+
+	// Legacy key rotation system (fallback)
 	const keyIndexKey = `key_rotation:${projectId}:groq`;
 	const currentIndex = await env.RATE_LIMITS.get(keyIndexKey) || '0';
 	const index = parseInt(currentIndex, 10);
 	
-	// Available Groq keys from settings
 	const groqKeys = API_KEYS.GROQ.map(keyName => (env as any)[keyName]).filter(Boolean);
+	
+	if (groqKeys.length === 0) {
+		throw new Error('No Groq API keys available');
+	}
 	
 	const selectedKey = groqKeys[index % groqKeys.length];
 	
@@ -87,13 +122,26 @@ app.get('/result/:requestId', async (c) => {
 	if (!token) return c.json({ error: 'Unauthorized' }, 401);
 	const tokenHash = await sha256Base64(token);
 	const project = await c.env.DB.prepare(
-		'SELECT id FROM projects WHERE apiKeyHash = ? LIMIT 1'
+		`SELECT daid as id FROM deals WHERE JSON_EXTRACT(data_in, '$.apiKeyHash') = ? LIMIT 1`
 	).bind(tokenHash).first<{ id: string }>();
 	if (!project) return c.json({ error: 'Unauthorized' }, 401);
 
 	// Get result from database
 	const result = await c.env.DB.prepare(
-		'SELECT status, provider, model, cost, promptTokens, completionTokens, latencyMs, requestBody, responseBody, createdAt FROM logs WHERE id = ? AND projectId = ? LIMIT 1'
+		`SELECT 
+			JSON_EXTRACT(details, '$.status') as status,
+			JSON_EXTRACT(details, '$.provider') as provider,
+			model_name as model,
+			JSON_EXTRACT(details, '$.cost') as cost,
+			JSON_EXTRACT(details, '$.promptTokens') as promptTokens,
+			JSON_EXTRACT(details, '$.completionTokens') as completionTokens,
+			JSON_EXTRACT(details, '$.latencyMs') as latencyMs,
+			JSON_EXTRACT(details, '$.requestBody') as requestBody,
+			JSON_EXTRACT(details, '$.responseBody') as responseBody,
+			created_at as createdAt
+		FROM journal_generations 
+		WHERE full_maid = ? AND JSON_EXTRACT(details, '$.original_projectId') = ? 
+		LIMIT 1`
 	).bind(requestId, project.id).first<{
 		status: string;
 		provider: string;
@@ -145,13 +193,18 @@ app.get('/status/:requestId', async (c) => {
 	if (!token) return c.json({ error: 'Unauthorized' }, 401);
 	const tokenHash = await sha256Base64(token);
 	const project = await c.env.DB.prepare(
-		'SELECT id FROM projects WHERE apiKeyHash = ? LIMIT 1'
+		`SELECT daid as id FROM deals WHERE JSON_EXTRACT(data_in, '$.apiKeyHash') = ? LIMIT 1`
 	).bind(tokenHash).first<{ id: string }>();
 	if (!project) return c.json({ error: 'Unauthorized' }, 401);
 
 	// Check if request exists in database
 	const result = await c.env.DB.prepare(
-		'SELECT status, createdAt FROM logs WHERE id = ? AND projectId = ? LIMIT 1'
+		`SELECT 
+			JSON_EXTRACT(details, '$.status') as status,
+			created_at as createdAt
+		FROM journal_generations 
+		WHERE full_maid = ? AND JSON_EXTRACT(details, '$.original_projectId') = ? 
+		LIMIT 1`
 	).bind(requestId, project.id).first<{
 		status: string;
 		createdAt: number;
@@ -182,7 +235,7 @@ app.get('/keys/status', async (c) => {
 	if (!token) return c.json({ error: 'Unauthorized' }, 401);
 	const tokenHash = await sha256Base64(token);
 	const project = await c.env.DB.prepare(
-		'SELECT id FROM projects WHERE apiKeyHash = ? LIMIT 1'
+		`SELECT daid as id FROM deals WHERE JSON_EXTRACT(data_in, '$.apiKeyHash') = ? LIMIT 1`
 	).bind(tokenHash).first<{ id: string }>();
 	if (!project) return c.json({ error: 'Unauthorized' }, 401);
 
@@ -215,7 +268,11 @@ app.post('/upload', async (c) => {
 	if (!token) return c.json({ error: 'Unauthorized' }, 401);
 	const tokenHash = await sha256Base64(token);
 	const project = await c.env.DB.prepare(
-		'SELECT id, monthlyBudget, currentUsage FROM projects WHERE apiKeyHash = ? LIMIT 1'
+		`SELECT 
+			daid as id,
+			JSON_EXTRACT(data_in, '$.monthlyBudget') as monthlyBudget,
+			JSON_EXTRACT(data_in, '$.currentUsage') as currentUsage
+		FROM deals WHERE JSON_EXTRACT(data_in, '$.apiKeyHash') = ? LIMIT 1`
 	).bind(tokenHash).first<{ id: string; monthlyBudget: number; currentUsage: number }>();
 	if (!project) return c.json({ error: 'Unauthorized' }, 401);
 
@@ -224,7 +281,9 @@ app.post('/upload', async (c) => {
 	
 	// Check permissions
 	const perm = await c.env.DB.prepare(
-		'SELECT 1 FROM project_permissions WHERE projectId = ? AND ? LIKE REPLACE(modelPattern, "*", "%") LIMIT 1'
+		`SELECT 1 FROM identities 
+		WHERE entity_aid = ? AND ? LIKE REPLACE(permission, "*", "%") 
+		LIMIT 1`
 	).bind(project.id, model).first();
 	if (!perm) return c.json({ error: 'Forbidden' }, 403);
 
@@ -256,8 +315,23 @@ app.post('/upload', async (c) => {
 		const fileName = file.name || 'audio';
 		const fileExt = fileName.split('.').pop()?.toLowerCase() || 'mp3';
 
-		// Process synchronously for immediate response
+		// Check cache by file hash
+		const fileHash = await sha256Base64(base64);
+		const cacheKey = `resp:${model}:${fileHash}`;
+		const cached = await c.env.CACHE.get(cacheKey);
+		
+		if (cached) {
+			const cachedData = JSON.parse(cached);
+			return c.json({
+				requestId: cachedData.requestId,
+				content: cachedData.content
+			});
+		}
+
+		// Generate requestId
 		const requestId = genId('req');
+		
+		// Process synchronously
 		const t0 = Date.now();
 		let status = 'SUCCESS';
 		let text = '';
@@ -265,8 +339,7 @@ app.post('/upload', async (c) => {
 		
 		try {
 			// Call Whisper with key rotation
-			const groqKey = await getNextGroqKey(c.env, project.id);
-			const out = await callWhisper(base64, fileExt, groqKey);
+			const out = await callWhisperWithKeyRotation(c.env, project.id, base64, fileExt);
 			text = out.text;
 			
 			// Calculate cost (Whisper pricing is per minute)
@@ -282,41 +355,52 @@ app.post('/upload', async (c) => {
 		const latency = Date.now() - t0;
 		
 		// Log to database
-		await c.env.DB.prepare(
-			'INSERT INTO logs (id, projectId, status, provider, model, cost, promptTokens, completionTokens, latencyMs, requestBody, responseBody, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)' 
-		).bind(
-			requestId,
-			project.id,
+		const detailsJson = JSON.stringify({
 			status,
-			'groq',
-			model,
+			provider: 'groq',
 			cost,
-			0, // promptTokens for audio
-			text.split(/\s+/).length, // completionTokens
-			latency,
-			JSON.stringify({ model, audioFormat: fileExt }),
-			JSON.stringify({ content: text }),
-			Math.floor(Date.now() / 1000)
+			promptTokens: 0, // audio
+			completionTokens: text.split(/\s+/).length,
+			latencyMs: latency,
+			requestBody: { model, audioFormat: fileExt },
+			responseBody: { content: text },
+			original_log_id: requestId,
+			original_projectId: project.id
+		});
+		
+		await c.env.DB.prepare(
+			`INSERT INTO journal_generations 
+			(uuid, full_maid, model_name, status, token_in, token_out, total_token, details, created_at, updated_at) 
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
+		).bind(
+			crypto.randomUUID(), // uuid
+			requestId, // full_maid
+			model,
+			status,
+			0,
+			text.split(/\s+/).length,
+			text.split(/\s+/).length,
+			detailsJson
 		).run();
 
 		// Update project usage
-		await c.env.DB.prepare('UPDATE projects SET currentUsage = currentUsage + ? WHERE id = ?').bind(cost, project.id).run();
+		await c.env.DB.prepare(
+			`UPDATE deals 
+			SET data_in = json_set(data_in, '$.currentUsage', CAST(JSON_EXTRACT(data_in, '$.currentUsage') AS REAL) + ?)
+			WHERE daid = ?`
+		).bind(cost, project.id).run();
 
 		console.log('Processed audio file', requestId, 'status', status, 'latency', latency);
 
-		// Return result immediately
+		// Cache the result
 		if (status === 'SUCCESS') {
-			return c.json({ 
-				content: text,
-				requestId: requestId,
-				cached: false
-			});
-		} else {
-			return c.json({ 
-				error: text,
-				requestId: requestId
-			}, 500);
+			await c.env.CACHE.put(cacheKey, JSON.stringify({ requestId, model, content: text }), { expirationTtl: CACHE_SETTINGS.TTL_SECONDS });
 		}
+		
+		// Return with requestId only
+		return c.json({ 
+			requestId: requestId
+		});
 
 	} catch (error) {
 		console.error('File upload error:', error);
@@ -343,7 +427,11 @@ app.post('/ask', async (c) => {
 	if (!token) return c.json({ error: 'Unauthorized' }, 401);
 	const tokenHash = await sha256Base64(token);
 	const project = await c.env.DB.prepare(
-		'SELECT id, monthlyBudget, currentUsage FROM projects WHERE apiKeyHash = ? LIMIT 1'
+		`SELECT 
+			daid as id,
+			JSON_EXTRACT(data_in, '$.monthlyBudget') as monthlyBudget,
+			JSON_EXTRACT(data_in, '$.currentUsage') as currentUsage
+		FROM deals WHERE JSON_EXTRACT(data_in, '$.apiKeyHash') = ? LIMIT 1`
 	).bind(tokenHash).first<{ id: string; monthlyBudget: number; currentUsage: number }>();
 	if (!project) return c.json({ error: 'Unauthorized' }, 401);
 
@@ -351,7 +439,9 @@ app.post('/ask', async (c) => {
 
 	// Permissions
 	const perm = await c.env.DB.prepare(
-		'SELECT 1 FROM project_permissions WHERE projectId = ? AND ? LIKE REPLACE(modelPattern, "*", "%") LIMIT 1'
+		`SELECT 1 FROM identities 
+		WHERE entity_aid = ? AND ? LIKE REPLACE(permission, "*", "%") 
+		LIMIT 1`
 	).bind(project.id, model).first();
 	if (!perm) return c.json({ error: 'Forbidden' }, 403);
 
@@ -430,6 +520,185 @@ async function callGemini(model: string, inputText: string, apiKey: string) {
 	return { text };
 }
 
+async function callGeminiWithKeyRotation(env: Env, projectId: string, model: string, inputText: string): Promise<{ text: string }> {
+	const keyManager = new KeyManagerService(env);
+	
+	// Try to get a valid key and make the API call
+	const { key, keyId } = await keyManager.getNextValidKey(PROVIDERS.GOOGLE, model);
+	
+	try {
+		console.log(`[KeyRotation] Trying key ${keyId} for Gemini API call`);
+		const result = await callGemini(model, inputText, key);
+		
+		// Mark key as valid if API call succeeds
+		await keyManager.markKeyAsValid(keyId);
+		console.log(`[KeyRotation] Key ${keyId} is valid, API call successful`);
+		
+		return result;
+	} catch (error) {
+		console.error(`[KeyRotation] Key ${keyId} failed:`, error);
+		
+		// Parse error message - it might be JSON
+		let errorMessage = String(error).toLowerCase();
+		let isAuthError = false;
+		
+		// Try to parse as JSON first
+		try {
+			const errorText = String(error);
+			const jsonMatch = errorText.match(/\{.*\}/);
+			if (jsonMatch) {
+				const errorJson = JSON.parse(jsonMatch[0]);
+				console.log(`[KeyRotation] Parsed JSON error:`, errorJson);
+				
+				if (errorJson.error) {
+					const errorObj = errorJson.error;
+					if (errorObj.message && (
+						errorObj.message.toLowerCase().includes('invalid api key') ||
+						errorObj.message.toLowerCase().includes('api key not valid') ||
+						errorObj.message.toLowerCase().includes('authentication') ||
+						errorObj.message.toLowerCase().includes('unauthorized')
+					)) {
+						isAuthError = true;
+					}
+					if (errorObj.type && (
+						errorObj.type.toLowerCase().includes('invalid_request_error') ||
+						errorObj.type.toLowerCase().includes('authentication_error')
+					)) {
+						isAuthError = true;
+					}
+					if (errorObj.code && (
+						errorObj.code.toLowerCase().includes('invalid_api_key') ||
+						errorObj.code.toLowerCase().includes('api_key_invalid')
+					)) {
+						isAuthError = true;
+					}
+				}
+			}
+		} catch (parseError) {
+			console.log(`[KeyRotation] Could not parse error as JSON, using string matching`);
+		}
+		
+		// Also check plain text patterns
+		if (!isAuthError) {
+			if (errorMessage.includes('api key not valid') || 
+				errorMessage.includes('api_key_invalid') ||
+				errorMessage.includes('invalid_argument') ||
+				errorMessage.includes('invalid api key') ||
+				errorMessage.includes('authentication') ||
+				errorMessage.includes('unauthorized')) {
+				isAuthError = true;
+			}
+		}
+		
+		console.log(`[KeyRotation] Is auth error: ${isAuthError}`);
+		
+		if (isAuthError) {
+			console.log(`[KeyRotation] Marking key ${keyId} as invalid due to auth error`);
+			await keyManager.markKeyAsInvalid(keyId);
+			
+			// Try with the next key
+			return await callGeminiWithKeyRotation(env, projectId, model, inputText);
+		}
+		
+		// If it's not an auth error, re-throw
+		throw error;
+	}
+}
+
+async function callWhisperWithKeyRotation(env: Env, projectId: string, audioBase64: string, audioFormat: string): Promise<{ text: string }> {
+	const keyManager = new KeyManagerService(env);
+	
+	// Try to get a valid key and make the API call
+	const { key, keyId } = await keyManager.getNextValidKey(PROVIDERS.GROQ, 'whisper-large-v3');
+	
+	try {
+		console.log(`[KeyRotation] Trying key ${keyId} for Whisper API call`);
+		const result = await callWhisper(audioBase64, audioFormat, key);
+		
+		// Mark key as valid if API call succeeds
+		await keyManager.markKeyAsValid(keyId);
+		console.log(`[KeyRotation] Key ${keyId} is valid, API call successful`);
+		
+		return result;
+	} catch (error) {
+		console.error(`[KeyRotation] Key ${keyId} failed:`, error);
+		console.error(`[KeyRotation] Error type:`, typeof error);
+		console.error(`[KeyRotation] Error string:`, String(error));
+		
+		// Parse error message - it might be JSON
+		let errorMessage = String(error).toLowerCase();
+		let isAuthError = false;
+		
+		// Try to parse as JSON first
+		try {
+			const errorText = String(error);
+			// Look for JSON pattern in error message
+			const jsonMatch = errorText.match(/\{.*\}/);
+			if (jsonMatch) {
+				const errorJson = JSON.parse(jsonMatch[0]);
+				console.log(`[KeyRotation] Parsed JSON error:`, errorJson);
+				
+				// Check JSON error fields
+				if (errorJson.error) {
+					const errorObj = errorJson.error;
+					if (errorObj.message && (
+						errorObj.message.toLowerCase().includes('invalid api key') ||
+						errorObj.message.toLowerCase().includes('api key not valid') ||
+						errorObj.message.toLowerCase().includes('authentication') ||
+						errorObj.message.toLowerCase().includes('unauthorized')
+					)) {
+						isAuthError = true;
+					}
+					if (errorObj.type && (
+						errorObj.type.toLowerCase().includes('invalid_request_error') ||
+						errorObj.type.toLowerCase().includes('authentication_error')
+					)) {
+						isAuthError = true;
+					}
+					if (errorObj.code && (
+						errorObj.code.toLowerCase().includes('invalid_api_key') ||
+						errorObj.code.toLowerCase().includes('api_key_invalid')
+					)) {
+						isAuthError = true;
+					}
+				}
+			}
+		} catch (parseError) {
+			console.log(`[KeyRotation] Could not parse error as JSON, using string matching`);
+		}
+		
+		// Also check plain text patterns
+		if (!isAuthError) {
+			if (errorMessage.includes('api key not valid') || 
+				errorMessage.includes('api_key_invalid') ||
+				errorMessage.includes('invalid_argument') ||
+				errorMessage.includes('invalid api key') ||
+				errorMessage.includes('authentication') ||
+				errorMessage.includes('unauthorized') ||
+				errorMessage.includes('budget exceeded') ||
+				errorMessage.includes('insufficient_quota') ||
+				errorMessage.includes('quota_exceeded') ||
+				errorMessage.includes('billing') ||
+				errorMessage.includes('payment')) {
+				isAuthError = true;
+			}
+		}
+		
+		console.log(`[KeyRotation] Is auth error: ${isAuthError}`);
+		
+		if (isAuthError) {
+			console.log(`[KeyRotation] Marking key ${keyId} as invalid due to auth/budget error`);
+			await keyManager.markKeyAsInvalid(keyId);
+			
+			// Try with the next key
+			return await callWhisperWithKeyRotation(env, projectId, audioBase64, audioFormat);
+		}
+		
+		// If it's not an auth/budget error, re-throw
+		throw error;
+	}
+}
+
 async function callGroq(model: string, inputText: string, messages: any[], apiKey: string) {
 	const url = 'https://api.groq.com/openai/v1/chat/completions';
 	const groqReq = {
@@ -495,16 +764,15 @@ async function processTask(message: { id: string; body: any }, env: Env) {
 		let out: { text: string };
 		
 		if (provider === PROVIDERS.GOOGLE) {
-			// Use key rotation for Google
-			const apiKey = await getNextGoogleKey(env, projectId);
-			out = await callGemini(model, inputText, apiKey);
+			// Use key rotation for Google with automatic retry on invalid keys
+			out = await callGeminiWithKeyRotation(env, projectId, model, inputText);
 		} else if (provider === PROVIDERS.GROQ) {
 			// Use key rotation for Groq
-			const groqKey = await getNextGroqKey(env, projectId);
 			// Check if this is a Whisper request (audio transcription)
 			if (audio && MODEL_PATTERNS.WHISPER.some(pattern => matchesModel(model, pattern))) {
-				out = await callWhisper(audio, audioFormat || 'mp3', groqKey);
+				out = await callWhisperWithKeyRotation(env, projectId, audio, audioFormat || 'mp3');
 			} else {
+				const groqKey = await getNextGroqKey(env, projectId, model);
 				out = await callGroq(model, inputText, messages, groqKey);
 			}
 		} else {
@@ -542,28 +810,44 @@ async function processTask(message: { id: string; body: any }, env: Env) {
 		}
 	}
 
-	await env.DB.prepare(
-		'INSERT INTO logs (id, projectId, status, provider, model, cost, promptTokens, completionTokens, latencyMs, requestBody, responseBody, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)' 
-	).bind(
-		requestId,
-		projectId,
+	// Log to database using journal_generations
+	const detailsJson = JSON.stringify({
 		status,
 		provider,
-		model,
 		cost,
 		promptTokens,
 		completionTokens,
-		latency,
-		JSON.stringify({ model, input, messages }),
-		JSON.stringify({ content: text }),
-		Math.floor(Date.now() / 1000)
+		latencyMs: latency,
+		requestBody: { model, input, messages },
+		responseBody: { content: text },
+		original_log_id: requestId,
+		original_projectId: projectId
+	});
+	
+	await env.DB.prepare(
+		`INSERT INTO journal_generations 
+		(uuid, full_maid, model_name, status, token_in, token_out, total_token, details, created_at, updated_at) 
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`
+	).bind(
+		crypto.randomUUID(), // uuid
+		requestId, // full_maid
+		model,
+		status,
+		promptTokens,
+		completionTokens,
+		promptTokens + completionTokens,
+		detailsJson
 	).run();
 
 	if (status === 'SUCCESS') {
 		await env.CACHE.put(`resp:${model}:${await sha256(inputText)}`, JSON.stringify({ requestId, model, content: text }), { expirationTtl: CACHE_SETTINGS.TTL_SECONDS });
 	}
 
-	await env.DB.prepare('UPDATE projects SET currentUsage = currentUsage + ? WHERE id = ?').bind(cost, projectId).run();
+	await env.DB.prepare(
+		`UPDATE deals 
+		SET data_in = json_set(data_in, '$.currentUsage', CAST(JSON_EXTRACT(data_in, '$.currentUsage') AS REAL) + ?)
+		WHERE daid = ?`
+	).bind(cost, projectId).run();
 
 	console.log('Processed message', message.id, 'requestId', requestId, 'status', status, 'latency', latency);
 }

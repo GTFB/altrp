@@ -8,6 +8,9 @@ export interface Post {
   tags?: string[];
   excerpt?: string;
   content?: string;
+  category?: string;
+  author?: string;
+  media?: string;
 }
 
 export interface UseBlogPostsOptions {
@@ -69,7 +72,7 @@ export function useBlogPosts(
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as { posts: Post[] };
       setPosts(data.posts);
       setAllPosts(data.posts);
     } catch (err) {
@@ -103,7 +106,7 @@ export function useBlogPosts(
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as { posts: Post[] };
       setPosts(data.posts);
       setCurrentPage(nextPage);
     } catch (err) {
@@ -164,7 +167,7 @@ export function useBlogPost(slug: string) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as { post: Post | null };
       setPost(data.post);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error loading post");

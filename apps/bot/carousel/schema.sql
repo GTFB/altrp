@@ -34,3 +34,24 @@ CREATE TABLE IF NOT EXISTS project_provider_keys (
 	keyAlias TEXT
 );
 
+-- Centralized API keys management with rotation support
+CREATE TABLE IF NOT EXISTS keys (
+	id TEXT PRIMARY KEY,
+	name TEXT NOT NULL,
+	provider TEXT NOT NULL,
+	keyValue TEXT NOT NULL, -- Actual API key (open for development)
+	keyType TEXT NOT NULL DEFAULT 'api_key',
+	models TEXT NOT NULL, -- JSON array of supported models (e.g., ["gemini-*", "gpt-*"])
+	isActive BOOLEAN DEFAULT 1,
+	isValid BOOLEAN DEFAULT 1, -- Key validity status (0 = invalid, 1 = valid)
+	lastUsed INTEGER,
+	usageCount INTEGER DEFAULT 0,
+	createdAt INTEGER DEFAULT (strftime('%s', 'now')),
+	updatedAt INTEGER DEFAULT (strftime('%s', 'now'))
+);
+
+-- Indexes for better performance
+CREATE INDEX IF NOT EXISTS idx_keys_provider ON keys(provider);
+CREATE INDEX IF NOT EXISTS idx_keys_active ON keys(isActive);
+CREATE INDEX IF NOT EXISTS idx_keys_usage ON keys(usageCount, lastUsed);
+

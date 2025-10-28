@@ -7,10 +7,8 @@ import rehypeHighlight from "rehype-highlight";
 import { CodeHighlight } from "./code-highlight";
 import rehypeRaw from "rehype-raw";
 import { InteractiveMermaid } from "./interactive-mermaid";
-import { shouldEnableZoom } from "@/lib/mermaid-config";
 import { useTheme } from "../../hooks/use-theme";
 import { Button } from "../ui/button";
-import Link from "next/link";
 import {
   Check,
   Square,
@@ -411,19 +409,19 @@ const createHeadingComponents = (
 
     // Lists
     ul: ({ children, ...props }: any) => {
-      // Check if any child contains ✓ symbol
+      // Check if any child contains checkboxes
       const hasCheckedItems = React.Children.toArray(children).some((child) => {
         if (React.isValidElement(child)) {
-          const childText = child.props?.children?.toString() || "";
-          return childText.includes("✓");
+          const className = (child.props as any)?.className || "";
+          return className.includes("task-list-item");
         }
         return false;
       });
 
       if (hasCheckedItems) {
-        // For checked lists, render as div container instead of ul
+        // For checked lists, render as div container instead of ul with same padding
         return (
-          <div className="mb-6 space-y-2" {...props}>
+          <div className="mb-6 space-y-2 pl-6" {...props}>
             {children}
           </div>
         );
@@ -443,56 +441,37 @@ const createHeadingComponents = (
     input: ({ checked, type, ...props }: any) => {
       if (type === "checkbox") {
         return (
-          <div className="absolute -left-6 top-1/2 -translate-y-1/2 flex-shrink-0">
+          <>
             {checked ? (
-              <CheckSquare className="w-4 h-4 text-green-600 dark:text-green-400" />
+              <CheckSquare className="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0" />
             ) : (
-              <Square className="w-4 h-4 text-muted-foreground" />
+              <Square className="w-4 h-4 text-muted-foreground flex-shrink-0" />
             )}
-          </div>
+          </>
         );
       }
       return <input {...props} />;
     },
     li: ({ children, ...props }: any) => {
       const isTaskListItem = props.className?.includes("task-list-item");
-      const baseClasses =
-        "text-foreground text-sm sm:text-base leading-relaxed mb-1 relative";
-      const listClasses = isTaskListItem ? "list-none" : "";
 
-      // Check if the first child is text that starts with "✓ "
-      const childrenArray = React.Children.toArray(children);
-      const firstChild = childrenArray[0];
-      let isCheckedItem = false;
-      let content = children;
-
-      if (typeof firstChild === "string" && firstChild.startsWith("✓ ")) {
-        isCheckedItem = true;
-        content = childrenArray
-          .slice(0, 1)
-          .map((child, index) => {
-            if (index === 0 && typeof child === "string") {
-              return child.slice(2); // Remove "✓ " prefix
-            }
-            return child;
-          })
-          .concat(childrenArray.slice(1));
-      }
-
-      if (isCheckedItem) {
+      // Check if this is a task list item with checkbox
+      if (isTaskListItem) {
         return (
-          <div className="flex items-center gap-2 text-foreground text-sm sm:text-base leading-relaxed mb-1">
-            <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-            <span>{content}</span>
-          </div>
+          <li className="list-none text-foreground text-sm sm:text-base leading-relaxed mb-1">
+            <span className="inline-flex items-baseline gap-2">
+              {children}
+            </span>
+          </li>
         );
       }
 
-      const finalListClasses = listClasses;
-      props.className =
-        (props.className || "") + " " + baseClasses + " " + finalListClasses;
-
-      return <li {...props}>{children}</li>;
+      const baseClasses = "text-foreground text-sm sm:text-base leading-relaxed mb-1";
+      return (
+        <li className={baseClasses} {...props}>
+          {children}
+        </li>
+      );
     },
 
     // Text formatting
@@ -514,15 +493,13 @@ const createHeadingComponents = (
 
     // Links
     a: ({ children, href, ...props }: any) => (
-      <Button
-        asChild
-        variant="link"
-        className="h-auto p-0 text-primary hover:text-primary/80 underline"
+      <a
+        href={href || "#"}
+        className="text-primary hover:text-primary/80 underline"
+        {...props}
       >
-        <Link href={{ pathname: href || "#" }} {...props}>
-          {children}
-        </Link>
-      </Button>
+        {children}
+      </a>
     ),
 
     // Code
@@ -553,8 +530,8 @@ const createHeadingComponents = (
         const codeElement = React.Children.only(children) as React.ReactElement;
 
         // Check if it's a code element with language class
-        if (codeElement?.props?.className?.includes("language-")) {
-          const match = codeElement.props.className.match(/language-(\w+)/);
+        if ((codeElement?.props as any)?.className?.includes("language-")) {
+          const match = (codeElement.props as any).className.match(/language-(\w+)/);
 
           if (match) {
             const language = match[1];
@@ -576,7 +553,7 @@ const createHeadingComponents = (
               return "";
             };
 
-            const code = extractTextContent(codeElement.props.children);
+            const code = extractTextContent((codeElement.props as any).children);
 
             return (
               <CodeHighlight
@@ -618,11 +595,11 @@ const createHeadingComponents = (
         typeof lastChild.type === "function" &&
         lastChild.type.name === "p"
       ) {
-        const lastChildText = extractText(lastChild.props.children);
+        const lastChildText = extractText((lastChild.props as any).children);
 
         if (lastChildText.trim().startsWith("—")) {
           // Extract author as React element (preserving links and other markup)
-          const authorContent = lastChild.props.children;
+          const authorContent = (lastChild.props as any).children;
           // Remove the "— " prefix from the author content
           if (Array.isArray(authorContent)) {
             // If it's an array, find the first text element and remove "— " from it
@@ -1142,10 +1119,7 @@ export function MDXRenderer({
           const chart = mermaidCharts[chartIndex];
 
           if (chart) {
-            const enableZoom =
-              settings.enableZoom !== undefined
-                ? settings.enableZoom
-                : shouldEnableZoom(chart, chartIndex);
+            const enableZoom = settings.enableZoom ?? true;
 
             return (
               <div

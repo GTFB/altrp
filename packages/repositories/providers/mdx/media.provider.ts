@@ -4,8 +4,8 @@ import matter from "gray-matter";
 import { parseMarkdown } from "@/lib/markdown";
 import { z } from "zod";
 import { getContentDir } from "@/lib/content-path";
-import type { MediaDataProvider } from "@/types/providers";
-import type { Media, MediaFilters, MediaSortOptions } from "@/types/media";
+import type { MediaDataProvider } from "@/packages/types/providers";
+import type { Media, MediaFilters, MediaSortOptions } from "@/packages/types/media";
 
 const mediaSchema = z.object({
   title: z.string(),

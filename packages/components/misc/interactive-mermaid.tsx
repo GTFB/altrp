@@ -6,7 +6,6 @@ import mermaid from "mermaid";
 import { Plus, Minus, Maximize, Info } from "lucide-react";
 import {
   getZoomSettings,
-  defaultMermaidConfig,
 } from "../../lib/mermaid-config";
 
 interface InteractiveMermaidProps {
@@ -44,9 +43,9 @@ export const InteractiveMermaid = memo(function InteractiveMermaid({
 
   const zoomSettings = {
     minScale:
-      settings.zoomMin ?? getZoomSettings(defaultMermaidConfig).minScale,
+      settings.zoomMin ?? getZoomSettings(true, 0.5, 3, 1).min,
     maxScale:
-      settings.zoomMax ?? getZoomSettings(defaultMermaidConfig).maxScale,
+      settings.zoomMax ?? getZoomSettings(true, 0.5, 3, 1).max,
   };
 
   useEffect(() => {
@@ -183,7 +182,6 @@ export const InteractiveMermaid = memo(function InteractiveMermaid({
     >
       {showControls &&
         !settings.disableTooltip &&
-        !defaultMermaidConfig.tooltip.disabled &&
         enableZoom && (
           <div className="mermaid-tooltip">
             <Info size={14} />

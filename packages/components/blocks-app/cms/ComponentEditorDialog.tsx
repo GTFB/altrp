@@ -11,7 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import Editor from "@monaco-editor/react";
-import { Block } from "@/types/page-editor";
+import { Block } from "@/packages/types/page-editor";
 
 interface ComponentEditorDialogProps {
   open: boolean;
@@ -70,7 +70,7 @@ export function ComponentEditorDialog({
         "@/*": ["src/*"],
         "@/components/*": ["src/components/*"],
         "@/lib/*": ["src/lib/*"],
-        "@/types/*": ["src/types/*"],
+        "@/packages/types/*": ["src/types/*"],
       },
     });
 

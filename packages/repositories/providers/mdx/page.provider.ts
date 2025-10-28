@@ -4,8 +4,8 @@ import matter from "gray-matter";
 import { parseMarkdown } from "@/lib/markdown";
 import { frontmatterSchema } from "@/lib/validators/content.schema";
 import { getContentDir } from "@/lib/content-path";
-import type { PageDataProvider } from "@/types/providers";
-import type { Page, PageFilters, PageSortOptions } from "@/types/page";
+import type { PageDataProvider } from "@/packages/types/providers";
+import type { Page, PageFilters, PageSortOptions } from "@/packages/types/page";
 
 export class MdxPageProvider implements PageDataProvider {
   private readonly contentDir = getContentDir("pages");
