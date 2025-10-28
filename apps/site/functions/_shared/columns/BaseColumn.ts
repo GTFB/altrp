@@ -12,17 +12,23 @@ export type RelationConfig = {
 }
 
 export type BaseColumnOptions = {
+    title?: string;
     hidden?: boolean;
+    hiddenTable?: boolean;  // Hide only in table, but show in forms
     required?: boolean;
     readOnly?: boolean;
     unique?: boolean;
-    type?: 'text' | 'number' | 'boolean' | 'date' | 'time' | 'datetime' | 'json' | 'array' | 'object';
+    virtual?: boolean;  // Virtual field, computed on backend
+    value?: (instance: any) => Promise<any> | any;  // Required if virtual = true
+    type?: 'text' | 'number' | 'email' | 'phone' | 'boolean' | 'date' | 'time' | 'datetime' | 'json' | 'array' | 'object';
     relation?: RelationConfig;
     index?: boolean;
     defaultValue?: any;
+    defaultCell?: any;  // Default value to display in table cell when value is empty/null
     hooks?: {
-        beforeChange?: (value: any) => any;
-        afterChange?: (value: any) => any;
+        beforeChange?: (value: any, instance: any) => any;
+        afterChange?: (value: any, instance: any) => any;
+        beforeSave?: (value: any, instance: any) => any;
     };
     format?: (value: any, locale?: string) => any;
     validate?: (value: any) => boolean;

@@ -136,10 +136,10 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
 
     // Insert user into database
     await env.DB.prepare(
-      `INSERT INTO users (uuid, human_aid, role_uuid, email, password_hash, is_active, created_at, updated_at) 
-       VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`
+      `INSERT INTO users (uuid, human_aid, email, password_hash, is_active, created_at, updated_at) 
+       VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`
     )
-      .bind(userUuid, humanAid, adminRole.uuid, email, passwordHash, 1)
+      .bind(userUuid, humanAid, email, passwordHash, 1)
       .run()
 
     // Create user_role relationship

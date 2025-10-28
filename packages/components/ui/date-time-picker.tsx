@@ -8,7 +8,7 @@ import { Label } from "./label"
 import { Popover, PopoverContent, PopoverTrigger } from "./popover"
 import { IconCalendar, IconClock, IconX } from "@tabler/icons-react"
 import { cn } from "@/lib/utils"
-import { format, parse, isValid } from "date-fns"
+import { format,  type Locale } from "date-fns"
 
 export type DateTimePickerMode = "date" | "time" | "datetime"
 
@@ -183,7 +183,7 @@ export function DateTimePicker({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>{renderTrigger()}</PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
+      <PopoverContent className="w-[400px] p-0 z-[9999]" align="center" side="bottom" sideOffset={4}>
         <div className="flex flex-col">
           {/* Calendar for date selection */}
           {(mode === "date" || mode === "datetime") && (
@@ -193,6 +193,9 @@ export function DateTimePicker({
               onSelect={handleDateSelect}
               disabled={disabled}
               locale={locale}
+              classNames={{
+                root: "w-full min-w-[300px]"
+              }}
             />
           )}
 

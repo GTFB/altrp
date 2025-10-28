@@ -45,7 +45,8 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
         r.is_system as is_admin
       FROM users u
       LEFT JOIN humans h ON u.human_aid = h.haid
-      LEFT JOIN roles r ON u.role_uuid = r.uuid
+      LEFT JOIN user_roles ur ON u.uuid = ur.user_uuid
+      LEFT JOIN roles r ON ur.role_uuid = r.uuid
       WHERE u.email = ?
       LIMIT 1`
     )

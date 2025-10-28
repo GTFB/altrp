@@ -15,7 +15,6 @@ export const User: CollectionConfig = {
       hooks: { beforeChange: [generateUUID] },
     },
     { name: 'human_aid', type: 'text', admin: { hidden: true } },
-    { name: 'role_uuid', type: 'text', admin: { hidden: true } },
     { name: 'email', type: 'email', required: true },
     { name: 'password_hash', type: 'text', admin: { hidden: true } },
     { name: 'is_active', type: 'checkbox', defaultValue: true, admin: { hidden: true } },

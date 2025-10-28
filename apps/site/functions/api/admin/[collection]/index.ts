@@ -3,6 +3,7 @@
 import { requireAdmin, type Context, type AuthenticatedContext } from '../../../_shared/middleware'
 import { COLLECTION_GROUPS } from '../../../_shared/collections'
 import { generateAid } from '../../../_shared/generate-aid'
+import { getCollection } from '../../../_shared/collections/getCollection'
 
 function isAllowedCollection(name: string): boolean {
   const all = Object.values(COLLECTION_GROUPS).flat()
@@ -15,6 +16,26 @@ function q(name: string): string {
 
 function generateUUID(): string {
   return crypto.randomUUID()
+}
+
+function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return emailRegex.test(email)
+}
+
+function validateEmailFields(collection: string, data: Record<string, any>): string | null {
+  const collectionConfig = getCollection(collection)
+  
+  for (const [fieldName, value] of Object.entries(data)) {
+    const columnConfig = (collectionConfig as any)[fieldName]
+    if (columnConfig?.options?.type === 'email' && value != null && value !== '') {
+      if (!isValidEmail(String(value))) {
+        return `Invalid email format for field: ${fieldName}`
+      }
+    }
+  }
+  
+  return null
 }
 
 async function handleGet(context: AuthenticatedContext): Promise<Response> {
@@ -83,13 +104,69 @@ async function handlePost(context: AuthenticatedContext): Promise<Response> {
       })
     }
 
+    // Validate email fields
+    const emailError = validateEmailFields(collection, body)
+    if (emailError) {
+      return new Response(JSON.stringify({ error: emailError }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+
+    // Process hooks and virtual fields
+    const collectionConfig = getCollection(collection)
+    const processedBody: Record<string, any> = {}
+    
+    for (const [key, value] of Object.entries(body)) {
+      const fieldConfig = (collectionConfig as any)[key]
+      
+      // Skip virtual fields (they don't exist in DB)
+      if (fieldConfig?.options?.virtual) {
+        // Execute beforeChange hook if exists
+        if (fieldConfig.options.hooks?.beforeChange) {
+          fieldConfig.options.hooks.beforeChange(value, body)
+        }
+        continue
+      }
+      
+      // Execute beforeChange hook for non-virtual fields
+      if (fieldConfig?.options?.hooks?.beforeChange) {
+        processedBody[key] = fieldConfig.options.hooks.beforeChange(value, body)
+      } else {
+        processedBody[key] = value
+      }
+    }
+    
+    // Execute beforeSave hooks for all fields (including virtual ones that modify other fields)
+    for (const key in collectionConfig) {
+      const fieldConfig = (collectionConfig as any)[key]
+      if (fieldConfig?.options?.hooks?.beforeSave) {
+        const fieldValue = body[key]
+        if (fieldValue !== undefined) {
+          const result = fieldConfig.options.hooks.beforeSave(fieldValue, processedBody)
+          // If beforeSave returns a value, it should modify the instance
+          // Virtual fields can modify other fields in processedBody
+          if (result !== undefined && !fieldConfig?.options?.virtual) {
+            processedBody[key] = result
+          }
+        }
+      }
+    }
+
     // Get table schema to detect auto-generated fields
     const pragma = await env.DB.prepare(`PRAGMA table_info(${collection})`).all<{
       name: string; type: string; pk: number
     }>()
 
     const columns = pragma.results || []
-    const data: Record<string, any> = { ...body }
+    const data: Record<string, any> = { ...processedBody }
+    
+    // Stringify JSON fields
+    for (const col of columns) {
+      if (data[col.name] && typeof data[col.name] === 'object' && col.type === 'TEXT') {
+        data[col.name] = JSON.stringify(data[col.name])
+      }
+    }
 
     // Auto-generate id, uuid, {x}aid if they exist in schema and not provided
     for (const col of columns) {

@@ -9,6 +9,8 @@ const dateLocales: Record<string, Locale> = {
 };
 
 export default class Users extends Base {
+    __title = 'Users';
+    
     created_at = new BaseColumn({ 
         hidden: false,
         type: 'datetime',
@@ -24,19 +26,19 @@ export default class Users extends Base {
         }
     });
     
-    updated_at = new BaseColumn({ 
-        hidden: false,
-        type: 'datetime',
-        format: (value: any, locale: string = 'en') => {
-            if (!value) return "-";
-            try {
-                const date = new Date(value);
-                const dateLocale = dateLocales[locale] || dateLocales.en;
-                return format(date, "dd.MM.yyyy HH:mm", { locale: dateLocale });
-            } catch {
-                return String(value);
-            }
-        }
+    human_aid = new BaseColumn({
+        title: 'Human',
+        relation: {
+            collection: 'humans',
+            valueField: 'haid',
+            labelField: 'full_name',
+        },
+    });
+
+    email = new BaseColumn({
+        title: 'Email',
+        readOnly: true,
+        type: 'email',
     });
     
     email_verified_at = new BaseColumn({ 
@@ -69,10 +71,13 @@ export default class Users extends Base {
         }
     });
     
-    password_hash = new BaseColumn({ hidden: true });
+    password_hash = new BaseColumn({ 
+        hiddenTable: true  
+    });
     hash = new BaseColumn({ hidden: true });
     salt = new BaseColumn({ hidden: true });
     is_active = new BaseColumn({ type: 'boolean' });
+    
     constructor() {
         super('users');
     }

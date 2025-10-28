@@ -2,6 +2,7 @@
 
 import type { Env } from "../../_shared/middleware"
 import { COLLECTION_GROUPS } from "../../_shared/collections"
+import { getCollection } from "../../_shared/collections/getCollection"
 
 interface AdminFilter {
   field: string
@@ -92,12 +93,33 @@ export const onRequestGet = async (context: { request: Request; env: Env }) => {
       )
     }
 
+    // Get collection config for virtual fields
+    const collectionConfig = getCollection(state.collection)
+    
     const columns = schemaResult.results.map((col) => ({
       name: col.name,
       type: col.type,
       nullable: col.notnull === 0,
       primary: col.pk === 1,
     }))
+    
+    // Add virtual fields to schema
+    const virtualFields: any[] = []
+    for (const key in collectionConfig) {
+      const fieldConfig = (collectionConfig as any)[key]
+      if (fieldConfig?.options?.virtual && fieldConfig?.options?.value) {
+        virtualFields.push({
+          name: key,
+          type: fieldConfig.options.type || 'TEXT',
+          nullable: !fieldConfig.options.required,
+          primary: false,
+          virtual: true,
+        })
+      }
+    }
+    
+    // Merge real and virtual columns
+    const allColumns = [...columns, ...virtualFields]
 
     const hasDeletedAt = schemaResult.results.some((c) => c.name.toLowerCase() === 'deleted_at')
     const where = hasDeletedAt ? `WHERE ${q('deleted_at')} IS NULL` : ''
@@ -117,16 +139,52 @@ export const onRequestGet = async (context: { request: Request; env: Env }) => {
       .bind(state.pageSize, offset)
       .all()
 
+    // Process data: parse JSON fields and compute virtual fields
+    const processedData = await Promise.all(
+      (dataResult.results || []).map(async (row: any) => {
+        const processed = { ...row }
+        
+        // Parse JSON fields
+        for (const col of columns) {
+          if (col.type === 'TEXT' && processed[col.name]) {
+            try {
+              const value = processed[col.name]
+              if (typeof value === 'string' && (value.startsWith('{') || value.startsWith('['))) {
+                processed[col.name] = JSON.parse(value)
+              }
+            } catch {
+              // Not JSON, keep as is
+            }
+          }
+        }
+        
+        // Compute virtual fields
+        for (const vField of virtualFields) {
+          const fieldConfig = (collectionConfig as any)[vField.name]
+          if (fieldConfig?.options?.value) {
+            try {
+              processed[vField.name] = await fieldConfig.options.value(processed)
+            } catch (error) {
+              console.error(`Error computing virtual field ${vField.name}:`, error)
+              processed[vField.name] = null
+            }
+          }
+        }
+        
+        return processed
+      })
+    )
+
     return new Response(
       JSON.stringify({
         success: true,
         state,
         schema: {
-          columns,
+          columns: allColumns,
           total,
           totalPages: Math.ceil(total / state.pageSize),
         },
-        data: dataResult.results || [],
+        data: processedData,
       }),
       {
         status: 200,
