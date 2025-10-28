@@ -56,19 +56,19 @@ export function NavMain({
                 <SidebarMenuSub>
                   {item.items?.map((subItem) => (
                     <SidebarMenuSubItem key={subItem.title}>
-                      {subItem.onClick ? (
-                        <SidebarMenuSubButton asChild>
-                          <button type="button" onClick={subItem.onClick}>
-                            <span>{subItem.title}</span>
-                          </button>
-                        </SidebarMenuSubButton>
-                      ) : (
-                        <SidebarMenuSubButton asChild>
-                          <a href={subItem.url}>
-                            <span>{subItem.title}</span>
-                          </a>
-                        </SidebarMenuSubButton>
-                      )}
+                      <SidebarMenuSubButton asChild>
+                        <a
+                          href={subItem.url}
+                          onClick={(e) => {
+                            if (subItem.onClick) {
+                              e.preventDefault()
+                              subItem.onClick()
+                            }
+                          }}
+                        >
+                          <span>{subItem.title}</span>
+                        </a>
+                      </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
                   ))}
                 </SidebarMenuSub>

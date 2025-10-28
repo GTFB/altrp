@@ -11,7 +11,12 @@ import {
   IconLayoutColumns,
   IconLoader,
   IconPlus,
+  IconCheck,
+  IconX,
 } from "@tabler/icons-react"
+import { getCollection } from "../../../functions/_shared/collections/getCollection"
+import { useLocale } from "@/packages/hooks/use-locale"
+import { DateTimePicker } from "@/packages/components/ui/date-time-picker"
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -79,6 +84,22 @@ type ColumnSchema = {
   primary: boolean
 }
 
+type RelationConfig = {
+  collection: string
+  valueField: string
+  labelField: string
+  labelFields?: string[]
+}
+
+type ColumnSchemaExtended = ColumnSchema & {
+  hidden?: boolean
+  readOnly?: boolean
+  required?: boolean
+  format?: (value: any, locale?: string) => string
+  fieldType?: 'text' | 'number' | 'boolean' | 'date' | 'time' | 'datetime' | 'json' | 'array' | 'object'
+  relation?: RelationConfig
+}
+
 type CollectionData = Record<string, any>
 
 type StateResponse = {
@@ -98,15 +119,93 @@ type StateResponse = {
 }
 
 // Helper to format cell value
-function formatCellValue(value: any): string {
+function formatCellValue(value: any): React.ReactNode {
   if (value === null || value === undefined) return "-"
-  if (typeof value === "boolean") return value ? "✓" : "✗"
+  if (typeof value === "boolean") {
+    return (
+      <div className="flex items-center justify-center">
+        {value ? <IconCheck className="size-4 text-green-600" /> : <IconX className="size-4 text-red-600" />}
+      </div>
+    )
+  }
   if (typeof value === "object") return JSON.stringify(value)
   return String(value)
 }
 
+// Relation Select Component
+function RelationSelect({
+  relation,
+  value,
+  onChange,
+  disabled,
+  required,
+}: {
+  relation: RelationConfig
+  value: any
+  onChange: (value: any) => void
+  disabled?: boolean
+  required?: boolean
+}) {
+  const [options, setOptions] = React.useState<Array<{ value: any; label: string }>>([])
+  const [loading, setLoading] = React.useState(false)
+
+  React.useEffect(() => {
+    const loadOptions = async () => {
+      setLoading(true)
+      try {
+        const params = new URLSearchParams()
+        params.set("c", relation.collection)
+        params.set("p", "1")
+        params.set("ps", "1000") // Load more items for select
+
+        const res = await fetch(`/api/admin/state?${params.toString()}`, {
+          credentials: "include",
+        })
+        if (!res.ok) throw new Error(`Failed to load: ${res.status}`)
+        
+        const json: StateResponse = await res.json()
+        
+        const opts = json.data.map((item) => ({
+          value: item[relation.valueField],
+          label: relation.labelFields
+            ? relation.labelFields.map(f => item[f]).filter(Boolean).join(" ")
+            : String(item[relation.labelField] || "-"),
+        }))
+        
+        console.log(`[RelationSelect] Loaded ${opts.length} options for ${relation.collection}:`, opts)
+        setOptions(opts)
+      } catch (e) {
+        console.error(`[RelationSelect] Failed to load options for ${relation.collection}:`, e)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadOptions()
+  }, [relation])
+
+  return (
+    <Select value={value ? String(value) : ""} onValueChange={onChange} disabled={disabled || loading} required={required}>
+      <SelectTrigger>
+        <SelectValue placeholder={loading ? "Loading..." : "Select..."} />
+      </SelectTrigger>
+      <SelectContent className="max-h-[300px] z-[9999]" position="popper" sideOffset={5}>
+        {options.length === 0 && !loading ? (
+          <div className="p-2 text-sm text-muted-foreground">No options available</div>
+        ) : (
+          options.map((opt) => (
+            <SelectItem key={opt.value} value={String(opt.value)}>
+              {opt.label}
+            </SelectItem>
+          ))
+        )}
+      </SelectContent>
+    </Select>
+  )
+}
+
 // Dynamic column generator
-function generateColumns(schema: ColumnSchema[], onDeleteRequest: (row: Row<CollectionData>) => void, onEditRequest: (row: Row<CollectionData>) => void): ColumnDef<CollectionData>[] {
+function generateColumns(schema: ColumnSchemaExtended[], onDeleteRequest: (row: Row<CollectionData>) => void, onEditRequest: (row: Row<CollectionData>) => void, locale: string = 'en', relationData: Record<string, Record<any, string>> = {}): ColumnDef<CollectionData>[] {
   return [
   {
     id: "select",
@@ -134,7 +233,7 @@ function generateColumns(schema: ColumnSchema[], onDeleteRequest: (row: Row<Coll
     enableSorting: false,
     enableHiding: false,
   },
-    ...schema.map((col) => ({
+    ...schema.filter(col => !col.hidden).map((col) => ({
       accessorKey: col.name,
       header: () => (
         <div className="flex items-center gap-1">
@@ -146,11 +245,36 @@ function generateColumns(schema: ColumnSchema[], onDeleteRequest: (row: Row<Coll
           )}
       </div>
     ),
-      cell: ({ row }: { row: Row<CollectionData> }) => (
-        <div className={`${col.primary ? "font-mono font-medium" : ""}`}>
-          {formatCellValue(row.original[col.name])}
-        </div>
-      ),
+      cell: ({ row }: { row: Row<CollectionData> }) => {
+        const value = row.original[col.name]
+        
+        // For boolean type, show checkbox-like display
+        if (col.fieldType === 'boolean') {
+          const boolValue = value === 1 || value === true || value === '1' || value === 'true'
+          return (
+            <div className="flex items-center justify-center">
+              {boolValue ? (
+                <IconCheck className="size-4 text-green-600" />
+              ) : (
+                <IconX className="size-4 text-red-600" />
+              )}
+            </div>
+          )
+        }
+        
+        // For relation fields, show label instead of value
+        if (col.relation && relationData[col.name]) {
+          const label = relationData[col.name][value] || value || "-"
+          return <div>{label}</div>
+        }
+        
+        const displayValue = col.format ? col.format(value, locale) : formatCellValue(value)
+        return (
+          <div className={`${col.primary ? "font-mono font-medium" : ""}`}>
+            {displayValue}
+          </div>
+        )
+      },
     })),
   {
     id: "actions",
@@ -182,13 +306,15 @@ function generateColumns(schema: ColumnSchema[], onDeleteRequest: (row: Row<Coll
 
 export function DataTable() {
   const { state, setState } = useAdminState()
+  const { locale } = useLocale()
 
   const [data, setData] = React.useState<CollectionData[]>([])
-  const [schema, setSchema] = React.useState<ColumnSchema[]>([])
+  const [schema, setSchema] = React.useState<ColumnSchemaExtended[]>([])
   const [total, setTotal] = React.useState(0)
   const [totalPages, setTotalPages] = React.useState(0)
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
+  const [relationData, setRelationData] = React.useState<Record<string, Record<any, string>>>({})
 
   const primaryKey = React.useMemo(() => schema.find((c) => c.primary)?.name || "id", [schema])
 
@@ -211,9 +337,64 @@ export function DataTable() {
       }
       const json: StateResponse = await res.json()
       
+      // Get collection config and apply column settings
+      const collection = getCollection(state.collection)
+      const extendedColumns: ColumnSchemaExtended[] = json.schema.columns.map((col) => {
+        const columnConfig = (collection as any)[col.name]
+        const options = columnConfig?.options || {}
+        
+        return {
+          ...col,
+          hidden: options.hidden || false,
+          readOnly: options.readOnly || false,
+          required: options.required || false,
+          format: options.format,
+          fieldType: options.type,
+          relation: options.relation,
+        }
+      })
+      
+      // Load relation data for display
+      const relationsToLoad = extendedColumns.filter(col => col.relation)
+      const relationDataMap: Record<string, Record<any, string>> = {}
+      
+      for (const col of relationsToLoad) {
+        if (!col.relation) continue
+        
+        try {
+          const params = new URLSearchParams()
+          params.set("c", col.relation.collection)
+          params.set("p", "1")
+          params.set("ps", "1000")
+          
+          const relRes = await fetch(`/api/admin/state?${params.toString()}`, {
+            credentials: "include",
+          })
+          
+          if (relRes.ok) {
+            const relJson: StateResponse = await relRes.json()
+            const map: Record<any, string> = {}
+            
+            relJson.data.forEach((item) => {
+              const value = item[col.relation!.valueField]
+              const label = col.relation!.labelFields
+                ? col.relation!.labelFields.map(f => item[f]).filter(Boolean).join(" ")
+                : String(item[col.relation!.labelField] || "-")
+              map[value] = label
+            })
+            
+            relationDataMap[col.name] = map
+          }
+        } catch (e) {
+          console.error(`Failed to load relation data for ${col.name}:`, e)
+        }
+      }
+      
+      setRelationData(relationDataMap)
+      
       // Update local state
       setState(() => json.state)
-      setSchema(json.schema.columns)
+      setSchema(extendedColumns)
       setTotal(json.schema.total)
       setTotalPages(json.schema.totalPages)
       setData(json.data)
@@ -270,7 +451,7 @@ export function DataTable() {
 
   // Create dialog state
   const [createOpen, setCreateOpen] = React.useState(false)
-  const [formData, setFormData] = React.useState<Record<string, string>>({})
+  const [formData, setFormData] = React.useState<Record<string, any>>({})
   const [createError, setCreateError] = React.useState<string | null>(null)
 
   // Clear form data when collection changes
@@ -293,14 +474,14 @@ export function DataTable() {
   }, [])
 
   const editableFields = React.useMemo(
-    () => schema.filter((col) => !isAutoGeneratedField(col.name) && !col.primary),
+    () => schema.filter((col) => !isAutoGeneratedField(col.name) && !col.primary && !col.hidden),
     [schema, isAutoGeneratedField]
   )
 
   // Edit dialog state
   const [editOpen, setEditOpen] = React.useState(false)
   const [recordToEdit, setRecordToEdit] = React.useState<CollectionData | null>(null)
-  const [editData, setEditData] = React.useState<Record<string, string>>({})
+  const [editData, setEditData] = React.useState<Record<string, any>>({})
   const [editError, setEditError] = React.useState<string | null>(null)
 
   // Clear edit data when collection changes
@@ -313,25 +494,31 @@ export function DataTable() {
   const onEditRequest = React.useCallback((row: Row<CollectionData>) => {
     const record = row.original
     setRecordToEdit(record)
-    const initial: Record<string, string> = {}
+    const initial: Record<string, any> = {}
     for (const col of schema) {
       if (!isAutoGeneratedField(col.name) && !col.primary) {
-        initial[col.name] = record[col.name] != null ? String(record[col.name]) : ''
+        if (col.fieldType === 'boolean') {
+          initial[col.name] = record[col.name] === 1 || record[col.name] === true || record[col.name] === '1' || record[col.name] === 'true'
+        } else if (col.fieldType === 'date' || col.fieldType === 'time' || col.fieldType === 'datetime') {
+          initial[col.name] = record[col.name] ? new Date(record[col.name]) : null
+        } else {
+          initial[col.name] = record[col.name] != null ? String(record[col.name]) : ''
+        }
       }
     }
     setEditData(initial)
     setEditOpen(true)
   }, [schema, isAutoGeneratedField])
 
-  const handleEditFieldChange = React.useCallback((fieldName: string, value: string) => {
+  const handleEditFieldChange = React.useCallback((fieldName: string, value: string | boolean | Date | null) => {
     setEditData((prev) => ({ ...prev, [fieldName]: value }))
   }, [])
 
   // Create dialog keep after
   // Generate columns dynamically
   const columns = React.useMemo(
-    () => (schema.length > 0 ? generateColumns(schema, onDeleteRequest, onEditRequest) : []),
-    [schema, onDeleteRequest, onEditRequest]
+    () => (schema.length > 0 ? generateColumns(schema, onDeleteRequest, onEditRequest, locale, relationData) : []),
+    [schema, onDeleteRequest, onEditRequest, locale, relationData]
   )
 
   const table = useReactTable({
@@ -380,11 +567,17 @@ export function DataTable() {
     e.preventDefault()
     setCreateError(null)
     try {
+      // Convert Date objects to ISO strings for API
+      const payload = Object.entries(formData).reduce((acc, [key, value]) => {
+        acc[key] = value instanceof Date ? value.toISOString() : value
+        return acc
+      }, {} as Record<string, any>)
+      
       const res = await fetch(`/api/admin/${encodeURIComponent(state.collection)}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       })
       if (!res.ok) {
         const json = await res.json() as { error?: string }
@@ -398,8 +591,8 @@ export function DataTable() {
     }
   }
 
-  const handleFieldChange = React.useCallback((fieldName: string, value: string) => {
-    setFormData((prev: Record<string, string>) => ({ ...prev, [fieldName]: value }))
+  const handleFieldChange = React.useCallback((fieldName: string, value: string | boolean | Date | null) => {
+    setFormData((prev: Record<string, any>) => ({ ...prev, [fieldName]: value }))
   }, [])
 
   async function handleEditSubmit(e: React.FormEvent) {
@@ -407,12 +600,18 @@ export function DataTable() {
     if (!recordToEdit) return
     setEditError(null)
     try {
+      // Convert Date objects to ISO strings for API
+      const payload = Object.entries(editData).reduce((acc, [key, value]) => {
+        acc[key] = value instanceof Date ? value.toISOString() : value
+        return acc
+      }, {} as Record<string, any>)
+      
       const idValue = recordToEdit[primaryKey]
       const res = await fetch(`/api/admin/${encodeURIComponent(state.collection)}/${encodeURIComponent(String(idValue))}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify(editData),
+        body: JSON.stringify(payload),
       })
       if (!res.ok) {
         const json = await res.json() as { error?: string }
@@ -646,19 +845,63 @@ export function DataTable() {
           <form onSubmit={handleCreateSubmit} className="space-y-4 p-4">
             {editableFields.map((field) => (
               <div key={field.name} className="flex flex-col gap-2">
-                <Label htmlFor={`field-${field.name}`} className="text-sm font-medium">
-                  {field.name}
-                  {!field.nullable && <span className="text-destructive ml-1">*</span>}
-                  <span className="text-muted-foreground ml-2 text-xs">({field.type})</span>
-                </Label>
-                <Input
-                  id={`field-${field.name}`}
-                  type="text"
-                  required={!field.nullable}
-                  value={formData[field.name] || ""}
-                  onChange={(e) => handleFieldChange(field.name, e.target.value)}
-                  placeholder={`Enter ${field.name}`}
-                />
+                {field.fieldType === 'boolean' ? (
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id={`field-${field.name}`}
+                      checked={formData[field.name] === true}
+                      onCheckedChange={(checked) => handleFieldChange(field.name, checked === true)}
+                    />
+                    <Label htmlFor={`field-${field.name}`} className="text-sm font-medium cursor-pointer">
+                      {field.name}
+                      <span className="text-muted-foreground ml-2 text-xs">({field.type})</span>
+                    </Label>
+                  </div>
+                ) : field.fieldType === 'date' || field.fieldType === 'time' || field.fieldType === 'datetime' ? (
+                  <>
+                    <Label htmlFor={`field-${field.name}`} className="text-sm font-medium">
+                      {field.name}
+                      {!field.nullable && <span className="text-destructive ml-1">*</span>}
+                      <span className="text-muted-foreground ml-2 text-xs">({field.type})</span>
+                    </Label>
+                    <DateTimePicker
+                      mode={field.fieldType}
+                      value={formData[field.name] || null}
+                      onChange={(date) => handleFieldChange(field.name, date)}
+                      placeholder={`Select ${field.name}`}
+                    />
+                  </>
+                ) : field.relation ? (
+                  <>
+                    <Label htmlFor={`field-${field.name}`} className="text-sm font-medium">
+                      {field.name}
+                      {!field.nullable && <span className="text-destructive ml-1">*</span>}
+                      <span className="text-muted-foreground ml-2 text-xs">({field.type})</span>
+                    </Label>
+                    <RelationSelect
+                      relation={field.relation}
+                      value={formData[field.name]}
+                      onChange={(value) => handleFieldChange(field.name, value)}
+                      required={!field.nullable}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <Label htmlFor={`field-${field.name}`} className="text-sm font-medium">
+                      {field.name}
+                      {!field.nullable && <span className="text-destructive ml-1">*</span>}
+                      <span className="text-muted-foreground ml-2 text-xs">({field.type})</span>
+                    </Label>
+                    <Input
+                      id={`field-${field.name}`}
+                      type="text"
+                      required={!field.nullable}
+                      value={formData[field.name] || ""}
+                      onChange={(e) => handleFieldChange(field.name, e.target.value)}
+                      placeholder={`Enter ${field.name}`}
+                    />
+                  </>
+                )}
               </div>
             ))}
             {createError && (
@@ -686,20 +929,64 @@ export function DataTable() {
             </ResponsiveDialogDescription>
           </ResponsiveDialogHeader>
           <form onSubmit={handleEditSubmit} className="space-y-4 p-4">
-            {schema.filter((f) => !isAutoGeneratedField(f.name) && !f.primary).map((field) => (
+            {schema.filter((f) => !isAutoGeneratedField(f.name) && !f.primary && !f.hidden).map((field) => (
               <div key={field.name} className="flex flex-col gap-2">
-                <Label htmlFor={`edit-field-${field.name}`} className="text-sm font-medium">
-                  {field.name}
-                  {!field.nullable && <span className="text-destructive ml-1">*</span>}
-                  <span className="text-muted-foreground ml-2 text-xs">({field.type})</span>
-                </Label>
-                <Input
-                  id={`edit-field-${field.name}`}
-                  type="text"
-                  required={!field.nullable}
-                  value={editData[field.name] || ''}
-                  onChange={(e) => handleEditFieldChange(field.name, e.target.value)}
-                />
+                {field.fieldType === 'boolean' ? (
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id={`edit-field-${field.name}`}
+                      checked={editData[field.name] === true}
+                      onCheckedChange={(checked) => handleEditFieldChange(field.name, checked === true)}
+                    />
+                    <Label htmlFor={`edit-field-${field.name}`} className="text-sm font-medium cursor-pointer">
+                      {field.name}
+                      <span className="text-muted-foreground ml-2 text-xs">({field.type})</span>
+                    </Label>
+                  </div>
+                ) : field.fieldType === 'date' || field.fieldType === 'time' || field.fieldType === 'datetime' ? (
+                  <>
+                    <Label htmlFor={`edit-field-${field.name}`} className="text-sm font-medium">
+                      {field.name}
+                      {!field.nullable && <span className="text-destructive ml-1">*</span>}
+                      <span className="text-muted-foreground ml-2 text-xs">({field.type})</span>
+                    </Label>
+                    <DateTimePicker
+                      mode={field.fieldType}
+                      value={editData[field.name] || null}
+                      onChange={(date) => handleEditFieldChange(field.name, date)}
+                      placeholder={`Select ${field.name}`}
+                    />
+                  </>
+                ) : field.relation ? (
+                  <>
+                    <Label htmlFor={`edit-field-${field.name}`} className="text-sm font-medium">
+                      {field.name}
+                      {!field.nullable && <span className="text-destructive ml-1">*</span>}
+                      <span className="text-muted-foreground ml-2 text-xs">({field.type})</span>
+                    </Label>
+                    <RelationSelect
+                      relation={field.relation}
+                      value={editData[field.name]}
+                      onChange={(value) => handleEditFieldChange(field.name, value)}
+                      required={!field.nullable}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <Label htmlFor={`edit-field-${field.name}`} className="text-sm font-medium">
+                      {field.name}
+                      {!field.nullable && <span className="text-destructive ml-1">*</span>}
+                      <span className="text-muted-foreground ml-2 text-xs">({field.type})</span>
+                    </Label>
+                    <Input
+                      id={`edit-field-${field.name}`}
+                      type="text"
+                      required={!field.nullable}
+                      value={editData[field.name] || ''}
+                      onChange={(e) => handleEditFieldChange(field.name, e.target.value)}
+                    />
+                  </>
+                )}
               </div>
             ))}
             {editError && (

@@ -94,13 +94,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       url: "#",
       icon: categoryIcon[group.category] || SquareTerminal,
       isActive: group.collections.includes(state.collection),
-      items: group.collections.map((name) => ({
-        title: name,
-        url: "#",
-        onClick: () => {
-          pushState({ collection: name, page: 1 })
-        },
-      })),
+      items: group.collections.map((name) => {
+        // Build proper URL for the collection
+        const params = new URLSearchParams()
+        params.set("c", name)
+        params.set("p", "1")
+        
+        return {
+          title: name,
+          url: `?${params.toString()}`,
+          onClick: () => {
+            pushState({ collection: name, page: 1 })
+          },
+        }
+      }),
     }))
   }, [groups, state.collection, pushState])
 
