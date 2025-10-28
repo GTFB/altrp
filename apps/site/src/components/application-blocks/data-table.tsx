@@ -871,7 +871,6 @@ export function DataTable() {
                     />
                     <Label htmlFor={`field-${field.name}`} className="text-sm font-medium cursor-pointer">
                       {field.title || field.name}
-                      <span className="text-muted-foreground ml-2 text-xs">({field.type})</span>
                     </Label>
                   </div>
                 ) : field.fieldType === 'date' || field.fieldType === 'time' || field.fieldType === 'datetime' ? (
@@ -879,7 +878,6 @@ export function DataTable() {
                     <Label htmlFor={`field-${field.name}`} className="text-sm font-medium">
                       {field.title || field.name}
                       {!field.nullable && <span className="text-destructive ml-1">*</span>}
-                      <span className="text-muted-foreground ml-2 text-xs">({field.type})</span>
                     </Label>
                     <DateTimePicker
                       mode={field.fieldType}
@@ -894,7 +892,6 @@ export function DataTable() {
                     <Label htmlFor={`field-${field.name}`} className="text-sm font-medium">
                       {field.title || field.name}
                       {!field.nullable && <span className="text-destructive ml-1">*</span>}
-                      <span className="text-muted-foreground ml-2 text-xs">({field.type})</span>
                     </Label>
                     <PhoneInput
                       value={formData[field.name] || ''}
@@ -908,7 +905,6 @@ export function DataTable() {
                     <Label htmlFor={`field-${field.name}`} className="text-sm font-medium">
                       {field.title || field.name}
                       {!field.nullable && <span className="text-destructive ml-1">*</span>}
-                      <span className="text-muted-foreground ml-2 text-xs">({field.type})</span>
                     </Label>
                     <RelationSelect
                       relation={field.relation}
@@ -923,7 +919,6 @@ export function DataTable() {
                     <Label htmlFor={`field-${field.name}`} className="text-sm font-medium">
                       {field.title || field.name}
                       {!field.nullable && <span className="text-destructive ml-1">*</span>}
-                      <span className="text-muted-foreground ml-2 text-xs">({field.type})</span>
                     </Label>
                     <Input
                       id={`field-${field.name}`}
@@ -975,7 +970,6 @@ export function DataTable() {
                     />
                     <Label htmlFor={`edit-field-${field.name}`} className="text-sm font-medium cursor-pointer">
                       {field.title || field.name}
-                      <span className="text-muted-foreground ml-2 text-xs">({field.type})</span>
                     </Label>
                   </div>
                 ) : field.fieldType === 'date' || field.fieldType === 'time' || field.fieldType === 'datetime' ? (
@@ -983,7 +977,6 @@ export function DataTable() {
                     <Label htmlFor={`edit-field-${field.name}`} className="text-sm font-medium">
                       {field.title || field.name}
                       {!field.nullable && <span className="text-destructive ml-1">*</span>}
-                      <span className="text-muted-foreground ml-2 text-xs">({field.type})</span>
                     </Label>
                     <DateTimePicker
                       mode={field.fieldType}
@@ -998,7 +991,6 @@ export function DataTable() {
                     <Label htmlFor={`edit-field-${field.name}`} className="text-sm font-medium">
                       {field.title || field.name}
                       {!field.nullable && <span className="text-destructive ml-1">*</span>}
-                      <span className="text-muted-foreground ml-2 text-xs">({field.type})</span>
                     </Label>
                     <PhoneInput
                       value={editData[field.name] || ''}
@@ -1012,7 +1004,6 @@ export function DataTable() {
                     <Label htmlFor={`edit-field-${field.name}`} className="text-sm font-medium">
                       {field.title || field.name}
                       {!field.nullable && <span className="text-destructive ml-1">*</span>}
-                      <span className="text-muted-foreground ml-2 text-xs">({field.type})</span>
                     </Label>
                     <RelationSelect
                       relation={field.relation}
@@ -1027,7 +1018,6 @@ export function DataTable() {
                     <Label htmlFor={`edit-field-${field.name}`} className="text-sm font-medium">
                       {field.title || field.name}
                       {!field.nullable && <span className="text-destructive ml-1">*</span>}
-                      <span className="text-muted-foreground ml-2 text-xs">({field.type})</span>
                     </Label>
                     <Input
                       id={`edit-field-${field.name}`}
