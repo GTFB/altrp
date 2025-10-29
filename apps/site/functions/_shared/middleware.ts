@@ -2,23 +2,8 @@
  * Middleware utilities for Cloudflare Pages Functions
  */
 
-import { getSession, isAdmin, forbiddenResponse, unauthorizedResponse, type User } from './session'
-
-export interface Env {
-  AUTH_SECRET: string
-  DB: D1Database
-  [key: string]: unknown
-}
-
-export interface Context {
-  request: Request
-  env: Env
-  params?: Record<string, string>
-}
-
-export interface AuthenticatedContext extends Context {
-  user: User
-}
+import { getSession, isAdmin, forbiddenResponse, unauthorizedResponse,  } from './session'
+import { Context, AuthenticatedContext } from './types'
 
 /**
  * Middleware to require authentication

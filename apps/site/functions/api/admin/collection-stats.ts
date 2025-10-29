@@ -1,13 +1,7 @@
 /// <reference types="@cloudflare/workers-types" />
 
-import { requireAdmin, type Context, type AuthenticatedContext } from '../../_shared/middleware'
-
-interface CollectionStats {
-  name: string
-  count: number
-  hasDeleted?: boolean
-  hasUuid?: boolean
-}
+import { requireAdmin, } from '../../_shared/middleware'
+import { Context, AuthenticatedContext, CollectionStats } from '../../_shared/types'
 
 /**
  * GET /api/admin/collection-stats?name=users

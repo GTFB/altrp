@@ -1,3 +1,4 @@
+import { Context } from '../types'
 export default class BaseColumn {   
     constructor(public options: BaseColumnOptions) {
 
@@ -28,7 +29,7 @@ export type BaseColumnOptions = {
     hooks?: {
         beforeChange?: (value: any, instance: any) => any;
         afterChange?: (value: any, instance: any) => any;
-        beforeSave?: (value: any, instance: any) => any;
+        beforeSave?: (value: any, instance: any, context: Context) => any;
     };
     format?: (value: any, locale?: string) => any;
     validate?: (value: any) => boolean;

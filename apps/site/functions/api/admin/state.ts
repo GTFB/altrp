@@ -1,6 +1,6 @@
 /// <reference types="@cloudflare/workers-types" />
 
-import type { Env } from "../../_shared/middleware"
+import { Env } from "../../_shared/types"
 import { COLLECTION_GROUPS } from "../../_shared/collections"
 import { getCollection } from "../../_shared/collections/getCollection"
 import qs from "qs"

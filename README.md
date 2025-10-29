@@ -261,6 +261,52 @@ git push origin main
 | Format code | `make format` | `bun run format` | Format code using Prettier |
 | Run tests | `make test` | `bun test` | Run unit tests with Bun |
 
+## 🗄️ Database Migrations
+
+### Single Source of Truth
+
+The **Payload collections** in `apps/app/src/collections` serve as the single source of truth for the database schema. All database changes should originate from these collection definitions.
+
+### Migration Workflow
+
+When adding or modifying database columns, follow this workflow:
+
+1. **Pull Latest Changes**
+   ```bash
+   git pull origin main
+   ```
+   ⚠️ **Important**: Always pull the latest version before creating migrations to avoid conflicts, especially since multiple migration files may already exist.
+
+2. **Modify Collection Schema**
+   - Add or update fields in the appropriate collection file in `apps/app/src/collections`
+
+3. **Generate Payload Migration**
+   ```bash
+   bun run db:app:generate
+   ```
+   This command generates Payload migration files based on schema changes.
+
+4. **Generate SQL Migration**
+   ```bash
+   bun run db:site:migrate:local
+   ```
+   This command creates the SQL migration file that will be applied to the database.
+
+### Migration Commands
+
+| Command | Description |
+|---------|-------------|
+| `bun run db:app:generate` | Generate Payload migrations from collection schema changes |
+| `bun run db:site:migrate:local` | Generate SQL migration file for local database |
+
+### Best Practices
+
+- Always work with the latest codebase to prevent migration conflicts
+- Test migrations locally before committing
+- Never manually edit the database schema outside of Payload collections
+- Keep migration files in version control
+- Review generated migration files before applying them
+
 ## 🔐 Access & Permissions
 
 ### Getting Admin Access

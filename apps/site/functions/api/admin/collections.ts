@@ -1,6 +1,7 @@
 /// <reference types="@cloudflare/workers-types" />
 
-import { requireAdmin, type Context, type AuthenticatedContext } from '../../_shared/middleware'
+import { requireAdmin, } from '../../_shared/middleware'
+import { Context, AuthenticatedContext } from '../../_shared/types'
 import { COLLECTION_GROUPS } from '../../_shared/collections'
 
 interface TableInfo {

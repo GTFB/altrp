@@ -1,10 +1,9 @@
 /// <reference types="@cloudflare/workers-types" />
 
 import { createSession, jsonWithSession } from '../../_shared/session'
-import type { Env } from '../../_shared/middleware'
 import { generateAid } from '../../_shared/generate-aid'
 import { hashPassword, validatePassword, validatePasswordMatch } from '../../_shared/password'
-
+import { Env } from '../../_shared/types'
 interface CreateUserRequest {
   email: string
   name: string

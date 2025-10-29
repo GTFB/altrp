@@ -1,8 +1,7 @@
 /// <reference types="@cloudflare/workers-types" />
 
 import { getSession } from '../../_shared/session'
-import type { Env } from '../../_shared/middleware'
-
+import { Env } from '../../_shared/types'
 /**
  * GET /api/auth/me
  * Returns current user from session and validates against database

@@ -1,9 +1,8 @@
 /// <reference types="@cloudflare/workers-types" />
 
 import { createSession, jsonWithSession } from '../../_shared/session'
-import type { Env } from '../../_shared/middleware'
 import { verifyPassword } from '../../_shared/password'
-
+import { Env } from '../../_shared/types'
 interface LoginRequest {
   email: string
   password: string

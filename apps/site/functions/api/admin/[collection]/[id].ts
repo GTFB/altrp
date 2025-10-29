@@ -1,6 +1,7 @@
 /// <reference types="@cloudflare/workers-types" />
 
-import { requireAdmin, type Context, type AuthenticatedContext } from '../../../_shared/middleware'
+import { requireAdmin, } from '../../../_shared/middleware'
+import { Context, AuthenticatedContext } from '../../../_shared/types'
 import { COLLECTION_GROUPS } from '../../../_shared/collections'
 import { getCollection } from '../../../_shared/collections/getCollection'
 import { hashPassword, validatePassword, validatePasswordMatch } from '../../../_shared/password'
@@ -224,7 +225,7 @@ async function handlePut(context: AuthenticatedContext): Promise<Response> {
       if (fieldConfig?.options?.hooks?.beforeSave) {
         const fieldValue = body[key]
         if (fieldValue !== undefined) {
-          const result = fieldConfig.options.hooks.beforeSave(fieldValue, processedBody)
+          const result = fieldConfig.options.hooks.beforeSave(fieldValue, processedBody, context)
           // If beforeSave returns a value, it should modify the instance
           // Virtual fields can modify other fields in processedBody
           if (result !== undefined && !fieldConfig?.options?.virtual) {

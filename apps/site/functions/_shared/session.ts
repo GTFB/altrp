@@ -2,19 +2,7 @@
  * Encrypted session management utilities for Cloudflare Workers
  * Uses Web Crypto API for encryption/decryption
  */
-
-export interface User {
-  id: string
-  email: string
-  name: string
-  role: string
-}
-
-export interface SessionData {
-  user: User
-  expiresAt: number
-}
-
+import { User, SessionData } from './types'
 const COOKIE_NAME = 'session'
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7 // 7 days in seconds
 

@@ -469,7 +469,6 @@ export interface User {
   id: number;
   uuid?: string | null;
   human_aid?: string | null;
-  role_uuid?: string | null;
   password_hash?: string | null;
   is_active?: boolean | null;
   last_login_at?: string | null;
@@ -2235,24 +2234,9 @@ export interface Role {
   id: number;
   uuid?: string | null;
   raid?: string | null;
-  title?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  description?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
+  title?: string | null;
+  name?: string | null;
+  description?: string | null;
   is_system?: boolean | null;
   order?: number | null;
   xaid?: string | null;
@@ -3521,7 +3505,6 @@ export interface PostsSelect<T extends boolean = true> {
 export interface UsersSelect<T extends boolean = true> {
   uuid?: T;
   human_aid?: T;
-  role_uuid?: T;
   password_hash?: T;
   is_active?: T;
   last_login_at?: T;
@@ -4262,6 +4245,7 @@ export interface RolesSelect<T extends boolean = true> {
   uuid?: T;
   raid?: T;
   title?: T;
+  name?: T;
   description?: T;
   is_system?: T;
   order?: T;

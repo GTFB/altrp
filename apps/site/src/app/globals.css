@@ -201,6 +201,9 @@ body {
   .font-heading {
     font-family: var(--font-inter-tight), "Playfair Display", ui-serif, serif, Georgia !important;
   }
+  button {
+    @apply cursor-pointer;
+  }
   button:focus-visible {
     outline: none !important;
     box-shadow: none !important;

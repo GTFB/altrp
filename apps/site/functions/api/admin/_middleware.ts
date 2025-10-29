@@ -1,8 +1,7 @@
 /// <reference types="@cloudflare/workers-types" />
 
 import { getSession, isAdmin, forbiddenResponse, unauthorizedResponse } from '../../_shared/session'
-import type { Env } from '../../_shared/middleware'
-
+import { Env } from '../../_shared/types'
 /**
  * Middleware for all /api/admin/* routes
  * Ensures only admin users can access these endpoints
