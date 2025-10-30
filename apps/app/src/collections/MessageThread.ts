@@ -20,6 +20,7 @@ export const MessageThread: CollectionConfig = {
     { name: 'title', type: 'text' },
     { name: 'status_name', type: 'text' },
     { name: 'type', type: 'text' },
+    { name: 'value', type: 'text' },
     { name: 'order', type: 'number', defaultValue: 0 },
     { name: 'xaid', type: 'text' },
     { 

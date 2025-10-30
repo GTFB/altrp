@@ -19,6 +19,7 @@ export const Key: CollectionConfig = {
     { name: 'key_hash', type: 'text', required: true },
     { name: 'title', type: 'text' },
     { name: 'is_active', type: 'checkbox', defaultValue: true },
+    { name: 'is_valid', type: 'checkbox', defaultValue: true },
     { name: 'order', type: 'number', defaultValue: 0 },
     { name: 'xaid', type: 'text' },
     { name: 'permission_id', type: 'number' },
