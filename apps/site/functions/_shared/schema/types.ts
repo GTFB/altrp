@@ -1,0 +1,45 @@
+import { InferSelectModel, InferInsertModel } from 'drizzle-orm'
+import { baseMoves } from './base-moves'
+import { bases } from './bases'
+import { contractors } from './contractors'
+import { dealProducts } from './deal-products'
+import { deals } from './deals'
+import { locations } from './locations'
+import { productVariants } from './product-variants'
+import { products } from './products'
+import { walletTransactions } from './wallet-transactions'
+import { wallets } from './wallets'
+import { users } from './users'
+import { roles } from './roles'
+import { userRoles } from './user-roles'
+import { humans } from './humans'
+
+export type BaseMove = InferSelectModel<typeof baseMoves>
+export type Product = InferSelectModel<typeof products>
+export type ProductVariant = InferSelectModel<typeof productVariants>
+export type Deal = InferSelectModel<typeof deals>
+export type DealProduct = InferSelectModel<typeof dealProducts>
+export type Contractor = InferSelectModel<typeof contractors>
+export type Base = InferSelectModel<typeof bases>
+export type Wallet = InferSelectModel<typeof wallets>
+export type WalletTransaction = InferSelectModel<typeof walletTransactions>
+export type Location = InferSelectModel<typeof locations>
+export type User = InferSelectModel<typeof users>
+export type Role = InferSelectModel<typeof roles>
+export type UserRole = InferSelectModel<typeof userRoles>
+export type Human = InferSelectModel<typeof humans>
+
+export type NewBaseMove = InferInsertModel<typeof baseMoves>
+export type NewProduct = InferInsertModel<typeof products>
+export type NewProductVariant = InferInsertModel<typeof productVariants>
+export type NewDeal = InferInsertModel<typeof deals>
+export type NewDealProduct = InferInsertModel<typeof dealProducts>
+export type NewContractor = InferInsertModel<typeof contractors>
+export type NewBase = InferInsertModel<typeof bases>
+export type NewWallet = InferInsertModel<typeof wallets>
+export type NewWalletTransaction = InferInsertModel<typeof walletTransactions>
+export type NewLocation = InferInsertModel<typeof locations>
+export type NewUser = InferInsertModel<typeof users>
+export type NewRole = InferInsertModel<typeof roles>
+export type NewUserRole = InferInsertModel<typeof userRoles>
+export type NewHuman = InferInsertModel<typeof humans>

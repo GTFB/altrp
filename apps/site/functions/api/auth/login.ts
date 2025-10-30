@@ -3,6 +3,7 @@
 import { createSession, jsonWithSession } from '../../_shared/session'
 import { verifyPassword } from '../../_shared/password'
 import { Env } from '../../_shared/types'
+import { MeRepository } from '../../_shared/repositories/me.repository'
 interface LoginRequest {
   email: string
   password: string
@@ -33,43 +34,23 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
       })
     }
 
-    // Query user from database with human and role information
-    const user = await env.DB.prepare(
-      `SELECT 
-        u.id, 
-        u.uuid,
-        u.email, 
-        u.password_hash,
-        h.full_name as name,
-        r.raid as role,
-        r.is_system as is_admin
-      FROM users u
-      LEFT JOIN humans h ON u.human_aid = h.haid
-      LEFT JOIN user_roles ur ON u.uuid = ur.user_uuid
-      LEFT JOIN roles r ON ur.role_uuid = r.uuid
-      WHERE u.email = ?
-      LIMIT 1`
-    )
-      .bind(email)
-      .first<{
-        id: number
-        uuid: string
-        email: string
-        name: string | null
-        password_hash: string
-        role: string | null
-        is_admin: number | null
-      }>()
+    // Initialize repository
+    const meRepository = MeRepository.getInstance(env.DB)
 
-    if (!user) {
+    // Query user from database with roles
+    const userWithRoles = await meRepository.findByEmailWithRoles(email)
+
+    if (!userWithRoles) {
       return new Response(JSON.stringify({ error: 'Invalid credentials' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },
       })
     }
 
+    const { user, roles, human } = userWithRoles
+
     // Verify password
-    const isValidPassword = await verifyPassword(password, user.password_hash)
+    const isValidPassword = await verifyPassword(password, user.passwordHash)
     if (!isValidPassword) {
       return new Response(JSON.stringify({ error: 'Invalid credentials' }), {
         status: 401,
@@ -77,13 +58,16 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
       })
     }
 
+    // Determine if user is admin (has any system role)
+    const isAdmin = roles.some((role) => role.isSystem === true)
+
     // Create session
     const sessionCookie = await createSession(
       {
         id: String(user.id),
         email: user.email,
-        name: user.name || email,
-        role: user.is_admin ? 'admin' : 'user',
+        name: human?.fullName || email,
+        role: isAdmin ? 'admin' : 'user',
       },
       env.AUTH_SECRET
     )
@@ -95,9 +79,16 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
           id: user.id,
           uuid: user.uuid,
           email: user.email,
-          name: user.name || email,
-          role: user.is_admin ? 'admin' : 'user',
-          raid: user.role,
+          name: human?.fullName || email,
+          role: isAdmin ? 'admin' : 'user',
+          roles: roles.map((role) => ({
+            uuid: role.uuid,
+            raid: role.raid,
+            title: role.title,
+            name: role.name,
+            description: role.description,
+            isSystem: role.isSystem,
+          })),
         },
       },
       sessionCookie

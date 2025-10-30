@@ -1,3 +1,4 @@
+/// <reference types="@cloudflare/workers-types" />
 
 export interface Env {
     AUTH_SECRET: string

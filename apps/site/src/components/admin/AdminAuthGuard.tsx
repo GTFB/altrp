@@ -33,14 +33,9 @@ export default function AdminAuthGuard({ children }: AdminAuthGuardProps) {
         return false
       }
 
-      const data: { user: { role: string } } = await response.json()
-      
-      if (data.user.role !== 'admin') {
-        redirectToLogin()
-        return false
-      }
+      const data: { user: { roles: { name: string }[] } } = await response.json()
 
-      return true
+      return data.user.roles.some((role) => role.name === 'Administrator')
     } catch (err) {
       console.error('Auth check failed:', err)
       redirectToLogin()

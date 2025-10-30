@@ -2,6 +2,7 @@
 
 import { getSession } from '../../_shared/session'
 import { Env } from '../../_shared/types'
+import { MeRepository } from '../../_shared/repositories/me.repository'
 /**
  * GET /api/auth/me
  * Returns current user from session and validates against database
@@ -26,46 +27,24 @@ export const onRequestGet = async (context: { request: Request; env: Env }) => {
   }
 
   try {
-    // Verify user still exists in database and get current data
-    const dbUser = await env.DB.prepare(
-      `SELECT 
-        u.id, 
-        u.uuid,
-        u.email, 
-        u.is_active,
-        u.deleted_at,
-        h.full_name as name,
-        r.raid as role_raid,
-        r.is_system as is_admin
-      FROM users u
-      LEFT JOIN humans h ON u.human_aid = h.haid
-      LEFT JOIN user_roles ur ON u.uuid = ur.user_uuid
-      LEFT JOIN roles r ON ur.role_uuid = r.uuid
-      WHERE u.id = ?
-      LIMIT 1`
-    )
-      .bind(sessionUser.id)
-      .first<{
-        id: number
-        uuid: string
-        email: string
-        is_active: number
-        deleted_at: string | null
-        name: string | null
-        role_raid: string | null
-        is_admin: number | null
-      }>()
+    // Initialize repository
+    const meRepository = MeRepository.getInstance()
+
+    // Get user with roles from database
+    const userWithRoles = await meRepository.findByIdWithRoles(Number(sessionUser.id))
 
     // User not found in database
-    if (!dbUser) {
+    if (!userWithRoles) {
       return new Response(JSON.stringify({ error: 'User not found' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },
       })
     }
 
+    const { user: dbUser, roles, human } = userWithRoles
+
     // User is deleted
-    if (dbUser.deleted_at) {
+    if (dbUser.deletedAt) {
       return new Response(JSON.stringify({ error: 'User account deleted' }), {
         status: 403,
         headers: { 'Content-Type': 'application/json' },
@@ -73,20 +52,30 @@ export const onRequestGet = async (context: { request: Request; env: Env }) => {
     }
 
     // User is not active
-    if (!dbUser.is_active) {
+    if (!dbUser.isActive) {
       return new Response(JSON.stringify({ error: 'User account inactive' }), {
         status: 403,
         headers: { 'Content-Type': 'application/json' },
       })
     }
 
+    // Determine if user is admin (has any system role)
+    const isAdmin = roles.some((role) => role.isSystem === true)
+
     // Return current user data from database
     const user = {
       id: String(dbUser.id),
+      uuid: dbUser.uuid,
       email: dbUser.email,
-      name: dbUser.name || dbUser.email,
-      role: dbUser.is_admin ? 'admin' : 'user',
-      raid: dbUser.role_raid,
+      name: human?.fullName || dbUser.email,
+      roles: roles.map((role) => ({
+        uuid: role.uuid,
+        raid: role.raid,
+        title: role.title,
+        name: role.name,
+        description: role.description,
+        isSystem: role.isSystem,
+      })),
     }
 
     return new Response(JSON.stringify({ user }), {
