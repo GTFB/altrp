@@ -2,6 +2,5 @@ node_modules/
 dist-nodejs/
 .env
 .wrangler/
-wrangler.toml
 generated-content.ts
 src/config/flows/index.ts

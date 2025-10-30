@@ -1,11 +1,11 @@
 // bot.ts (updated, without customHandlers inside constructor)
 import type { Env } from './worker';
 import { KVStorageService } from './kv-storage-service';
-import { D1StorageService } from './d1-storage-service';
+import { D1StorageService, type User } from './d1-storage-service';
 import { MessageService } from '../core/message-service';
 import { TopicService } from '../core/topic-service';
 import { SessionService } from '../core/session-service';
-import { UserContextManager } from '../core/user-context';
+import { UserContextManager, type UserContext } from '../core/user-context';
 import { FlowEngine } from '../core/flow-engine';
 import { I18nService } from '../core/i18n';
 import { isVKLink, normalizeVKLink } from '../core/helpers';
@@ -201,6 +201,8 @@ export class TelegramBotWorker {
     const adminChatId = parseInt(this.env.ADMIN_CHAT_ID);
 
     console.log(`Processing message from user ${userId} in chat ${chatId}`);
+    console.log(`Admin chat ID (hardcoded): ${adminChatId}`);
+    console.log(`Message thread ID: ${(message as any).message_thread_id}`);
 
     // First process commands (including in topics)
     if (message.text?.startsWith('/')) {
@@ -210,47 +212,51 @@ export class TelegramBotWorker {
 
     // Check if message came to admin group (topic)
     if (chatId === adminChatId && (message as any).message_thread_id) {
-      // This is a message in admin group topic - forward to user
-      await this.topicService.handleMessageFromTopic(
-        message, 
-        this.d1Storage.getUserIdByTopic.bind(this.d1Storage),
-        this.getDbUserId.bind(this)
-      );
+      const topicId = (message as any).message_thread_id;
+      console.log(`✅ Entering topic handling block, topicId: ${topicId}`);
+      
+      // Check if this is a consultant topic
+      try {
+        const consultantThread = await this.d1Storage.execute(`
+          SELECT id 
+          FROM message_threads 
+          WHERE value = ? AND type = 'consultant' AND deleted_at IS NULL
+          LIMIT 1
+        `, [topicId.toString()]);
+
+        if (consultantThread && consultantThread.length > 0) {
+          // This is a consultant topic - handle with AI
+          console.log(`Processing message in consultant topic ${topicId}`);
+          
+          //if (message.text) {
+            // Get handlers and call handleConsultantTopicMessage
+            const handlers = this.flowEngine['customHandlers'] || {};
+            if (handlers.handleConsultantTopicMessage) {
+              await handlers.handleConsultantTopicMessage(message);
+            }
+          //}
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking consultant topic:', error);
+      }
+
+      // Try to handle as user topic (old bot logic)
+      // Wrapped in try-catch to handle missing users table gracefully
+      try {
+        await this.topicService.handleMessageFromTopic(
+          message, 
+          this.d1Storage.getUserIdByTopic.bind(this.d1Storage),
+          this.getDbUserId.bind(this)
+        );
+      } catch (error) {
+        console.log(`Message in topic ${topicId} is not a user or consultant topic, ignoring`);
+      }
       return;
     }
 
-    // Add user to database
-    await this.ensureUserExists(message.from);
-
-    // Get dbUserId for logging
-    const user = await this.d1Storage.getUser(message.from.id);
-    if (!user) {
-      console.error(`User ${message.from.id} not found in database for logging`);
-      return;
-    }
-
-    // Log message
-    if (user.id) {
-      await this.messageService.logMessage(message, 'incoming', user.id);
-    }
-
-    // Get or create user context
-    if (user.id) {
-      await this.userContextManager.getOrCreateContext(message.from.id, user.id);
-    }
-    
-    // Check if user is in flow mode
-    const isInFlow = await this.userContextManager.isInFlowMode(message.from.id);
-    
-    if (isInFlow && message.text) {
-      // User in flow - process through FlowEngine
-      console.log(`🎯 User ${message.from.id} is in flow mode, processing through FlowEngine`);
-      await this.flowEngine.handleIncomingMessage(message.from.id, message.text);
-      return;
-    }
-
-    // Process all message types (considering forwarding settings)
-    await this.handleAllMessages(message);
+    // Skip all user-related logic for consultant bot
+    // Consultant bot only handles messages in topics
   }
 
   private async processCallbackQuery(callbackQuery: TelegramCallbackQuery): Promise<void> {
