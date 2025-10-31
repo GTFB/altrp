@@ -1698,6 +1698,7 @@ export interface Key {
   key_hash: string;
   title?: string | null;
   is_active?: boolean | null;
+  is_valid?: boolean | null;
   order?: number | null;
   xaid?: string | null;
   permission_id?: number | null;
@@ -1815,6 +1816,7 @@ export interface MessageThread {
   title?: string | null;
   status_name?: string | null;
   type?: string | null;
+  value?: string | null;
   order?: number | null;
   xaid?: string | null;
   updated_at?: string | null;
@@ -3984,6 +3986,7 @@ export interface KeysSelect<T extends boolean = true> {
   key_hash?: T;
   title?: T;
   is_active?: T;
+  is_valid?: T;
   order?: T;
   xaid?: T;
   permission_id?: T;
@@ -4050,6 +4053,7 @@ export interface MessageThreadsSelect<T extends boolean = true> {
   title?: T;
   status_name?: T;
   type?: T;
+  value?: T;
   order?: T;
   xaid?: T;
   updated_at?: T;
