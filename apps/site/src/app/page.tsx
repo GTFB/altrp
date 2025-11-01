@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Container } from "@/components/misc/layout/Container";
 import Hero01 from "@/components/blocks-app/Hero01";
-import { Settings } from "lucide-react";
+import { Settings, LogIn } from "lucide-react";
 
 export default function Home() {
   return (
@@ -42,6 +42,15 @@ export default function Home() {
                 </Link>
               </li>
               <li className="ml-auto">
+                <Link 
+                  href="/login" 
+                  className="flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary"
+                >
+                  <LogIn className="h-4 w-4" />
+                  Login
+                </Link>
+              </li>
+              <li>
                 <Link 
                   href="/admin" 
                   target="_blank"
