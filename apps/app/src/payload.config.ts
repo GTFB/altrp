@@ -24,6 +24,7 @@ import { Deal } from './collections/Deal'
 import { DealProduct } from './collections/DealProduct'
 import { Echelon } from './collections/Echelon'
 import { EchelonEmployee } from './collections/EchelonEmployee'
+import { Employee } from './collections/Employee'
 import { EmployeeLeave } from './collections/EmployeeLeave'
 import { EmployeeTimesheet } from './collections/EmployeeTimesheet'
 import { Expanse } from './collections/Expanse'
@@ -138,6 +139,7 @@ export default buildConfig({
     DealProduct,
     Echelon,
     EchelonEmployee,
+    Employee,
     EmployeeLeave,
     EmployeeTimesheet,
     Expanse,

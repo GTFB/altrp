@@ -21,6 +21,7 @@ export const COLLECTION_GROUPS: Record<string, string[]> = {
   ],
   Organization: [
     'echelons',
+    'employees',
     'echelon_employees',
     'employee_leaves',
     'employee_timesheets',
