@@ -14,6 +14,7 @@ import {
   IconCheck,
   IconX,
   IconSearch,
+  IconTrash,
 } from "@tabler/icons-react"
 import { getCollection } from "../../../functions/_shared/collections/getCollection"
 import { useLocale } from "@/packages/hooks/use-locale"
@@ -494,6 +495,10 @@ export function DataTable() {
     setConfirmOpen(true)
   }, [])
 
+  // Batch delete confirmation state
+  const [batchDeleteOpen, setBatchDeleteOpen] = React.useState(false)
+  const [batchDeleting, setBatchDeleting] = React.useState(false)
+
   // Create dialog state
   const [createOpen, setCreateOpen] = React.useState(false)
   const [formData, setFormData] = React.useState<Record<string, any>>({})
@@ -608,6 +613,34 @@ export function DataTable() {
     }
   }
 
+  async function handleBatchDelete() {
+    const selectedRows = table.getFilteredSelectedRowModel().rows
+    if (selectedRows.length === 0) return
+    
+    setBatchDeleting(true)
+    setError(null)
+    
+    try {
+      // Delete each selected row
+      for (const row of selectedRows) {
+        const idValue = row.original[primaryKey]
+        const res = await fetch(`/api/admin/${encodeURIComponent(state.collection)}/${encodeURIComponent(String(idValue))}`, {
+          method: "DELETE",
+          credentials: "include",
+        })
+        if (!res.ok) throw new Error(`Delete failed: ${res.status}`)
+      }
+      
+      setBatchDeleteOpen(false)
+      setRowSelection({}) // Clear selection
+      await fetchData()
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      setBatchDeleting(false)
+    }
+  }
+
   async function handleCreateSubmit(e: React.FormEvent) {
     e.preventDefault()
     setCreateError(null)
@@ -693,6 +726,18 @@ export function DataTable() {
           View
         </Label>
         <div className="flex items-center gap-2">
+          {table.getFilteredSelectedRowModel().rows.length > 0 && (
+            <Button 
+              variant="destructive" 
+              size="sm" 
+              onClick={() => setBatchDeleteOpen(true)}
+              disabled={batchDeleting}
+            >
+              <IconTrash />
+              <span className="hidden lg:inline">Delete Selected</span>
+              <span className="lg:hidden">Delete</span>
+            </Button>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
@@ -886,6 +931,31 @@ export function DataTable() {
           <ResponsiveDialogFooter>
             <Button variant="outline" onClick={() => setConfirmOpen(false)}>Cancel</Button>
             <Button variant="destructive" onClick={handleConfirmDelete}>Delete</Button>
+          </ResponsiveDialogFooter>
+          <ResponsiveDialogClose className="sr-only" />
+        </ResponsiveDialogContent>
+      </ResponsiveDialog>
+
+      <ResponsiveDialog open={batchDeleteOpen} onOpenChange={setBatchDeleteOpen}>
+        <ResponsiveDialogContent className="p-5">
+          <ResponsiveDialogHeader>
+            <ResponsiveDialogTitle>Delete selected records?</ResponsiveDialogTitle>
+            <ResponsiveDialogDescription>
+              This action cannot be undone. You are about to delete {table.getFilteredSelectedRowModel().rows.length} records from "{state.collection}".
+            </ResponsiveDialogDescription>
+          </ResponsiveDialogHeader>
+          <ResponsiveDialogFooter>
+            <Button variant="outline" onClick={() => setBatchDeleteOpen(false)} disabled={batchDeleting}>Cancel</Button>
+            <Button variant="destructive" onClick={handleBatchDelete} disabled={batchDeleting}>
+              {batchDeleting ? (
+                <>
+                  <IconLoader className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                'Delete All'
+              )}
+            </Button>
           </ResponsiveDialogFooter>
           <ResponsiveDialogClose className="sr-only" />
         </ResponsiveDialogContent>
