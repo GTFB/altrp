@@ -9,6 +9,7 @@ import {
   PieChart,
   Settings2,
   SquareTerminal,
+  Database,
 } from "lucide-react"
 
 import { NavMain } from "@/components/application-blocks/nav-main"
@@ -89,7 +90,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }, [])
 
   const items = React.useMemo(() => {
-    return groups.map((group) => ({
+    const databaseItems = [
+      {
+        title: "Database",
+        url: "#",
+        icon: Database,
+        isActive: false,
+        items: [
+          {
+            title: "Seed Data",
+            url: "/admin/seed",
+          },
+        ],
+      },
+    ]
+
+    const collectionItems = groups.map((group) => ({
       title: group.category,
       url: "#",
       icon: categoryIcon[group.category] || SquareTerminal,
@@ -102,13 +118,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         
         return {
           title: name,
-          url: `?${params.toString()}`,
-          onClick: () => {
-            pushState({ collection: name, page: 1 })
-          },
+          url: `/admin?${params.toString()}`,
         }
       }),
     }))
+
+    return [...databaseItems, ...collectionItems]
   }, [groups, state.collection, pushState])
 
   // Dummy teams source for TeamSwitcher (kept UI parity). Could be enriched later.

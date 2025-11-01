@@ -31,14 +31,61 @@ export default function LoginPage() {
         body: JSON.stringify(formData),
       })
 
-      const data: { error?: string; success?: boolean } = await response.json()
+      const data: { 
+        error?: string
+        success?: boolean
+        user?: {
+          roles?: Array<{
+            dataIn?: string | null
+            [key: string]: any
+          }>
+        }
+      } = await response.json()
 
       if (!response.ok) {
         throw new Error(data.error || 'Login failed')
       }
 
-      // Redirect to admin page on success
-      router.push('/admin')
+      // Check if user has Administrator role
+      const hasAdministratorRole = data.user?.roles?.some(
+        (role) => role.name === 'Administrator' || role.raid === 'Administrator'
+      )
+
+      // Check if user has any role with auth_redirect_url
+      let redirectUrl = '/admin' // Default for admin
+      
+      if (data.user?.roles) {
+        let foundRedirect = false
+        
+        for (const role of data.user.roles) {
+          if (role.dataIn) {
+            try {
+              const dataIn = typeof role.dataIn === 'string' 
+                ? JSON.parse(role.dataIn) 
+                : role.dataIn
+              
+              if (dataIn?.auth_redirect_url && typeof dataIn.auth_redirect_url === 'string') {
+                redirectUrl = dataIn.auth_redirect_url
+                foundRedirect = true
+                break // Use first match
+              }
+            } catch (e) {
+              // Ignore JSON parse errors
+            }
+          }
+        }
+
+        // If no custom redirect and user doesn't have Administrator role, redirect to home
+        if (!foundRedirect && !hasAdministratorRole) {
+          redirectUrl = '/'
+        }
+      } else if (!hasAdministratorRole) {
+        // No roles and no Administrator, redirect to home
+        redirectUrl = '/'
+      }
+
+      // Redirect to determined URL
+      router.push(redirectUrl)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error')
     } finally {

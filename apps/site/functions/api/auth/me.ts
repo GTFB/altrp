@@ -75,6 +75,7 @@ export const onRequestGet = async (context: { request: Request; env: Env }) => {
         name: role.name,
         description: role.description,
         isSystem: role.isSystem,
+        dataIn: role.dataIn,
       })),
     }
 
