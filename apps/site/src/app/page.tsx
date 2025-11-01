@@ -93,7 +93,7 @@ export default function Home() {
 
         {/* Mobile Menu Dialog */}
         <Dialog open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-          <DialogContent className="max-w-full h-screen w-full m-0 rounded-none p-0 flex flex-col left-0 top-0 translate-x-0 translate-y-0 sm:left-0 sm:top-0 sm:translate-x-0 sm:translate-y-0">
+          <DialogContent className="max-w-full h-screen w-full m-0 rounded-none p-0 flex flex-col left-0 top-0 translate-x-0 translate-y-0 sm:left-0 sm:top-0 sm:translate-x-0 sm:translate-y-0 [&>button:last-child]:hidden">
             <DialogHeader className="px-6 pt-6 pb-4 border-b shrink-0">
               <div className="flex items-center justify-between">
                 <DialogTitle className="text-xl font-semibold">Menu</DialogTitle>
