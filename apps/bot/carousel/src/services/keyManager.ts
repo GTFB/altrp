@@ -24,6 +24,17 @@ export interface KeyUsageStats {
 	leastUsedKey?: string;
 }
 
+// JSON stored in keys.data_in
+type KeyDataIn = {
+    provider?: string;
+    keyValue?: string;
+    keyType?: 'api_key' | 'bearer_token';
+    models?: string | string[];
+    isValid?: boolean;
+    lastUsed?: number;
+    usageCount?: number;
+};
+
 export class KeyManagerService {
 	constructor(private env: any) {}
 
@@ -320,25 +331,25 @@ export class KeyManagerService {
 	private mapDbRowToApiKey(row: any): ApiKey {
 		console.log(`[KeyManager] Mapping DB row:`, row);
 		
-		// Parse data_in JSON
-		let dataIn = {};
-		try {
-			dataIn = JSON.parse(row.data_in || '{}');
-		} catch (e) {
-			console.error('Failed to parse data_in:', e);
-		}
+    // Parse data_in JSON
+    let dataIn: KeyDataIn = {};
+    try {
+        dataIn = JSON.parse(row.data_in || '{}') as KeyDataIn;
+    } catch (e) {
+        console.error('Failed to parse data_in:', e);
+    }
 		
 		return {
 			id: row.id?.toString() || row.kaid,
 			name: row.title || '',
-			provider: dataIn['provider'] || '',
-			keyValue: dataIn['keyValue'] || '',
-			keyType: dataIn['keyType'] || 'api_key',
-			models: JSON.parse(dataIn['models'] || '[]'),
-			isActive: Boolean(row.is_active),
-			isValid: Boolean(dataIn['isValid']),
-			lastUsed: dataIn['lastUsed'],
-			usageCount: dataIn['usageCount'] || 0,
+            provider: dataIn.provider || '',
+            keyValue: dataIn.keyValue || '',
+            keyType: dataIn.keyType || 'api_key',
+            models: Array.isArray(dataIn.models) ? dataIn.models : JSON.parse((dataIn.models ?? '[]') as string),
+            isActive: Boolean(row.is_active),
+            isValid: Boolean(dataIn.isValid),
+            lastUsed: dataIn.lastUsed,
+            usageCount: dataIn.usageCount || 0,
 			createdAt: new Date(row.created_at).getTime() / 1000,
 			updatedAt: new Date(row.updated_at).getTime() / 1000
 		};

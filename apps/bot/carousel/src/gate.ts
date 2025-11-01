@@ -515,7 +515,25 @@ async function callGemini(model: string, inputText: string, apiKey: string) {
 		throw new Error(await res.text());
 	}
 	const data = await res.json<any>();
+	
+	// Check for safety blocks or empty response
+	if (data?.candidates?.[0]?.finishReason === 'SAFETY') {
+		console.warn('Gemini blocked response due to safety:', data.candidates[0]);
+		throw new Error('Content blocked by safety filter');
+	}
+	
+	if (!data?.candidates || data.candidates.length === 0) {
+		console.warn('Gemini returned no candidates:', JSON.stringify(data, null, 2));
+		throw new Error('No candidates in Gemini response');
+	}
+	
 	const text = data?.candidates?.[0]?.content?.parts?.map((p: any) => p?.text).filter(Boolean).join('\n') ?? '';
+	
+	if (!text) {
+		console.warn('Gemini returned empty text. Full response:', JSON.stringify(data, null, 2));
+		throw new Error(`Empty response from Gemini. Finish reason: ${data?.candidates?.[0]?.finishReason || 'unknown'}`);
+	}
+	
 	console.log('Gemini response:', JSON.stringify(data, null, 2));
 	return { text };
 }

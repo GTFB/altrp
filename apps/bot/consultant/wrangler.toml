@@ -1,0 +1,23 @@
+name = "altrp-consultant-dev"
+main = "src/worker/worker.ts"
+compatibility_date = "2024-01-01"
+workers_dev = true
+account_id = "7f412ebe1901fb520bca3fbe424faf94"
+
+[observability.logs]
+enabled = true
+
+# Environment variables
+[vars]
+BOT_TOKEN = "8327834264:AAEJpJHzUoZ0_WeHsaVP6OQBdyb4W-05XhY"
+ADMIN_CHAT_ID = "-1003292860991"
+NODE_ENV = "production"
+LOCALE = "ru"
+AI_API_URL = "https://api-gateway-dev.gtfb.tech"
+AI_API_TOKEN = "sk-prod-958813"
+GATEWAY_API_TOKEN = "sk-prod-958813"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "consultant-bot-db"
+database_id = "fa51d644-4e01-49ea-a661-0c74f8c986cc"
