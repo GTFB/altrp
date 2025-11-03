@@ -1,6 +1,6 @@
 import type { Env } from './worker';
 import { KVStorageService } from './kv-storage-service';
-import { D1StorageService, type User } from './d1-storage-service';
+import { D1StorageService, type Human } from './d1-storage-service';
 import { MessageService } from '../core/message-service';
 import { TopicService } from '../core/topic-service';
 import { SessionService } from '../core/session-service';
@@ -135,14 +135,14 @@ export class TelegramBotWorker {
   }
 
   /**
-   * Gets user ID from users table by Telegram ID
+   * Gets human ID from humans table by Telegram ID
    */
   private async getDbUserId(telegramUserId: number): Promise<number | null> {
     try {
-      const user = await this.d1Storage.getUser(telegramUserId);
-      return user && user.id ? user.id : null;
+      const human = await this.d1Storage.getHumanByTelegramId(telegramUserId);
+      return human && human.id ? human.id : null;
     } catch (error) {
-      console.error(`Error getting DB user ID for Telegram user ${telegramUserId}:`, error);
+      console.error(`Error getting DB human ID for Telegram user ${telegramUserId}:`, error);
       return null;
     }
   }
@@ -194,14 +194,76 @@ export class TelegramBotWorker {
     }
   }
 
+  // private async processMessage(message: TelegramMessage): Promise<void> {
+  //   const userId = message.from.id;
+  //   const chatId = message.chat.id;
+  //   const adminChatId = parseInt(this.env.ADMIN_CHAT_ID);
+
+  //   console.log(`Processing message from user ${userId} in chat ${chatId}`);
+  //   console.log(`Admin chat ID (hardcoded): ${adminChatId}`);
+  //   console.log(`Message thread ID: ${(message as any).message_thread_id}`);
+
+  //   // First process commands (including in topics)
+  //   if (message.text?.startsWith('/')) {
+  //     await this.handleCommand(message);
+  //     return;
+  //   }
+
+  //   // Check if message came to admin group (topic)
+  //   if (chatId === adminChatId && (message as any).message_thread_id) {
+  //     const topicId = (message as any).message_thread_id;
+  //     console.log(`✅ Entering topic handling block, topicId: ${topicId}`);
+      
+  //     // Check if this is a consultant topic
+  //     try {
+  //       const consultantThread = await this.d1Storage.execute(`
+  //         SELECT id 
+  //         FROM message_threads 
+  //         WHERE value = ? AND type = 'consultant' AND deleted_at IS NULL
+  //         LIMIT 1
+  //       `, [topicId.toString()]);
+
+  //       if (consultantThread && consultantThread.length > 0) {
+  //         // This is a consultant topic - handle with AI
+  //         console.log(`Processing message in consultant topic ${topicId}`);
+          
+  //         //if (message.text) {
+  //           // Get handlers and call handleConsultantTopicMessage
+  //           const handlers = this.flowEngine['customHandlers'] || {};
+  //           if (handlers.handleConsultantTopicMessage) {
+  //             await handlers.handleConsultantTopicMessage(message);
+  //           }
+  //         //}
+  //         return;
+  //       }
+  //     } catch (error) {
+  //       console.error('Error checking consultant topic:', error);
+  //     }
+
+  //     // Try to handle as user topic (old bot logic)
+  //     // Wrapped in try-catch to handle missing users table gracefully
+  //     try {
+  //       await this.topicService.handleMessageFromTopic(
+  //         message, 
+  //         this.d1Storage.getUserIdByTopic.bind(this.d1Storage),
+  //         this.getDbUserId.bind(this)
+  //       );
+  //     } catch (error) {
+  //       console.log(`Message in topic ${topicId} is not a user or consultant topic, ignoring`);
+  //     }
+  //     return;
+  //   }
+
+  //   // Skip all user-related logic for consultant bot
+  //   // Consultant bot only handles messages in topics
+  // }
+
   private async processMessage(message: TelegramMessage): Promise<void> {
     const userId = message.from.id;
     const chatId = message.chat.id;
     const adminChatId = parseInt(this.env.ADMIN_CHAT_ID);
 
     console.log(`Processing message from user ${userId} in chat ${chatId}`);
-    console.log(`Admin chat ID (hardcoded): ${adminChatId}`);
-    console.log(`Message thread ID: ${(message as any).message_thread_id}`);
 
     // First process commands (including in topics)
     if (message.text?.startsWith('/')) {
@@ -211,81 +273,77 @@ export class TelegramBotWorker {
 
     // Check if message came to admin group (topic)
     if (chatId === adminChatId && (message as any).message_thread_id) {
-      const topicId = (message as any).message_thread_id;
-      console.log(`✅ Entering topic handling block, topicId: ${topicId}`);
-      
-      // Check if this is a consultant topic
-      try {
-        const consultantThread = await this.d1Storage.execute(`
-          SELECT id 
-          FROM message_threads 
-          WHERE value = ? AND type = 'consultant' AND deleted_at IS NULL
-          LIMIT 1
-        `, [topicId.toString()]);
-
-        if (consultantThread && consultantThread.length > 0) {
-          // This is a consultant topic - handle with AI
-          console.log(`Processing message in consultant topic ${topicId}`);
-          
-          //if (message.text) {
-            // Get handlers and call handleConsultantTopicMessage
-            const handlers = this.flowEngine['customHandlers'] || {};
-            if (handlers.handleConsultantTopicMessage) {
-              await handlers.handleConsultantTopicMessage(message);
-            }
-          //}
-          return;
-        }
-      } catch (error) {
-        console.error('Error checking consultant topic:', error);
-      }
-
-      // Try to handle as user topic (old bot logic)
-      // Wrapped in try-catch to handle missing users table gracefully
-      try {
-        await this.topicService.handleMessageFromTopic(
-          message, 
-          this.d1Storage.getUserIdByTopic.bind(this.d1Storage),
-          this.getDbUserId.bind(this)
-        );
-      } catch (error) {
-        console.log(`Message in topic ${topicId} is not a user or consultant topic, ignoring`);
-      }
+      // This is a message in admin group topic - forward to human
+      await this.topicService.handleMessageFromTopic(
+        message, 
+        this.d1Storage.getHumanTelegramIdByTopic.bind(this.d1Storage),
+        this.getDbUserId.bind(this)
+      );
       return;
     }
 
-    // Skip all user-related logic for consultant bot
-    // Consultant bot only handles messages in topics
+    // Add human to database
+    await this.ensureHumanExists(message.from);
+
+    // Get dbHumanId for logging
+    const human = await this.d1Storage.getHumanByTelegramId(message.from.id);
+    if (!human) {
+      console.error(`Human ${message.from.id} not found in database for logging`);
+      return;
+    }
+
+    // Log message
+    if (human.id) {
+      await this.messageService.logMessage(message, 'incoming', human.id);
+    }
+
+    // Get or create human context
+    if (human.id) {
+      await this.userContextManager.getOrCreateContext(message.from.id, human.id);
+    }
+    
+    // Check if human is in flow mode
+    const isInFlow = await this.userContextManager.isInFlowMode(message.from.id);
+    
+    if (isInFlow && message.text) {
+      // Human in flow - process through FlowEngine
+      console.log(`🎯 Human ${message.from.id} is in flow mode, processing through FlowEngine`);
+      await this.flowEngine.handleIncomingMessage(message.from.id, message.text);
+      return;
+    }
+
+    // Process all message types (considering forwarding settings)
+    await this.handleAllMessages(message);
   }
 
   private async processCallbackQuery(callbackQuery: TelegramCallbackQuery): Promise<void> {
     const userId = callbackQuery.from.id;
     const data = callbackQuery.data;
 
-    console.log(`Processing callback query from user ${userId}: ${data}`);
+    console.log(`Processing callback query from human ${userId}: ${data}`);
 
-    // Get dbUserId for logging
-    const user = await this.d1Storage.getUser(callbackQuery.from.id);
-    if (!user) {
-      console.error(`User ${callbackQuery.from.id} not found in database for logging`);
+    // Get dbHumanId for logging
+    const human = await this.d1Storage.getHumanByTelegramId(callbackQuery.from.id);
+    if (!human) {
+      console.error(`Human ${callbackQuery.from.id} not found in database for logging`);
       return;
     }
 
     // Process callback query through MessageService (logging + response)
-    if (user.id) {
-      await this.messageService.handleCallbackQuery(callbackQuery, user.id);
+    if (human.id) {
+      await this.messageService.handleCallbackQuery(callbackQuery, human.id);
     }
 
-    // Get or create user context  
-    if (user.id) {
-      await this.userContextManager.getOrCreateContext(userId, user.id);
+    // Get or create human context  
+    if (human.id) {
+      await this.userContextManager.getOrCreateContext(userId, human.id);
     }
     
     // Universal processing of all callbacks through FlowEngine
-    // If user pressed button - they are already interacting with bot
+    // If human pressed button - they are already interacting with bot
     const context = await this.userContextManager.getContext(userId);
     
-    console.log(`🔍 Callback processing for user ${userId}:`);
+    console.log(`🔍 Callback processing for human ${userId}:`);
     console.log(`  - Current flow: ${context?.currentFlow || 'none'}`);
     console.log(`  - Current step: ${context?.currentStep || 'none'}`);
     console.log(`  - Callback data: ${data}`);
@@ -296,16 +354,16 @@ export class TelegramBotWorker {
     }
   }
 
-  private async ensureUserExists(user: TelegramUser): Promise<void> {
+  private async ensureHumanExists(user: TelegramUser): Promise<void> {
     try {
-      const existingUser = await this.d1Storage.getUser(user.id);
+      const exists = await this.d1Storage.humanExists(user.id);
       
-      if (!existingUser) {
-        // User will be registered on /start command
-        console.log(`User ${user.id} not found in database - will be registered on /start command`);
+      if (!exists) {
+        // Human will be registered on /start command
+        console.log(`Human ${user.id} not found in database - will be registered on /start command`);
       }
     } catch (error) {
-      console.error(`Error checking if user exists:`, error);
+      console.error(`Error checking if human exists:`, error);
     }
   }
 
@@ -373,23 +431,34 @@ export class TelegramBotWorker {
   private async handleAllMessages(message: TelegramMessage): Promise<void> {
     const userId = message.from.id;
 
-    // Get user information
-    const user = await this.d1Storage.getUser(userId);
+    // Get human information
+    const human = await this.d1Storage.getHumanByTelegramId(userId);
     
-    if (!user) {
-      console.log(`User ${userId} not found`);
+    if (!human) {
+      console.log(`Human ${userId} not found`);
       return;
+    }
+    
+    // Extract topicId from data_in JSON
+    let topicId: number | undefined;
+    if (human.dataIn) {
+      try {
+        const dataInObj = JSON.parse(human.dataIn);
+        topicId = dataInObj.topic_id;
+      } catch (e) {
+        console.warn(`Failed to parse data_in for human ${userId}, topic_id not available`);
+      }
     }
     
     // Check if message forwarding is enabled
     const forwardingEnabled = await this.userContextManager.isMessageForwardingEnabled(userId);
     
-    if (forwardingEnabled && user.topicId) {
-      // Forward message to user's topic only if forwarding is enabled
-      await this.topicService.forwardMessageToUserTopic(userId, user.topicId, message);
-      console.log(`📬 Message forwarded to topic for user ${userId}`);
+    if (forwardingEnabled && topicId) {
+      // Forward message to human's topic only if forwarding is enabled
+      await this.topicService.forwardMessageToUserTopic(userId, topicId, message);
+      console.log(`📬 Message forwarded to topic for human ${userId}`);
     } else {
-      console.log(`📪 Message forwarding disabled for user ${userId} - not forwarding to topic`);
+      console.log(`📪 Message forwarding disabled for human ${userId} - not forwarding to topic`);
     }
   }
 

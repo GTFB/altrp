@@ -1,4 +1,5 @@
 import { D1Database } from '@cloudflare/workers-types';
+import { generateUuidV4, generateAid } from '../core/helpers';
 
 export interface User {
   id?: number; // Auto-increment ID from users table
@@ -40,6 +41,48 @@ export interface Message {
   topicId?: number;
   data?: string; // JSON string for additional data
   createdAt?: string;
+}
+
+export interface Human {
+  id?: number; // Auto-increment ID from humans table
+  uuid?: string;
+  haid?: string;
+  fullName: string;
+  birthday?: string;
+  email?: string;
+  sex?: string;
+  statusName?: string;
+  type?: string;
+  cityName?: string;
+  order?: number;
+  xaid?: string;
+  mediaId?: string;
+  updatedAt?: string;
+  createdAt?: string;
+  deletedAt?: number;
+  gin?: string;
+  fts?: string;
+  dataIn?: string;
+  dataOut?: string;
+}
+
+export interface Text {
+  id?: number; // Auto-increment ID from texts table
+  uuid?: string;
+  taid?: string;
+  title?: string;
+  type?: string;
+  statusName?: string;
+  isPublic?: number;
+  order?: number;
+  xaid?: string;
+  updatedAt?: string;
+  createdAt?: string;
+  deletedAt?: number;
+  gin?: string;
+  fts?: string;
+  dataIn?: string;
+  dataOut?: string;
 }
 
 export class D1StorageService {
@@ -193,6 +236,391 @@ export class D1StorageService {
       }
     } catch (error) {
       console.error(`Error updating data for user ${telegramId}:`, error);
+      throw error;
+    }
+  }
+
+  // Humans
+  async addHuman(human: Human): Promise<number> {
+    console.log(`Adding human ${human.fullName} to D1 database`);
+
+    try {
+
+      const uuid = human.uuid || generateUuidV4();
+      const haid = human.haid || generateAid('h');
+      const now = new Date().toISOString();
+
+      const result = await this.db.prepare(`
+        INSERT INTO humans (
+          uuid, haid, full_name, birthday, email, sex, status_name, type,
+          city_name, \`order\`, xaid, media_id, updated_at, created_at,
+          deleted_at, gin, fts, data_in, data_out
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        uuid,
+        haid,
+        human.fullName,
+        human.birthday || null,
+        human.email || null,
+        human.sex || null,
+        human.statusName || null,
+        human.type || null,
+        human.cityName || null,
+        human.order ?? 0,
+        human.xaid || null,
+        human.mediaId || null,
+        now,
+        now,
+        human.deletedAt || null,
+        human.gin || null,
+        human.fts || null,
+        human.dataIn || null,
+        human.dataOut || null
+      ).run();
+
+      console.log(`Human ${human.fullName} added to D1 database with ID: ${result.meta.last_row_id}`);
+      return result.meta.last_row_id as number;
+    } catch (error) {
+      console.error(`Error adding human ${human.fullName}:`, error);
+      throw error;
+    }
+  }
+
+  async getHumanByTelegramId(telegramId: number): Promise<Human | null> {
+    console.log(`Getting human by telegram_id ${telegramId} from D1 database`);
+
+    try {
+
+      const result = await this.db.prepare(`
+        SELECT * FROM humans 
+        WHERE json_extract(data_in, '$.telegram_id') = ?
+        AND deleted_at IS NULL
+      `).bind(telegramId).first();
+
+      if (result) {
+        const human: Human = {
+          id: result.id as number,
+          uuid: result.uuid as string,
+          haid: result.haid as string,
+          fullName: result.full_name as string,
+          birthday: result.birthday as string || undefined,
+          email: result.email as string || undefined,
+          sex: result.sex as string || undefined,
+          statusName: result.status_name as string || undefined,
+          type: result.type as string || undefined,
+          cityName: result.city_name as string || undefined,
+          order: result.order as number || 0,
+          xaid: result.xaid as string || undefined,
+          mediaId: result.media_id as string || undefined,
+          updatedAt: result.updated_at as string,
+          createdAt: result.created_at as string,
+          deletedAt: result.deleted_at as number || undefined,
+          gin: result.gin as string || undefined,
+          fts: result.fts as string || undefined,
+          dataIn: result.data_in as string || undefined,
+          dataOut: result.data_out as string || undefined
+        };
+        console.log(`Human with telegram_id ${telegramId} found with DB ID: ${human.id}`);
+        return human;
+      } else {
+        console.log(`Human with telegram_id ${telegramId} not found in D1 database`);
+        return null;
+      }
+    } catch (error) {
+      console.error(`Error getting human by telegram_id ${telegramId}:`, error);
+      throw error;
+    }
+  }
+
+  async getHumanById(id: number): Promise<Human | null> {
+    console.log(`Getting human by id ${id} from D1 database`);
+
+    try {
+      const result = await this.db.prepare(`
+        SELECT * FROM humans 
+        WHERE id = ? AND deleted_at IS NULL
+      `).bind(id).first();
+
+      if (result) {
+        const human: Human = {
+          id: result.id as number,
+          uuid: result.uuid as string,
+          haid: result.haid as string,
+          fullName: result.full_name as string,
+          birthday: result.birthday as string || undefined,
+          email: result.email as string || undefined,
+          sex: result.sex as string || undefined,
+          statusName: result.status_name as string || undefined,
+          type: result.type as string || undefined,
+          cityName: result.city_name as string || undefined,
+          order: result.order as number || 0,
+          xaid: result.xaid as string || undefined,
+          mediaId: result.media_id as string || undefined,
+          updatedAt: result.updated_at as string,
+          createdAt: result.created_at as string,
+          deletedAt: result.deleted_at as number || undefined,
+          gin: result.gin as string || undefined,
+          fts: result.fts as string || undefined,
+          dataIn: result.data_in as string || undefined,
+          dataOut: result.data_out as string || undefined
+        };
+        console.log(`Human with id ${id} found`);
+        return human;
+      } else {
+        console.log(`Human with id ${id} not found in D1 database`);
+        return null;
+      }
+    } catch (error) {
+      console.error(`Error getting human by id ${id}:`, error);
+      throw error;
+    }
+  }
+
+  async updateHuman(telegramId: number, updates: Partial<Human>): Promise<void> {
+    console.log(`Updating human with telegram_id ${telegramId} with:`, updates);
+
+    try {
+      const setParts: string[] = [];
+      const values: any[] = [];
+      
+      if (updates.fullName !== undefined) {
+        setParts.push('full_name = ?');
+        values.push(updates.fullName);
+      }
+      if (updates.birthday !== undefined) {
+        setParts.push('birthday = ?');
+        values.push(updates.birthday);
+      }
+      if (updates.email !== undefined) {
+        setParts.push('email = ?');
+        values.push(updates.email);
+      }
+      if (updates.sex !== undefined) {
+        setParts.push('sex = ?');
+        values.push(updates.sex);
+      }
+      if (updates.statusName !== undefined) {
+        setParts.push('status_name = ?');
+        values.push(updates.statusName);
+      }
+      if (updates.type !== undefined) {
+        setParts.push('type = ?');
+        values.push(updates.type);
+      }
+      if (updates.cityName !== undefined) {
+        setParts.push('city_name = ?');
+        values.push(updates.cityName);
+      }
+      if (updates.order !== undefined) {
+        setParts.push('`order` = ?');
+        values.push(updates.order);
+      }
+      if (updates.xaid !== undefined) {
+        setParts.push('xaid = ?');
+        values.push(updates.xaid);
+      }
+      if (updates.mediaId !== undefined) {
+        setParts.push('media_id = ?');
+        values.push(updates.mediaId);
+      }
+      if (updates.gin !== undefined) {
+        setParts.push('gin = ?');
+        values.push(updates.gin);
+      }
+      if (updates.fts !== undefined) {
+        setParts.push('fts = ?');
+        values.push(updates.fts);
+      }
+      
+      if (setParts.length === 0) {
+        console.warn('No valid updates provided');
+        return;
+      }
+      
+      setParts.push('updated_at = ?');
+      values.push(new Date().toISOString());
+      
+      values.push(telegramId);
+      
+      const result = await this.db.prepare(`
+        UPDATE humans 
+        SET ${setParts.join(', ')} 
+        WHERE json_extract(data_in, '$.telegram_id') = ?
+        AND deleted_at IS NULL
+      `).bind(...values).run();
+
+      console.log(`Human update result:`, result);
+      console.log(`Human with telegram_id ${telegramId} updated - changes: ${result.meta.changes}`);
+      
+      if (result.meta.changes === 0) {
+        console.warn(`No rows were updated for human with telegram_id ${telegramId}. Human might not exist.`);
+      }
+    } catch (error) {
+      console.error(`Error updating human with telegram_id ${telegramId}:`, error);
+      throw error;
+    }
+  }
+
+  async updateHumanDataIn(telegramId: number, dataIn: string): Promise<void> {
+    console.log(`Updating data_in for human with telegram_id ${telegramId}`);
+
+    try {
+      const result = await this.db.prepare(`
+        UPDATE humans 
+        SET data_in = ?, updated_at = ?
+        WHERE json_extract(data_in, '$.telegram_id') = ?
+        AND deleted_at IS NULL
+      `).bind(dataIn, new Date().toISOString(), telegramId).run();
+
+      console.log(`Data_in update result:`, result);
+      console.log(`Data_in updated for human with telegram_id ${telegramId} - changes: ${result.meta.changes}`);
+      
+      if (result.meta.changes === 0) {
+        console.warn(`No rows were updated for human with telegram_id ${telegramId}. Human might not exist.`);
+      }
+    } catch (error) {
+      console.error(`Error updating data_in for human with telegram_id ${telegramId}:`, error);
+      throw error;
+    }
+  }
+
+  async updateHumanDataOut(telegramId: number, dataOut: string): Promise<void> {
+    console.log(`Updating data_out for human with telegram_id ${telegramId}`);
+
+    try {
+      const result = await this.db.prepare(`
+        UPDATE humans 
+        SET data_out = ?, updated_at = ?
+        WHERE json_extract(data_in, '$.telegram_id') = ?
+        AND deleted_at IS NULL
+      `).bind(dataOut, new Date().toISOString(), telegramId).run();
+
+      console.log(`Data_out update result:`, result);
+      console.log(`Data_out updated for human with telegram_id ${telegramId} - changes: ${result.meta.changes}`);
+      
+      if (result.meta.changes === 0) {
+        console.warn(`No rows were updated for human with telegram_id ${telegramId}. Human might not exist.`);
+      }
+    } catch (error) {
+      console.error(`Error updating data_out for human with telegram_id ${telegramId}:`, error);
+      throw error;
+    }
+  }
+
+  async getAllHumans(includeDeleted: boolean = false): Promise<Human[]> {
+    try {
+      const whereClause = includeDeleted ? '' : 'WHERE deleted_at IS NULL';
+      const results = await this.db.prepare(`
+        SELECT * FROM humans ${whereClause} ORDER BY created_at DESC
+      `).all();
+
+      return results.results.map((row: any) => ({
+        id: row.id as number,
+        uuid: row.uuid as string,
+        haid: row.haid as string,
+        fullName: row.full_name as string,
+        birthday: row.birthday as string || undefined,
+        email: row.email as string || undefined,
+        sex: row.sex as string || undefined,
+        statusName: row.status_name as string || undefined,
+        type: row.type as string || undefined,
+        cityName: row.city_name as string || undefined,
+        order: row.order as number || 0,
+        xaid: row.xaid as string || undefined,
+        mediaId: row.media_id as string || undefined,
+        updatedAt: row.updated_at as string,
+        createdAt: row.created_at as string,
+        deletedAt: row.deleted_at as number || undefined,
+        gin: row.gin as string || undefined,
+        fts: row.fts as string || undefined,
+        dataIn: row.data_in as string || undefined,
+        dataOut: row.data_out as string || undefined
+      }));
+    } catch (error) {
+      console.error('Error getting all humans:', error);
+      throw error;
+    }
+  }
+
+  async updateHumanTopic(telegramId: number, topicId: number): Promise<void> {
+    console.log(`Updating topic for human with telegram_id ${telegramId} to ${topicId}`);
+
+    try {
+
+      const human = await this.getHumanByTelegramId(telegramId);
+      if (!human) {
+        throw new Error(`Human with telegram_id ${telegramId} not found`);
+      }
+
+      let dataInObj: any = {};
+      if (human.dataIn) {
+        try {
+          dataInObj = JSON.parse(human.dataIn);
+        } catch (e) {
+          console.warn(`Failed to parse data_in for human ${telegramId}, using empty object`);
+        }
+      }
+
+      dataInObj.topic_id = topicId;
+      const newDataIn = JSON.stringify(dataInObj);
+
+      const result = await this.db.prepare(`
+        UPDATE humans 
+        SET data_in = ?, updated_at = ?
+        WHERE json_extract(data_in, '$.telegram_id') = ?
+        AND deleted_at IS NULL
+      `).bind(newDataIn, new Date().toISOString(), telegramId).run();
+
+      console.log(`Topic update result:`, result);
+      console.log(`Topic updated for human with telegram_id ${telegramId} - changes: ${result.meta.changes}`);
+      
+      if (result.meta.changes === 0) {
+        console.warn(`No rows were updated for human with telegram_id ${telegramId}. Human might not exist.`);
+      }
+    } catch (error) {
+      console.error(`Error updating topic for human with telegram_id ${telegramId}:`, error);
+      throw error;
+    }
+  }
+
+  async humanExists(telegramId: number): Promise<boolean> {
+    try {
+      const result = await this.db.prepare(`
+        SELECT COUNT(*) as count 
+        FROM humans 
+        WHERE json_extract(data_in, '$.telegram_id') = ?
+        AND deleted_at IS NULL
+      `).bind(telegramId).first();
+
+      return (result?.count as number) > 0;
+    } catch (error) {
+      console.error(`Error checking if human with telegram_id ${telegramId} exists:`, error);
+      return false;
+    }
+  }
+
+  async getHumanTelegramIdByTopic(topicId: number): Promise<number | null> {
+    console.log(`Getting human telegram_id for topic ${topicId}`);
+
+    try {
+      const result = await this.db.prepare(`
+        SELECT json_extract(data_in, '$.telegram_id') as telegram_id
+        FROM humans 
+        WHERE json_extract(data_in, '$.topic_id') = ?
+        AND deleted_at IS NULL
+      `).bind(topicId).first();
+
+      if (result && result.telegram_id !== null) {
+        const telegramId = result.telegram_id as number;
+        console.log(`Found human telegram_id ${telegramId} for topic ${topicId}`);
+        return telegramId;
+      } else {
+        console.log(`No human found for topic ${topicId}`);
+        return null;
+      }
+    } catch (error) {
+      console.error(`Error getting human telegram_id for topic ${topicId}:`, error);
       throw error;
     }
   }
@@ -646,6 +1074,48 @@ export class D1StorageService {
       return result.results || [];
     } catch (error) {
       console.error('Error executing SQL:', error);
+      throw error;
+    }
+  }
+
+  // Texts
+  async getTextByTaid(taid: string): Promise<Text | null> {
+    console.log(`Getting text by taid ${taid} from D1 database`);
+
+    try {
+      const result = await this.db.prepare(`
+        SELECT * FROM texts 
+        WHERE taid = ? 
+        AND deleted_at IS NULL
+      `).bind(taid).first();
+
+      if (result) {
+        const text: Text = {
+          id: result.id as number,
+          uuid: result.uuid as string || undefined,
+          taid: result.taid as string || undefined,
+          title: result.title as string || undefined,
+          type: result.type as string || undefined,
+          statusName: result.status_name as string || undefined,
+          isPublic: result.is_public as number || undefined,
+          order: result.order as number || 0,
+          xaid: result.xaid as string || undefined,
+          updatedAt: result.updated_at as string,
+          createdAt: result.created_at as string,
+          deletedAt: result.deleted_at as number || undefined,
+          gin: result.gin as string || undefined,
+          fts: result.fts as string || undefined,
+          dataIn: result.data_in as string || undefined,
+          dataOut: result.data_out as string || undefined
+        };
+        console.log(`Text with taid ${taid} found with DB ID: ${text.id}`);
+        return text;
+      } else {
+        console.log(`Text with taid ${taid} not found in D1 database`);
+        return null;
+      }
+    } catch (error) {
+      console.error(`Error getting text by taid ${taid}:`, error);
       throw error;
     }
   }
