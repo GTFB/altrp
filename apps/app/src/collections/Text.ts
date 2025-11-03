@@ -16,6 +16,7 @@ export const Text: CollectionConfig = {
     },
     { name: 'taid', type: 'text' },
     { name: 'title', type: 'text' },
+    { name: 'content', type: 'text' },
     { name: 'type', type: 'text' },
     { name: 'status_name', type: 'text' },
     { name: 'is_public', type: 'checkbox', defaultValue: true },
