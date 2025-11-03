@@ -1,4 +1,4 @@
-import { Context } from '../types'
+import { Context, AdminFilter } from '../types'
 export default class BaseColumn {   
     constructor(public options: BaseColumnOptions) {
 
@@ -10,6 +10,10 @@ export type RelationConfig = {
     valueField: string;      // Field to use as value (e.g., 'uuid')
     labelField: string;      // Field to display as label (e.g., 'email')
     labelFields?: string[];  // Multiple fields for composite label (e.g., ['first_name', 'last_name'])
+    // Optional default filters to apply when fetching relation options
+    filters?: AdminFilter[];
+    // If true, propagate parent table search (s) to relation fetch
+    inheritSearch?: boolean;
 }
 
 export type BaseColumnOptions = {

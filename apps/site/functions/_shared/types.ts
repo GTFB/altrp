@@ -34,3 +34,20 @@ export interface CollectionStats {
     hasDeleted?: boolean
     hasUuid?: boolean
   }
+
+// Admin listing/types shared between client and worker
+export type AdminFilterOp = "eq" | "neq" | "gt" | "gte" | "lt" | "lte" | "like" | "in"
+
+export interface AdminFilter {
+    field: string
+    op: AdminFilterOp
+    value: unknown
+}
+
+export interface AdminState {
+    collection: string
+    page: number
+    pageSize: number
+    filters: AdminFilter[]
+    search: string
+}
