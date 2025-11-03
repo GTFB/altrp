@@ -17,6 +17,7 @@ import {
   IconTrash,
 } from "@tabler/icons-react"
 import { getCollection } from "../../../functions/_shared/collections/getCollection"
+import type { AdminFilter } from "../../../functions/_shared/types"
 import { useLocale } from "@/packages/hooks/use-locale"
 import { DateTimePicker } from "@/packages/components/ui/date-time-picker"
 import { PhoneInput } from "@/packages/components/ui/phone-input"
@@ -93,6 +94,8 @@ type RelationConfig = {
   valueField: string
   labelField: string
   labelFields?: string[]
+  filters?: AdminFilter[]
+  inheritSearch?: boolean
 }
 
 type ColumnSchemaExtended = ColumnSchema & {
@@ -116,7 +119,7 @@ type StateResponse = {
     collection: string
     page: number
     pageSize: number
-    filters: any[]
+    filters: AdminFilter[]
   }
   schema: {
     columns: ColumnSchema[]
@@ -387,10 +390,30 @@ export function DataTable() {
         if (!col.relation) continue
         
         try {
+          // Limit relation fetch to only values actually used in current page data
+          const valuesInUse = Array.from(
+            new Set(
+              (json.data || [])
+                .map((row: any) => row[col.name])
+                .filter((v: any) => v !== null && v !== undefined && v !== "")
+            )
+          )
+
+          // Compose relation filters: defaults from schema + limit to values in current page
+          const relationFilters: AdminFilter[] = []
+          if (Array.isArray(col.relation.filters)) {
+            relationFilters.push(...col.relation.filters)
+          }
+          if (valuesInUse.length > 0) {
+            relationFilters.push({ field: col.relation.valueField, op: 'in', value: valuesInUse.join(',') })
+          }
+
           const queryParams = qs.stringify({
             c: col.relation.collection,
             p: 1,
             ps: 1000,
+            ...(col.relation.inheritSearch && state.search && { s: state.search }),
+            ...(relationFilters.length > 0 && { filters: relationFilters }),
           })
           
           const relRes = await fetch(`/api/admin/state?${queryParams}`, {

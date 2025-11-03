@@ -1,19 +1,20 @@
 import { sqliteTable, text, integer, numeric } from 'drizzle-orm/sqlite-core'
 
-export const humans = sqliteTable('humans', {
+export const employees = sqliteTable('employees', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   uuid: text('uuid').notNull(),
-  haid: text('haid').notNull(),
-  fullName: text('full_name').notNull(),
-  birthday: text('birthday'),
-  email: text('email'),
-  sex: text('sex'),
+  eaid: text('eaid'),
+  fullEaid: text('full_eaid'),
+  haid: text('haid'),
+  position: text('position'),
+  department: text('department'),
+  salary: numeric('salary'),
+  hireDate: text('hire_date'),
+  terminationDate: text('termination_date'),
   statusName: text('status_name'),
-  type: text('type'),
-  cityName: text('city_name'),
+  email: text('email'),
   order: numeric('order').default('0'),
   xaid: text('xaid'),
-  mediaId: text('media_id'),
   updatedAt: text('updated_at').notNull().default("(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"),
   createdAt: text('created_at').notNull().default("(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"),
   deletedAt: numeric('deleted_at'),
@@ -22,4 +23,3 @@ export const humans = sqliteTable('humans', {
   dataIn: text('data_in'),
   dataOut: text('data_out'),
 })
-
