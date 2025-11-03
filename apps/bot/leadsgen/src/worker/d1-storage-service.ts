@@ -76,6 +76,7 @@ export interface Text {
   isPublic?: number;
   order?: number;
   xaid?: string;
+  content?: string; // Text content
   updatedAt?: string;
   createdAt?: string;
   deletedAt?: number;
@@ -1100,6 +1101,7 @@ export class D1StorageService {
           isPublic: result.is_public as number || undefined,
           order: result.order as number || 0,
           xaid: result.xaid as string || undefined,
+          content: result.content as string || undefined,
           updatedAt: result.updated_at as string,
           createdAt: result.created_at as string,
           deletedAt: result.deleted_at as number || undefined,
@@ -1116,6 +1118,31 @@ export class D1StorageService {
       }
     } catch (error) {
       console.error(`Error getting text by taid ${taid}:`, error);
+      throw error;
+    }
+  }
+
+  async getTaidByContent(content: string): Promise<string | null> {
+    console.log(`Getting taid by content from D1 database`);
+
+    try {
+      const result = await this.db.prepare(`
+        SELECT taid FROM texts 
+        WHERE content = ? 
+        AND deleted_at IS NULL
+        LIMIT 1
+      `).bind(content).first();
+
+      if (result && result.taid) {
+        const taid = result.taid as string;
+        console.log(`Taid found for content: ${taid}`);
+        return taid;
+      } else {
+        console.log(`No taid found for given content`);
+        return null;
+      }
+    } catch (error) {
+      console.error(`Error getting taid by content:`, error);
       throw error;
     }
   }

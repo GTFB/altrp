@@ -7,7 +7,7 @@ export const menuFlow: BotFlow = {
     {
       type: 'message',
       id: 'show_main_menu',
-      messageKey: 'mainMenu',
+      text: 'Select an action:',
       keyboardKey: 'main_menu'
     },
   ]

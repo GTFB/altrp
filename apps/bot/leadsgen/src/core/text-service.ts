@@ -17,7 +17,7 @@ export class TextService {
 
   /**
    * Gets text content by taid
-   * Extracts content from data_in JSON field
+   * Retrieves content from content field
    * @param taid - Text identifier (taid)
    * @returns Content string or null if not found
    */
@@ -25,25 +25,16 @@ export class TextService {
     try {
       const text = await this.d1Storage.getTextByTaid(taid);
       
-      if (!text || !text.dataIn) {
-        console.log(`Text with taid ${taid} not found or has no data_in`);
+      if (!text) {
+        console.log(`Text with taid ${taid} not found`);
         return null;
       }
 
-      // Parse data_in JSON and extract content
-      try {
-        const dataInObj = JSON.parse(text.dataIn);
-        const content = dataInObj.content;
-        
-        if (typeof content === 'string') {
-          console.log(`✅ Content retrieved for taid ${taid}`);
-          return content;
-        } else {
-          console.warn(`Content for taid ${taid} is not a string`);
-          return null;
-        }
-      } catch (e) {
-        console.error(`Failed to parse data_in for text ${taid}:`, e);
+      if (text.content) {
+        console.log(`✅ Content retrieved for taid ${taid}`);
+        return text.content;
+      } else {
+        console.log(`Text with taid ${taid} has no content`);
         return null;
       }
     } catch (error) {
@@ -62,6 +53,21 @@ export class TextService {
       return await this.d1Storage.getTextByTaid(taid);
     } catch (error) {
       console.error(`Error getting text for taid ${taid}:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Finds taid by content
+   * Searches for text with exact content match
+   * @param content - Text content to search for
+   * @returns taid string or null if not found
+   */
+  async getTaidByContent(content: string): Promise<string | null> {
+    try {
+      return await this.d1Storage.getTaidByContent(content);
+    } catch (error) {
+      console.error(`Error getting taid for content:`, error);
       return null;
     }
   }

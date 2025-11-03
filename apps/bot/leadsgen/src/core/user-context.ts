@@ -264,11 +264,14 @@ export class UserContextManager {
       }
       
       // Check that language is supported
-      if (userLanguage && ['ru', 'sr'].includes(userLanguage)) {
+      // if (userLanguage && ['ru', 'sr'].includes(userLanguage)) {
+      //   return userLanguage;
+      // }
+      if (userLanguage) {
         return userLanguage;
       }
       
-      return 'ru'; // Default fallback
+      return 'en'; // Default fallback
     } catch (error) {
       console.error(`Error getting human language for ${telegramId}:`, error);
       return 'ru';

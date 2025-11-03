@@ -88,7 +88,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
       await bot.userContextManager.setVariable(userId, '_system.currentMessage', message);
 
       // Start registration flow
-      await handlerWorker.flowEngine.startFlow(userId, 'start_registration');
+      await handlerWorker.flowEngine.startFlow(userId, 'onboarding');
 
       console.log(`✅ Start flow launched for human ${userId}`);
     },

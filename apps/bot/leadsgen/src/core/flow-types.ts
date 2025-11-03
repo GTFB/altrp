@@ -5,14 +5,16 @@ export interface BaseFlowStep {
 
 export interface MessageStep extends BaseFlowStep {
   type: 'message';
-  messageKey: string;
+  //messageKey?: string;
+  text: string;
   keyboardKey?: string;
   nextStepId?: string | number; // Next step ID or number
 }
 
 export interface WaitInputStep extends BaseFlowStep {
   type: 'wait_input';
-  prompt?: string; // Request text (optional)
+  //prompt?: string; // Request text (optional)
+  text: string;
   saveToVariable: string; // Path where to save response (e.g.: "onboarding.name")
   validation?: {
     type: 'text' | 'number' | 'email' | 'phone' | 'url';

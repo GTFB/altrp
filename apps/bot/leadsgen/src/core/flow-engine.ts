@@ -157,16 +157,10 @@ export class FlowEngine {
     const context = await this.userContextManager.getContext(telegramId);
     if (!context) return;
     
-    // Get user language through UserContextManager
-    const userLanguage = await this.userContextManager.getUserLanguage(telegramId);
-    const message = await this.i18nService.getMessage(step.messageKey, userLanguage);
-    
-    if (!message) {
-      console.error(`❌ Message key "${step.messageKey}" not found`);
-      return;
-    }
+    // Use text property directly from step
+    const message = step.text;
 
-    console.log(`💬 Sending message to user ${telegramId}: "${step.messageKey}" (${message}) [lang: ${userLanguage}]`);
+    console.log(`💬 Sending message to user ${telegramId}: "${message.substring(0, 50)}${message.length > 50 ? '...' : ''}"`);
 
     const keyboard = step.keyboardKey ? keyboards[step.keyboardKey as keyof typeof keyboards] : undefined;
     
@@ -204,12 +198,9 @@ export class FlowEngine {
       nextStepId: step.nextStepId
     });
 
-    if (step.prompt) {
-      // Get user language and translated message
-      const userLanguage = await this.userContextManager.getUserLanguage(telegramId);
-      const message = await this.i18nService.getMessage(step.prompt, userLanguage);
-      await this.messageService.sendMessage(telegramId, message, context.userId);
-    }
+    // Use text property directly from step
+    const message = step.text;
+    await this.messageService.sendMessage(telegramId, message, context.userId);
   }
 
   private async handleCallbackStep(telegramId: number, step: CallbackStep): Promise<void> {

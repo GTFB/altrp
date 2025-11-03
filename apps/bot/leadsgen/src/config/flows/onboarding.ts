@@ -4,75 +4,40 @@ export const onboardingFlow: BotFlow = {
   name: 'onboarding',
   description: 'Primary organization card filling process',
   steps: [
-    {
-      type: 'handler',
-      id: 'check_user_company',
-      handlerName: 'checkUserCompany'
-      // Handler decides where to go: main_menu or send_welcome
-    },
+    // {
+    //   type: 'handler',
+    //   id: 'check_human',
+    //   handlerName: 'checkHuman'
+    // },
     {
       type: 'message',
       id: 'send_welcome',
-      messageKey: 'welcome',
-      keyboardKey: 'start_creating_company'
+      text: `🚀 <b>LeadsGen Bot:</b> Automatic 24/7 Lead Collector<b>LeadsGen Bot</b> is an effective tool for automating the collection of contact data (leads) and prequalification of clients.`,
+      keyboardKey: 'start_onboarding_button'
     },
     {
       type: 'wait_input',
-      id: 'ask_company_name',
-      prompt: 'companyName',
-      saveToVariable: 'company.name',
-      nextStepId: 'pib'
+      id: 'onboarding_asking_name',
+      text: 'Enter a name:',
+      saveToVariable: 'human.name',
+      nextStepId: 'onboarding_asking_email'
     },
     {
       type: 'wait_input',
-      id: 'pib',
-      prompt: 'pib',
-      saveToVariable: 'company.pib',
-      nextStepId: 'okved'
-    },
-    {
-      type: 'wait_input',
-      id: 'okved',
-      prompt: 'okved',
-      saveToVariable: 'company.okved',
-      nextStepId: 'mainService'
-    },
-    {
-      type: 'wait_input',
-      id: 'mainService',
-      prompt: 'mainService',
-      saveToVariable: 'mainService.name',
-      nextStepId: 'phone'
-    },
-    {
-      type: 'wait_input',
-      id: 'phone',
-      prompt: 'phone',
-      saveToVariable: 'company.phone',
-      nextStepId: 'email'
-    },
-    {
-      type: 'wait_input',
-      id: 'email',
-      prompt: 'email',
-      saveToVariable: 'company.email',
-      nextStepId: 'create_company_handler'
-    },
-    {
-      type: 'handler',
-      id: 'create_company_handler',
-      handlerName: 'createCompanyAndMainService',
-      nextStepId: 'onboardingThanks'
+      id: 'onboarding_asking_email',
+      text: 'Specify the email address:',
+      saveToVariable: 'human.email',
+      nextStepId: 'onboarding_thanks'
     },
     {
       type: 'message',
-      id: 'onboardingThanks',
-      messageKey: 'onboardingThanks',
-      nextStepId: 'redirect_to_main_menu'
+      id: 'onboarding_thanks',
+      text: 'Thanks for registering!',
+      nextStepId: 'onboarding_main_menu'
     },
     {
       type: 'flow',
-      id: 'redirect_to_main_menu',
+      id: 'onboarding_main_menu',
       flowName: 'menu',
     }
   ]
