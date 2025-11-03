@@ -11,6 +11,8 @@ export interface Env {
   TRANSCRIPTION_API_TOKEN: string;
   NODE_ENV: string;
   LOCALE: string;
+  AI_API_URL: string;
+  AI_API_TOKEN: string;
 }
 
 export interface ScheduledEvent {

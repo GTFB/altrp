@@ -637,4 +637,16 @@ export class D1StorageService {
       throw error;
     }
   }
+
+  // Execute queries and return results as array
+  async execute(sql: string, params: any[] = []): Promise<any[]> {
+    try {
+      const stmt = this.db.prepare(sql).bind(...params);
+      const result = await stmt.all();
+      return result.results || [];
+    } catch (error) {
+      console.error('Error executing SQL:', error);
+      throw error;
+    }
+  }
 }

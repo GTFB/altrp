@@ -535,6 +535,6 @@ try {
 **🎉 Ready! You can now create powerful Telegram bots with our builder!**
 
 For help, refer to:
-- [README.md](../README.md) - general information
+- [README.md](./README.md) - general information
 - [DEPLOYMENT.md](./DEPLOYMENT.md) - deployment
 - [Flow examples](./src/config/flows/) - ready examples

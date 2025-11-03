@@ -192,7 +192,8 @@ export class MessageService {
    */
   async sendMessageToTopic(chatId: number, topicId: number, text: string): Promise<void> {
     try {
-      const response = await fetch(`https://api.telegram.org/bot${this.botToken}/sendMessage`, {
+
+      const sendConfig = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -203,7 +204,11 @@ export class MessageService {
           text: text,
           parse_mode: 'HTML'
         })
-      });
+      };
+
+      const url = `https://api.telegram.org/bot${this.botToken}/sendMessage`;
+
+      const response = await fetch(url, sendConfig);
 
       if (!response.ok) {
         const errorData = await response.text();

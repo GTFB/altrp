@@ -354,106 +354,19 @@ export class TelegramBotWorker {
   }
 
 
-  // Method to check delayed messages (triggered by cron)
+  // TODO Method to check delayed messages (triggered by cron)
   async checkDelayedMessages(): Promise<void> {
     try {
       console.log('Checking delayed messages...');
       
-      // Get all users
-      const users = await this.d1Storage.getAllUsers();
+      // // Get all users
+      // const users = await this.d1Storage.getAllUsers();
       
-      for (const user of users) {
-        await this.checkUserDelayedMessage(user);
-      }
+      // for (const user of users) {
+      //   await this.checkUserDelayedMessage(user);
+      // }
     } catch (error) {
       console.error('Error checking delayed messages:', error);
-    }
-  }
-
-  private async checkUserDelayedMessage(user: any): Promise<void> {
-    try {
-      console.log(`Checking user ${user.telegramId} for delayed messages`);
-      
-      // Get user data
-      const userData = user.data ? JSON.parse(user.data) : {};
-      if (!userData.confirmation) {
-        console.log(`No confirmation data for user ${user.telegramId}`);
-        return;
-      }
-      
-      console.log(`User ${user.telegramId} user data:`, JSON.stringify(userData, null, 2));
-      
-      // Check if subscriptions are confirmed
-      if (!userData.confirmation || !userData.confirmation.tg || !userData.confirmation.vk) {
-        console.log(`No confirmation for user ${user.telegramId}`);
-        return;
-      }
-      
-      // Check if one hour has passed since confirmation
-      const dateTimeStr = userData.confirmation.date_time;
-      console.log(`Checking confirmation time: ${dateTimeStr}`);
-      
-      // Parse date in UTC ISO format
-      const confirmationTime = new Date(dateTimeStr);
-      
-      if (isNaN(confirmationTime.getTime())) {
-        console.log(`Invalid date format: ${dateTimeStr}`);
-        return;
-      }
-      
-      // Current time in UTC
-      const now = new Date();
-      
-      // Calculate difference in milliseconds
-      const timeDiff = now.getTime() - confirmationTime.getTime();
-      const oneHourInMs = 60 * 60 * 1000;
-      
-      console.log(`Confirmation time: ${confirmationTime.toISOString()}`);
-      console.log(`Current time: ${now.toISOString()}`);
-      console.log(`Time difference: ${timeDiff}ms (${Math.round(timeDiff / 1000 / 60)} minutes)`);
-      console.log(`One hour in ms: ${oneHourInMs}`);
-      
-      if (timeDiff < oneHourInMs) {
-        console.log(`Not yet an hour passed for user ${user.telegramId} (${Math.round(timeDiff / 1000 / 60)} minutes ago)`);
-        return; // Less than one hour passed
-      }
-      
-      // Ensure the message has not already been sent
-      if (userData.additional_messages && userData.additional_messages.some((msg: any) => msg.message_1)) {
-        return; // Already sent
-      }
-      
-      // Send message
-      await this.sendDelayedMessage(user.telegramId);
-      
-      // Update user data
-      const currentDateTime = new Date().toISOString();
-      
-      const additionalMessages = userData.additional_messages || [];
-      additionalMessages.push({
-        message_1: currentDateTime
-      });
-      
-      userData.additional_messages = additionalMessages;
-      await this.d1Storage.updateUserData(user.telegramId, JSON.stringify(userData));
-      console.log(`Delayed message sent to user ${user.telegramId}`);
-      
-    } catch (error) {
-      console.error(`Error checking delayed message for user ${user.telegramId}:`, error);
-    }
-  }
-
-  private async sendDelayedMessage(userId: number): Promise<void> {
-    const message = `By the way, did you know that with MaikLoriss you can not only look great, but also earn well? 💰
-
-✨ Want to buy our cosmetics with a HUGE discount and get cashback for every purchase?
-✨ Or maybe you're interested in sharing the products with friends and family and building a business with us?
-
-All the opportunities are waiting for you on our website! Jump in, explore, and join our friendly team!`;
-
-    const dbUserId = await this.getDbUserId(userId);
-    if (dbUserId) {
-      await this.messageService.sendMessage(userId, message, dbUserId);
     }
   }
 

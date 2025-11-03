@@ -1,15 +1,13 @@
-// bot.ts (updated, without customHandlers inside constructor)
 import type { Env } from './worker';
 import { KVStorageService } from './kv-storage-service';
-import { D1StorageService } from './d1-storage-service';
+import { D1StorageService, type User } from './d1-storage-service';
 import { MessageService } from '../core/message-service';
 import { TopicService } from '../core/topic-service';
 import { SessionService } from '../core/session-service';
-import { UserContextManager } from '../core/user-context';
+import { UserContextManager, type UserContext } from '../core/user-context';
 import { FlowEngine } from '../core/flow-engine';
 import { I18nService } from '../core/i18n';
 import { isVKLink, normalizeVKLink } from '../core/helpers';
-//import { createCustomHandlers } from './handlers';
 import { createCustomHandlers } from '../config/handlers';
 import { commands, findCommand } from '../config/commands';
 
@@ -77,18 +75,19 @@ export interface TelegramCallbackQuery {
 
 export class TelegramBotWorker {
   private env: Env;
-  private kvStorage: KVStorageService;
+  //private kvStorage: KVStorageService;
   private d1Storage: D1StorageService;
   private messageService: MessageService;
   private topicService: TopicService;
-  private sessionService: SessionService;
+  //private sessionService: SessionService;
   private userContextManager: UserContextManager;
   private flowEngine: FlowEngine;
   private i18nService: I18nService;
 
-  constructor(env: Env, kvStorage: KVStorageService) {
+  //constructor(env: Env, kvStorage: KVStorageService) {
+  constructor(env: Env) {
     this.env = env;
-    this.kvStorage = kvStorage;
+    //this.kvStorage = kvStorage;
     this.d1Storage = new D1StorageService(env.DB);
     this.messageService = new MessageService({
       botToken: env.BOT_TOKEN,
@@ -99,9 +98,9 @@ export class TelegramBotWorker {
       adminChatId: parseInt(env.ADMIN_CHAT_ID),
       messageService: this.messageService
     });
-    this.sessionService = new SessionService({
-      d1Storage: this.d1Storage
-    });
+    // this.sessionService = new SessionService({
+    //   d1Storage: this.d1Storage
+    // });
     
     // Initialize new components
     this.userContextManager = new UserContextManager();
@@ -201,6 +200,8 @@ export class TelegramBotWorker {
     const adminChatId = parseInt(this.env.ADMIN_CHAT_ID);
 
     console.log(`Processing message from user ${userId} in chat ${chatId}`);
+    console.log(`Admin chat ID (hardcoded): ${adminChatId}`);
+    console.log(`Message thread ID: ${(message as any).message_thread_id}`);
 
     // First process commands (including in topics)
     if (message.text?.startsWith('/')) {
@@ -210,47 +211,51 @@ export class TelegramBotWorker {
 
     // Check if message came to admin group (topic)
     if (chatId === adminChatId && (message as any).message_thread_id) {
-      // This is a message in admin group topic - forward to user
-      await this.topicService.handleMessageFromTopic(
-        message, 
-        this.d1Storage.getUserIdByTopic.bind(this.d1Storage),
-        this.getDbUserId.bind(this)
-      );
+      const topicId = (message as any).message_thread_id;
+      console.log(`✅ Entering topic handling block, topicId: ${topicId}`);
+      
+      // Check if this is a consultant topic
+      try {
+        const consultantThread = await this.d1Storage.execute(`
+          SELECT id 
+          FROM message_threads 
+          WHERE value = ? AND type = 'consultant' AND deleted_at IS NULL
+          LIMIT 1
+        `, [topicId.toString()]);
+
+        if (consultantThread && consultantThread.length > 0) {
+          // This is a consultant topic - handle with AI
+          console.log(`Processing message in consultant topic ${topicId}`);
+          
+          //if (message.text) {
+            // Get handlers and call handleConsultantTopicMessage
+            const handlers = this.flowEngine['customHandlers'] || {};
+            if (handlers.handleConsultantTopicMessage) {
+              await handlers.handleConsultantTopicMessage(message);
+            }
+          //}
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking consultant topic:', error);
+      }
+
+      // Try to handle as user topic (old bot logic)
+      // Wrapped in try-catch to handle missing users table gracefully
+      try {
+        await this.topicService.handleMessageFromTopic(
+          message, 
+          this.d1Storage.getUserIdByTopic.bind(this.d1Storage),
+          this.getDbUserId.bind(this)
+        );
+      } catch (error) {
+        console.log(`Message in topic ${topicId} is not a user or consultant topic, ignoring`);
+      }
       return;
     }
 
-    // Add user to database
-    await this.ensureUserExists(message.from);
-
-    // Get dbUserId for logging
-    const user = await this.d1Storage.getUser(message.from.id);
-    if (!user) {
-      console.error(`User ${message.from.id} not found in database for logging`);
-      return;
-    }
-
-    // Log message
-    if (user.id) {
-      await this.messageService.logMessage(message, 'incoming', user.id);
-    }
-
-    // Get or create user context
-    if (user.id) {
-      await this.userContextManager.getOrCreateContext(message.from.id, user.id);
-    }
-    
-    // Check if user is in flow mode
-    const isInFlow = await this.userContextManager.isInFlowMode(message.from.id);
-    
-    if (isInFlow && message.text) {
-      // User in flow - process through FlowEngine
-      console.log(`🎯 User ${message.from.id} is in flow mode, processing through FlowEngine`);
-      await this.flowEngine.handleIncomingMessage(message.from.id, message.text);
-      return;
-    }
-
-    // Process all message types (considering forwarding settings)
-    await this.handleAllMessages(message);
+    // Skip all user-related logic for consultant bot
+    // Consultant bot only handles messages in topics
   }
 
   private async processCallbackQuery(callbackQuery: TelegramCallbackQuery): Promise<void> {
@@ -348,108 +353,22 @@ export class TelegramBotWorker {
   }
 
 
-  // Method to check delayed messages (triggered by cron)
+  // TODO Method to check delayed messages (triggered by cron)
   async checkDelayedMessages(): Promise<void> {
     try {
       console.log('Checking delayed messages...');
       
       // Get all users
-      const users = await this.d1Storage.getAllUsers();
+      // const users = await this.d1Storage.getAllUsers();
       
-      for (const user of users) {
-        await this.checkUserDelayedMessage(user);
-      }
+      // for (const user of users) {
+      //   await this.checkUserDelayedMessage(user);
+      // }
     } catch (error) {
       console.error('Error checking delayed messages:', error);
     }
   }
 
-  private async checkUserDelayedMessage(user: any): Promise<void> {
-    try {
-      console.log(`Checking user ${user.telegramId} for delayed messages`);
-      
-      // Get user data
-      const userData = user.data ? JSON.parse(user.data) : {};
-      if (!userData.confirmation) {
-        console.log(`No confirmation data for user ${user.telegramId}`);
-        return;
-      }
-      
-      console.log(`User ${user.telegramId} user data:`, JSON.stringify(userData, null, 2));
-      
-      // Check if subscriptions are confirmed
-      if (!userData.confirmation || !userData.confirmation.tg || !userData.confirmation.vk) {
-        console.log(`No confirmation for user ${user.telegramId}`);
-        return;
-      }
-      
-      // Check if one hour has passed since confirmation
-      const dateTimeStr = userData.confirmation.date_time;
-      console.log(`Checking confirmation time: ${dateTimeStr}`);
-      
-      // Parse date in UTC ISO format
-      const confirmationTime = new Date(dateTimeStr);
-      
-      if (isNaN(confirmationTime.getTime())) {
-        console.log(`Invalid date format: ${dateTimeStr}`);
-        return;
-      }
-      
-      // Current time in UTC
-      const now = new Date();
-      
-      // Calculate difference in milliseconds
-      const timeDiff = now.getTime() - confirmationTime.getTime();
-      const oneHourInMs = 60 * 60 * 1000;
-      
-      console.log(`Confirmation time: ${confirmationTime.toISOString()}`);
-      console.log(`Current time: ${now.toISOString()}`);
-      console.log(`Time difference: ${timeDiff}ms (${Math.round(timeDiff / 1000 / 60)} minutes)`);
-      console.log(`One hour in ms: ${oneHourInMs}`);
-      
-      if (timeDiff < oneHourInMs) {
-        console.log(`Not yet an hour passed for user ${user.telegramId} (${Math.round(timeDiff / 1000 / 60)} minutes ago)`);
-        return; // Less than one hour passed
-      }
-      
-      // Ensure the message has not already been sent
-      if (userData.additional_messages && userData.additional_messages.some((msg: any) => msg.message_1)) {
-        return; // Already sent
-      }
-      
-      // Send message
-      await this.sendDelayedMessage(user.telegramId);
-      
-      // Update user data
-      const currentDateTime = new Date().toISOString();
-      
-      const additionalMessages = userData.additional_messages || [];
-      additionalMessages.push({
-        message_1: currentDateTime
-      });
-      
-      userData.additional_messages = additionalMessages;
-      await this.d1Storage.updateUserData(user.telegramId, JSON.stringify(userData));
-      console.log(`Delayed message sent to user ${user.telegramId}`);
-      
-    } catch (error) {
-      console.error(`Error checking delayed message for user ${user.telegramId}:`, error);
-    }
-  }
-
-  private async sendDelayedMessage(userId: number): Promise<void> {
-    const message = `By the way, did you know that with MaikLoriss you can not only look great, but also earn well? 💰
-
-✨ Want to buy our cosmetics with a HUGE discount and get cashback for every purchase?
-✨ Or maybe you're interested in sharing the products with friends and family and building a business with us?
-
-All the opportunities are waiting for you on our website! Jump in, explore, and join our friendly team!`;
-
-    const dbUserId = await this.getDbUserId(userId);
-    if (dbUserId) {
-      await this.messageService.sendMessage(userId, message, dbUserId);
-    }
-  }
 
   private async handleAllMessages(message: TelegramMessage): Promise<void> {
     const userId = message.from.id;
