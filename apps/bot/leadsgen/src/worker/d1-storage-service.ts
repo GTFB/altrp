@@ -1,5 +1,5 @@
 import { D1Database } from '@cloudflare/workers-types';
-import { generateUuidV4, generateAid } from '../core/helpers';
+import { generateUuidV4, generateAid, generateFullId } from '../core/helpers';
 
 export interface User {
   id?: number; // Auto-increment ID from users table
@@ -854,29 +854,48 @@ export class D1StorageService {
         throw new Error('D1 database connection is not initialized');
       }
 
-      console.log(`💾 D1: Preparing SQL statement...`);
+      // Get human to get haid for maid field
+      const human = await this.getHumanById(message.userId);
+      if (!human || !human.haid) {
+        throw new Error(`Human with id ${message.userId} not found or has no haid`);
+      }
+
+      const uuid = generateUuidV4();
+      const fullMaid = generateFullId('m');
+      const maid = human.haid; // Use human's haid as maid to link messages
+
+      // Prepare title (content) and data_in
+      const title = message.content || '';
+      const dataIn = JSON.stringify({
+        userId: message.userId,
+        messageType: message.messageType,
+        direction: message.direction,
+        telegramMessageId: message.telegramMessageId,
+        callbackData: message.callbackData,
+        commandName: message.commandName,
+        fileId: message.fileId,
+        fileName: message.fileName,
+        caption: message.caption,
+        topicId: message.topicId,
+        data: message.data,
+        createdAt: message.createdAt || new Date().toISOString()
+      });
+
+      console.log(`💾 D1: Preparing SQL statement with new structure...`);
       
       const query = `
         INSERT INTO messages (
-          user_id, message_type, direction, content, telegram_message_id, 
-          callback_data, command_name, file_id, file_name, caption,
-          topic_id, data
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          uuid, maid, full_maid, title, status_name, "order", gin, fts, data_in
+        ) VALUES (?, ?, ?, ?, 'active', 0, ?, '', ?)
       `;
       
       const params = [
-        message.userId,
-        message.messageType,
-        message.direction,
-        message.content || null,
-        message.telegramMessageId || null,
-        message.callbackData || null,
-        message.commandName || null,
-        message.fileId || null,
-        message.fileName || null,
-        message.caption || null,
-        message.topicId || null,
-        message.data || null
+        uuid,
+        maid,
+        fullMaid,
+        title,
+        maid, // Use maid for grouping (gin)
+        dataIn
       ];
 
       console.log(`💾 D1: Executing query with params:`, params);

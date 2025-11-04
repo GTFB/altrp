@@ -96,7 +96,8 @@ export class TelegramBotWorker {
     this.topicService = new TopicService({
       botToken: env.BOT_TOKEN,
       adminChatId: parseInt(env.ADMIN_CHAT_ID),
-      messageService: this.messageService
+      messageService: this.messageService,
+      d1Storage: this.d1Storage
     });
     // this.sessionService = new SessionService({
     //   d1Storage: this.d1Storage
