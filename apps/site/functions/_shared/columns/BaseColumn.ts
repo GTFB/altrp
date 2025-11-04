@@ -25,7 +25,7 @@ export type BaseColumnOptions = {
     unique?: boolean;
     virtual?: boolean;  // Virtual field, computed on backend
     value?: (instance: any) => Promise<any> | any;  // Required if virtual = true
-    type?: 'text' | 'number' | 'email' | 'phone' | 'password' | 'boolean' | 'date' | 'time' | 'datetime' | 'json' | 'array' | 'object';
+    type?: 'text' | 'number' | 'email' | 'phone' | 'password' | 'boolean' | 'date' | 'time' | 'datetime' | 'json' | 'array' | 'object' | 'price';
     relation?: RelationConfig;
     index?: boolean;
     defaultValue?: any;

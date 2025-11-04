@@ -219,6 +219,21 @@ async function handlePut(context: AuthenticatedContext): Promise<Response> {
       }
     }
     
+    // Parse JSON fields in processedBody to objects for beforeSave hooks (especially virtual fields)
+    for (const key in processedBody) {
+      const fieldConfig = (collectionConfig as any)[key]
+      if (fieldConfig?.options?.type === 'json' && processedBody[key] != null) {
+        const value = processedBody[key]
+        if (typeof value === 'string') {
+          try {
+            processedBody[key] = JSON.parse(value)
+          } catch {
+            // Not valid JSON, keep as is
+          }
+        }
+      }
+    }
+    
     // Execute beforeSave hooks for all fields (including virtual ones that modify other fields)
     for (const key in collectionConfig) {
       const fieldConfig = (collectionConfig as any)[key]
@@ -253,9 +268,15 @@ async function handlePut(context: AuthenticatedContext): Promise<Response> {
       assignments.push(`${q(key)} = ?`)
       let value = processedBody[key]
       
-      // Stringify JSON fields
+      // Stringify JSON fields based on collection config
+      const fieldConfig = (collectionConfig as any)[key]
+      const isJsonField = fieldConfig?.options?.type === 'json'
       const colInfo = columnsInfo.find(c => c.name === key)
-      if (value && typeof value === 'object' && colInfo?.type === 'TEXT') {
+      
+      if (isJsonField && value != null && typeof value === 'object') {
+        value = JSON.stringify(value)
+      } else if (!isJsonField && value && typeof value === 'object' && colInfo?.type === 'TEXT') {
+        // Fallback: stringify object fields in TEXT columns (for backward compatibility)
         value = JSON.stringify(value)
       }
       

@@ -236,9 +236,23 @@ export const onRequestGet = async (context: { request: Request; env: Env }) => {
       (dataResult.results || []).map(async (row: any) => {
         const processed = { ...row }
         
-        // Parse JSON fields
+        // Parse JSON fields based on collection config
         for (const col of columns) {
-          if (col.type === 'TEXT' && processed[col.name]) {
+          const fieldConfig = (collectionConfig as any)[col.name]
+          const isJsonField = fieldConfig?.options?.type === 'json'
+          
+          if (isJsonField && processed[col.name] != null) {
+            try {
+              const value = processed[col.name]
+              if (typeof value === 'string') {
+                processed[col.name] = JSON.parse(value)
+              }
+            } catch {
+              // Not valid JSON, keep as is
+              console.warn(`Failed to parse JSON field ${col.name} for collection ${state.collection}`)
+            }
+          } else if (col.type === 'TEXT' && processed[col.name]) {
+            // Fallback: try parsing TEXT fields that look like JSON (for backward compatibility)
             try {
               const value = processed[col.name]
               if (typeof value === 'string' && (value.startsWith('{') || value.startsWith('['))) {
