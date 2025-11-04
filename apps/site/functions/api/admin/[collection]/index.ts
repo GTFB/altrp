@@ -113,13 +113,51 @@ async function handleGet(context: AuthenticatedContext): Promise<Response> {
     const offset = (page - 1) * pageSize
     const rows = await env.DB.prepare(`SELECT * FROM ${collection} ${where} LIMIT ? OFFSET ?`).bind(pageSize, offset).all()
 
+    // Parse JSON fields based on collection config
+    const collectionConfig = getCollection(collection)
+    const processedData = (rows.results || []).map((row: any) => {
+      const processed = { ...row }
+      
+      // Get column info for type checking
+      const columnsInfo = pragma.results || []
+      
+      for (const col of columnsInfo) {
+        const fieldConfig = (collectionConfig as any)[col.name]
+        const isJsonField = fieldConfig?.options?.type === 'json'
+        
+        if (isJsonField && processed[col.name] != null) {
+          try {
+            const value = processed[col.name]
+            if (typeof value === 'string') {
+              processed[col.name] = JSON.parse(value)
+            }
+          } catch {
+            // Not valid JSON, keep as is
+            console.warn(`Failed to parse JSON field ${col.name} for collection ${collection}`)
+          }
+        } else if (col.type === 'TEXT' && processed[col.name]) {
+          // Fallback: try parsing TEXT fields that look like JSON (for backward compatibility)
+          try {
+            const value = processed[col.name]
+            if (typeof value === 'string' && (value.startsWith('{') || value.startsWith('['))) {
+              processed[col.name] = JSON.parse(value)
+            }
+          } catch {
+            // Not JSON, keep as is
+          }
+        }
+      }
+      
+      return processed
+    })
+
     return new Response(JSON.stringify({
       success: true,
       page,
       pageSize,
       total,
       totalPages: Math.ceil(total / pageSize),
-      data: rows.results || [],
+      data: processedData,
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
@@ -221,9 +259,15 @@ async function handlePost(context: AuthenticatedContext): Promise<Response> {
     const columns = pragma.results || []
     const data: Record<string, any> = { ...processedBody }
     
-    // Stringify JSON fields
+    // Stringify JSON fields based on collection config
     for (const col of columns) {
-      if (data[col.name] && typeof data[col.name] === 'object' && col.type === 'TEXT') {
+      const fieldConfig = (collectionConfig as any)[col.name]
+      const isJsonField = fieldConfig?.options?.type === 'json'
+      
+      if (isJsonField && data[col.name] != null && typeof data[col.name] === 'object') {
+        data[col.name] = JSON.stringify(data[col.name])
+      } else if (!isJsonField && data[col.name] && typeof data[col.name] === 'object' && col.type === 'TEXT') {
+        // Fallback: stringify object fields in TEXT columns (for backward compatibility)
         data[col.name] = JSON.stringify(data[col.name])
       }
     }

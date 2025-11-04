@@ -253,9 +253,15 @@ async function handlePut(context: AuthenticatedContext): Promise<Response> {
       assignments.push(`${q(key)} = ?`)
       let value = processedBody[key]
       
-      // Stringify JSON fields
+      // Stringify JSON fields based on collection config
+      const fieldConfig = (collectionConfig as any)[key]
+      const isJsonField = fieldConfig?.options?.type === 'json'
       const colInfo = columnsInfo.find(c => c.name === key)
-      if (value && typeof value === 'object' && colInfo?.type === 'TEXT') {
+      
+      if (isJsonField && value != null && typeof value === 'object') {
+        value = JSON.stringify(value)
+      } else if (!isJsonField && value && typeof value === 'object' && colInfo?.type === 'TEXT') {
+        // Fallback: stringify object fields in TEXT columns (for backward compatibility)
         value = JSON.stringify(value)
       }
       
