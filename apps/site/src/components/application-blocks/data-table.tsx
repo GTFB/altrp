@@ -583,6 +583,21 @@ export function DataTable() {
         } else if (col.fieldType === 'price') {
           const cents = record[col.name]
           initial[col.name] = cents == null ? null : Number(cents)
+        } else if (col.fieldType === 'json') {
+          // Keep JSON fields as objects (or parse from string if needed)
+          if (record[col.name] != null) {
+            if (typeof record[col.name] === 'string') {
+              try {
+                initial[col.name] = JSON.parse(record[col.name])
+              } catch {
+                initial[col.name] = {}
+              }
+            } else {
+              initial[col.name] = record[col.name]
+            }
+          } else {
+            initial[col.name] = {}
+          }
         } else {
           initial[col.name] = record[col.name] != null ? String(record[col.name]) : ''
         }
@@ -677,9 +692,16 @@ export function DataTable() {
     e.preventDefault()
     setCreateError(null)
     try {
-      // Convert Date objects to ISO strings for API
+      // Convert Date objects to ISO strings and serialize JSON fields for API
       const payload = Object.entries(formData).reduce((acc, [key, value]) => {
-        acc[key] = value instanceof Date ? value.toISOString() : value
+        const field = schema.find(f => f.name === key)
+        if (field?.fieldType === 'json' && value != null && typeof value === 'object') {
+          acc[key] = value // Keep as object, server will stringify
+        } else if (value instanceof Date) {
+          acc[key] = value.toISOString()
+        } else {
+          acc[key] = value
+        }
         return acc
       }, {} as Record<string, any>)
       
@@ -710,9 +732,16 @@ export function DataTable() {
     if (!recordToEdit) return
     setEditError(null)
     try {
-      // Convert Date objects to ISO strings for API
+      // Convert Date objects to ISO strings and keep JSON fields as objects for API
       const payload = Object.entries(editData).reduce((acc, [key, value]) => {
-        acc[key] = value instanceof Date ? value.toISOString() : value
+        const field = schema.find(f => f.name === key)
+        if (field?.fieldType === 'json' && value != null && typeof value === 'object') {
+          acc[key] = value // Keep as object, server will stringify
+        } else if (value instanceof Date) {
+          acc[key] = value.toISOString()
+        } else {
+          acc[key] = value
+        }
         return acc
       }, {} as Record<string, any>)
       
