@@ -93,6 +93,225 @@ export const createCustomHandlers = (worker: BotInterface) => {
       console.log(`✅ Start flow launched for human ${userId}`);
     },
 
+
+    handleEnableAICommand: async (message: any, bot: any) => {
+      const userId = message.from.id;
+      const chatId = message.chat.id;
+      const adminChatId = parseInt(handlerWorker.env.ADMIN_CHAT_ID);
+
+      // Check if command is executed in admin group
+      if (chatId !== adminChatId) {
+        console.log(`/enable_ai command ignored - not in admin group`);
+        return;
+      }
+
+      // Check if command is executed in a topic
+      const topicId = (message as any).message_thread_id;
+      if (!topicId) {
+        console.log(`/enable_ai command ignored - not in a topic`);
+        return;
+      }
+
+      console.log(`🚀 Handling /enable_ai command in topic ${topicId}`);
+
+      try {
+        // Find human by topic_id
+        const humanTelegramId = await handlerWorker.d1Storage.getHumanTelegramIdByTopic(topicId);
+        
+        if (!humanTelegramId) {
+          console.error(`❌ Human not found for topic ${topicId}`);
+          await handlerWorker.messageService.sendMessageToTopic(chatId, topicId, 'Human not found for this topic.');
+          return;
+        }
+
+        // Get human to access current data_in
+        const human = await handlerWorker.d1Storage.getHumanByTelegramId(humanTelegramId);
+        
+        if (!human) {
+          console.error(`❌ Human ${humanTelegramId} not found in database`);
+          return;
+        }
+
+        // Parse existing data_in and add ai_enabled: true
+        let dataInObj: any = {};
+        if (human.dataIn) {
+          try {
+            dataInObj = JSON.parse(human.dataIn);
+          } catch (e) {
+            console.warn(`Failed to parse existing data_in for human ${humanTelegramId}, using empty object`);
+          }
+        }
+
+        // Ensure telegram_id and topic_id are preserved
+        if (!dataInObj.telegram_id) {
+          dataInObj.telegram_id = humanTelegramId;
+        }
+        if (!dataInObj.topic_id) {
+          dataInObj.topic_id = topicId;
+        }
+
+        // Set ai_enabled to true
+        dataInObj.ai_enabled = true;
+
+        // Update data_in
+        await handlerWorker.d1Storage.updateHumanDataIn(humanTelegramId, JSON.stringify(dataInObj));
+
+        console.log(`✅ AI enabled for human ${humanTelegramId} in topic ${topicId}`);
+        await handlerWorker.messageService.sendMessageToTopic(chatId, topicId, '✅ AI enabled.');
+      } catch (error) {
+        console.error(`❌ Error enabling AI for topic ${topicId}:`, error);
+        await handlerWorker.messageService.sendMessageToTopic(chatId, topicId, '❌ Error when enabling AI.');
+      }
+    },
+
+
+    handleDisableAICommand: async (message: any, bot: any) => {
+      const userId = message.from.id;
+      const chatId = message.chat.id;
+      const adminChatId = parseInt(handlerWorker.env.ADMIN_CHAT_ID);
+
+      // Check if command is executed in admin group
+      if (chatId !== adminChatId) {
+        console.log(`/disable_ai command ignored - not in admin group`);
+        return;
+      }
+
+      // Check if command is executed in a topic
+      const topicId = (message as any).message_thread_id;
+      if (!topicId) {
+        console.log(`/disable_ai command ignored - not in a topic`);
+        return;
+      }
+
+      console.log(`🚀 Handling /disable_ai command in topic ${topicId}`);
+
+      try {
+        // Find human by topic_id
+        const humanTelegramId = await handlerWorker.d1Storage.getHumanTelegramIdByTopic(topicId);
+        
+        if (!humanTelegramId) {
+          console.error(`❌ Human not found for topic ${topicId}`);
+          await handlerWorker.messageService.sendMessageToTopic(chatId, topicId, 'Human not found for this topic.');
+          return;
+        }
+
+        // Get human to access current data_in
+        const human = await handlerWorker.d1Storage.getHumanByTelegramId(humanTelegramId);
+        
+        if (!human) {
+          console.error(`❌ Human ${humanTelegramId} not found in database`);
+          return;
+        }
+
+        // Parse existing data_in and set ai_enabled: false
+        let dataInObj: any = {};
+        if (human.dataIn) {
+          try {
+            dataInObj = JSON.parse(human.dataIn);
+          } catch (e) {
+            console.warn(`Failed to parse existing data_in for human ${humanTelegramId}, using empty object`);
+          }
+        }
+
+        // Ensure telegram_id and topic_id are preserved
+        if (!dataInObj.telegram_id) {
+          dataInObj.telegram_id = humanTelegramId;
+        }
+        if (!dataInObj.topic_id) {
+          dataInObj.topic_id = topicId;
+        }
+
+        // Set ai_enabled to false
+        dataInObj.ai_enabled = false;
+
+        // Update data_in
+        await handlerWorker.d1Storage.updateHumanDataIn(humanTelegramId, JSON.stringify(dataInObj));
+
+        console.log(`✅ AI disabled for human ${humanTelegramId} in topic ${topicId}`);
+        await handlerWorker.messageService.sendMessageToTopic(chatId, topicId, '✅ AI disabled.');
+      } catch (error) {
+        console.error(`❌ Error disabling AI for topic ${topicId}:`, error);
+        await handlerWorker.messageService.sendMessageToTopic(chatId, topicId, '❌ Error when disabling AI.');
+      }
+    },
+
+
+    handleMenuCommand: async (message: any, bot: any) => {
+      const userId = message.from.id;
+      const chatId = message.chat.id;
+
+      console.log(`🚀 Handling /menu command via flow for user ${userId}`);
+     
+      // Start menu flow
+      await handlerWorker.flowEngine.startFlow(userId, 'menu');
+
+      console.log(`✅ Menu flow launched for user ${userId}`);
+    },
+
+
+    handleSetStatusCommand: async (message: any, bot: any) => {
+      const userId = message.from.id;
+      const chatId = message.chat.id;
+      const adminChatId = parseInt(handlerWorker.env.ADMIN_CHAT_ID);
+
+      // Check if command is executed in admin group
+      if (chatId !== adminChatId) {
+        console.log(`/set_status command ignored - not in admin group`);
+        return;
+      }
+
+      // Check if command is executed in a topic
+      const topicId = (message as any).message_thread_id;
+      if (!topicId) {
+        console.log(`/set_status command ignored - not in a topic`);
+        return;
+      }
+
+      console.log(`🚀 Handling /set_status command in topic ${topicId}`);
+
+      try {
+        // Find human by topic_id
+        const humanTelegramId = await handlerWorker.d1Storage.getHumanTelegramIdByTopic(topicId);
+        
+        if (!humanTelegramId) {
+          console.error(`❌ Human not found for topic ${topicId}`);
+          await handlerWorker.messageService.sendMessageToTopic(chatId, topicId, 'Human not found for this topic.');
+          return;
+        }
+
+        // Get human to access current data_in
+        const human = await handlerWorker.d1Storage.getHumanByTelegramId(humanTelegramId);
+        
+        if (!human) {
+          console.error(`❌ Human ${humanTelegramId} not found in database`);
+          return;
+        }
+
+        // Parse existing data_in and add ai_enabled: true
+        let dataInObj: any = {};
+        if (human.dataIn) {
+          try {
+            dataInObj = JSON.parse(human.dataIn);
+          } catch (e) {
+            console.warn(`Failed to parse existing data_in for human ${humanTelegramId}, using empty object`);
+          }
+        }
+
+        
+
+        
+
+
+        
+
+        console.log(`✅ AI enabled for human ${humanTelegramId} in topic ${topicId}`);
+        await handlerWorker.messageService.sendMessageToTopic(chatId, topicId, '✅ AI enabled.');
+      } catch (error) {
+        console.error(`❌ Error enabling AI for topic ${topicId}:`, error);
+        await handlerWorker.messageService.sendMessageToTopic(chatId, topicId, '❌ Error when enabling AI.');
+      }
+    },
+
   };
 };
 
