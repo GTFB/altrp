@@ -343,6 +343,9 @@ export function DataTable() {
   
   // Local search state for input (debounced before updating global state)
   const [searchInput, setSearchInput] = React.useState(state.search)
+  
+  // Local state for price inputs to allow free input without formatting interference
+  const [priceInputs, setPriceInputs] = React.useState<Record<string, string>>({})
 
   const primaryKey = React.useMemo(() => schema.find((c) => c.primary)?.name || "id", [schema])
 
@@ -537,6 +540,7 @@ export function DataTable() {
   React.useEffect(() => {
     setFormData({})
     setCreateError(null)
+    setPriceInputs({})
   }, [state.collection])
 
   // Fields to skip (auto-generated): id, uuid, {x}aid (but not relation fields), created_at, updated_at, deleted_at
@@ -568,6 +572,7 @@ export function DataTable() {
     setEditData({})
     setEditError(null)
     setRecordToEdit(null)
+    setPriceInputs({})
   }, [state.collection])
 
   const onEditRequest = React.useCallback((row: Row<CollectionData>) => {
@@ -1115,12 +1120,16 @@ export function DataTable() {
                       min="0"
                       required={!field.nullable}
                       value={
-                        formData[field.name] === undefined || formData[field.name] === null
-                          ? ""
-                          : (Number(formData[field.name]) / 100).toFixed(2)
+                        priceInputs[`create-${field.name}`] !== undefined
+                          ? priceInputs[`create-${field.name}`]
+                          : formData[field.name] === undefined || formData[field.name] === null
+                            ? ""
+                            : (Number(formData[field.name]) / 100).toFixed(2)
                       }
                       onChange={(e) => {
                         let v = e.target.value.replace(/,/g, '.')
+                        // Store raw input value for free editing
+                        setPriceInputs(prev => ({ ...prev, [`create-${field.name}`]: v }))
                         // limit to two decimals
                         if (v.includes('.')) {
                           const [i, d] = v.split('.')
@@ -1130,38 +1139,22 @@ export function DataTable() {
                         const cents = !isFinite(num) ? null : Math.round(num * 100)
                         handleFieldChange(field.name, cents)
                       }}
-                      placeholder={`Enter ${field.title || field.name}`}
-                    />
-                  </>
-                ) : (field as any).fieldType === 'price' ? (
-                  <>
-                    <Label htmlFor={`edit-field-${field.name}`} className="text-sm font-medium">
-                      {field.title || field.name}
-                      {!field.nullable && <span className="text-destructive ml-1">*</span>}
-                    </Label>
-                    <Input
-                      id={`edit-field-${field.name}`}
-                      type="number"
-                      inputMode="decimal"
-                      step="0.01"
-                      min="0"
-                      required={!field.nullable}
-                      value={
-                        editData[field.name] === undefined || editData[field.name] === null
-                          ? ""
-                          : (Number(editData[field.name]) / 100).toFixed(2)
-                      }
-                      onChange={(e) => {
+                      onBlur={(e) => {
                         let v = e.target.value.replace(/,/g, '.')
+                        // Format on blur
                         if (v.includes('.')) {
                           const [i, d] = v.split('.')
                           v = `${i}.${d.slice(0, 2)}`
                         }
                         const num = v === '' ? NaN : Number(v)
-                        const cents = !isFinite(num) ? null : Math.round(num * 100)
-                        handleEditFieldChange(field.name, cents)
+                        if (isFinite(num)) {
+                          const formatted = num.toFixed(2)
+                          setPriceInputs(prev => ({ ...prev, [`create-${field.name}`]: formatted }))
+                          const cents = Math.round(num * 100)
+                          handleFieldChange(field.name, cents)
+                        }
                       }}
-                      disabled={field.readOnly}
+                      placeholder={`Enter ${field.title || field.name}`}
                     />
                   </>
                 ) : field.relation ? (
@@ -1290,6 +1283,57 @@ export function DataTable() {
                     {editData[field.name] && editData[`${field.name}_confirm`] && editData[field.name] !== editData[`${field.name}_confirm`] && (
                       <p className="text-sm text-destructive">Passwords do not match</p>
                     )}
+                  </>
+                ) : (field as any).fieldType === 'price' ? (
+                  <>
+                    <Label htmlFor={`edit-field-${field.name}`} className="text-sm font-medium">
+                      {field.title || field.name}
+                      {!field.nullable && <span className="text-destructive ml-1">*</span>}
+                    </Label>
+                    <Input
+                      id={`edit-field-${field.name}`}
+                      type="number"
+                      inputMode="decimal"
+                      step="0.01"
+                      min="0"
+                      required={!field.nullable}
+                      value={
+                        priceInputs[`edit-${field.name}`] !== undefined
+                          ? priceInputs[`edit-${field.name}`]
+                          : editData[field.name] === undefined || editData[field.name] === null
+                            ? ""
+                            : (Number(editData[field.name]) / 100).toFixed(2)
+                      }
+                      onChange={(e) => {
+                        let v = e.target.value.replace(/,/g, '.')
+                        // Store raw input value for free editing
+                        setPriceInputs(prev => ({ ...prev, [`edit-${field.name}`]: v }))
+                        // limit to two decimals
+                        if (v.includes('.')) {
+                          const [i, d] = v.split('.')
+                          v = `${i}.${d.slice(0, 2)}`
+                        }
+                        const num = v === '' ? NaN : Number(v)
+                        const cents = !isFinite(num) ? null : Math.round(num * 100)
+                        handleEditFieldChange(field.name, cents)
+                      }}
+                      onBlur={(e) => {
+                        let v = e.target.value.replace(/,/g, '.')
+                        // Format on blur
+                        if (v.includes('.')) {
+                          const [i, d] = v.split('.')
+                          v = `${i}.${d.slice(0, 2)}`
+                        }
+                        const num = v === '' ? NaN : Number(v)
+                        if (isFinite(num)) {
+                          const formatted = num.toFixed(2)
+                          setPriceInputs(prev => ({ ...prev, [`edit-${field.name}`]: formatted }))
+                          const cents = Math.round(num * 100)
+                          handleEditFieldChange(field.name, cents)
+                        }
+                      }}
+                      disabled={field.readOnly}
+                    />
                   </>
                 ) : field.relation ? (
                   <>
