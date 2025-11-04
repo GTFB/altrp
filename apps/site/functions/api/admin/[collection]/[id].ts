@@ -219,6 +219,21 @@ async function handlePut(context: AuthenticatedContext): Promise<Response> {
       }
     }
     
+    // Parse JSON fields in processedBody to objects for beforeSave hooks (especially virtual fields)
+    for (const key in processedBody) {
+      const fieldConfig = (collectionConfig as any)[key]
+      if (fieldConfig?.options?.type === 'json' && processedBody[key] != null) {
+        const value = processedBody[key]
+        if (typeof value === 'string') {
+          try {
+            processedBody[key] = JSON.parse(value)
+          } catch {
+            // Not valid JSON, keep as is
+          }
+        }
+      }
+    }
+    
     // Execute beforeSave hooks for all fields (including virtual ones that modify other fields)
     for (const key in collectionConfig) {
       const fieldConfig = (collectionConfig as any)[key]
