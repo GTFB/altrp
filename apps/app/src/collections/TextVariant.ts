@@ -17,6 +17,7 @@ export const TextVariant: CollectionConfig = {
     { name: 'taid', type: 'text' },
     { name: 'full_taid', type: 'text' },
     { name: 'title', type: 'text' },
+    { name: 'content', type: 'text' },
     { name: 'type', type: 'text' },
     { name: 'status_name', type: 'text' },
     { name: 'version', type: 'text' },

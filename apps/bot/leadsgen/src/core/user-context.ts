@@ -27,16 +27,26 @@ export class UserContextManager {
     }
     
     try {
-      const user = await this.d1Storage.getUser(telegramId);
-      if (!user || !user.id) {
-        console.log(`⚠️ User ${telegramId} not found in database`);
+      const human = await this.d1Storage.getHumanByTelegramId(telegramId);
+      if (!human || !human.id) {
+        console.log(`⚠️ Human ${telegramId} not found in database`);
         return null;
       }
       
-      const savedData = user.data ? JSON.parse(user.data) : {};
+      // Parse data_in JSON to extract context and other data
+      let savedData = {};
+      if (human.dataIn) {
+        try {
+          const dataInObj = JSON.parse(human.dataIn);
+          // Context data is stored in the context field of dataIn, or directly in dataIn
+          savedData = dataInObj.context || dataInObj;
+        } catch (e) {
+          console.warn(`Failed to parse data_in for human ${telegramId}, using empty object`);
+        }
+      }
       
       const context: UserContext = {
-        userId: user.id,
+        userId: human.id,
         telegramId,
         currentFlow: savedData.currentFlow || '',
         currentStep: savedData.currentStep || 0,
@@ -46,7 +56,7 @@ export class UserContextManager {
         flowMode: savedData.flowMode ?? false
       };
       
-      console.log(`📚 Context loaded from DB for user ${telegramId}:`, {
+      console.log(`📚 Context loaded from DB for human ${telegramId}:`, {
         currentFlow: context.currentFlow,
         currentStep: context.currentStep,
         flowMode: context.flowMode
@@ -54,7 +64,7 @@ export class UserContextManager {
       
       return context;
     } catch (error) {
-      console.error(`❌ Error loading context for user ${telegramId}:`, error);
+      console.error(`❌ Error loading context for human ${telegramId}:`, error);
       return null;
     }
   }
@@ -197,9 +207,29 @@ export class UserContextManager {
       flowMode: context.flowMode
     };
     
-    console.log(`💾 Saving context to database for user ${context.telegramId}`);
-    await this.d1Storage.updateUserData(context.telegramId, JSON.stringify(contextData));
-    console.log(`✅ Context saved to database for user ${context.telegramId}`);
+    // Get existing human to preserve other data_in fields
+    const human = await this.d1Storage.getHumanByTelegramId(context.telegramId);
+    let dataInObj: any = {};
+    
+    if (human && human.dataIn) {
+      try {
+        dataInObj = JSON.parse(human.dataIn);
+      } catch (e) {
+        console.warn(`Failed to parse existing data_in for human ${context.telegramId}, using empty object`);
+      }
+    }
+    
+    // Ensure telegram_id is in data_in
+    if (!dataInObj.telegram_id) {
+      dataInObj.telegram_id = context.telegramId;
+    }
+    
+    // Store context in data_in
+    dataInObj.context = contextData;
+    
+    console.log(`💾 Saving context to database for human ${context.telegramId}`);
+    await this.d1Storage.updateHumanDataIn(context.telegramId, JSON.stringify(dataInObj));
+    console.log(`✅ Context saved to database for human ${context.telegramId}`);
   }
 
   // Get or create context
@@ -220,17 +250,30 @@ export class UserContextManager {
     }
 
     try {
-      const user = await this.d1Storage.getUser(telegramId);
-      const userLanguage = user?.language;
+      const human = await this.d1Storage.getHumanByTelegramId(telegramId);
+      
+      // Extract language from data_in JSON
+      let userLanguage: string | undefined;
+      if (human && human.dataIn) {
+        try {
+          const dataInObj = JSON.parse(human.dataIn);
+          userLanguage = dataInObj.language;
+        } catch (e) {
+          console.warn(`Failed to parse data_in for human ${telegramId}, using default language`);
+        }
+      }
       
       // Check that language is supported
-      if (userLanguage && ['ru', 'sr'].includes(userLanguage)) {
+      // if (userLanguage && ['ru', 'sr'].includes(userLanguage)) {
+      //   return userLanguage;
+      // }
+      if (userLanguage) {
         return userLanguage;
       }
       
-      return 'ru'; // Default fallback
+      return 'en'; // Default fallback
     } catch (error) {
-      console.error(`Error getting user language for ${telegramId}:`, error);
+      console.error(`Error getting human language for ${telegramId}:`, error);
       return 'ru';
     }
   }
