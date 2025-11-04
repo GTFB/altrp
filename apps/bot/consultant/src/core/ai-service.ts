@@ -99,7 +99,48 @@ export class AIService {
 
       // Otherwise, poll for result
       console.log(`⏳ Waiting for AI response: ${data.requestId}`);
-      return await this.getResult(data.requestId);
+      try {
+        return await this.getResult(data.requestId);
+      } catch (error) {
+        // If getResult failed with FAILED status or error, retry once
+        if (error instanceof Error && (error.message.includes('AI request failed') || error.message.includes('FAILED'))) {
+          console.log(`🔄 Retrying AI request after failure...`);
+          
+          // Make a new request to get a new requestId
+          const retryResponse = await fetch(url, {
+            method: 'POST',
+            headers: headers,
+            body: raw,
+            redirect: 'follow'
+          });
+
+          if (!retryResponse.ok) {
+            let errorText = '';
+            try {
+              errorText = await retryResponse.text();
+              console.log('Retry error response text:', errorText);
+            } catch (e) {
+              console.error('Error reading retry response text:', e);
+              errorText = `Unable to read error: ${e}`;
+            }
+            throw new Error(`AI API error on retry: ${retryResponse.status} - ${errorText}`);
+          }
+
+          const retryData: AIAskResponse = await retryResponse.json();
+
+          // If response is cached, return it immediately
+          if (retryData.content) {
+            console.log(`✅ AI response (cached on retry): ${retryData.requestId}`);
+            return retryData.content;
+          }
+
+          // Poll for result with new requestId
+          console.log(`⏳ Waiting for AI response (retry): ${retryData.requestId}`);
+          return await this.getResult(retryData.requestId);
+        }
+        // If it's a different error, re-throw it
+        throw error;
+      }
     } catch (error) {
       console.error('Error in AI service ask:', error);
       throw error;
@@ -169,7 +210,8 @@ export class AIService {
 
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
-        await this.sleep(attempt * 1000); // Exponential backoff: 1s, 2s, 3s...
+        //await this.sleep(attempt * 1000); // Exponential backoff: 1s, 2s, 3s...
+        await this.sleep(1000); // Exponential backoff: 1s, 2s, 3s...
 
         let response = await fetch(`${this.apiUrl}/result/${requestId}`, {
             method: 'GET',

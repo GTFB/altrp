@@ -56,7 +56,7 @@ export class TopicService {
       // Prepare title (content) and data_in
       const title = message.text || message.caption || '';
       const dataIn = JSON.stringify({
-        userId: human.id,
+        humanId: human.id,
         telegramId: userId,
         messageType: this.getMessageType(message),
         direction: 'incoming',
@@ -103,7 +103,7 @@ export class TopicService {
       // Prepare title (content) and data_in
       const title = message.text || message.caption || '';
       const dataIn = JSON.stringify({
-        userId: human.id,
+        humanId: human.id,
         telegramId: userId,
         messageType: this.getMessageType(message),
         direction: 'outgoing',

@@ -867,7 +867,7 @@ export class D1StorageService {
       // Prepare title (content) and data_in
       const title = message.content || '';
       const dataIn = JSON.stringify({
-        userId: message.userId,
+        //userId: message.userId,
         messageType: message.messageType,
         direction: message.direction,
         telegramMessageId: message.telegramMessageId,

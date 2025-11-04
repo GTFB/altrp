@@ -432,6 +432,8 @@ export class TelegramBotWorker {
   private async handleAllMessages(message: TelegramMessage): Promise<void> {
     const userId = message.from.id;
 
+    console.log(`YYYYYYYYY`);
+
     // Get human information
     const human = await this.d1Storage.getHumanByTelegramId(userId);
     
@@ -450,6 +452,8 @@ export class TelegramBotWorker {
         console.warn(`Failed to parse data_in for human ${userId}, topic_id not available`);
       }
     }
+
+    console.log(`OKKKKKKK`);
     
     // Check if message forwarding is enabled
     const forwardingEnabled = await this.userContextManager.isMessageForwardingEnabled(userId);
