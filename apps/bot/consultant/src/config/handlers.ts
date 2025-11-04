@@ -304,11 +304,11 @@ export const createCustomHandlers = (worker: BotInterface) => {
 
           // Get consultant by topic_id from message_threads
           const consultantResult = await handlerWorker.d1Storage.execute(`
-          SELECT id, maid, title, data_in 
-          FROM message_threads 
-          WHERE value = ? AND type = 'consultant' AND deleted_at IS NULL
-          LIMIT 1
-          `, [topicId.toString()]);
+            SELECT id, maid, title, data_in 
+            FROM message_threads 
+            WHERE value = ? AND type = 'consultant' AND deleted_at IS NULL
+            LIMIT 1
+            `, [topicId.toString()]);
 
           if (!consultantResult || consultantResult.length === 0) {
             console.log(`No consultant found for topic ${topicId}`);
@@ -329,7 +329,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
           let settingsJson: any = {};
           let historySummaryText: string = '';
           let historySummaryUpdatedAt: string | null = null;
-          let historySummaryLastFullMaid: string | null = null;
+          //let historySummaryLastFullMaid: string | null = null;
 
           if (!consultant.data_in) {
             console.error(`No data_in found for consultant ${consultantMaid}`);
@@ -361,15 +361,15 @@ export const createCustomHandlers = (worker: BotInterface) => {
                 topicId,
                 '❌ Consultant configuration error: missing required settings (prompt, model, or context_length).'
               );
-          return;
-        }
+              return;
+            }
 
             // Get existing summary if any
             if (settingsJson.history_summary && settingsJson.history_summary.text) {
               historySummaryText = settingsJson.history_summary.text as string;
             }
             historySummaryUpdatedAt = settingsJson.history_summary_updated_at || null;
-            historySummaryLastFullMaid = settingsJson.history_summary_last_full_maid || null;
+            //historySummaryLastFullMaid = settingsJson.history_summary_last_full_maid || null;
           } catch (error) {
             console.error('Error parsing consultant settings:', error);
             await handlerWorker.messageService.sendMessageToTopic(
@@ -377,8 +377,8 @@ export const createCustomHandlers = (worker: BotInterface) => {
               topicId,
               '❌ Consultant configuration error: invalid JSON in settings.'
             );
-          return;
-        }
+            return;
+          }
 
           // At this point all values are guaranteed to be non-null after validation above
           const validatedPrompt = prompt as string;
@@ -419,13 +419,14 @@ export const createCustomHandlers = (worker: BotInterface) => {
               // If no recent messages but summary exists
               context = `Summary:\n${historySummaryText}`;
             }
-        } catch (error) {
+          } catch (error) {
             console.error('Error getting recent messages:', error);
             context = ''; // Continue without context if error
           }
 
           // Prepare AI input
-          const aiInput = `${validatedPrompt}\n\nRecent conversation:\n${context}\n\nUser: ${messageText}\n\nConsultant:`;
+          //const aiInput = `${validatedPrompt}\n\nRecent conversation:\n${context}\n\nUser: ${messageText}\n\nConsultant:`;
+          const aiInput = `${validatedPrompt}\n\nRecent conversation:\n${context}\n\nUser: ${messageText}`;
 
           // Check for duplicate message (same text from same user in last 5 seconds)
           const duplicateCheck = await handlerWorker.d1Storage.execute(`
@@ -481,7 +482,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
 
             aiResponse = await aiService.ask(validatedModel, aiInput);
             console.log(`✅ AI Response received: ${aiResponse}`);
-      } catch (error) {
+          } catch (error) {
             console.error('❌ Error calling AI service:', error);
             console.error('Error details:', error?.message, error?.stack);
             
@@ -520,7 +521,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
               JSON.stringify({ consultant: consultantMaid, response: aiResponse, createdAt: new Date().toISOString() })
             ]);
             console.log(`✅ AI message saved: ${aiMessageFullMaid} (linked to consultant ${consultantMaid})`);
-        } catch (error) {
+          } catch (error) {
             console.error('❌ Error saving AI response to database:', error);
             // Continue execution to send response even if DB save fails
           }
@@ -534,12 +535,12 @@ export const createCustomHandlers = (worker: BotInterface) => {
               aiResponse
             );
             console.log(`✅ Message sent to topic ${topicId}`);
-        } catch (error) {
+          } catch (error) {
             console.error('❌ Error sending AI response to topic:', error);
             // Don't return here - summary check should still happen
           }
           
-          // Create/update summary after AI response if total messages divisible by context_length
+          // Create SUMMURY
           try {
             // Count total messages after saving both user and AI messages
             const allMessages = await handlerWorker.d1Storage.execute(`
@@ -668,11 +669,11 @@ export const createCustomHandlers = (worker: BotInterface) => {
                   
                   // Find last message full_maid for tracking
                   const lastMessage = allMessages[allMessages.length - 1]; // Use allMessages for last full_maid
-                  const lastMessageFullMaid = lastMessage?.full_maid || historySummaryLastFullMaid;
+                  //const lastMessageFullMaid = lastMessage?.full_maid || historySummaryLastFullMaid;
 
                   // Update settings.data_in with new summary
                   settingsJson.history_summary = { text: newSummaryText, version: 1 };
-                  settingsJson.history_summary_last_full_maid = lastMessageFullMaid;
+                  //settingsJson.history_summary_last_full_maid = lastMessageFullMaid;
                   settingsJson.history_summary_updated_at = new Date().toISOString();
 
                   await handlerWorker.d1Storage.execute(`
