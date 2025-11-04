@@ -279,36 +279,25 @@ export const createCustomHandlers = (worker: BotInterface) => {
           return;
         }
 
-        // Get human to access current data_in
+        // Get human to ensure it exists and get context
         const human = await handlerWorker.d1Storage.getHumanByTelegramId(humanTelegramId);
         
-        if (!human) {
+        if (!human || !human.id) {
           console.error(`❌ Human ${humanTelegramId} not found in database`);
+          await handlerWorker.messageService.sendMessageToTopic(chatId, topicId, 'Human not found in database.');
           return;
         }
 
-        // Parse existing data_in and add ai_enabled: true
-        let dataInObj: any = {};
-        if (human.dataIn) {
-          try {
-            dataInObj = JSON.parse(human.dataIn);
-          } catch (e) {
-            console.warn(`Failed to parse existing data_in for human ${humanTelegramId}, using empty object`);
-          }
-        }
+        // Get or create human context
+        await bot.userContextManager.getOrCreateContext(humanTelegramId, human.id);
 
-        
+        // Start set_status flow for the human associated with this topic
+        await handlerWorker.flowEngine.startFlow(humanTelegramId, 'set_status');
 
-        
-
-
-        
-
-        console.log(`✅ AI enabled for human ${humanTelegramId} in topic ${topicId}`);
-        await handlerWorker.messageService.sendMessageToTopic(chatId, topicId, '✅ AI enabled.');
+        console.log(`✅ Set status flow launched for human ${humanTelegramId} in topic ${topicId}`);
       } catch (error) {
-        console.error(`❌ Error enabling AI for topic ${topicId}:`, error);
-        await handlerWorker.messageService.sendMessageToTopic(chatId, topicId, '❌ Error when enabling AI.');
+        console.error(`❌ Error starting set_status flow for topic ${topicId}:`, error);
+        await handlerWorker.messageService.sendMessageToTopic(chatId, topicId, '❌ Error starting set_status flow.');
       }
     },
 

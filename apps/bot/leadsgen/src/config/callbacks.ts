@@ -31,14 +31,10 @@ export const keyboards = {
           text: "New",
           callback_data: "new_lead_status"
         },
-      ],
-      [
         {
           text: "Hot",
           callback_data: "hot_lead_status"
         },
-      ],
-      [
         {
           text: "Sell",
           callback_data: "sell_lead_status"
