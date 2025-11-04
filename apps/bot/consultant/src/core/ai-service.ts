@@ -103,7 +103,7 @@ export class AIService {
         return await this.getResult(data.requestId);
       } catch (error) {
         // If getResult failed with FAILED status or error, retry once
-        if (error instanceof Error && (error.message.includes('AI request failed') || error.message.includes('FAILED'))) {
+        //if (error instanceof Error && (error.message.includes('AI request failed') || error.message.includes('FAILED'))) {
           console.log(`🔄 Retrying AI request after failure...`);
           
           // Make a new request to get a new requestId
@@ -137,9 +137,9 @@ export class AIService {
           // Poll for result with new requestId
           console.log(`⏳ Waiting for AI response (retry): ${retryData.requestId}`);
           return await this.getResult(retryData.requestId);
-        }
+        //}
         // If it's a different error, re-throw it
-        throw error;
+        //throw error;
       }
     } catch (error) {
       console.error('Error in AI service ask:', error);
@@ -207,6 +207,7 @@ export class AIService {
   private async getResult(requestId: string, maxAttempts: number = 10): Promise<string> {
 
     const url = this.apiUrl
+    let failedError: Error | null = null;
 
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
@@ -234,17 +235,25 @@ export class AIService {
 
         if (data.status === 'FAILED' || data.error) {
           console.error(`❌ AI request failed: ${data.error}`);
-          throw new Error(data.error || 'AI request failed');
+          // Stop the loop immediately
+          failedError = new Error(data.error || 'AI request failed');
+          break; // Explicitly stop the loop
         }
 
         // Still processing
         console.log(`⏳ Still processing (attempt ${attempt}/${maxAttempts})...`);
       } catch (error) {
         console.error(`Error in getResult attempt ${attempt}:`, error);
+        // For other errors, continue retrying
         if (attempt === maxAttempts) {
           throw error;
         }
       }
+    }
+
+    // If we stopped the loop due to FAILED status, throw the error
+    if (failedError) {
+      throw failedError;
     }
 
     throw new Error('AI request timeout');
