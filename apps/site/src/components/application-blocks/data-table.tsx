@@ -150,12 +150,14 @@ function RelationSelect({
   onChange,
   disabled,
   required,
+  search,
 }: {
   relation: RelationConfig
   value: any
   onChange: (value: any) => void
   disabled?: boolean
   required?: boolean
+  search?: string
 }) {
   const [options, setOptions] = React.useState<Array<{ value: any; label: string }>>([])
   const [loading, setLoading] = React.useState(false)
@@ -164,10 +166,18 @@ function RelationSelect({
     const loadOptions = async () => {
       setLoading(true)
       try {
+        // Compose relation filters: defaults from schema
+        const relationFilters: AdminFilter[] = []
+        if (Array.isArray(relation.filters)) {
+          relationFilters.push(...relation.filters)
+        }
+
         const queryParams = qs.stringify({
           c: relation.collection,
           p: 1,
           ps: 1000, // Load more items for select
+          ...(relation.inheritSearch && search && { s: search }),
+          ...(relationFilters.length > 0 && { filters: relationFilters }),
         })
 
         const res = await fetch(`/api/admin/state?${queryParams}`, {
@@ -194,7 +204,7 @@ function RelationSelect({
     }
 
     loadOptions()
-  }, [relation])
+  }, [relation, search])
 
   return (
     <Select value={value ? String(value) : ""} onValueChange={onChange} disabled={disabled || loading} required={required}>
@@ -1168,6 +1178,7 @@ export function DataTable() {
                       value={formData[field.name]}
                       onChange={(value) => handleFieldChange(field.name, value)}
                       required={!field.nullable}
+                      search={state.search}
                     />
                   </>
                 ) : (
@@ -1347,6 +1358,7 @@ export function DataTable() {
                       onChange={(value) => handleEditFieldChange(field.name, value)}
                       required={!field.nullable}
                       disabled={field.readOnly}
+                      search={state.search}
                     />
                   </>
                 ) : (
