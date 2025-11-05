@@ -223,6 +223,17 @@ export class AIService {
 
         if (!response.ok) {
           console.error(`Error getting result (attempt ${attempt}):`, response.status);
+          // Read or cancel response body to avoid Cloudflare warning about stalled HTTP responses
+          try {
+            await response.text(); // Read body to avoid stalled response warning
+          } catch (e) {
+            // If reading fails, try to cancel
+            try {
+              response.body?.cancel();
+            } catch (cancelError) {
+              // Ignore cancel errors
+            }
+          }
           continue;
         }
 

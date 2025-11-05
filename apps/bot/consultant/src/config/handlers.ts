@@ -304,11 +304,11 @@ export const createCustomHandlers = (worker: BotInterface) => {
 
           // Get consultant by topic_id from message_threads
           const consultantResult = await handlerWorker.d1Storage.execute(`
-          SELECT id, maid, title, data_in 
-          FROM message_threads 
-          WHERE value = ? AND type = 'consultant' AND deleted_at IS NULL
-          LIMIT 1
-          `, [topicId.toString()]);
+            SELECT id, maid, title, data_in 
+            FROM message_threads 
+            WHERE value = ? AND type = 'consultant' AND deleted_at IS NULL
+            LIMIT 1
+            `, [topicId.toString()]);
 
           if (!consultantResult || consultantResult.length === 0) {
             console.log(`No consultant found for topic ${topicId}`);
@@ -361,8 +361,8 @@ export const createCustomHandlers = (worker: BotInterface) => {
                 topicId,
                 '❌ Consultant configuration error: missing required settings (prompt, model, or context_length).'
               );
-          return;
-        }
+              return;
+            }
 
             // Get existing summary if any
             if (settingsJson.history_summary && settingsJson.history_summary.text) {
@@ -377,8 +377,8 @@ export const createCustomHandlers = (worker: BotInterface) => {
               topicId,
               '❌ Consultant configuration error: invalid JSON in settings.'
             );
-          return;
-        }
+            return;
+          }
 
           // At this point all values are guaranteed to be non-null after validation above
           const validatedPrompt = prompt as string;
@@ -419,13 +419,14 @@ export const createCustomHandlers = (worker: BotInterface) => {
               // If no recent messages but summary exists
               context = `Summary:\n${historySummaryText}`;
             }
-        } catch (error) {
+          } catch (error) {
             console.error('Error getting recent messages:', error);
             context = ''; // Continue without context if error
           }
 
           // Prepare AI input
-          const aiInput = `${validatedPrompt}\n\nRecent conversation:\n${context}\n\nUser: ${messageText}\n\nConsultant:`;
+          //const aiInput = `${validatedPrompt}\n\nRecent conversation:\n${context}\n\nUser: ${messageText}\n\nConsultant:`;
+          const aiInput = `${validatedPrompt}\n\nRecent conversation:\n${context}\n\nUser: ${messageText}`;
 
           // Check for duplicate message (same text from same user in last 5 seconds)
           const duplicateCheck = await handlerWorker.d1Storage.execute(`
@@ -481,7 +482,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
 
             aiResponse = await aiService.ask(validatedModel, aiInput);
             console.log(`✅ AI Response received: ${aiResponse}`);
-      } catch (error) {
+          } catch (error) {
             console.error('❌ Error calling AI service:', error);
             console.error('Error details:', error?.message, error?.stack);
             
@@ -520,7 +521,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
               JSON.stringify({ consultant: consultantMaid, response: aiResponse, createdAt: new Date().toISOString() })
             ]);
             console.log(`✅ AI message saved: ${aiMessageFullMaid} (linked to consultant ${consultantMaid})`);
-        } catch (error) {
+          } catch (error) {
             console.error('❌ Error saving AI response to database:', error);
             // Continue execution to send response even if DB save fails
           }
@@ -534,160 +535,151 @@ export const createCustomHandlers = (worker: BotInterface) => {
               aiResponse
             );
             console.log(`✅ Message sent to topic ${topicId}`);
-        } catch (error) {
+          } catch (error) {
             console.error('❌ Error sending AI response to topic:', error);
             // Don't return here - summary check should still happen
           }
           
-          // Create/update summary after AI response if total messages divisible by context_length
-          try {
-            // Count total messages after saving both user and AI messages
-            const allMessages = await handlerWorker.d1Storage.execute(`
-              SELECT created_at, full_maid
-              FROM messages
-              WHERE maid = ?
-              ORDER BY created_at ASC
-            `, [consultantMaid]);
 
-            const totalMessageCount = allMessages?.length || 0;
-            console.log(`📊 Total messages after saving: ${totalMessageCount} (expected: ${totalMessageCount % MESSAGES_FOR_SUMMARY === 0 ? 'CREATE SUMMARY' : 'NO SUMMARY'})`);
+        // ================== CREATE / UPDATE SUMMARY ==================
+        try {
+          const MAX_MESSAGES_FOR_SUMMARY = 10; // можно менять экспериментально
+          const allMessages = await handlerWorker.d1Storage.execute(`
+            SELECT uuid, full_maid, title, data_in, created_at
+            FROM messages
+            WHERE maid = ?
+            ORDER BY created_at ASC
+          `, [consultantMaid]);
 
-            // Check if we need to create/update summary (every context_length messages)
-            if (totalMessageCount > 0 && totalMessageCount % MESSAGES_FOR_SUMMARY === 0) {
-              console.log(`🧾 SUMMARY TRIGGER: totalMessageCount=${totalMessageCount}, MESSAGES_FOR_SUMMARY=${MESSAGES_FOR_SUMMARY}, ${totalMessageCount % MESSAGES_FOR_SUMMARY} === 0`);
-              console.log(`🧾 Creating/updating summary after message ${totalMessageCount} (every ${MESSAGES_FOR_SUMMARY} messages)`);
+          const totalMessages = allMessages?.length || 0;
+          const contextLength = validatedContextLength;
+          const currentSummaryVersion = settingsJson.summary_version || 0;
+          const latestSummaryVersion = Math.floor(totalMessages / contextLength);
 
-              let messagesToSummarize: any[] = [];
-              
-              if (!historySummaryText) {
-                // First summary: first context_length messages
-                const firstMessages = await handlerWorker.d1Storage.execute(`
-                  SELECT title, full_maid, data_in
-                  FROM messages
-                  WHERE maid = ?
-                  ORDER BY created_at ASC
-                  LIMIT ?
-                `, [consultantMaid, MESSAGES_FOR_SUMMARY]);
-                
-                messagesToSummarize = firstMessages || [];
-                console.log(`📝 First summary: ${messagesToSummarize.length} messages`);
-              } else {
-                // Subsequent summaries: next context_length messages after last summary
-                const nextMessages = await handlerWorker.d1Storage.execute(`
-                  SELECT title, full_maid, data_in
-                  FROM messages
-                  WHERE maid = ? AND created_at > ?
-                  ORDER BY created_at ASC
-                  LIMIT ?
-                `, [consultantMaid, historySummaryUpdatedAt || '1970-01-01', MESSAGES_FOR_SUMMARY]);
-                
-                messagesToSummarize = nextMessages || [];
-                console.log(`📝 Next summary batch: ${messagesToSummarize.length} messages`);
-              }
-
-              if (messagesToSummarize.length > 0) {
-                const messagesText = messagesToSummarize
-                  .map((msg: any) => {
-                    const text = (msg.title || '').trim();
-                    if (!text) return '';
-                    
-                    // Determine message author from data_in
-                    let author = 'User';
-                    try {
-                      if (msg.data_in) {
-                        const data = JSON.parse(msg.data_in);
-                        // If data_in has 'response' field, it's from AI/Consultant
-                        // If data_in has 'text' field, it's from user
-                        if (data.response !== undefined) {
-                          author = 'Consultant';
-                        } else if (data.text !== undefined) {
-                          author = 'User';
-                        }
-                      }
-                    } catch (e) {
-                      // If parsing fails, default to 'User'
-                      console.warn('Failed to parse data_in for message:', msg.full_maid);
-                    }
-                    
-                    return `${author}: ${text}`;
-                  })
-                  .filter(Boolean)
-                  .join('\n\n');
-
-                const summaryPrompt = historySummaryText
-                ? [
-                    'Summarize the conversation briefly and informatively.',
-                    'Preserve facts, agreements, intentions, definitions and terms.',
-                    'Do not make up facts. Use neutral tone.',
-                    'IMPORTANT: Complete all sentences fully. Do not cut phrases in the middle.',
-                    '',
-                    'Previous summary:',
-                    historySummaryText,
-                    '',
-                    `New ${MESSAGES_FOR_SUMMARY} replies to add:`,
-                    messagesText,
-                    '',
-                    'Merge the previous summary with new replies into one complete summary. Each sentence must be completed.'
-                  ].join('\n')
-                : [
-                    `Summarize the first ${MESSAGES_FOR_SUMMARY} messages of the conversation briefly and informatively.`,
-                    'Preserve facts, agreements, intentions, definitions and terms.',
-                    'Do not make up facts. Use neutral tone.',
-                    'IMPORTANT: Complete all sentences fully. Do not cut phrases in the middle.',
-                    '',
-                    'Messages:',
-                    messagesText
-                  ].join('\n');
-
-                const aiApiToken = handlerWorker.env.AI_API_TOKEN;
-                if (aiApiToken) {
-                  const aiServiceForSummary = new AIService(
-                    handlerWorker.env.AI_API_URL,
-                    aiApiToken
-                  );
-
-                  let newSummaryText = await aiServiceForSummary.ask(validatedModel, summaryPrompt);
-                  
-                  // Fix incomplete sentences at the end
-                  newSummaryText = newSummaryText.trim();
-                  const lastChar = newSummaryText.slice(-1);
-                  
-                  if (!['.', '!', '?', '\n'].includes(lastChar)) {
-                    const lastSentenceEnd = Math.max(
-                      newSummaryText.lastIndexOf('.'),
-                      newSummaryText.lastIndexOf('!'),
-                      newSummaryText.lastIndexOf('?'),
-                      newSummaryText.lastIndexOf('\n')
-                    );
-                    
-                    if (lastSentenceEnd > 0 && (newSummaryText.length - lastSentenceEnd) < 200) {
-                      newSummaryText = newSummaryText.substring(0, lastSentenceEnd + 1).trim();
-                      console.log('⚠️ Trimmed incomplete summary to last complete sentence');
-                    }
-                  }
-                  
-                  // Find last message full_maid for tracking
-                  const lastMessage = allMessages[allMessages.length - 1]; // Use allMessages for last full_maid
-                  const lastMessageFullMaid = lastMessage?.full_maid || historySummaryLastFullMaid;
-
-                  // Update settings.data_in with new summary
-                  settingsJson.history_summary = { text: newSummaryText, version: 1 };
-                  settingsJson.history_summary_last_full_maid = lastMessageFullMaid;
-                  settingsJson.history_summary_updated_at = new Date().toISOString();
-
-                  await handlerWorker.d1Storage.execute(`
-                    UPDATE message_threads
-                    SET data_in = ?, updated_at = datetime('now')
-                    WHERE id = ?
-                  `, [JSON.stringify(settingsJson), consultant.id]);
-
-                  console.log('✅ Summary updated in settings');
-                }
-              }
-            }
-          } catch (error) {
-            console.error('Error creating summary after AI response:', error);
+          if (latestSummaryVersion <= currentSummaryVersion) {
+            console.log('⛔️ Нет новых сообщений для саммари, пропускаем');
+            return;
           }
+
+          // Вычисляем диапазон сообщений для summary
+          let startIndex = currentSummaryVersion * contextLength;
+          let endIndex = latestSummaryVersion * contextLength;
+
+          // Ограничиваем batch последних сообщений до MAX_MESSAGES_FOR_SUMMARY
+          if (endIndex - startIndex > MAX_MESSAGES_FOR_SUMMARY) {
+            startIndex = endIndex - MAX_MESSAGES_FOR_SUMMARY;
+          }
+
+          const messagesToSummarize = allMessages
+            .slice(startIndex, endIndex)
+            .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+
+          if (messagesToSummarize.length === 0) {
+            console.log('⛔️ Нет сообщений для создания саммари после фильтрации');
+            return;
+          }
+
+          // Собираем текст сообщений для модели
+          const messagesText = messagesToSummarize
+            .map(msg => {
+              const text = (msg.title || '').trim();
+              if (!text) return '';
+              let author = 'User';
+              try {
+                if (msg.data_in) {
+                  const data = JSON.parse(msg.data_in);
+                  if (data.response !== undefined) author = 'Consultant';
+                  else if (data.text !== undefined) author = 'User';
+                }
+              } catch (e) {
+                console.warn('Failed to parse data_in for message:', msg.full_maid);
+              }
+              return `${author}: ${text}`;
+            })
+            .filter(Boolean)
+            .join('\n\n');
+
+          // Формируем prompt для AI
+          const summaryPrompt = currentSummaryVersion === 0 || !historySummaryText
+            ? [
+                `Summarize the first ${messagesToSummarize.length} messages of the conversation briefly and informatively.`,
+                'Preserve facts, agreements, intentions, definitions and terms.',
+                'Do not make up facts. Use neutral tone.',
+                'IMPORTANT: Complete all sentences fully. Do not cut phrases in the middle.',
+                '',
+                'Messages:',
+                messagesText
+              ].join('\n')
+            : [
+                'Summarize the conversation briefly and informatively.',
+                'Preserve facts, agreements, intentions, definitions and terms.',
+                'Do not make up facts. Use neutral tone.',
+                'IMPORTANT: Complete all sentences fully. Do not cut phrases in the middle.',
+                '',
+                'Previous summary:',
+                historySummaryText,
+                '',
+                `New ${messagesToSummarize.length} replies to add:`,
+                messagesText,
+                '',
+                'Merge the previous summary with new replies into one complete summary. Each sentence must be completed.'
+              ].join('\n');
+
+          const aiApiToken = handlerWorker.env.AI_API_TOKEN;
+          if (!aiApiToken) {
+            console.error('AI_API_TOKEN is not configured!');
+            return;
+          }
+
+          const aiServiceForSummary = new AIService(handlerWorker.env.AI_API_URL, aiApiToken);
+          let newSummaryText = await aiServiceForSummary.ask(validatedModel, summaryPrompt);
+
+          // Trim incomplete sentences
+          newSummaryText = newSummaryText.trim();
+          const lastChar = newSummaryText.slice(-1);
+          if (!['.', '!', '?', '\n'].includes(lastChar)) {
+            const lastSentenceEnd = Math.max(
+              newSummaryText.lastIndexOf('.'),
+              newSummaryText.lastIndexOf('!'),
+              newSummaryText.lastIndexOf('?'),
+              newSummaryText.lastIndexOf('\n')
+            );
+            if (lastSentenceEnd > 0 && (newSummaryText.length - lastSentenceEnd) < 200) {
+              newSummaryText = newSummaryText.substring(0, lastSentenceEnd + 1).trim();
+              console.log('⚠️ Trimmed incomplete summary to last complete sentence');
+            }
+          }
+
+          // Последнее сообщение batch
+          const lastMessage = messagesToSummarize[messagesToSummarize.length - 1];
+          const lastMessageFullMaid = lastMessage?.full_maid || null;
+
+          // Обновляем settingsJson
+          settingsJson.history_summary = { text: newSummaryText, version: latestSummaryVersion };
+          settingsJson.history_summary_last_full_maid = lastMessageFullMaid;
+          settingsJson.summary_version = latestSummaryVersion;
+          settingsJson.history_summary_updated_at = new Date().toISOString();
+
+          await handlerWorker.d1Storage.execute(`
+            UPDATE message_threads
+            SET data_in = ?, updated_at = datetime('now')
+            WHERE id = ?
+          `, [JSON.stringify(settingsJson), consultant.id]);
+
+          console.log(`✅ Summary updated to version ${latestSummaryVersion}`);
+        } catch (error) {
+          console.error('❌ Error creating summary after AI response:', error);
+        }
+
+
+
+
+
+
+
+
+
+
         
       } catch (error) {
           console.error('❌ Error in handleConsultantTopicMessage:', error);
