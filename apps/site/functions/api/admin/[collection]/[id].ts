@@ -4,7 +4,7 @@ import { requireAdmin, } from '../../../_shared/middleware'
 import { Context, AuthenticatedContext } from '../../../_shared/types'
 import { COLLECTION_GROUPS } from '../../../_shared/collections'
 import { getCollection } from '../../../_shared/collections/getCollection'
-import { hashPassword, validatePassword, validatePasswordMatch } from '../../../_shared/password'
+import { preparePassword, validatePassword, validatePasswordMatch } from '../../../_shared/password'
 
 function isAllowedCollection(name: string): boolean {
   const all = Object.values(COLLECTION_GROUPS).flat()
@@ -89,7 +89,16 @@ async function hashPasswordFields(collection: string, data: Record<string, any>,
       
       // Hash the password if it's provided
       if (value != null && value !== '') {
-        data[fieldName] = await hashPassword(String(value))
+        // For users collection, use preparePassword to generate hash and salt
+        if (collection === 'users' && fieldName === 'password_hash') {
+          const { hashedPassword, salt } = await preparePassword(String(value))
+          data[fieldName] = hashedPassword
+          data['salt'] = salt
+        } else {
+          // For other collections or fields, use preparePassword but only save hash
+          const { hashedPassword } = await preparePassword(String(value))
+          data[fieldName] = hashedPassword
+        }
         // Remove confirmation field from data (it shouldn't be saved to DB)
         delete data[`${fieldName}_confirm`]
       }

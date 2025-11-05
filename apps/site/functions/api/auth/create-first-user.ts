@@ -2,7 +2,7 @@
 
 import { createSession, jsonWithSession } from '../../_shared/session'
 import { generateAid } from '../../_shared/generate-aid'
-import { hashPassword, validatePassword, validatePasswordMatch } from '../../_shared/password'
+import { preparePassword, validatePassword, validatePasswordMatch } from '../../_shared/password'
 import { Env } from '../../_shared/types'
 interface CreateUserRequest {
   email: string
@@ -90,8 +90,8 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
       )
     }
 
-    // Hash password
-    const passwordHash = await hashPassword(password)
+    // Prepare password (hash and generate salt)
+    const { hashedPassword, salt } = await preparePassword(password)
 
     // Generate UUIDs and AIDs
     const userUuid = crypto.randomUUID()
@@ -134,10 +134,10 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
 
     // Insert user into database
     await env.DB.prepare(
-      `INSERT INTO users (uuid, human_aid, email, password_hash, is_active, created_at, updated_at) 
-       VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`
+      `INSERT INTO users (uuid, human_aid, email, password_hash, salt, is_active, created_at, updated_at) 
+       VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`
     )
-      .bind(userUuid, humanAid, email, passwordHash, 1)
+      .bind(userUuid, humanAid, email, hashedPassword, salt, 1)
       .run()
 
     // Create user_role relationship

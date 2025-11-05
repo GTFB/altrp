@@ -5,7 +5,7 @@ import { Context, AuthenticatedContext } from '../../../_shared/types'
 import { COLLECTION_GROUPS } from '../../../_shared/collections'
 import { generateAid } from '../../../_shared/generate-aid'
 import { getCollection } from '../../../_shared/collections/getCollection'
-import { hashPassword, validatePassword, validatePasswordMatch } from '../../../_shared/password'
+import { preparePassword, validatePassword, validatePasswordMatch } from '../../../_shared/password'
 
 function isAllowedCollection(name: string): boolean {
   const all = Object.values(COLLECTION_GROUPS).flat()
@@ -77,8 +77,16 @@ async function hashPasswordFields(collection: string, data: Record<string, any>)
   for (const [fieldName, value] of Object.entries(data)) {
     const columnConfig = (collectionConfig as any)[fieldName]
     if (columnConfig?.options?.type === 'password' && value != null && value !== '') {
-      // Hash the password
-      data[fieldName] = await hashPassword(String(value))
+      // For users collection, use preparePassword to generate hash and salt
+      if (collection === 'users' && fieldName === 'password_hash') {
+        const { hashedPassword, salt } = await preparePassword(String(value))
+        data[fieldName] = hashedPassword
+        data['salt'] = salt
+      } else {
+        // For other collections or fields, use preparePassword but only save hash
+        const { hashedPassword } = await preparePassword(String(value))
+        data[fieldName] = hashedPassword
+      }
       
       // Remove confirmation field from data (it shouldn't be saved to DB)
       delete data[`${fieldName}_confirm`]
@@ -119,7 +127,7 @@ async function handleGet(context: AuthenticatedContext): Promise<Response> {
       const processed = { ...row }
       
       // Get column info for type checking
-      const columnsInfo = pragma.results || []
+      const columnsInfo = pragma.results as { name: string; type: string }[] || []
       
       for (const col of columnsInfo) {
         const fieldConfig = (collectionConfig as any)[col.name]

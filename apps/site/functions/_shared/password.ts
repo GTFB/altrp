@@ -8,7 +8,7 @@
  * @param password Plain text password
  * @returns Hashed password as hex string
  */
-export async function hashPassword(password: string): Promise<string> {
+async function _hashPassword(password: string): Promise<string> {
   const encoder = new TextEncoder()
   const passwordData = encoder.encode(password)
   const hashBuffer = await crypto.subtle.digest('SHA-256', passwordData)
@@ -18,12 +18,13 @@ export async function hashPassword(password: string): Promise<string> {
 
 /**
  * Verify a password against a hash
- * @param password Plain text password to verify
+ * @param salt Salt used to hash the password
+* @param password Plain text password to verify
  * @param hash Stored password hash
  * @returns True if password matches hash
  */
-export async function verifyPassword(password: string, hash: string): Promise<boolean> {
-  const passwordHash = await hashPassword(password)
+export async function verifyPassword(salt: string, password: string, hash: string): Promise<boolean> {
+  const passwordHash = await _hashPassword(`${salt}:${password}`)
   return passwordHash === hash
 }
 
@@ -42,6 +43,16 @@ export function validatePassword(password: string): { valid: boolean; error?: st
   }
   
   return { valid: true }
+}
+
+export async function preparePassword(password: string): Promise<{
+  hashedPassword: string
+  salt: string  
+}> {
+  const saltArray = crypto.getRandomValues(new Uint8Array(16))
+  const salt = Array.from(saltArray).map(b => b.toString(16).padStart(2, '0')).join('')
+  const hashedPassword = await _hashPassword(`${salt}:${password}`)
+  return { hashedPassword, salt }
 }
 
 /**

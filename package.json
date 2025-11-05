@@ -11,6 +11,7 @@
   "scripts": {
     "dev:site": "bun run --filter=altrp-site dev",
     "dev:wrangler:site": "bun run --filter=altrp-site dev:all",
+    "dev:wrangler:migrate:site": "bun run db:site:migrate:local && bun run --filter=altrp-site dev:all",
     "build:site": "bun run --filter=altrp-site build:static",
     "start:site": "bun run --filter=altrp-site start",
     "dev:cms": "bun run --filter=altrp-cms dev",

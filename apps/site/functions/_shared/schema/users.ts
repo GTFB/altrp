@@ -6,6 +6,7 @@ export const users = sqliteTable('users', {
   humanAid: text('human_aid'),
   email: text('email').notNull(),
   passwordHash: text('password_hash').notNull(),
+  salt: text('salt').notNull(),
   isActive: integer('is_active', { mode: 'boolean' }).default(true),
   lastLoginAt: text('last_login_at'),
   emailVerifiedAt: text('email_verified_at'),

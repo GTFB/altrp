@@ -50,7 +50,7 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
     const { user, roles, human } = userWithRoles
 
     // Verify password
-    const isValidPassword = await verifyPassword(password, user.passwordHash)
+    const isValidPassword = await verifyPassword(user.salt, password, user.passwordHash)
     if (!isValidPassword) {
       return new Response(JSON.stringify({ error: 'Invalid credentials' }), {
         status: 401,
