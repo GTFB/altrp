@@ -8,6 +8,7 @@
 
 import { spawn } from 'child_process';
 import { createServer, request as httpRequest } from 'http';
+import { connect as netConnect } from 'net';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
 
@@ -126,6 +127,45 @@ async function proxyRequest(req, res, targetPort, serverName, body) {
 }
 
 /**
+ * Proxies WebSocket upgrade request to a target server
+ */
+function proxyWebSocket(req, socket, head, targetPort, serverName) {
+  log('[Proxy]', colors.cyan, `WebSocket upgrade → ${serverName}: ${req.url}`);
+  
+  const target = netConnect({
+    host: 'localhost',
+    port: targetPort,
+  });
+
+  target.on('connect', () => {
+    // Forward the upgrade request
+    const headers = [
+      `${req.method} ${req.url} HTTP/${req.httpVersion}`,
+      ...Object.keys(req.headers).map(key => `${key}: ${req.headers[key]}`),
+      '',
+      '',
+    ].join('\r\n');
+
+    target.write(headers);
+    target.write(head);
+
+    // Pipe bidirectionally
+    socket.pipe(target);
+    target.pipe(socket);
+  });
+
+  target.on('error', (err) => {
+    log('[Proxy]', colors.red, `WebSocket proxy error: ${err.message}`);
+    socket.destroy();
+  });
+
+  socket.on('error', (err) => {
+    log('[Proxy]', colors.red, `WebSocket socket error: ${err.message}`);
+    target.destroy();
+  });
+}
+
+/**
  * Creates a proxy server with smart routing logic
  */
 function createProxyServer() {
@@ -204,6 +244,27 @@ function createProxyServer() {
     });
   });
 
+  // Handle WebSocket upgrade requests
+  server.on('upgrade', (req, socket, head) => {
+    const url = req.url || '/';
+    
+    // Route WebSocket connections
+    // Next.js HMR and internal WebSockets
+    if (url.startsWith('/_next/') || url.startsWith('/__nextjs')) {
+      proxyWebSocket(req, socket, head, NEXT_PORT, 'Next.js');
+      return;
+    }
+    
+    // API WebSockets - try Wrangler first
+    if (url.startsWith('/api/')) {
+      proxyWebSocket(req, socket, head, WRANGLER_PORT, 'Wrangler');
+      return;
+    }
+    
+    // Default to Next.js for other WebSocket connections
+    proxyWebSocket(req, socket, head, NEXT_PORT, 'Next.js');
+  });
+
   server.listen(PROXY_PORT, () => {
     log('[Proxy]', colors.blue, `Proxy server listening on http://localhost:${PROXY_PORT}`);
   });
@@ -222,6 +283,7 @@ ${colors.green}Next.js${colors.reset}      → http://localhost:${NEXT_PORT}
 ${colors.magenta}Wrangler${colors.reset}     → http://localhost:${WRANGLER_PORT}
 
 ${colors.dim}Proxy logic: Wrangler first, then Next.js on 404${colors.reset}
+${colors.dim}WebSocket support: Enabled${colors.reset}
 ${colors.dim}Press Ctrl+C to stop all processes${colors.reset}
 `);
 
