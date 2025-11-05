@@ -5,6 +5,7 @@ export default class UserRoles extends BaseCollection {
     __title = 'Users Roles';
     
     user_uuid = new BaseColumn({
+        title: 'User',
         relation: {
             collection: 'users',
             valueField: 'uuid',
@@ -13,6 +14,7 @@ export default class UserRoles extends BaseCollection {
     });
     
     role_uuid = new BaseColumn({
+        title: 'Role',
         relation: {
             collection: 'roles',
             valueField: 'uuid',
