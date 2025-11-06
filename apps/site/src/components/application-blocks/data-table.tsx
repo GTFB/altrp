@@ -107,7 +107,11 @@ type ColumnSchemaExtended = ColumnSchema & {
   virtual?: boolean
   defaultCell?: any
   format?: (value: any, locale?: string) => string
-  fieldType?: 'text' | 'number' | 'email' | 'phone' | 'password' | 'boolean' | 'date' | 'time' | 'datetime' | 'json' | 'array' | 'object' | 'price'
+  fieldType?: 'text' | 'number' | 'email' | 'phone' | 'password' | 'boolean' | 'date' | 'time' | 'datetime' | 'json' | 'array' | 'object' | 'price' | 'enum'
+  enum?: {
+    values: string[]
+    labels: string[]
+  }
   relation?: RelationConfig
 }
 
@@ -290,6 +294,13 @@ function generateColumns(schema: ColumnSchemaExtended[], onDeleteRequest: (row: 
           return <div className={`${col.primary ? "font-mono font-medium" : "font-mono"}`}>{amount}</div>
         }
 
+        // For enum type, show label instead of value
+        if (col.fieldType === 'enum' && col.enum) {
+          const valueIndex = col.enum.values.indexOf(String(value))
+          const label = valueIndex >= 0 ? col.enum.labels[valueIndex] : value || "-"
+          return <div>{label}</div>
+        }
+
         // For relation fields, show label instead of value
         if (col.relation && relationData[col.name]) {
           const label = relationData[col.name][value] || value || "-"
@@ -397,6 +408,7 @@ export function DataTable() {
           defaultCell: options.defaultCell,
           format: options.format,
           fieldType: options.type,
+          enum: options.enum,
           relation: options.relation,
         }
       })
@@ -1223,6 +1235,29 @@ export function DataTable() {
                       placeholder={`Enter ${field.title || field.name}`}
                     />
                   </>
+                ) : field.fieldType === 'enum' && field.enum ? (
+                  <>
+                    <Label htmlFor={`field-${field.name}`} className="text-sm font-medium">
+                      {field.title || field.name}
+                      {!field.nullable && <span className="text-destructive ml-1">*</span>}
+                    </Label>
+                    <Select
+                      value={formData[field.name] || ""}
+                      onValueChange={(value) => handleFieldChange(field.name, value)}
+                      required={!field.nullable}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={`Select ${field.title || field.name}`} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {field.enum.values.map((val, index) => (
+                          <SelectItem key={val} value={val}>
+                            {field.enum!.labels[index] || val}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </>
                 ) : field.relation ? (
                   <>
                     <Label htmlFor={`field-${field.name}`} className="text-sm font-medium">
@@ -1418,6 +1453,30 @@ export function DataTable() {
                       }}
                       disabled={field.readOnly}
                     />
+                  </>
+                ) : field.fieldType === 'enum' && field.enum ? (
+                  <>
+                    <Label htmlFor={`edit-field-${field.name}`} className="text-sm font-medium">
+                      {field.title || field.name}
+                      {!field.nullable && <span className="text-destructive ml-1">*</span>}
+                    </Label>
+                    <Select
+                      value={editData[field.name] || ""}
+                      onValueChange={(value) => handleEditFieldChange(field.name, value)}
+                      required={!field.nullable}
+                      disabled={field.readOnly}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={`Select ${field.title || field.name}`} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {field.enum.values.map((val, index) => (
+                          <SelectItem key={val} value={val}>
+                            {field.enum!.labels[index] || val}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </>
                 ) : field.relation ? (
                   <>

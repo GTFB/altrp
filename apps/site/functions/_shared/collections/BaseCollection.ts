@@ -39,6 +39,7 @@ export default class BaseCollection {
         // Iterate through all properties of this collection instance
         for (const key in this) {
             const field = this[key]
+            const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase())
             
             // Skip if not a BaseColumn instance
             if (!(field instanceof BaseColumn)) {
@@ -51,11 +52,13 @@ export default class BaseCollection {
             }
 
             // Parse JSON fields
-            if (field.options.type === 'json' && parsed[key] != null) {
+
+            if (field.options.type === 'json' && (parsed[key] != null || parsed[camelKey] != null)) {
                 try {
-                    const value = parsed[key]
+                    const value = parsed[key] || parsed[camelKey]
                     if (typeof value === 'string') {
                         parsed[key] = JSON.parse(value)
+                        parsed[camelKey] = JSON.parse(value)
                     }
                 } catch (error) {
                     // Not valid JSON, keep as is
