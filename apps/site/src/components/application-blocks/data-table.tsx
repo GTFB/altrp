@@ -1249,7 +1249,7 @@ export function DataTable() {
                       <SelectTrigger>
                         <SelectValue placeholder={`Select ${field.title || field.name}`} />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="max-h-[300px] z-[9999]" position="popper" sideOffset={5}>
                         {field.enum.values.map((val, index) => (
                           <SelectItem key={val} value={val}>
                             {field.enum!.labels[index] || val}
@@ -1469,7 +1469,7 @@ export function DataTable() {
                       <SelectTrigger>
                         <SelectValue placeholder={`Select ${field.title || field.name}`} />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="max-h-[300px] z-[9999]" position="popper" sideOffset={5}>
                         {field.enum.values.map((val, index) => (
                           <SelectItem key={val} value={val}>
                             {field.enum!.labels[index] || val}
