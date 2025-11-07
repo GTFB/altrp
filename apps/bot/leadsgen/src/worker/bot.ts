@@ -432,7 +432,7 @@ export class TelegramBotWorker {
   private async handleAllMessages(message: TelegramMessage): Promise<void> {
     const userId = message.from.id;
 
-    console.log(`YYYYYYYYY`);
+    //console.log(`YYYYYYYYY`);
 
     // Get human information
     const human = await this.d1Storage.getHumanByTelegramId(userId);
@@ -444,16 +444,17 @@ export class TelegramBotWorker {
     
     // Extract topicId from data_in JSON
     let topicId: number | undefined;
+    let dataInObj = null;
     if (human.dataIn) {
       try {
-        const dataInObj = JSON.parse(human.dataIn);
+        dataInObj = JSON.parse(human.dataIn);
         topicId = dataInObj.topic_id;
       } catch (e) {
         console.warn(`Failed to parse data_in for human ${userId}, topic_id not available`);
       }
     }
 
-    console.log(`OKKKKKKK`);
+    //console.log(`OKKKKKKK`);
     
     // Check if message forwarding is enabled
     const forwardingEnabled = await this.userContextManager.isMessageForwardingEnabled(userId);
@@ -462,6 +463,15 @@ export class TelegramBotWorker {
       // Forward message to human's topic only if forwarding is enabled
       await this.topicService.forwardMessageToUserTopic(userId, topicId, message);
       console.log(`📬 Message forwarded to topic for human ${userId}`);
+
+      console.log(`human.dataIn ${userId}`, dataInObj.ai_enabled, dataInObj.dataIn);
+
+      // Get handlers and call handleConsultantTopicMessage
+      const handlers = this.flowEngine['customHandlers'] || {};
+      if (handlers.handleConsultantTopicMessage && dataInObj.topic_id && dataInObj.ai_enabled) {
+        await handlers.handleConsultantTopicMessage(message);
+      }
+
     } else {
       console.log(`📪 Message forwarding disabled for human ${userId} - not forwarding to topic`);
     }

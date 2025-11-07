@@ -212,7 +212,7 @@ export class MessageService {
 
       if (!response.ok) {
         const errorData = await response.text();
-        console.error('Error sending message to topic:', errorData);
+        console.error('Error sending message to topic:', errorData, sendConfig);
       }
     } catch (error) {
       console.error('Error sending message to topic:', error);
