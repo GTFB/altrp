@@ -99,7 +99,48 @@ export class AIService {
 
       // Otherwise, poll for result
       console.log(`⏳ Waiting for AI response: ${data.requestId}`);
-      return await this.getResult(data.requestId);
+      try {
+        return await this.getResult(data.requestId);
+      } catch (error) {
+        // If getResult failed with FAILED status or error, retry once
+        //if (error instanceof Error && (error.message.includes('AI request failed') || error.message.includes('FAILED'))) {
+          console.log(`🔄 Retrying AI request after failure...`);
+          
+          // Make a new request to get a new requestId
+          const retryResponse = await fetch(url, {
+            method: 'POST',
+            headers: headers,
+            body: raw,
+            redirect: 'follow'
+          });
+
+          if (!retryResponse.ok) {
+            let errorText = '';
+            try {
+              errorText = await retryResponse.text();
+              console.log('Retry error response text:', errorText);
+            } catch (e) {
+              console.error('Error reading retry response text:', e);
+              errorText = `Unable to read error: ${e}`;
+            }
+            throw new Error(`AI API error on retry: ${retryResponse.status} - ${errorText}`);
+          }
+
+          const retryData: AIAskResponse = await retryResponse.json();
+
+          // If response is cached, return it immediately
+          if (retryData.content) {
+            console.log(`✅ AI response (cached on retry): ${retryData.requestId}`);
+            return retryData.content;
+          }
+
+          // Poll for result with new requestId
+          console.log(`⏳ Waiting for AI response (retry): ${retryData.requestId}`);
+          return await this.getResult(retryData.requestId);
+        //}
+        // If it's a different error, re-throw it
+        //throw error;
+      }
     } catch (error) {
       console.error('Error in AI service ask:', error);
       throw error;
@@ -166,10 +207,12 @@ export class AIService {
   private async getResult(requestId: string, maxAttempts: number = 10): Promise<string> {
 
     const url = this.apiUrl
+    let failedError: Error | null = null;
 
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
-        await this.sleep(attempt * 1000); // Exponential backoff: 1s, 2s, 3s...
+        //await this.sleep(attempt * 1000); // Exponential backoff: 1s, 2s, 3s...
+        await this.sleep(1000); // Exponential backoff: 1s, 2s, 3s...
 
         let response = await fetch(`${this.apiUrl}/result/${requestId}`, {
             method: 'GET',
@@ -180,6 +223,17 @@ export class AIService {
 
         if (!response.ok) {
           console.error(`Error getting result (attempt ${attempt}):`, response.status);
+          // Read or cancel response body to avoid Cloudflare warning about stalled HTTP responses
+          try {
+            await response.text(); // Read body to avoid stalled response warning
+          } catch (e) {
+            // If reading fails, try to cancel
+            try {
+              response.body?.cancel();
+            } catch (cancelError) {
+              // Ignore cancel errors
+            }
+          }
           continue;
         }
 
@@ -192,17 +246,25 @@ export class AIService {
 
         if (data.status === 'FAILED' || data.error) {
           console.error(`❌ AI request failed: ${data.error}`);
-          throw new Error(data.error || 'AI request failed');
+          // Stop the loop immediately
+          failedError = new Error(data.error || 'AI request failed');
+          break; // Explicitly stop the loop
         }
 
         // Still processing
         console.log(`⏳ Still processing (attempt ${attempt}/${maxAttempts})...`);
       } catch (error) {
         console.error(`Error in getResult attempt ${attempt}:`, error);
+        // For other errors, continue retrying
         if (attempt === maxAttempts) {
           throw error;
         }
       }
+    }
+
+    // If we stopped the loop due to FAILED status, throw the error
+    if (failedError) {
+      throw failedError;
     }
 
     throw new Error('AI request timeout');
