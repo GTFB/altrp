@@ -150,11 +150,25 @@ export const createCustomHandlers = (worker: BotInterface) => {
           dataInObj.topic_id = topicId;
         }
 
+        // Save original icon if not already saved
+        if (!dataInObj.original_topic_icon) {
+          dataInObj.original_topic_icon = {
+            icon_color: 0x6FB9F0, // Default blue color
+            icon_custom_emoji_id: null
+          };
+        }
+
         // Set ai_enabled to true
         dataInObj.ai_enabled = true;
 
         // Update data_in
         await handlerWorker.d1Storage.updateHumanDataIn(humanTelegramId, JSON.stringify(dataInObj));
+
+        // Change topic icon to AI emoji
+        const iconChanged = await handlerWorker.topicService.editTopicIcon(topicId, "5237889595894414384");
+        if (!iconChanged) {
+          console.warn(`⚠️ Failed to change topic icon for topic ${topicId}`);
+        }
 
         console.log(`✅ AI enabled for human ${humanTelegramId} in topic ${topicId}`);
         await handlerWorker.messageService.sendMessageToTopic(chatId, topicId, '✅ AI enabled.');
@@ -226,6 +240,25 @@ export const createCustomHandlers = (worker: BotInterface) => {
 
         // Update data_in
         await handlerWorker.d1Storage.updateHumanDataIn(humanTelegramId, JSON.stringify(dataInObj));
+
+        // Restore original topic icon
+        const originalIcon = dataInObj.original_topic_icon;
+        if (originalIcon) {
+          const iconRestored = await handlerWorker.topicService.editTopicIcon(
+            topicId, 
+            originalIcon.icon_custom_emoji_id, 
+            originalIcon.icon_color
+          );
+          if (!iconRestored) {
+            console.warn(`⚠️ Failed to restore topic icon for topic ${topicId}`);
+          }
+        } else {
+          // If no original icon saved, use default (blue color, no emoji)
+          const iconRestored = await handlerWorker.topicService.editTopicIcon(topicId, null, 0x6FB9F0);
+          if (!iconRestored) {
+            console.warn(`⚠️ Failed to restore default topic icon for topic ${topicId}`);
+          }
+        }
 
         console.log(`✅ AI disabled for human ${humanTelegramId} in topic ${topicId}`);
         await handlerWorker.messageService.sendMessageToTopic(chatId, topicId, '✅ AI disabled.');

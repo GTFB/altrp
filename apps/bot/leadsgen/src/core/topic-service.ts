@@ -180,6 +180,47 @@ export class TopicService {
   }
 
   /**
+   * Edits topic icon
+   */
+  async editTopicIcon(topicId: number, iconCustomEmojiId: string | null, iconColor?: number): Promise<boolean> {
+    try {
+      const body: any = {
+        chat_id: this.adminChatId,
+        message_thread_id: topicId
+      };
+
+      if (iconCustomEmojiId !== null) {
+        body.icon_custom_emoji_id = iconCustomEmojiId;
+      } else {
+        body.icon_custom_emoji_id = null;
+        if (iconColor !== undefined) {
+          body.icon_color = iconColor;
+        }
+      }
+
+      const response = await fetch(`https://api.telegram.org/bot${this.botToken}/editForumTopic`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Error editing topic icon:', errorData);
+        return false;
+      }
+
+      console.log(`✅ Topic icon updated for topic ${topicId}`);
+      return true;
+    } catch (error) {
+      console.error('Error editing topic icon:', error);
+      return false;
+    }
+  }
+
+  /**
    * Forwards message to user from admin group topic
    */
   async forwardMessageToUser(userId: number, message: TelegramMessage, getDbUserId: (telegramId: number) => Promise<number | null>): Promise<void> {
