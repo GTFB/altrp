@@ -220,6 +220,41 @@ export class MessageService {
   }
 
   /**
+   * Sends message with keyboard to topic
+   */
+  async sendMessageWithKeyboardToTopic(chatId: number, topicId: number, text: string, replyMarkup: any): Promise<void> {
+    try {
+      const sendConfig = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          chat_id: chatId,
+          message_thread_id: topicId,
+          text: text,
+          parse_mode: 'HTML',
+          reply_markup: replyMarkup
+        })
+      };
+
+      const url = `https://api.telegram.org/bot${this.botToken}/sendMessage`;
+
+      const response = await fetch(url, sendConfig);
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Error sending message with keyboard to topic:', errorData, sendConfig);
+      } else {
+        const result = await response.json();
+        console.log('Message with keyboard sent to topic successfully:', (result as any).message_id);
+      }
+    } catch (error) {
+      console.error('Error sending message with keyboard to topic:', error);
+    }
+  }
+
+  /**
    * Answers callback query
    */
   async answerCallbackQuery(callbackQueryId: string): Promise<void> {

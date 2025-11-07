@@ -28,15 +28,15 @@ export const keyboards = {
     inline_keyboard: [
       [
         {
-          text: "New",
+          text: "💡 New",
           callback_data: "new_lead_status"
         },
         {
-          text: "Hot",
+          text: "🔥 Hot",
           callback_data: "hot_lead_status"
         },
         {
-          text: "Sell",
+          text: "💰 Sell",
           callback_data: "sell_lead_status"
         },
       ],
@@ -59,6 +59,20 @@ export const callbackActions = {
     action: "start_flow",
     flowName: "help"
   },
+  "new_lead_status": {
+    action: "handler",
+    handlerName: "setStatusHandler"
+    // Optional: nextStepId or nextFlow can be added here if handler should transition
+    // Example: nextStepId: "next_step" or nextFlow: "some_flow"
+  },
+  "hot_lead_status": {
+    action: "handler",
+    handlerName: "setStatusHandler"
+  },
+  "sell_lead_status": {
+    action: "handler",
+    handlerName: "setStatusHandler"
+  },
 
 } as const;
 
@@ -67,7 +81,7 @@ export const callbackActions = {
 
 // TypeScript types
 //export type CommandHandler = keyof typeof commands;
-export type CallbackActionType = 'start_flow' | 'go_to_step' | 'go_to_flow' | 'set_variable';
+export type CallbackActionType = 'start_flow' | 'go_to_step' | 'go_to_flow' | 'set_variable' | 'handler';
 
 export interface CallbackActionConfig {
   action: CallbackActionType;
@@ -76,5 +90,5 @@ export interface CallbackActionConfig {
   variable?: string;    // For set_variable
   value?: any;          // For set_variable
   nextFlow?: string;    // For transition to next flow after action
-  nextStepId?: string;    // For transition to next step after action
+  handlerName?: string; // For handler action - name of custom handler
 }

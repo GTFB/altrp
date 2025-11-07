@@ -12,7 +12,8 @@ export class FlowEngine {
     private userContextManager: UserContextManager,
     private messageService: MessageService,
     private i18nService: I18nService,
-    private customHandlers: Record<string, Function> = {}
+    private customHandlers: Record<string, Function> = {},
+    private adminChatId?: number // Optional admin chat ID for topic flows
   ) {
     
   }
@@ -76,7 +77,11 @@ export class FlowEngine {
 
     await this.userContextManager.updateContext(telegramId, {
       currentFlow: flowName,
-      currentStep: 0
+      currentStep: 0,
+      flowInTopic: false, // Regular flow, not in topic
+      topicId: null,
+      adminChatId: null,
+      targetUserId: null
     });
 
     console.log(`✅ Flow "${flowName}" started for user ${telegramId}, total steps: ${flow.steps.length}`);
@@ -85,6 +90,62 @@ export class FlowEngine {
     if (flow.steps.length > 0) {
       if (flow.steps[0]) {
         await this.executeStep(telegramId, flow.steps[0]);
+      }
+    } else {
+      console.warn(`⚠️ Flow "${flowName}" has no steps`);
+    }
+  }
+
+  /**
+   * Start flow in topic mode (admin manages flow in user's topic)
+   */
+  async startTopicFlow(adminId: number, topicId: number, flowName: string, targetUserId?: number, adminChatId?: number): Promise<void> {
+    console.log(`🎬 Starting topic flow "${flowName}" for admin ${adminId} in topic ${topicId}`);
+    
+    const flow = flows[flowName];
+    if (!flow) {
+      console.error(`❌ Flow ${flowName} not found`);
+      return;
+    }
+
+    // Get admin context (should be created before calling this method)
+    const adminContext = await this.userContextManager.getContext(adminId);
+    if (!adminContext) {
+      console.error(`❌ Admin ${adminId} context not found. Please create context first.`);
+      return;
+    }
+
+    // Get adminChatId from parameter, class property, or context
+    const adminChatIdValue = adminChatId || this.adminChatId || adminContext.adminChatId || null;
+    if (!adminChatIdValue) {
+      console.error(`❌ Admin chat ID not configured. Please provide adminChatId parameter.`);
+      return;
+    }
+
+    // Enter flow mode for admin
+    await this.userContextManager.enterFlowMode(adminId);
+
+    // Update context with topic flow information
+    await this.userContextManager.updateContext(adminId, {
+      currentFlow: flowName,
+      currentStep: 0,
+      flowInTopic: true,
+      topicId: topicId,
+      adminChatId: adminChatIdValue,
+      targetUserId: targetUserId || null
+    });
+
+    // Save targetUserId in flow data if provided
+    if (targetUserId) {
+      await this.userContextManager.setVariable(adminId, 'targetUserId', targetUserId);
+    }
+
+    console.log(`✅ Topic flow "${flowName}" started for admin ${adminId} in topic ${topicId}, total steps: ${flow.steps.length}`);
+
+    // Execute first step
+    if (flow.steps.length > 0) {
+      if (flow.steps[0]) {
+        await this.executeStep(adminId, flow.steps[0]);
       }
     } else {
       console.warn(`⚠️ Flow "${flowName}" has no steps`);
@@ -147,7 +208,11 @@ export class FlowEngine {
     
     await this.userContextManager.updateContext(telegramId, {
       currentFlow: '',
-      currentStep: 0
+      currentStep: 0,
+      flowInTopic: false,
+      topicId: null,
+      adminChatId: null,
+      targetUserId: null
     });
 
     console.log(`✅ Flow completed for user ${telegramId}`);
@@ -164,22 +229,47 @@ export class FlowEngine {
 
     const keyboard = step.keyboardKey ? keyboards[step.keyboardKey as keyof typeof keyboards] : undefined;
     
-    if (keyboard) {
-      await this.messageService.sendMessageWithKeyboard(telegramId, message, keyboard, context.userId);
-      
-      // If there is a keyboard, do NOT automatically go to next step
-      // Transition will only happen on button press
-      console.log(`⏳ Message with keyboard sent, waiting for user interaction...`);
-    } else {
-      await this.messageService.sendMessage(telegramId, message, context.userId);
-      
-      // If no keyboard, go to next step
-      if (step.nextStepId) {
-        await this.goToStepInternal(telegramId, step.nextStepId);
+    // Check if flow is in topic mode
+    if (context.flowInTopic && context.topicId && context.adminChatId) {
+      // Send to topic
+      if (keyboard) {
+        await this.messageService.sendMessageWithKeyboardToTopic(
+          context.adminChatId,
+          context.topicId,
+          message,
+          keyboard
+        );
+        console.log(`⏳ Message with keyboard sent to topic, waiting for admin interaction...`);
       } else {
-        // If no nextStepId - complete flow
-        console.log(`🏁 No next step defined, completing flow for user ${telegramId}`);
-        await this.completeFlow(telegramId);
+        await this.messageService.sendMessageToTopic(
+          context.adminChatId,
+          context.topicId,
+          message
+        );
+        
+        // If no keyboard, go to next step
+        if (step.nextStepId) {
+          await this.goToStepInternal(telegramId, step.nextStepId);
+        } else {
+          console.log(`🏁 No next step defined, completing flow for admin ${telegramId}`);
+          await this.completeFlow(telegramId);
+        }
+      }
+    } else {
+      // Regular flow mode - send to user
+      if (keyboard) {
+        await this.messageService.sendMessageWithKeyboard(telegramId, message, keyboard, context.userId);
+        console.log(`⏳ Message with keyboard sent, waiting for user interaction...`);
+      } else {
+        await this.messageService.sendMessage(telegramId, message, context.userId);
+        
+        // If no keyboard, go to next step
+        if (step.nextStepId) {
+          await this.goToStepInternal(telegramId, step.nextStepId);
+        } else {
+          console.log(`🏁 No next step defined, completing flow for user ${telegramId}`);
+          await this.completeFlow(telegramId);
+        }
       }
     }
   }
@@ -200,7 +290,17 @@ export class FlowEngine {
 
     // Use text property directly from step
     const message = step.text;
-    await this.messageService.sendMessage(telegramId, message, context.userId);
+    
+    // Check if flow is in topic mode
+    if (context.flowInTopic && context.topicId && context.adminChatId) {
+      await this.messageService.sendMessageToTopic(
+        context.adminChatId,
+        context.topicId,
+        message
+      );
+    } else {
+      await this.messageService.sendMessage(telegramId, message, context.userId);
+    }
   }
 
   private async handleCallbackStep(telegramId: number, step: CallbackStep): Promise<void> {
@@ -225,13 +325,24 @@ export class FlowEngine {
     const context = await this.userContextManager.getContext(telegramId);
     if (!context) return;
 
-    // Send message with buttons (can add messageKey to CallbackStep if needed)
-    await this.messageService.sendMessageWithKeyboard(
-      telegramId, 
-      step.buttons.map(b => b.text).join(' or ') + '?', // Temporary message
-      keyboard, 
-      context.userId
-    );
+    const message = step.buttons.map(b => b.text).join(' or ') + '?'; // Temporary message
+
+    // Check if flow is in topic mode
+    if (context.flowInTopic && context.topicId && context.adminChatId) {
+      await this.messageService.sendMessageWithKeyboardToTopic(
+        context.adminChatId,
+        context.topicId,
+        message,
+        keyboard
+      );
+    } else {
+      await this.messageService.sendMessageWithKeyboard(
+        telegramId, 
+        message,
+        keyboard, 
+        context.userId
+      );
+    }
   }
 
   private async handleConditionStep(telegramId: number, step: ConditionStep): Promise<void> {
@@ -323,17 +434,28 @@ export class FlowEngine {
     if (waitingState) {
       console.log(`⏳ User ${telegramId} was waiting for input, processing...`);
       
+      const context = await this.userContextManager.getContext(telegramId);
+      if (!context) return;
+      
       // Validation if specified
       if (waitingState.validation && !this.validateInput(messageText, waitingState.validation)) {
-        const context = await this.userContextManager.getContext(telegramId);
-        if (!context) return;
-        
         console.log(`❌ Validation failed for user ${telegramId}`);
-        await this.messageService.sendMessage(
-          telegramId, 
-          waitingState.validation.errorMessage || 'Invalid input format', 
-          context.userId
-        );
+        const errorMessage = waitingState.validation.errorMessage || 'Invalid input format';
+        
+        // Check if flow is in topic mode
+        if (context.flowInTopic && context.topicId && context.adminChatId) {
+          await this.messageService.sendMessageToTopic(
+            context.adminChatId,
+            context.topicId,
+            errorMessage
+          );
+        } else {
+          await this.messageService.sendMessage(
+            telegramId, 
+            errorMessage, 
+            context.userId
+          );
+        }
         return;
       }
 
@@ -352,6 +474,23 @@ export class FlowEngine {
     }
   }
 
+  /**
+   * Handle incoming message from topic (admin in topic flow)
+   */
+  async handleTopicMessage(adminId: number, messageText: string): Promise<void> {
+    console.log(`📥 Handling incoming topic message from admin ${adminId}: "${messageText}"`);
+    
+    // Check if admin is in topic flow mode
+    const context = await this.userContextManager.getContext(adminId);
+    if (!context || !context.flowInTopic) {
+      console.log(`⚠️ Admin ${adminId} is not in topic flow mode`);
+      return;
+    }
+
+    // Use the same logic as handleIncomingMessage
+    await this.handleIncomingMessage(adminId, messageText);
+  }
+
   private async handleDynamicStep(telegramId: number, step: DynamicStep): Promise<void> {
     const context = await this.userContextManager.getContext(telegramId);
     if (!context) return;
@@ -363,19 +502,37 @@ export class FlowEngine {
 
         const keyboard = step.keyboardKey ? keyboards[step.keyboardKey as keyof typeof keyboards] : undefined;
         
-        if (keyboard) {
-          await this.messageService.sendMessageWithKeyboard(
-            telegramId, 
-            dynamicMessage, 
-            keyboard, 
-            context.userId
-          );
+        // Check if flow is in topic mode
+        if (context.flowInTopic && context.topicId && context.adminChatId) {
+          if (keyboard) {
+            await this.messageService.sendMessageWithKeyboardToTopic(
+              context.adminChatId,
+              context.topicId,
+              dynamicMessage,
+              keyboard
+            );
+          } else {
+            await this.messageService.sendMessageToTopic(
+              context.adminChatId,
+              context.topicId,
+              dynamicMessage
+            );
+          }
         } else {
-          await this.messageService.sendMessage(
-            telegramId, 
-            dynamicMessage, 
-            context.userId
-          );
+          if (keyboard) {
+            await this.messageService.sendMessageWithKeyboard(
+              telegramId, 
+              dynamicMessage, 
+              keyboard, 
+              context.userId
+            );
+          } else {
+            await this.messageService.sendMessage(
+              telegramId, 
+              dynamicMessage, 
+              context.userId
+            );
+          }
         }
 
         if (step.nextStepId) {
@@ -384,9 +541,6 @@ export class FlowEngine {
         else if(step.nextStepId === ''){
           await this.completeFlow(telegramId);
         }
-        //  else {
-        //   await this.completeFlow(telegramId);
-        // }
 
       } catch (error) {
         console.error(`❌ Error in dynamic step handler ${step.handler}:`, error);
@@ -450,12 +604,22 @@ export class FlowEngine {
           ]
         };
 
-        await this.messageService.sendMessageWithKeyboard(
-          telegramId, 
-          result.message, 
-          keyboard, 
-          context.userId
-        );
+        // Check if flow is in topic mode
+        if (context.flowInTopic && context.topicId && context.adminChatId) {
+          await this.messageService.sendMessageWithKeyboardToTopic(
+            context.adminChatId,
+            context.topicId,
+            result.message,
+            keyboard
+          );
+        } else {
+          await this.messageService.sendMessageWithKeyboard(
+            telegramId, 
+            result.message, 
+            keyboard, 
+            context.userId
+          );
+        }
 
         // Don't go to next step automatically - wait for callback
         console.log(`⏳ Dynamic callback step "${step.id}" sent, waiting for user selection...`);
@@ -530,6 +694,23 @@ export class FlowEngine {
     }
   }
 
+  /**
+   * Handle incoming callback from topic (admin in topic flow)
+   */
+  async handleTopicCallback(adminId: number, callbackData: string): Promise<void> {
+    console.log(`🔘 Handling incoming topic callback from admin ${adminId}: ${callbackData}`);
+    
+    // Check if admin is in topic flow mode
+    const context = await this.userContextManager.getContext(adminId);
+    if (!context || !context.flowInTopic) {
+      console.log(`⚠️ Admin ${adminId} is not in topic flow mode`);
+      return;
+    }
+
+    // Use the same logic as handleIncomingCallback
+    await this.handleIncomingCallback(adminId, callbackData);
+  }
+
   // Universal callback handler
   async handleIncomingCallback(telegramId: number, callbackData: string): Promise<void> {
     console.log(`🔘 Handling incoming callback from user ${telegramId}: ${callbackData}`);
@@ -556,6 +737,29 @@ export class FlowEngine {
             await this.userContextManager.setVariable(telegramId, callbackConfig.variable, callbackConfig.value);
           }
           // Go to next flow if specified
+          if (callbackConfig.nextFlow) {
+            console.log(`🚀 Starting next flow: ${callbackConfig.nextFlow}`);
+            await this.startFlow(telegramId, callbackConfig.nextFlow);
+          } else if (callbackConfig.nextStepId) {
+            console.log(`📍 Going to next step: ${callbackConfig.nextStepId}`);
+            await this.goToStepInternal(telegramId, callbackConfig.nextStepId);
+          }
+          return;
+
+        case 'handler':
+          console.log(`🛠️ Executing custom handler "${callbackConfig.handlerName}" for callback "${callbackData}"`);
+          const handler = this.customHandlers[callbackConfig.handlerName!];
+          if (handler) {
+            try {
+              // Pass callbackData to handler so it can access the callback information
+              await handler(telegramId, this.userContextManager, callbackData);
+            } catch (error) {
+              console.error(`❌ Error in custom handler "${callbackConfig.handlerName}":`, error);
+            }
+          } else {
+            console.error(`❌ Custom handler "${callbackConfig.handlerName}" not found`);
+          }
+          // Go to next flow or step if specified (after handler execution)
           if (callbackConfig.nextFlow) {
             console.log(`🚀 Starting next flow: ${callbackConfig.nextFlow}`);
             await this.startFlow(telegramId, callbackConfig.nextFlow);

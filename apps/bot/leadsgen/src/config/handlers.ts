@@ -321,16 +321,107 @@ export const createCustomHandlers = (worker: BotInterface) => {
           return;
         }
 
-        // Get or create human context
-        await bot.userContextManager.getOrCreateContext(humanTelegramId, human.id);
+        // Get or create admin context (admin who runs the command)
+        const adminHuman = await handlerWorker.d1Storage.getHumanByTelegramId(userId);
+        if (!adminHuman || !adminHuman.id) {
+          console.error(`❌ Admin ${userId} not found in database`);
+          await handlerWorker.messageService.sendMessageToTopic(chatId, topicId, 'Admin not found in database.');
+          return;
+        }
 
-        // Start set_status flow for the human associated with this topic
-        await handlerWorker.flowEngine.startFlow(humanTelegramId, 'set_status');
+        await bot.userContextManager.getOrCreateContext(userId, adminHuman.id);
 
-        console.log(`✅ Set status flow launched for human ${humanTelegramId} in topic ${topicId}`);
+        // Start set_status flow in topic mode for admin
+        await handlerWorker.flowEngine.startTopicFlow(userId, topicId, 'set_status', humanTelegramId, adminChatId);
+
+        console.log(`✅ Set status flow launched for admin ${userId} in topic ${topicId} (managing user ${humanTelegramId})`);
       } catch (error) {
         console.error(`❌ Error starting set_status flow for topic ${topicId}:`, error);
         await handlerWorker.messageService.sendMessageToTopic(chatId, topicId, '❌ Error starting set_status flow.');
+      }
+    },
+
+
+    setStatusHandler: async (telegramId: number, contextManager: UserContextManager, callbackData: string) => {
+      console.log(`🛠️ setStatusHandler called with callbackData: ${callbackData}`);
+      
+      // Get context to access topic flow information
+      const context = await contextManager.getContext(telegramId);
+      if (!context) {
+        console.error(`❌ Context not found for admin ${telegramId}`);
+        return;
+      }
+
+      // Get target user ID and topic ID from context
+      const targetUserId = context.targetUserId;
+      const topicId = context.topicId;
+      const adminChatId = context.adminChatId;
+
+      if (!targetUserId || !topicId || !adminChatId) {
+        console.error(`❌ Missing required context: targetUserId=${targetUserId}, topicId=${topicId}, adminChatId=${adminChatId}`);
+        return;
+      }
+
+      // Map callbackData to status name
+      const statusMap: Record<string, string> = {
+        'new_lead_status': 'NEW',
+        'hot_lead_status': 'HOT',
+        'sell_lead_status': 'SELL'
+      };
+
+      const statusName = statusMap[callbackData];
+      if (!statusName) {
+        console.error(`❌ Unknown callback data: ${callbackData}`);
+        return;
+      }
+
+      try {
+        // Update human status_name
+        await handlerWorker.d1Storage.updateHuman(targetUserId, {
+          statusName: statusName
+        });
+        console.log(`✅ Status updated to "${statusName}" for human ${targetUserId}`);
+
+        // Change topic icon based on status
+        let icon: string | null = null;
+        switch (statusName) {
+          case 'NEW':
+            icon = '5312536423851630001';
+            break;
+          case 'HOT':
+            icon = '5312241539987020022';
+            break;
+          case 'SELL':
+            icon = '5350452584119279096';
+            break;
+        }
+
+        console.log(`🎨 Setting status ${statusName} icon ${icon} for topic ${topicId}`);
+
+        if (icon) {
+          const iconChanged = await handlerWorker.topicService.editTopicIcon(topicId, icon);
+          if (!iconChanged) {
+            console.warn(`⚠️ Failed to change topic icon for topic ${topicId}`);
+          } else {
+            console.log(`✅ Topic icon updated to ${icon} for topic ${topicId}`);
+          }
+        } else {
+          console.warn(`⚠️ No icon defined for status ${statusName}`);
+        }
+
+        // Send confirmation message to topic
+        await handlerWorker.messageService.sendMessageToTopic(
+          adminChatId,
+          topicId,
+          `✅ Status updated to <b>${statusName}</b>`
+        );
+      } catch (error) {
+        console.error(`❌ Error in setStatusHandler:`, error);
+        await handlerWorker.messageService.sendMessageToTopic(
+          adminChatId,
+          topicId,
+          `❌ Error updating status: ${error instanceof Error ? error.message : 'Unknown error'}`
+        );
       }
     },
 

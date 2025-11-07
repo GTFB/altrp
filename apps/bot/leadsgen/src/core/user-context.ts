@@ -11,6 +11,12 @@ export interface UserContext {
   // New fields for forwarding management
   messageForwardingEnabled: boolean; // Whether forwarding to topic is enabled
   flowMode: boolean; // Whether user is in flow mode
+  
+  // Fields for topic flow mode (when admin manages flow in topic)
+  flowInTopic: boolean; // Whether flow is running in topic mode
+  topicId: number | null; // Topic ID where flow is running
+  adminChatId: number | null; // Admin chat ID where topic is located
+  targetUserId: number | null; // User ID (human) that admin is managing in this flow
 }
 
 export class UserContextManager {
@@ -53,7 +59,11 @@ export class UserContextManager {
         data: savedData.data || {},
         stepHistory: savedData.stepHistory || [],
         messageForwardingEnabled: savedData.messageForwardingEnabled ?? true,
-        flowMode: savedData.flowMode ?? false
+        flowMode: savedData.flowMode ?? false,
+        flowInTopic: savedData.flowInTopic ?? false,
+        topicId: savedData.topicId ?? null,
+        adminChatId: savedData.adminChatId ?? null,
+        targetUserId: savedData.targetUserId ?? null
       };
       
       console.log(`📚 Context loaded from DB for human ${telegramId}:`, {
@@ -79,7 +89,11 @@ export class UserContextManager {
       data: {},
       stepHistory: [],
       messageForwardingEnabled: true, // Enabled by default
-      flowMode: false // By default not in flow
+      flowMode: false, // By default not in flow
+      flowInTopic: false, // By default not in topic flow
+      topicId: null,
+      adminChatId: null,
+      targetUserId: null
     };
     
     // Immediately save to DB
@@ -204,7 +218,11 @@ export class UserContextManager {
       data: context.data,
       stepHistory: context.stepHistory,
       messageForwardingEnabled: context.messageForwardingEnabled,
-      flowMode: context.flowMode
+      flowMode: context.flowMode,
+      flowInTopic: context.flowInTopic,
+      topicId: context.topicId,
+      adminChatId: context.adminChatId,
+      targetUserId: context.targetUserId
     };
     
     // Get existing human to preserve other data_in fields

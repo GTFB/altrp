@@ -115,7 +115,8 @@ export class TelegramBotWorker {
       this.userContextManager,
       this.messageService,
       this.i18nService,
-      {} // Empty handlers object for now
+      {}, // Empty handlers object for now
+      parseInt(env.ADMIN_CHAT_ID) // Pass admin chat ID for topic flows
     );
     
     // Теперь создаем обработчики с доступом к flowEngine
@@ -274,7 +275,18 @@ export class TelegramBotWorker {
 
     // Check if message came to admin group (topic)
     if (chatId === adminChatId && (message as any).message_thread_id) {
-      // This is a message in admin group topic - forward to human
+      const topicId = (message as any).message_thread_id;
+      
+      // Check if admin is in topic flow mode
+      const adminContext = await this.userContextManager.getContext(userId);
+      if (adminContext && adminContext.flowInTopic && adminContext.topicId === topicId && message.text) {
+        // Admin is managing flow in this topic - process through FlowEngine
+        console.log(`🎯 Admin ${userId} is in topic flow mode, processing message through FlowEngine`);
+        await this.flowEngine.handleTopicMessage(userId, message.text);
+        return;
+      }
+      
+      // Otherwise, forward message to human (normal topic behavior)
       await this.topicService.handleMessageFromTopic(
         message, 
         this.d1Storage.getHumanTelegramIdByTopic.bind(this.d1Storage),
@@ -320,8 +332,26 @@ export class TelegramBotWorker {
   private async processCallbackQuery(callbackQuery: TelegramCallbackQuery): Promise<void> {
     const userId = callbackQuery.from.id;
     const data = callbackQuery.data;
+    const adminChatId = parseInt(this.env.ADMIN_CHAT_ID);
 
     console.log(`Processing callback query from human ${userId}: ${data}`);
+
+    // Check if callback is from admin group topic
+    const message = callbackQuery.message;
+    const chatId = message?.chat?.id;
+    const topicId = (message as any)?.message_thread_id;
+
+    // Check if admin is in topic flow mode
+    if (chatId === adminChatId && topicId) {
+      const adminContext = await this.userContextManager.getContext(userId);
+      if (adminContext && adminContext.flowInTopic && adminContext.topicId === topicId && data) {
+        // Admin is managing flow in this topic - process through FlowEngine
+        console.log(`🎯 Admin ${userId} is in topic flow mode, processing callback through FlowEngine`);
+        await this.messageService.answerCallbackQuery(callbackQuery.id);
+        await this.flowEngine.handleTopicCallback(userId, data);
+        return;
+      }
+    }
 
     // Get dbHumanId for logging
     const human = await this.d1Storage.getHumanByTelegramId(callbackQuery.from.id);
