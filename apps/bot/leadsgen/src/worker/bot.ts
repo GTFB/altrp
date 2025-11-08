@@ -5,6 +5,7 @@ import { MessageService } from '../core/message-service';
 import { MessageLoggingService } from '../core/message-logging-service';
 import { TopicService } from '../core/topic-service';
 import { Human } from '../models/Human';
+import { Message } from '../models/Message';
 //import { SessionService } from '../core/session-service';
 import { UserContextManager, type UserContext } from '../core/user-context';
 import { FlowEngine } from '../core/flow-engine';
@@ -79,6 +80,7 @@ export class TelegramBotWorker {
   //private kvStorage: KVStorageService;
   private d1Storage: D1StorageService;
   private humanModel: Human;
+  private messageModel: Message;
   private messageLoggingService: MessageLoggingService;
   private messageService: MessageService;
   private topicService: TopicService;
@@ -97,10 +99,14 @@ export class TelegramBotWorker {
     this.humanModel = new Human({ db: env.DB });
     this.d1Storage.setHumanModel(this.humanModel);
     
+    // Create message model
+    this.messageModel = new Message({ db: env.DB, humanModel: this.humanModel });
+    
     // Create message logging service
     this.messageLoggingService = new MessageLoggingService({
       d1Storage: this.d1Storage,
-      humanModel: this.humanModel
+      humanModel: this.humanModel,
+      messageModel: this.messageModel
     });
     
     this.messageService = new MessageService({
