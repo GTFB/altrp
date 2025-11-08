@@ -1,5 +1,5 @@
 import type { Env } from './worker';
-import { KVStorageService } from './kv-storage-service';
+//import { KVStorageService } from './kv-storage-service';
 import { D1StorageService, type Human } from './d1-storage-service';
 import { MessageService } from '../core/message-service';
 import { MessageLoggingService } from '../core/message-logging-service';
@@ -104,7 +104,7 @@ export class TelegramBotWorker {
       botToken: env.BOT_TOKEN,
       adminChatId: parseInt(env.ADMIN_CHAT_ID),
       messageService: this.messageService,
-      d1Storage: this.d1Storage
+      messageLoggingService: this.messageLoggingService
     });
     // this.sessionService = new SessionService({
     //   d1Storage: this.d1Storage
@@ -302,9 +302,6 @@ export class TelegramBotWorker {
       return;
     }
 
-    // Add human to database
-    await this.ensureHumanExists(message.from);
-
     // Get dbHumanId for logging
     const human = await this.d1Storage.getHumanByTelegramId(message.from.id);
     if (!human) {
@@ -392,19 +389,6 @@ export class TelegramBotWorker {
     }
   }
 
-  private async ensureHumanExists(user: TelegramUser): Promise<void> {
-    try {
-      const exists = await this.d1Storage.humanExists(user.id);
-      
-      if (!exists) {
-        // Human will be registered on /start command
-        console.log(`Human ${user.id} not found in database - will be registered on /start command`);
-      }
-    } catch (error) {
-      console.error(`Error checking if human exists:`, error);
-    }
-  }
-
   private async handleCommand(message: TelegramMessage): Promise<void> {
     let command = message.text?.split(' ')[0];
     const userId = message.from.id;
@@ -469,8 +453,6 @@ export class TelegramBotWorker {
   private async handleAllMessages(message: TelegramMessage): Promise<void> {
     const userId = message.from.id;
 
-    //console.log(`YYYYYYYYY`);
-
     // Get human information
     const human = await this.d1Storage.getHumanByTelegramId(userId);
     
@@ -491,8 +473,6 @@ export class TelegramBotWorker {
       }
     }
 
-    //console.log(`OKKKKKKK`);
-    
     // Check if message forwarding is enabled
     const forwardingEnabled = await this.userContextManager.isMessageForwardingEnabled(userId);
     

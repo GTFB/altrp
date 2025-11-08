@@ -264,7 +264,7 @@ export class UserContextManager {
   async getUserLanguage(telegramId: number): Promise<string> {
     if (!this.d1Storage) {
       console.warn('D1Storage not set, using default locale');
-      return 'ru';
+      return 'en';
     }
 
     try {
