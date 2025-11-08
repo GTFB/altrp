@@ -97,7 +97,6 @@ export class TelegramBotWorker {
     
     // Create human model
     this.humanModel = new Human({ db: env.DB });
-    this.d1Storage.setHumanModel(this.humanModel);
     
     // Create message model
     this.messageModel = new Message({ db: env.DB, humanModel: this.humanModel });
@@ -187,9 +186,6 @@ export class TelegramBotWorker {
 
       // Check D1 connection
       console.log('🗄️ D1 database connection:', this.d1Storage ? 'OK' : 'FAILED');
-      
-      // Initialize D1 Storage (check tables)
-      await this.d1Storage.initialize();
 
       // Process update
       await this.processUpdate(update);
