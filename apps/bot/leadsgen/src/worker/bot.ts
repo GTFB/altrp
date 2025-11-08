@@ -3,10 +3,10 @@ import { KVStorageService } from './kv-storage-service';
 import { D1StorageService, type Human } from './d1-storage-service';
 import { MessageService } from '../core/message-service';
 import { TopicService } from '../core/topic-service';
-import { SessionService } from '../core/session-service';
+//import { SessionService } from '../core/session-service';
 import { UserContextManager, type UserContext } from '../core/user-context';
 import { FlowEngine } from '../core/flow-engine';
-import { I18nService } from '../core/i18n';
+//import { I18nService } from '../core/i18n';
 import { isVKLink, normalizeVKLink } from '../core/helpers';
 import { createCustomHandlers } from '../config/handlers';
 import { commands, findCommand } from '../config/commands';
@@ -82,7 +82,7 @@ export class TelegramBotWorker {
   //private sessionService: SessionService;
   private userContextManager: UserContextManager;
   private flowEngine: FlowEngine;
-  private i18nService: I18nService;
+  //private i18nService: I18nService;
 
   //constructor(env: Env, kvStorage: KVStorageService) {
   constructor(env: Env) {
@@ -108,13 +108,13 @@ export class TelegramBotWorker {
     this.userContextManager.setD1Storage(this.d1Storage);
     
     // Initialize i18n service
-    this.i18nService = new I18nService(env.LOCALE);
+    //this.i18nService = new I18nService(env.LOCALE);
     
     // Create FlowEngine without handlers first
     this.flowEngine = new FlowEngine(
       this.userContextManager,
       this.messageService,
-      this.i18nService,
+      //this.i18nService,
       {}, // Empty handlers object for now
       parseInt(env.ADMIN_CHAT_ID) // Pass admin chat ID for topic flows
     );

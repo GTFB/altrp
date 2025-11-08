@@ -2,10 +2,10 @@
 import { PostgreSQLStorageService, RedisStorageService } from './storage-service';
 import { MessageService } from '../core/message-service';
 import { TopicService } from '../core/topic-service';
-import { SessionService } from '../core/session-service';
+//import { SessionService } from '../core/session-service';
 import { UserContextManager } from '../core/user-context';
 import { FlowEngine } from '../core/flow-engine';
-import { I18nService } from '../core/i18n';
+//import { I18nService } from '../core/i18n';
 import { isVKLink, normalizeVKLink } from '../core/helpers';
 import { createCustomHandlers } from '../config/handlers';
 
@@ -89,10 +89,10 @@ export class TelegramBotNode {
   private postgresStorage: PostgreSQLStorageService;
   private messageService: MessageService;
   private topicService: TopicService;
-  private sessionService: SessionService;
+  //private sessionService: SessionService;
   private userContextManager: UserContextManager;
   private flowEngine: FlowEngine;
-  private i18nService: I18nService;
+  //private i18nService: I18nService;
 
   constructor(env: NodeEnv, redisStorage: RedisStorageService, postgresStorage: PostgreSQLStorageService) {
     this.env = env;
@@ -111,22 +111,22 @@ export class TelegramBotNode {
       messageService: this.messageService
     });
     
-    this.sessionService = new SessionService({
-      d1Storage: this.postgresStorage as any // Cast to compatible type
-    });
+    // this.sessionService = new SessionService({
+    //   d1Storage: this.postgresStorage as any // Cast to compatible type
+    // });
     
     // Initialize new components
     this.userContextManager = new UserContextManager();
     this.userContextManager.setD1Storage(this.postgresStorage as any);
     
     // Initialize i18n service
-    this.i18nService = new I18nService(env.LOCALE);
+    //this.i18nService = new I18nService(env.LOCALE);
     
     // Create FlowEngine without handlers first
     this.flowEngine = new FlowEngine(
       this.userContextManager,
       this.messageService,
-      this.i18nService,
+      //this.i18nService,
       {} // Empty handlers object for now
     );
     

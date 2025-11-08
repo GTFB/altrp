@@ -628,6 +628,8 @@ export const createCustomHandlers = (worker: BotInterface) => {
 
       const dataInObj = JSON.parse(human.dataIn);
 
+      console.log('Selecting messages:', consultantMaid, human.haid, MESSAGES_FOR_ANSWER)
+
       try {
         const recentMessages = await handlerWorker.d1Storage.execute(`
           SELECT title, created_at, data_in 

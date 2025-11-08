@@ -1,6 +1,6 @@
 import { UserContextManager } from './user-context';
 import { MessageService } from './message-service';
-import { I18nService } from './i18n';
+//import { I18nService } from './i18n';
 import type { FlowStepType, MessageStep, WaitInputStep, CallbackStep, ConditionStep, HandlerStep, FlowStep, ForwardingControlStep, DynamicStep, DynamicCallbackStep } from './flow-types';
 import { flows } from '../config/flows/index';
 import { callbackActions } from '../config/callbacks';
@@ -11,7 +11,7 @@ export class FlowEngine {
   constructor(
     private userContextManager: UserContextManager,
     private messageService: MessageService,
-    private i18nService: I18nService,
+    //private i18nService: I18nService,
     private customHandlers: Record<string, Function> = {},
     private adminChatId?: number // Optional admin chat ID for topic flows
   ) {

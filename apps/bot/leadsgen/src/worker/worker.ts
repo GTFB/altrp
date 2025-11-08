@@ -1,9 +1,10 @@
 import { TelegramBotWorker } from './bot';
-import { KVStorageService } from './kv-storage-service';
-import type { KVNamespace, D1Database, R2Bucket, ExecutionContext } from '@cloudflare/workers-types';
+//import { KVStorageService } from './kv-storage-service';
+//import type { KVNamespace, D1Database, R2Bucket, ExecutionContext } from '@cloudflare/workers-types';
+import type { D1Database, R2Bucket, ExecutionContext } from '@cloudflare/workers-types';
 
 export interface Env {
-  BZN_BOT_KV: KVNamespace;
+  //BZN_BOT_KV: KVNamespace;
   DB: D1Database;
   BOT_STORAGE: R2Bucket;
   BOT_TOKEN: string;
@@ -25,7 +26,7 @@ export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     try {
       // Initialize services
-      const storageService = new KVStorageService(env.BZN_BOT_KV);
+      //const storageService = new KVStorageService(env.BZN_BOT_KV);
       const botWorker = new TelegramBotWorker(env, storageService);
 
       // Process request
@@ -43,7 +44,7 @@ export default {
       console.log('Cron triggered:', event.cron);
       
       // Initialize services
-      const storageService = new KVStorageService(env.BZN_BOT_KV);
+      //const storageService = new KVStorageService(env.BZN_BOT_KV);
       const botWorker = new TelegramBotWorker(env, storageService);
 
       // Check delayed messages
