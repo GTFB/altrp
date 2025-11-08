@@ -9,7 +9,7 @@ import { MessageRepository } from '../repositories/MessageRepository';
 export interface MessageLoggingServiceConfig {
   d1Storage: D1StorageService;
   humanModel: HumanRepository;
-  messageModel: MessageRepository;
+  messageRepository: MessageRepository;
 }
 
 /**
@@ -19,12 +19,12 @@ export interface MessageLoggingServiceConfig {
 export class MessageLoggingService {
   private d1Storage: D1StorageService;
   private humanModel: HumanRepository;
-  private messageModel: MessageRepository;
+  private messageRepository: MessageRepository;
 
   constructor(config: MessageLoggingServiceConfig) {
     this.d1Storage = config.d1Storage;
     this.humanModel = config.humanModel;
-    this.messageModel = config.messageModel;
+    this.messageRepository = config.messageRepository;
   }
 
   /**
@@ -48,7 +48,7 @@ export class MessageLoggingService {
 
       console.log(`📝 Message log object:`, JSON.stringify(messageLog, null, 2));
       
-      const result = await this.messageModel.addMessage(messageLog);
+      const result = await this.messageRepository.addMessage(messageLog);
       console.log(`✅ Message logged successfully with ID: ${result}`);
     } catch (error) {
       console.error('❌ Error logging message:', error);
@@ -75,7 +75,7 @@ export class MessageLoggingService {
 
       console.log(`🔘 Callback log object:`, JSON.stringify(messageLog, null, 2));
       
-      const result = await this.messageModel.addMessage(messageLog);
+      const result = await this.messageRepository.addMessage(messageLog);
       console.log(`✅ Callback logged successfully with ID: ${result}`);
     } catch (error) {
       console.error('❌ Error logging callback query:', error);
@@ -101,7 +101,7 @@ export class MessageLoggingService {
 
       console.log(`🤖 Bot message log object:`, JSON.stringify(messageLog, null, 2));
       
-      const result = await this.messageModel.addMessage(messageLog);
+      const result = await this.messageRepository.addMessage(messageLog);
       console.log(`✅ Bot message logged successfully with ID: ${result} for user ${chatId}: ${text.substring(0, 50)}...`);
     } catch (error) {
       console.error('❌ Error logging sent message:', error);
@@ -128,7 +128,7 @@ export class MessageLoggingService {
 
       console.log(`🎤 Bot voice log object:`, JSON.stringify(messageLog, null, 2));
       
-      const result = await this.messageModel.addMessage(messageLog);
+      const result = await this.messageRepository.addMessage(messageLog);
       console.log(`✅ Bot voice message logged successfully with ID: ${result} for user ${userId}`);
     } catch (error) {
       console.error('❌ Error logging sent voice message:', error);
@@ -156,7 +156,7 @@ export class MessageLoggingService {
 
       console.log(`📷 Bot photo log object:`, JSON.stringify(messageLog, null, 2));
       
-      const result = await this.messageModel.addMessage(messageLog);
+      const result = await this.messageRepository.addMessage(messageLog);
       console.log(`✅ Bot photo message logged successfully with ID: ${result} for user ${userId}`);
     } catch (error) {
       console.error('❌ Error logging sent photo message:', error);
@@ -185,7 +185,7 @@ export class MessageLoggingService {
 
       console.log(`📄 Bot document log object:`, JSON.stringify(messageLog, null, 2));
       
-      const result = await this.messageModel.addMessage(messageLog);
+      const result = await this.messageRepository.addMessage(messageLog);
       console.log(`✅ Bot document message logged successfully with ID: ${result} for user ${userId}`);
     } catch (error) {
       console.error('❌ Error logging sent document message:', error);

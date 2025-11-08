@@ -19,10 +19,6 @@ export class MessageService {
     this.messageLoggingService = config.messageLoggingService;
   }
 
-  // ===========================================
-  // MESSAGE SENDING METHODS
-  // ===========================================
-
   /**
    * Sends text message
    */

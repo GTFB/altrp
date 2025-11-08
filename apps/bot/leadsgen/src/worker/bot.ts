@@ -77,7 +77,7 @@ export class TelegramBotWorker {
   //private kvStorage: KVStorageService;
   private d1Storage: D1StorageService;
   private humanModel: HumanRepository;
-  private messageModel: MessageRepository;
+  private messageRepository: MessageRepository;
   private messageLoggingService: MessageLoggingService;
   private messageService: MessageService;
   private topicService: TopicService;
@@ -96,13 +96,13 @@ export class TelegramBotWorker {
     this.humanModel = new HumanRepository({ db: env.DB });
     
     // Create message model
-    this.messageModel = new MessageRepository({ db: env.DB, humanModel: this.humanModel });
+    this.messageRepository = new MessageRepository({ db: env.DB, humanModel: this.humanModel });
     
     // Create message logging service
     this.messageLoggingService = new MessageLoggingService({
       d1Storage: this.d1Storage,
       humanModel: this.humanModel,
-      messageModel: this.messageModel
+      messageRepository: this.messageRepository
     });
     
     this.messageService = new MessageService({
