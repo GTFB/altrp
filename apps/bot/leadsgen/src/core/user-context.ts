@@ -282,7 +282,7 @@ export class UserContextManager {
       }
       
       // Check that language is supported
-      // if (userLanguage && ['ru', 'sr'].includes(userLanguage)) {
+      // if (userLanguage && ['en', 'ru'].includes(userLanguage)) {
       //   return userLanguage;
       // }
       if (userLanguage) {
@@ -292,7 +292,7 @@ export class UserContextManager {
       return 'en'; // Default fallback
     } catch (error) {
       console.error(`Error getting human language for ${telegramId}:`, error);
-      return 'ru';
+      return 'en';
     }
   }
 }

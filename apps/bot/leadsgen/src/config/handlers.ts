@@ -1,5 +1,5 @@
 import { BotInterface } from '../core/bot-interface';
-import { AIService } from '../core/ai-service';
+import { AIService } from '../integrations/ai-service';
 import { generateUuidV4 } from '../helpers/generateUuidV4';
 import { generateAid } from '../helpers/generateAid';
 

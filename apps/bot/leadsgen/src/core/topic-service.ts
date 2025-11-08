@@ -2,6 +2,7 @@ import { MessageService } from './message-service';
 import type { TelegramMessage, TelegramUser } from '../worker/bot';
 import { generateUuidV4 } from '../helpers/generateUuidV4';
 import { generateAid } from '../helpers/generateAid';
+import { getMessageType } from '../helpers/getMessageType';
 
 export interface TopicServiceConfig {
   botToken: string;
@@ -23,15 +24,6 @@ export class TopicService {
     this.d1Storage = config.d1Storage;
   }
 
-  /**
-   * Get message type from TelegramMessage
-   */
-  private getMessageType(message: TelegramMessage): 'user_text' | 'user_voice' | 'user_photo' | 'user_document' {
-    if (message.voice) return 'user_voice';
-    if (message.photo && message.photo.length > 0) return 'user_photo';
-    if (message.document) return 'user_document';
-    return 'user_text';
-  }
 
   /**
    * Log message from user to topic
@@ -59,7 +51,7 @@ export class TopicService {
       const dataIn = JSON.stringify({
         humanId: human.id,
         telegramId: userId,
-        messageType: this.getMessageType(message),
+        messageType: getMessageType(message),
         direction: 'incoming',
         telegramMessageId: message.message_id,
         fileId: message.voice?.file_id || message.photo?.[0]?.file_id || message.document?.file_id,
@@ -106,7 +98,7 @@ export class TopicService {
       const dataIn = JSON.stringify({
         humanId: human.id,
         telegramId: userId,
-        messageType: this.getMessageType(message),
+        messageType: getMessageType(message),
         direction: 'outgoing',
         telegramMessageId: message.message_id,
         fileId: message.voice?.file_id || message.photo?.[0]?.file_id || message.document?.file_id,

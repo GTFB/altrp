@@ -2,6 +2,7 @@ import type { Env } from './worker';
 import { KVStorageService } from './kv-storage-service';
 import { D1StorageService, type Human } from './d1-storage-service';
 import { MessageService } from '../core/message-service';
+import { MessageLoggingService } from '../core/message-logging-service';
 import { TopicService } from '../core/topic-service';
 //import { SessionService } from '../core/session-service';
 import { UserContextManager, type UserContext } from '../core/user-context';
@@ -76,6 +77,7 @@ export class TelegramBotWorker {
   private env: Env;
   //private kvStorage: KVStorageService;
   private d1Storage: D1StorageService;
+  private messageLoggingService: MessageLoggingService;
   private messageService: MessageService;
   private topicService: TopicService;
   //private sessionService: SessionService;
@@ -88,9 +90,15 @@ export class TelegramBotWorker {
     this.env = env;
     //this.kvStorage = kvStorage;
     this.d1Storage = new D1StorageService(env.DB);
+    
+    // Create message logging service
+    this.messageLoggingService = new MessageLoggingService({
+      d1Storage: this.d1Storage
+    });
+    
     this.messageService = new MessageService({
       botToken: env.BOT_TOKEN,
-      d1Storage: this.d1Storage
+      messageLoggingService: this.messageLoggingService
     });
     this.topicService = new TopicService({
       botToken: env.BOT_TOKEN,
@@ -306,7 +314,7 @@ export class TelegramBotWorker {
 
     // Log message
     if (human.id) {
-      await this.messageService.logMessage(message, 'incoming', human.id);
+      await this.messageLoggingService.logMessage(message, 'incoming', human.id);
     }
 
     // Get or create human context
