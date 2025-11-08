@@ -1,4 +1,5 @@
 import { D1StorageService } from '../worker/d1-storage-service';
+import { Human } from '../models/Human';
 
 export interface UserContext {
   userId: number;
@@ -21,9 +22,14 @@ export interface UserContext {
 
 export class UserContextManager {
   private d1Storage: D1StorageService | null = null;
+  private humanModel: Human | null = null;
   
   setD1Storage(d1Storage: D1StorageService): void {
     this.d1Storage = d1Storage;
+  }
+
+  setHumanModel(humanModel: Human): void {
+    this.humanModel = humanModel;
   }
 
   async getContext(telegramId: number): Promise<UserContext | null> {
@@ -33,7 +39,11 @@ export class UserContextManager {
     }
     
     try {
-      const human = await this.d1Storage.getHumanByTelegramId(telegramId);
+      if (!this.humanModel) {
+        console.error('❌ HumanModel not initialized');
+        return null;
+      }
+      const human = await this.humanModel.getHumanByTelegramId(telegramId);
       if (!human || !human.id) {
         console.log(`⚠️ Human ${telegramId} not found in database`);
         return null;
@@ -226,7 +236,11 @@ export class UserContextManager {
     };
     
     // Get existing human to preserve other data_in fields
-    const human = await this.d1Storage.getHumanByTelegramId(context.telegramId);
+    if (!this.humanModel) {
+      console.error('❌ HumanModel not initialized');
+      return;
+    }
+    const human = await this.humanModel.getHumanByTelegramId(context.telegramId);
     let dataInObj: any = {};
     
     if (human && human.dataIn) {
@@ -246,7 +260,11 @@ export class UserContextManager {
     dataInObj.context = contextData;
     
     console.log(`💾 Saving context to database for human ${context.telegramId}`);
-    await this.d1Storage.updateHumanDataIn(context.telegramId, JSON.stringify(dataInObj));
+    if (!this.humanModel) {
+      console.error('❌ HumanModel not initialized');
+      return;
+    }
+    await this.humanModel.updateHumanDataIn(context.telegramId, JSON.stringify(dataInObj));
     console.log(`✅ Context saved to database for human ${context.telegramId}`);
   }
 
@@ -268,7 +286,11 @@ export class UserContextManager {
     }
 
     try {
-      const human = await this.d1Storage.getHumanByTelegramId(telegramId);
+      if (!this.humanModel) {
+        console.error('❌ HumanModel not initialized');
+        return null;
+      }
+      const human = await this.humanModel.getHumanByTelegramId(telegramId);
       
       // Extract language from data_in JSON
       let userLanguage: string | undefined;

@@ -3,9 +3,11 @@ import type { TelegramMessage, TelegramCallbackQuery } from '../worker/bot';
 import { getMessageType } from '../helpers/getMessageType';
 import { generateUuidV4 } from '../helpers/generateUuidV4';
 import { generateAid } from '../helpers/generateAid';
+import { Human } from '../models/Human';
 
 export interface MessageLoggingServiceConfig {
   d1Storage: D1StorageService;
+  humanModel: Human;
 }
 
 /**
@@ -14,9 +16,11 @@ export interface MessageLoggingServiceConfig {
  */
 export class MessageLoggingService {
   private d1Storage: D1StorageService;
+  private humanModel: Human;
 
   constructor(config: MessageLoggingServiceConfig) {
     this.d1Storage = config.d1Storage;
+    this.humanModel = config.humanModel;
   }
 
   /**
@@ -191,7 +195,7 @@ export class MessageLoggingService {
   async logMessageToTopic(userId: number, topicId: number, message: TelegramMessage): Promise<void> {
     try {
       // Get human to get haid and id
-      const human = await this.d1Storage.getHumanByTelegramId(userId);
+      const human = await this.humanModel.getHumanByTelegramId(userId);
       if (!human || !human.id || !human.haid) {
         console.warn(`Human ${userId} not found or has no haid, skipping message logging`);
         return;
@@ -233,7 +237,7 @@ export class MessageLoggingService {
   async logMessageFromTopic(userId: number, topicId: number, message: TelegramMessage): Promise<void> {
     try {
       // Get human to get haid and id
-      const human = await this.d1Storage.getHumanByTelegramId(userId);
+      const human = await this.humanModel.getHumanByTelegramId(userId);
       if (!human || !human.id || !human.haid) {
         console.warn(`Human ${userId} not found or has no haid, skipping message logging`);
         return;

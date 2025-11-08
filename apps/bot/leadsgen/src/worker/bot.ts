@@ -1,9 +1,10 @@
 import type { Env } from './worker';
 //import { KVStorageService } from './kv-storage-service';
-import { D1StorageService, type Human } from './d1-storage-service';
+import { D1StorageService } from './d1-storage-service';
 import { MessageService } from '../core/message-service';
 import { MessageLoggingService } from '../core/message-logging-service';
 import { TopicService } from '../core/topic-service';
+import { Human } from '../models/Human';
 //import { SessionService } from '../core/session-service';
 import { UserContextManager, type UserContext } from '../core/user-context';
 import { FlowEngine } from '../core/flow-engine';
@@ -77,6 +78,7 @@ export class TelegramBotWorker {
   private env: Env;
   //private kvStorage: KVStorageService;
   private d1Storage: D1StorageService;
+  private humanModel: Human;
   private messageLoggingService: MessageLoggingService;
   private messageService: MessageService;
   private topicService: TopicService;
@@ -91,9 +93,14 @@ export class TelegramBotWorker {
     //this.kvStorage = kvStorage;
     this.d1Storage = new D1StorageService(env.DB);
     
+    // Create human model
+    this.humanModel = new Human({ db: env.DB });
+    this.d1Storage.setHumanModel(this.humanModel);
+    
     // Create message logging service
     this.messageLoggingService = new MessageLoggingService({
-      d1Storage: this.d1Storage
+      d1Storage: this.d1Storage,
+      humanModel: this.humanModel
     });
     
     this.messageService = new MessageService({
@@ -113,6 +120,7 @@ export class TelegramBotWorker {
     // Initialize new components
     this.userContextManager = new UserContextManager();
     this.userContextManager.setD1Storage(this.d1Storage);
+    this.userContextManager.setHumanModel(this.humanModel);
     
     // Initialize i18n service
     //this.i18nService = new I18nService(env.LOCALE);
@@ -130,6 +138,7 @@ export class TelegramBotWorker {
     // Создаем адаптер для совместимости с BotInterface
     const botAdapter = {
       d1Storage: this.d1Storage,
+      humanModel: this.humanModel,
       flowEngine: this.flowEngine,
       env: this.env,
       messageService: this.messageService,
@@ -148,7 +157,7 @@ export class TelegramBotWorker {
    */
   private async getDbUserId(telegramUserId: number): Promise<number | null> {
     try {
-      const human = await this.d1Storage.getHumanByTelegramId(telegramUserId);
+      const human = await this.humanModel.getHumanByTelegramId(telegramUserId);
       return human && human.id ? human.id : null;
     } catch (error) {
       console.error(`Error getting DB human ID for Telegram user ${telegramUserId}:`, error);
@@ -296,14 +305,14 @@ export class TelegramBotWorker {
       // Otherwise, forward message to human (normal topic behavior)
       await this.topicService.handleMessageFromTopic(
         message, 
-        this.d1Storage.getHumanTelegramIdByTopic.bind(this.d1Storage),
+        this.humanModel.getHumanTelegramIdByTopic.bind(this.humanModel),
         this.getDbUserId.bind(this)
       );
       return;
     }
 
     // Get dbHumanId for logging
-    const human = await this.d1Storage.getHumanByTelegramId(message.from.id);
+    const human = await this.humanModel.getHumanByTelegramId(message.from.id);
     if (!human) {
       console.error(`Human ${message.from.id} not found in database for logging`);
       return;
@@ -358,7 +367,7 @@ export class TelegramBotWorker {
     }
 
     // Get dbHumanId for logging
-    const human = await this.d1Storage.getHumanByTelegramId(callbackQuery.from.id);
+    const human = await this.humanModel.getHumanByTelegramId(callbackQuery.from.id);
     if (!human) {
       console.error(`Human ${callbackQuery.from.id} not found in database for logging`);
       return;
@@ -454,7 +463,7 @@ export class TelegramBotWorker {
     const userId = message.from.id;
 
     // Get human information
-    const human = await this.d1Storage.getHumanByTelegramId(userId);
+    const human = await this.humanModel.getHumanByTelegramId(userId);
     
     if (!human) {
       console.log(`Human ${userId} not found`);
@@ -463,11 +472,11 @@ export class TelegramBotWorker {
     
     // Extract topicId from data_in JSON
     let topicId: number | undefined;
-    let dataInObj = null;
+    let dataInObj: any = null;
     if (human.dataIn) {
       try {
         dataInObj = JSON.parse(human.dataIn);
-        topicId = dataInObj.topic_id;
+        topicId = dataInObj?.topic_id;
       } catch (e) {
         console.warn(`Failed to parse data_in for human ${userId}, topic_id not available`);
       }
@@ -481,11 +490,11 @@ export class TelegramBotWorker {
       await this.topicService.forwardMessageToUserTopic(userId, topicId, message);
       console.log(`📬 Message forwarded to topic for human ${userId}`);
 
-      console.log(`human.dataIn ${userId}`, dataInObj.ai_enabled, dataInObj.dataIn);
+      console.log(`human.dataIn ${userId}`, dataInObj?.ai_enabled, dataInObj?.dataIn);
 
       // Get handlers and call handleConsultantTopicMessage
       const handlers = this.flowEngine['customHandlers'] || {};
-      if (handlers.handleConsultantTopicMessage && dataInObj.topic_id && dataInObj.ai_enabled) {
+      if (handlers.handleConsultantTopicMessage && dataInObj?.topic_id && dataInObj?.ai_enabled) {
         await handlers.handleConsultantTopicMessage(message);
       }
 
