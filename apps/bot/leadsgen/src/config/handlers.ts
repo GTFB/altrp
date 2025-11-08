@@ -28,6 +28,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
   const handlerWorker = {
     d1Storage: worker['d1Storage'],
     humanRepository: worker['humanRepository'],
+    messageThreadRepository: worker['messageThreadRepository'],
     flowEngine: worker['flowEngine'],
     env: worker['env'],
     messageService: worker['messageService'],
@@ -76,6 +77,27 @@ export const createCustomHandlers = (worker: BotInterface) => {
         
         // Update human reference
         existingHuman = await handlerWorker.humanRepository.getHumanByTelegramId(userId);
+      
+        // Create message_threads entry if topic was created and human has haid
+        if (topicId && existingHuman && existingHuman.haid) {
+          const topicName = fullName;
+          const threadDataIn = JSON.stringify({
+            prompt: "You are a technical support assistant providing troubleshooting help and technical guidance. Help users resolve technical issues, understand software functionality, and navigate system features. Always clarify that your assistance is for general troubleshooting and encourage users to contact official support channels for complex issues, account problems, or security concerns. Keep your answers brief and concise. Format your responses using HTML tags for Telegram only from this list: use <b> for bold, <i> for italics, <u> for underscores, <code> for code, and <a href=\"url\"> for links DO NOT use <br> tag.",
+            model: "gemini-2.5-flash",
+            context_length: 6
+          });
+          
+          await handlerWorker.messageThreadRepository.addMessageThread({
+            value: topicId.toString(),
+            dataIn: threadDataIn,
+            xaid: existingHuman.haid,
+            statusName: 'active',
+            type: 'leadsgen',
+            title: topicName
+          });
+          
+          console.log(`✅ Message thread created for topic ${topicId}`);
+        }
       }
 
       if (!existingHuman || !existingHuman.id) {

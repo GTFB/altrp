@@ -42,11 +42,12 @@ export class MessageThreadRepository {
    * Add message thread to database
    */
   async addMessageThread(thread: MessageThreadData): Promise<number> {
-    console.log(`Adding message thread ${thread.maid} to D1 database`);
+    const uuid = generateUuidV4();
+    const maid = generateAid('m');
+    
+    console.log(`Adding message thread ${maid} to D1 database`);
 
     try {
-      const uuid = thread.uuid || generateUuidV4();
-
       const result = await this.db.prepare(`
         INSERT INTO message_threads (
           uuid, maid, parent_maid, title, status_name, type,
@@ -56,7 +57,7 @@ export class MessageThreadRepository {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).bind(
         uuid,
-        thread.maid,
+        maid,
         thread.parentMaid || null,
         thread.title || null,
         thread.statusName || null,
@@ -69,10 +70,10 @@ export class MessageThreadRepository {
         thread.dataIn || null
       ).run();
 
-      console.log(`Message thread ${thread.maid} added to D1 database with ID: ${result.meta.last_row_id}`);
+      console.log(`Message thread ${maid} added to D1 database with ID: ${result.meta.last_row_id}`);
       return result.meta.last_row_id as number;
     } catch (error) {
-      console.error(`Error adding message thread ${thread.maid}:`, error);
+      console.error(`Error adding message thread ${maid}:`, error);
       throw error;
     }
   }

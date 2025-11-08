@@ -1,6 +1,7 @@
 import type { Env } from './worker';
 import { HumanRepository } from '../repositories/HumanRepository';
 import { MessageRepository } from '../repositories/MessageRepository';
+import { MessageThreadRepository } from '../repositories/MessageThreadRepository';
 import { FlowEngine } from '../core/flow-engine';
 import { TopicService } from '../core/topic-service';
 import { D1StorageService } from './d1-storage-service';
@@ -78,6 +79,7 @@ export class TelegramBotWorker {
   private d1Storage: D1StorageService;
   private humanRepository: HumanRepository;
   private messageRepository: MessageRepository;
+  private messageThreadRepository: MessageThreadRepository;
   private messageLoggingService: MessageLoggingService;
   private messageService: MessageService;
   private topicService: TopicService;
@@ -97,6 +99,9 @@ export class TelegramBotWorker {
     
     // Create message model
     this.messageRepository = new MessageRepository({ db: env.DB, humanRepository: this.humanRepository });
+    
+    // Create message thread repository
+    this.messageThreadRepository = new MessageThreadRepository({ db: env.DB, d1Storage: this.d1Storage });
     
     // Create message logging service
     this.messageLoggingService = new MessageLoggingService({
@@ -141,6 +146,7 @@ export class TelegramBotWorker {
     const botAdapter = {
       d1Storage: this.d1Storage,
       humanRepository: this.humanRepository,
+      messageThreadRepository: this.messageThreadRepository,
       flowEngine: this.flowEngine,
       env: this.env,
       messageService: this.messageService,
