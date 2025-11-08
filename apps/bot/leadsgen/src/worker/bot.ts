@@ -1,17 +1,14 @@
 import type { Env } from './worker';
-//import { KVStorageService } from './kv-storage-service';
+import { HumanRepository } from '../repositories/HumanRepository';
+import { MessageRepository } from '../repositories/MessageRepository';
+import { FlowEngine } from '../core/flow-engine';
+import { TopicService } from '../core/topic-service';
 import { D1StorageService } from './d1-storage-service';
 import { MessageService } from '../core/message-service';
-import { MessageLoggingService } from '../core/message-logging-service';
-import { TopicService } from '../core/topic-service';
-import { Human } from '../repositories/Human';
-import { Message } from '../repositories/Message';
-//import { SessionService } from '../core/session-service';
-import { UserContextManager, type UserContext } from '../core/user-context';
-import { FlowEngine } from '../core/flow-engine';
-//import { I18nService } from '../core/i18n';
 import { createCustomHandlers } from '../config/handlers';
 import { commands, findCommand } from '../config/commands';
+import { MessageLoggingService } from '../core/message-logging-service';
+import { UserContextManager, type UserContext } from '../core/user-context';
 
 export interface TelegramUpdate {
   update_id: number;
@@ -79,8 +76,8 @@ export class TelegramBotWorker {
   private env: Env;
   //private kvStorage: KVStorageService;
   private d1Storage: D1StorageService;
-  private humanModel: Human;
-  private messageModel: Message;
+  private humanModel: HumanRepository;
+  private messageModel: MessageRepository;
   private messageLoggingService: MessageLoggingService;
   private messageService: MessageService;
   private topicService: TopicService;
@@ -96,10 +93,10 @@ export class TelegramBotWorker {
     this.d1Storage = new D1StorageService(env.DB);
     
     // Create human model
-    this.humanModel = new Human({ db: env.DB });
+    this.humanModel = new HumanRepository({ db: env.DB });
     
     // Create message model
-    this.messageModel = new Message({ db: env.DB, humanModel: this.humanModel });
+    this.messageModel = new MessageRepository({ db: env.DB, humanModel: this.humanModel });
     
     // Create message logging service
     this.messageLoggingService = new MessageLoggingService({

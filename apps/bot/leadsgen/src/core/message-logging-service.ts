@@ -3,13 +3,13 @@ import type { TelegramMessage, TelegramCallbackQuery } from '../worker/bot';
 import { getMessageType } from '../helpers/getMessageType';
 import { generateUuidV4 } from '../helpers/generateUuidV4';
 import { generateAid } from '../helpers/generateAid';
-import { Human } from '../repositories/Human';
-import { Message } from '../repositories/Message';
+import { HumanRepository } from '../repositories/HumanRepository';
+import { MessageRepository } from '../repositories/MessageRepository';
 
 export interface MessageLoggingServiceConfig {
   d1Storage: D1StorageService;
-  humanModel: Human;
-  messageModel: Message;
+  humanModel: HumanRepository;
+  messageModel: MessageRepository;
 }
 
 /**
@@ -18,8 +18,8 @@ export interface MessageLoggingServiceConfig {
  */
 export class MessageLoggingService {
   private d1Storage: D1StorageService;
-  private humanModel: Human;
-  private messageModel: Message;
+  private humanModel: HumanRepository;
+  private messageModel: MessageRepository;
 
   constructor(config: MessageLoggingServiceConfig) {
     this.d1Storage = config.d1Storage;

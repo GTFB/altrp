@@ -1,7 +1,7 @@
 import type { D1Database } from '@cloudflare/workers-types';
 import { generateUuidV4 } from '../helpers/generateUuidV4';
 import { generateAid } from '../helpers/generateAid';
-import { Human } from './Human';
+import { HumanRepository } from './HumanRepository';
 
 export interface MessageData {
   id?: number;
@@ -22,15 +22,15 @@ export interface MessageData {
 
 export interface MessageConfig {
   db: D1Database;
-  humanModel: Human;
+  humanModel: HumanRepository;
 }
 
 /**
- * Model for working with messages table
+ * Repository for working with messages table
  */
-export class Message {
+export class MessageRepository {
   private db: D1Database;
-  private humanModel: Human;
+  private humanModel: HumanRepository;
 
   constructor(config: MessageConfig) {
     this.db = config.db;

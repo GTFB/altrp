@@ -1,5 +1,5 @@
 import { D1StorageService } from '../worker/d1-storage-service';
-import { Human } from '../repositories/Human';
+import { HumanRepository } from '../repositories/HumanRepository';
 
 export interface UserContext {
   userId: number;
@@ -22,13 +22,13 @@ export interface UserContext {
 
 export class UserContextManager {
   private d1Storage: D1StorageService | null = null;
-  private humanModel: Human | null = null;
+  private humanModel: HumanRepository | null = null;
   
   setD1Storage(d1Storage: D1StorageService): void {
     this.d1Storage = d1Storage;
   }
 
-  setHumanModel(humanModel: Human): void {
+  setHumanModel(humanModel: HumanRepository): void {
     this.humanModel = humanModel;
   }
 

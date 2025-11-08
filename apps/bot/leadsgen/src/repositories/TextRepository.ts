@@ -25,9 +25,9 @@ export interface TextConfig {
 }
 
 /**
- * Model for working with texts table
+ * Repository for working with texts table
  */
-export class Text {
+export class TextRepository {
   private db: D1Database;
 
   constructor(config: TextConfig) {

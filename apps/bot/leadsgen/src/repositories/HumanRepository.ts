@@ -30,9 +30,9 @@ export interface HumanConfig {
 }
 
 /**
- * Model for working with humans table
+ * Repository for working with humans table
  */
-export class Human {
+export class HumanRepository {
   private db: D1Database;
 
   constructor(config: HumanConfig) {
