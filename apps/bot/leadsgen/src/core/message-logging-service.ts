@@ -3,8 +3,8 @@ import type { TelegramMessage, TelegramCallbackQuery } from '../worker/bot';
 import { getMessageType } from '../helpers/getMessageType';
 import { generateUuidV4 } from '../helpers/generateUuidV4';
 import { generateAid } from '../helpers/generateAid';
-import { Human } from '../models/Human';
-import { Message } from '../models/Message';
+import { Human } from '../repositories/Human';
+import { Message } from '../repositories/Message';
 
 export interface MessageLoggingServiceConfig {
   d1Storage: D1StorageService;

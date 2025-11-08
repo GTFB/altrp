@@ -1,5 +1,5 @@
 import { D1StorageService } from '../worker/d1-storage-service';
-import { Human } from '../models/Human';
+import { Human } from '../repositories/Human';
 
 export interface UserContext {
   userId: number;
