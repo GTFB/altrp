@@ -36,7 +36,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
   
   return {
     /**
-     * Handle /start command - initialize consultants
+     * Handle /start command
      */
     handleStartCommand: async (message: any, bot: any) => {
       const userId = message.from.id;
