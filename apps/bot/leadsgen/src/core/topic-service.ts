@@ -1,6 +1,7 @@
 import { MessageService } from './message-service';
 import type { TelegramMessage, TelegramUser } from '../worker/bot';
-import { generateUuidV4, generateFullId } from '../core/helpers';
+import { generateUuidV4 } from '../helpers/generateUuidV4';
+import { generateAid } from '../helpers/generateAid';
 
 export interface TopicServiceConfig {
   botToken: string;
@@ -50,7 +51,7 @@ export class TopicService {
       }
 
       const uuid = generateUuidV4();
-      const fullMaid = generateFullId('m');
+      const fullMaid = generateAid('m');
       const maid = human.haid;
 
       // Prepare title (content) and data_in
@@ -97,7 +98,7 @@ export class TopicService {
       }
 
       const uuid = generateUuidV4();
-      const fullMaid = generateFullId('m');
+      const fullMaid = generateAid('m');
       const maid = human.haid;
 
       // Prepare title (content) and data_in

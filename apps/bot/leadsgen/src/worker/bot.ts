@@ -7,7 +7,6 @@ import { TopicService } from '../core/topic-service';
 import { UserContextManager, type UserContext } from '../core/user-context';
 import { FlowEngine } from '../core/flow-engine';
 //import { I18nService } from '../core/i18n';
-import { isVKLink, normalizeVKLink } from '../core/helpers';
 import { createCustomHandlers } from '../config/handlers';
 import { commands, findCommand } from '../config/commands';
 

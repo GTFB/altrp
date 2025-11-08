@@ -1,5 +1,6 @@
 import { D1Database } from '@cloudflare/workers-types';
-import { generateUuidV4, generateAid, generateFullId } from '../core/helpers';
+import { generateUuidV4 } from '../helpers/generateUuidV4';
+import { generateAid } from '../helpers/generateAid';
 
 export interface User {
   id?: number; // Auto-increment ID from users table
@@ -796,53 +797,6 @@ export class D1StorageService {
     }
   }
 
-  // Methods for working with courses and groups (if needed)
-  async getCourses(): Promise<any[]> {
-    try {
-      const results = await this.db.prepare(`
-        SELECT * FROM courses ORDER BY name
-      `).all();
-
-      return results.results;
-    } catch (error) {
-      console.error('Error getting courses:', error);
-      throw error;
-    }
-  }
-
-  async getGroups(): Promise<any[]> {
-    try {
-      const results = await this.db.prepare(`
-        SELECT g.*, c.name as course_name 
-        FROM groups g 
-        JOIN courses c ON g.course_id = c.id 
-        ORDER BY g.weekday, g.time
-      `).all();
-
-      return results.results;
-    } catch (error) {
-      console.error('Error getting groups:', error);
-      throw error;
-    }
-  }
-
-  async getGroupsByWeekday(weekday: string): Promise<any[]> {
-    try {
-      const results = await this.db.prepare(`
-        SELECT g.*, c.name as course_name 
-        FROM groups g 
-        JOIN courses c ON g.course_id = c.id 
-        WHERE g.weekday = ?
-        ORDER BY g.time
-      `).bind(weekday).all();
-
-      return results.results;
-    } catch (error) {
-      console.error(`Error getting groups for weekday ${weekday}:`, error);
-      throw error;
-    }
-  }
-
   // Methods for working with messages
   async addMessage(message: Message): Promise<number> {
     console.log(`💾 D1: Adding message for user ${message.userId}, type: ${message.messageType}, direction: ${message.direction}`);
@@ -861,7 +815,7 @@ export class D1StorageService {
       }
 
       const uuid = generateUuidV4();
-      const fullMaid = generateFullId('m');
+      const fullMaid = generateAid('m');
       const maid = human.haid; // Use human's haid as maid to link messages
 
       // Prepare title (content) and data_in

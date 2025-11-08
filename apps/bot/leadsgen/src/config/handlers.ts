@@ -1,6 +1,7 @@
 import { BotInterface } from '../core/bot-interface';
 import { AIService } from '../core/ai-service';
-import { generateUuidV4, generateAid, generateFullId } from '../core/helpers';
+import { generateUuidV4 } from '../helpers/generateUuidV4';
+import { generateAid } from '../helpers/generateAid';
 
 interface Consultant {
   id: number;
@@ -679,7 +680,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
       // Save user message to database FIRST (before AI call)
       // Use consultantMaid in maid field to link messages with message_threads
       const userMessageUuid = generateUuidV4();
-      const userMessageFullMaid = generateFullId('m');
+      const userMessageFullMaid = generateAid('m');
       await handlerWorker.d1Storage.execute(`
         INSERT INTO messages (uuid, maid, full_maid, title, status_name, "order", gin, fts, data_in, xaid)
         VALUES (?, ?, ?, ?, 'active', 0, ?, '', ?, ?)
@@ -742,7 +743,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
       // Use consultantMaid in maid field to link messages with message_threads
       try {
         const aiMessageUuid = generateUuidV4();
-        const aiMessageFullMaid = generateFullId('m');
+        const aiMessageFullMaid = generateAid('m');
         await handlerWorker.d1Storage.execute(`
           INSERT INTO messages (uuid, maid, full_maid, title, status_name, "order", gin, fts, data_in, xaid)
           VALUES (?, ?, ?, ?, 'active', 0, ?, '', ?)
