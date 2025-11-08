@@ -79,18 +79,19 @@ export const onboardingFlow: BotFlow = {
 };
 ```
 
-### 2. **Automatic generation**
+### 2. **Automatic flow registration**
 
 The builder automatically:
 - **Finds all flows** in the `flows/` folder
 - **Generates `index.ts`** with imports
 - **Connects flows** to the engine
-- **Updates configuration** when adding new flows
 
 ```bash
 npm run generate-flows-index
 # ✅ Automatically finds and connects all flows
 ```
+
+**Note:** MDX content generation has been removed - content is now stored in the database.
 
 ### 3. **Ready-made components**
 

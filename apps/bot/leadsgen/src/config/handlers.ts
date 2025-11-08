@@ -165,7 +165,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
         await handlerWorker.d1Storage.updateHumanDataIn(humanTelegramId, JSON.stringify(dataInObj));
 
         // Change topic icon to AI emoji
-        const iconChanged = await handlerWorker.topicService.editTopicIcon(topicId, "5237889595894414384");
+        const iconChanged = await handlerWorker.topicService.editTopicIcon(topicId, "5309832892262654231");
         if (!iconChanged) {
           console.warn(`⚠️ Failed to change topic icon for topic ${topicId}`);
         }

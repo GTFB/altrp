@@ -27,7 +27,8 @@ export default {
     try {
       // Initialize services
       //const storageService = new KVStorageService(env.BZN_BOT_KV);
-      const botWorker = new TelegramBotWorker(env, storageService);
+      //const botWorker = new TelegramBotWorker(env, storageService);
+      const botWorker = new TelegramBotWorker(env);
 
       // Process request
       const response = await botWorker.handleRequest(request);
@@ -45,7 +46,8 @@ export default {
       
       // Initialize services
       //const storageService = new KVStorageService(env.BZN_BOT_KV);
-      const botWorker = new TelegramBotWorker(env, storageService);
+      //const botWorker = new TelegramBotWorker(env, storageService);
+      const botWorker = new TelegramBotWorker(env);
 
       // Check delayed messages
       await botWorker.checkDelayedMessages();

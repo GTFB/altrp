@@ -57,3 +57,4 @@ fs.writeFileSync(indexPath, content, 'utf8');
 
 console.log('✅ Generated index.ts with', files.length, 'flows');
 console.log('📁 Files included:', files.join(', '));
+
