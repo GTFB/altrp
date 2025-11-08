@@ -22,7 +22,7 @@ export interface MessageData {
 
 export interface MessageConfig {
   db: D1Database;
-  humanModel: HumanRepository;
+  humanRepository: HumanRepository;
 }
 
 /**
@@ -30,11 +30,11 @@ export interface MessageConfig {
  */
 export class MessageRepository {
   private db: D1Database;
-  private humanModel: HumanRepository;
+  private humanRepository: HumanRepository;
 
   constructor(config: MessageConfig) {
     this.db = config.db;
-    this.humanModel = config.humanModel;
+    this.humanRepository = config.humanRepository;
   }
 
   /**
@@ -51,7 +51,7 @@ export class MessageRepository {
       }
 
       // Get human to get haid for maid field
-      const human = await this.humanModel.getHumanById(message.userId);
+      const human = await this.humanRepository.getHumanById(message.userId);
       if (!human || !human.haid) {
         throw new Error(`Human with id ${message.userId} not found or has no haid`);
       }

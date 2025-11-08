@@ -76,7 +76,7 @@ export class TelegramBotWorker {
   private env: Env;
   //private kvStorage: KVStorageService;
   private d1Storage: D1StorageService;
-  private humanModel: HumanRepository;
+  private humanRepository: HumanRepository;
   private messageRepository: MessageRepository;
   private messageLoggingService: MessageLoggingService;
   private messageService: MessageService;
@@ -93,15 +93,15 @@ export class TelegramBotWorker {
     this.d1Storage = new D1StorageService(env.DB);
     
     // Create human model
-    this.humanModel = new HumanRepository({ db: env.DB });
+    this.humanRepository = new HumanRepository({ db: env.DB });
     
     // Create message model
-    this.messageRepository = new MessageRepository({ db: env.DB, humanModel: this.humanModel });
+    this.messageRepository = new MessageRepository({ db: env.DB, humanRepository: this.humanRepository });
     
     // Create message logging service
     this.messageLoggingService = new MessageLoggingService({
       d1Storage: this.d1Storage,
-      humanModel: this.humanModel,
+      humanRepository: this.humanRepository,
       messageRepository: this.messageRepository
     });
     
@@ -122,7 +122,7 @@ export class TelegramBotWorker {
     // Initialize new components
     this.userContextManager = new UserContextManager();
     this.userContextManager.setD1Storage(this.d1Storage);
-    this.userContextManager.setHumanModel(this.humanModel);
+    this.userContextManager.setHumanRepository(this.humanRepository);
     
     // Initialize i18n service
     //this.i18nService = new I18nService(env.LOCALE);
@@ -140,7 +140,7 @@ export class TelegramBotWorker {
     // Создаем адаптер для совместимости с BotInterface
     const botAdapter = {
       d1Storage: this.d1Storage,
-      humanModel: this.humanModel,
+      humanRepository: this.humanRepository,
       flowEngine: this.flowEngine,
       env: this.env,
       messageService: this.messageService,
@@ -159,7 +159,7 @@ export class TelegramBotWorker {
    */
   private async getDbUserId(telegramUserId: number): Promise<number | null> {
     try {
-      const human = await this.humanModel.getHumanByTelegramId(telegramUserId);
+      const human = await this.humanRepository.getHumanByTelegramId(telegramUserId);
       return human && human.id ? human.id : null;
     } catch (error) {
       console.error(`Error getting DB human ID for Telegram user ${telegramUserId}:`, error);
@@ -304,14 +304,14 @@ export class TelegramBotWorker {
       // Otherwise, forward message to human (normal topic behavior)
       await this.topicService.handleMessageFromTopic(
         message, 
-        this.humanModel.getHumanTelegramIdByTopic.bind(this.humanModel),
+        this.humanRepository.getHumanTelegramIdByTopic.bind(this.humanRepository),
         this.getDbUserId.bind(this)
       );
       return;
     }
 
     // Get dbHumanId for logging
-    const human = await this.humanModel.getHumanByTelegramId(message.from.id);
+    const human = await this.humanRepository.getHumanByTelegramId(message.from.id);
     if (!human) {
       console.error(`Human ${message.from.id} not found in database for logging`);
       return;
@@ -366,7 +366,7 @@ export class TelegramBotWorker {
     }
 
     // Get dbHumanId for logging
-    const human = await this.humanModel.getHumanByTelegramId(callbackQuery.from.id);
+    const human = await this.humanRepository.getHumanByTelegramId(callbackQuery.from.id);
     if (!human) {
       console.error(`Human ${callbackQuery.from.id} not found in database for logging`);
       return;
@@ -462,7 +462,7 @@ export class TelegramBotWorker {
     const userId = message.from.id;
 
     // Get human information
-    const human = await this.humanModel.getHumanByTelegramId(userId);
+    const human = await this.humanRepository.getHumanByTelegramId(userId);
     
     if (!human) {
       console.log(`Human ${userId} not found`);

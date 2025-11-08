@@ -27,7 +27,7 @@ interface MessageThread {
 export const createCustomHandlers = (worker: BotInterface) => {
   const handlerWorker = {
     d1Storage: worker['d1Storage'],
-    humanModel: worker['humanModel'],
+    humanRepository: worker['humanRepository'],
     flowEngine: worker['flowEngine'],
     env: worker['env'],
     messageService: worker['messageService'],
@@ -45,7 +45,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
       console.log(`🚀 Handling /start command via flow for human ${userId}`);
 
       // Get or create human in database to get dbHumanId
-      let existingHuman = await handlerWorker.humanModel.getHumanByTelegramId(userId);
+      let existingHuman = await handlerWorker.humanRepository.getHumanByTelegramId(userId);
       
       if (!existingHuman) {
         // Create topic in admin group for new human
@@ -71,11 +71,11 @@ export const createCustomHandlers = (worker: BotInterface) => {
           dataIn: dataIn
         };
 
-        await handlerWorker.humanModel.addHuman(newHuman);
+        await handlerWorker.humanRepository.addHuman(newHuman);
         console.log(`✅ New human ${userId} registered for start flow`);
         
         // Update human reference
-        existingHuman = await handlerWorker.humanModel.getHumanByTelegramId(userId);
+        existingHuman = await handlerWorker.humanRepository.getHumanByTelegramId(userId);
       }
 
       if (!existingHuman || !existingHuman.id) {
@@ -118,7 +118,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
 
       try {
         // Find human by topic_id
-        const humanTelegramId = await handlerWorker.humanModel.getHumanTelegramIdByTopic(topicId);
+        const humanTelegramId = await handlerWorker.humanRepository.getHumanTelegramIdByTopic(topicId);
         
         if (!humanTelegramId) {
           console.error(`❌ Human not found for topic ${topicId}`);
@@ -127,7 +127,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
         }
 
         // Get human to access current data_in
-        const human = await handlerWorker.humanModel.getHumanByTelegramId(humanTelegramId);
+        const human = await handlerWorker.humanRepository.getHumanByTelegramId(humanTelegramId);
         
         if (!human) {
           console.error(`❌ Human ${humanTelegramId} not found in database`);
@@ -164,7 +164,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
         dataInObj.ai_enabled = true;
 
         // Update data_in
-        await handlerWorker.humanModel.updateHumanDataIn(humanTelegramId, JSON.stringify(dataInObj));
+        await handlerWorker.humanRepository.updateHumanDataIn(humanTelegramId, JSON.stringify(dataInObj));
 
         // Change topic icon to AI emoji
         const iconChanged = await handlerWorker.topicService.editTopicIcon(topicId, "5309832892262654231");
@@ -203,7 +203,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
 
       try {
         // Find human by topic_id
-        const humanTelegramId = await handlerWorker.humanModel.getHumanTelegramIdByTopic(topicId);
+        const humanTelegramId = await handlerWorker.humanRepository.getHumanTelegramIdByTopic(topicId);
         
         if (!humanTelegramId) {
           console.error(`❌ Human not found for topic ${topicId}`);
@@ -212,7 +212,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
         }
 
         // Get human to access current data_in
-        const human = await handlerWorker.humanModel.getHumanByTelegramId(humanTelegramId);
+        const human = await handlerWorker.humanRepository.getHumanByTelegramId(humanTelegramId);
         
         if (!human) {
           console.error(`❌ Human ${humanTelegramId} not found in database`);
@@ -241,7 +241,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
         dataInObj.ai_enabled = false;
 
         // Update data_in
-        await handlerWorker.humanModel.updateHumanDataIn(humanTelegramId, JSON.stringify(dataInObj));
+        await handlerWorker.humanRepository.updateHumanDataIn(humanTelegramId, JSON.stringify(dataInObj));
 
         // Restore original topic icon
         const originalIcon = dataInObj.original_topic_icon;
@@ -306,7 +306,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
 
       try {
         // Find human by topic_id
-        const humanTelegramId = await handlerWorker.humanModel.getHumanTelegramIdByTopic(topicId);
+        const humanTelegramId = await handlerWorker.humanRepository.getHumanTelegramIdByTopic(topicId);
         
         if (!humanTelegramId) {
           console.error(`❌ Human not found for topic ${topicId}`);
@@ -315,7 +315,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
         }
 
         // Get human to ensure it exists and get context
-        const human = await handlerWorker.humanModel.getHumanByTelegramId(humanTelegramId);
+        const human = await handlerWorker.humanRepository.getHumanByTelegramId(humanTelegramId);
         
         if (!human || !human.id) {
           console.error(`❌ Human ${humanTelegramId} not found in database`);
@@ -324,7 +324,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
         }
 
         // Get or create admin context (admin who runs the command)
-        const adminHuman = await handlerWorker.humanModel.getHumanByTelegramId(userId);
+        const adminHuman = await handlerWorker.humanRepository.getHumanByTelegramId(userId);
         if (!adminHuman || !adminHuman.id) {
           console.error(`❌ Admin ${userId} not found in database`);
           await handlerWorker.messageService.sendMessageToTopic(chatId, topicId, 'Admin not found in database.');
@@ -379,7 +379,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
 
       try {
         // Update human status_name
-        await handlerWorker.humanModel.updateHuman(targetUserId, {
+        await handlerWorker.humanRepository.updateHuman(targetUserId, {
           statusName: statusName
         });
         console.log(`✅ Status updated to "${statusName}" for human ${targetUserId}`);
@@ -626,7 +626,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
       // Read current summary if exists
       let context = '';
 
-      const human = await handlerWorker.humanModel.getHumanByTelegramId(chatId);
+      const human = await handlerWorker.humanRepository.getHumanByTelegramId(chatId);
 
       const dataInObj = JSON.parse(human.dataIn);
 

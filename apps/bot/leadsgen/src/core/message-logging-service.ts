@@ -8,7 +8,7 @@ import { MessageRepository } from '../repositories/MessageRepository';
 
 export interface MessageLoggingServiceConfig {
   d1Storage: D1StorageService;
-  humanModel: HumanRepository;
+  humanRepository: HumanRepository;
   messageRepository: MessageRepository;
 }
 
@@ -18,12 +18,12 @@ export interface MessageLoggingServiceConfig {
  */
 export class MessageLoggingService {
   private d1Storage: D1StorageService;
-  private humanModel: HumanRepository;
+  private humanRepository: HumanRepository;
   private messageRepository: MessageRepository;
 
   constructor(config: MessageLoggingServiceConfig) {
     this.d1Storage = config.d1Storage;
-    this.humanModel = config.humanModel;
+    this.humanRepository = config.humanRepository;
     this.messageRepository = config.messageRepository;
   }
 
@@ -199,7 +199,7 @@ export class MessageLoggingService {
   async logMessageToTopic(userId: number, topicId: number, message: TelegramMessage): Promise<void> {
     try {
       // Get human to get haid and id
-      const human = await this.humanModel.getHumanByTelegramId(userId);
+      const human = await this.humanRepository.getHumanByTelegramId(userId);
       if (!human || !human.id || !human.haid) {
         console.warn(`Human ${userId} not found or has no haid, skipping message logging`);
         return;
@@ -241,7 +241,7 @@ export class MessageLoggingService {
   async logMessageFromTopic(userId: number, topicId: number, message: TelegramMessage): Promise<void> {
     try {
       // Get human to get haid and id
-      const human = await this.humanModel.getHumanByTelegramId(userId);
+      const human = await this.humanRepository.getHumanByTelegramId(userId);
       if (!human || !human.id || !human.haid) {
         console.warn(`Human ${userId} not found or has no haid, skipping message logging`);
         return;

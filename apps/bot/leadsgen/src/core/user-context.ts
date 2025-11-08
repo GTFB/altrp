@@ -22,14 +22,14 @@ export interface UserContext {
 
 export class UserContextManager {
   private d1Storage: D1StorageService | null = null;
-  private humanModel: HumanRepository | null = null;
+  private humanRepository: HumanRepository | null = null;
   
   setD1Storage(d1Storage: D1StorageService): void {
     this.d1Storage = d1Storage;
   }
 
-  setHumanModel(humanModel: HumanRepository): void {
-    this.humanModel = humanModel;
+  setHumanRepository(humanRepository: HumanRepository): void {
+    this.humanRepository = humanRepository;
   }
 
   async getContext(telegramId: number): Promise<UserContext | null> {
@@ -39,11 +39,11 @@ export class UserContextManager {
     }
     
     try {
-      if (!this.humanModel) {
-        console.error('❌ HumanModel not initialized');
+      if (!this.humanRepository) {
+        console.error('❌ HumanRepository not initialized');
         return null;
       }
-      const human = await this.humanModel.getHumanByTelegramId(telegramId);
+      const human = await this.humanRepository.getHumanByTelegramId(telegramId);
       if (!human || !human.id) {
         console.log(`⚠️ Human ${telegramId} not found in database`);
         return null;
@@ -236,11 +236,11 @@ export class UserContextManager {
     };
     
     // Get existing human to preserve other data_in fields
-    if (!this.humanModel) {
+    if (!this.humanRepository) {
       console.error('❌ HumanModel not initialized');
       return;
     }
-    const human = await this.humanModel.getHumanByTelegramId(context.telegramId);
+    const human = await this.humanRepository.getHumanByTelegramId(context.telegramId);
     let dataInObj: any = {};
     
     if (human && human.dataIn) {
@@ -260,11 +260,11 @@ export class UserContextManager {
     dataInObj.context = contextData;
     
     console.log(`💾 Saving context to database for human ${context.telegramId}`);
-    if (!this.humanModel) {
+    if (!this.humanRepository) {
       console.error('❌ HumanModel not initialized');
       return;
     }
-    await this.humanModel.updateHumanDataIn(context.telegramId, JSON.stringify(dataInObj));
+    await this.humanRepository.updateHumanDataIn(context.telegramId, JSON.stringify(dataInObj));
     console.log(`✅ Context saved to database for human ${context.telegramId}`);
   }
 
@@ -286,11 +286,11 @@ export class UserContextManager {
     }
 
     try {
-      if (!this.humanModel) {
-        console.error('❌ HumanModel not initialized');
+      if (!this.humanRepository) {
+        console.error('❌ HumanRepository not initialized');
         return null;
       }
-      const human = await this.humanModel.getHumanByTelegramId(telegramId);
+      const human = await this.humanRepository.getHumanByTelegramId(telegramId);
       
       // Extract language from data_in JSON
       let userLanguage: string | undefined;
