@@ -154,22 +154,31 @@ export class MessageRepository {
 
   /**
    * Get recent messages by maid, xaid and status_name
-   * Returns messages ordered by created_at DESC with limit
+   * Returns messages ordered by created_at DESC with optional limit
+   * If limit is not provided, returns all matching messages
    */
   async getRecentMessages(
     maid: string, 
     xaid: string, 
     statusName: string = 'text', 
-    limit: number = 6
+    limit?: number
   ): Promise<Array<{ title: string; created_at: string; data_in: string }>> {
     try {
-      const result = await this.db.prepare(`
+      let query = `
         SELECT title, created_at, data_in 
         FROM messages 
         WHERE status_name = ? AND maid = ? AND xaid = ?
         ORDER BY created_at DESC
-        LIMIT ?
-      `).bind(statusName, maid, xaid, limit).all();
+      `;
+      
+      const params: any[] = [statusName, maid, xaid];
+      
+      if (limit !== undefined) {
+        query += ` LIMIT ?`;
+        params.push(limit);
+      }
+      
+      const result = await this.db.prepare(query).bind(...params).all();
 
       if (!result.success || !result.results) {
         return [];
@@ -182,6 +191,41 @@ export class MessageRepository {
       }));
     } catch (error) {
       console.error(`❌ Error getting recent messages:`, error);
+      return [];
+    }
+  }
+
+  /**
+   * Get all messages by maid, xaid and status_name
+   * Returns messages ordered by created_at ASC (for summary generation)
+   * Includes uuid and full_maid fields needed for summary tracking
+   */
+  async getAllMessagesByMaid(
+    maid: string,
+    xaid: string,
+    statusName: string = 'text'
+  ): Promise<Array<{ uuid: string; full_maid: string; title: string; data_in: string; created_at: string }>> {
+    try {
+      const result = await this.db.prepare(`
+        SELECT uuid, full_maid, title, data_in, created_at
+        FROM messages
+        WHERE status_name = ? AND maid = ? AND xaid = ?
+        ORDER BY created_at ASC
+      `).bind(statusName, maid, xaid).all();
+
+      if (!result.success || !result.results) {
+        return [];
+      }
+
+      return result.results.map((row: any) => ({
+        uuid: row.uuid as string || '',
+        full_maid: row.full_maid as string || '',
+        title: row.title as string || '',
+        data_in: row.data_in as string || '',
+        created_at: row.created_at as string || ''
+      }));
+    } catch (error) {
+      console.error(`❌ Error getting all messages by maid:`, error);
       return [];
     }
   }

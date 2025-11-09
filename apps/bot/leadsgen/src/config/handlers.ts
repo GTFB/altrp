@@ -873,6 +873,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
       }
 
       // Send AI response to topic
+      //TO DO disable logging this messages
       try {
         console.log(`📤 Sending AI response to topic ${humanTopicId}`);
         await handlerWorker.messageService.sendMessage(
@@ -893,6 +894,150 @@ ${aiResponse}`
         console.error('❌ Error sending AI response to topic:', error);
         // Don't return here - summary check should still happen
       }
+
+      // ================== CREATE / UPDATE SUMMARY ==================
+      try {
+        console.log('Start summarization logic...');
+
+        const MAX_MESSAGES_FOR_SUMMARY = 10; // can change
+        const allMessages = await handlerWorker.messageRepository.getAllMessagesByMaid(
+          consultantMaid,
+          human.haid,
+          'text'
+        );
+
+        const totalMessages = allMessages.length;
+        const contextLength = validatedContextLength;
+        const currentSummaryVersion = settingsJson.summary_version || 0;
+        const latestSummaryVersion = Math.floor(totalMessages / contextLength);
+
+        if (latestSummaryVersion <= currentSummaryVersion) {
+          console.log('⛔️ No new messages for Summary, skip it.');
+          return;
+        }
+
+        // Calculating the message range for summary
+        let startIndex = currentSummaryVersion * contextLength;
+        let endIndex = latestSummaryVersion * contextLength;
+
+        // Limiting the batch of recent messages to MAX_MESSAGES_FOR_SUMMARY
+        if (endIndex - startIndex > MAX_MESSAGES_FOR_SUMMARY) {
+          startIndex = endIndex - MAX_MESSAGES_FOR_SUMMARY;
+        }
+
+        const messagesToSummarize = allMessages
+          .slice(startIndex, endIndex)
+          .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+
+        if (messagesToSummarize.length === 0) {
+          console.log('⛔️ There are no messages to create summary after filtering');
+          return;
+        }
+
+        // We collect the text of messages for the model
+        const messagesText = messagesToSummarize
+          .map(msg => {
+            const text = (msg.title || '').trim();
+            if (!text) return '';
+            
+            // Parse data_in to determine message direction (same logic as lines 716-749)
+            let direction = 'incoming'; // Default to incoming (User)
+            try {
+              if (msg.data_in) {
+                const dataInObj = JSON.parse(msg.data_in);
+                direction = dataInObj.direction || 'incoming';
+                
+                // Check if this is AI response
+                if (dataInObj.data) {
+                  try {
+                    const dataObj = JSON.parse(dataInObj.data);
+                    if (dataObj.isAIResponse) {
+                      return `Assistant: ${text}`;
+                    }
+                  } catch (e) {
+                    // Ignore parse errors for nested data
+                  }
+                }
+              }
+            } catch (e) {
+              console.warn('Failed to parse data_in for message:', msg.full_maid);
+            }
+            
+            // Add prefix based on direction
+            const prefix = direction === 'outgoing' ? 'Assistant' : 'User';
+            return `${prefix}: ${text}`;
+          })
+          .filter(Boolean)
+          .join('\n\n');
+
+        // Creating a prompt for AI
+        const summaryPrompt = currentSummaryVersion === 0 || !historySummaryText
+          ? [
+              `Summarize the first ${messagesToSummarize.length} messages of the conversation briefly and informatively.`,
+              'Preserve facts, agreements, intentions, definitions and terms.',
+              'Do not make up facts. Use neutral tone.',
+              'IMPORTANT: Complete all sentences fully. Do not cut phrases in the middle.',
+              '',
+              'Messages:',
+              messagesText
+            ].join('\n')
+          : [
+              'Summarize the conversation briefly and informatively.',
+              'Preserve facts, agreements, intentions, definitions and terms.',
+              'Do not make up facts. Use neutral tone.',
+              'IMPORTANT: Complete all sentences fully. Do not cut phrases in the middle.',
+              '',
+              'Previous summary:',
+              historySummaryText,
+              '',
+              `New ${messagesToSummarize.length} replies to add:`,
+              messagesText,
+              '',
+              'Merge the previous summary with new replies into one complete summary. Each sentence must be completed.'
+            ].join('\n');
+
+        const aiServiceForSummary = new AIService(handlerWorker.env.AI_API_URL, aiApiToken);
+        let newSummaryText = await aiServiceForSummary.ask(validatedModel, summaryPrompt);
+
+        // Trim incomplete sentences
+        newSummaryText = newSummaryText.trim();
+        const lastChar = newSummaryText.slice(-1);
+        if (!['.', '!', '?', '\n'].includes(lastChar)) {
+          const lastSentenceEnd = Math.max(
+            newSummaryText.lastIndexOf('.'),
+            newSummaryText.lastIndexOf('!'),
+            newSummaryText.lastIndexOf('?'),
+            newSummaryText.lastIndexOf('\n')
+          );
+          if (lastSentenceEnd > 0 && (newSummaryText.length - lastSentenceEnd) < 200) {
+            newSummaryText = newSummaryText.substring(0, lastSentenceEnd + 1).trim();
+            console.log('⚠️ Trimmed incomplete summary to last complete sentence');
+          }
+        }
+
+        // Last batch message
+        const lastMessage = messagesToSummarize[messagesToSummarize.length - 1];
+        const lastMessageFullMaid = lastMessage?.full_maid || null;
+
+        // Updating settingsJson
+        settingsJson.history_summary = { text: newSummaryText, version: latestSummaryVersion };
+        settingsJson.history_summary_last_full_maid = lastMessageFullMaid;
+        settingsJson.summary_version = latestSummaryVersion;
+        settingsJson.history_summary_updated_at = new Date().toISOString();
+
+        // Update message thread using repository
+        if (!consultant.id) {
+          throw new Error('Consultant id is missing');
+        }
+        await handlerWorker.messageThreadRepository.updateMessageThread(consultant.id, {
+          dataIn: JSON.stringify(settingsJson)
+        });
+
+        console.log(`✅ Summary updated to version ${latestSummaryVersion}`);
+      } catch (error) {
+        console.error('❌ Error creating summary after AI response:', error);
+      }
+
       
     } catch (error) {
       console.error('❌ Error in handleConsultantTopicMessage:', error);
