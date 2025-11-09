@@ -29,6 +29,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
   const handlerWorker = {
     d1Storage: worker['d1Storage'],
     humanRepository: worker['humanRepository'],
+    messageRepository: worker['messageRepository'],
     messageThreadRepository: worker['messageThreadRepository'],
     flowEngine: worker['flowEngine'],
     env: worker['env'],
@@ -801,24 +802,27 @@ export const createCustomHandlers = (worker: BotInterface) => {
         return;
       }
 
-      // Save AI response to database
+      // Save AI response to database using MessageRepository
       // Use consultantMaid in maid field to link messages with message_threads
       try {
-        const aiMessageUuid = generateUuidV4();
-        const aiMessageFullMaid = generateAid('m');
-        await handlerWorker.d1Storage.execute(`
-          INSERT INTO messages (uuid, maid, full_maid, title, status_name, "order", gin, fts, data_in, xaid)
-          VALUES (?, ?, ?, ?, 'text', 0, ?, '', ?)
-        `, [
-          aiMessageUuid,
-          consultantMaid, // Link to message_threads via maid
-          aiMessageFullMaid,
-          aiResponse,
-          consultantMaid, // Use maid for grouping (gin is redundant)
-          JSON.stringify({ consultant: consultantMaid, response: aiResponse, createdAt: new Date().toISOString() }),
-          human.haid,
-        ]);
-        console.log(`✅ AI message saved: ${aiMessageFullMaid} (linked to consultant ${consultantMaid})`);
+        if (!human.id) {
+          throw new Error(`Human ${chatId} has no id`);
+        }
+
+        await handlerWorker.messageRepository.addMessage({
+          humanId: human.id,
+          messageType: 'bot_text',
+          direction: 'outgoing',
+          content: aiResponse,
+          statusName: 'text',
+          data: JSON.stringify({ 
+            consultant: consultantMaid, 
+            response: aiResponse, 
+            isAIResponse: true,
+            createdAt: new Date().toISOString() 
+          })
+        });
+        console.log(`✅ AI message saved (linked to consultant ${consultantMaid})`);
       } catch (error) {
         console.error('❌ Error saving AI response to database:', error);
         // Continue execution to send response even if DB save fails

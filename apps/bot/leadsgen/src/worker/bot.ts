@@ -151,6 +151,7 @@ export class TelegramBotWorker {
     const botAdapter = {
       d1Storage: this.d1Storage,
       humanRepository: this.humanRepository,
+      messageRepository: this.messageRepository,
       messageThreadRepository: this.messageThreadRepository,
       flowEngine: this.flowEngine,
       env: this.env,
