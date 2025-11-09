@@ -84,7 +84,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
         if (topicId && existingHuman && existingHuman.haid) {
           const topicName = fullName;
           const threadDataIn = JSON.stringify({
-            prompt: "You are a technical support assistant providing troubleshooting help and technical guidance. Help users resolve technical issues, understand software functionality, and navigate system features. Always clarify that your assistance is for general troubleshooting and encourage users to contact official support channels for complex issues, account problems, or security concerns. Keep your answers brief and concise. Format your responses using HTML tags for Telegram only from this list: use <b> for bold, <i> for italics, <u> for underscores, <code> for code, and <a href=\"url\"> for links DO NOT use <br> tag.",
+            prompt: "You are a technical support assistant providing troubleshooting help and technical guidance. Help users resolve technical issues, understand software functionality, and navigate system features. Always clarify that your assistance is for general troubleshooting and encourage users to contact official support channels for complex issues, account problems, or security concerns. Keep your answers brief and concise. Format your responses using HTML tags for Telegram only from this list: use <b> for bold, <i> for italics, <u> for underscores, <code> for code, and <a href=\"url\"> for links DO NOT use <br> tag. Respond clearly only to the user's message, taking into account the context, without unnecessary auxiliary information.",
             model: "gemini-2.5-flash",
             context_length: 6
           });
@@ -599,21 +599,18 @@ export const createCustomHandlers = (worker: BotInterface) => {
 
       // Get consultant (message_thread) from message_threads by topic_id
       // human and humanTopicId already retrieved above
-      const consultantResult = await handlerWorker.d1Storage.execute(`
-      SELECT id, maid, title, data_in 
-      FROM message_threads 
-      WHERE value = ? AND deleted_at IS NULL
-      LIMIT 1
-      `, [humanTopicId.toString()]);
+      const consultant = await handlerWorker.messageThreadRepository.getMessageThreadByValue(
+        humanTopicId.toString(),
+        'leadsgen'
+      );
 
-      if (!consultantResult || consultantResult.length === 0) {
+      if (!consultant) {
         console.log(`No consultant found`);
         return;
       }
 
-      const consultant = consultantResult[0];
-      const consultantMaid = consultant.maid as string;
-      const consultantTitle = consultant.title as string;
+      const consultantMaid = consultant.maid;
+      const consultantTitle = consultant.title || '';
 
       console.log(`Found consultant: ${consultantTitle} (${consultantMaid})`);
 
@@ -627,7 +624,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
       let historySummaryUpdatedAt: string | null = null;
       let historySummaryLastFullMaid: string | null = null;
 
-      if (!consultant.data_in) {
+      if (!consultant.dataIn) {
         console.error(`No data_in found for consultant ${consultantMaid}`);
         await handlerWorker.messageService.sendMessage(
           adminChatId,
@@ -637,7 +634,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
       }
 
       try {
-        settingsJson = JSON.parse(consultant.data_in);
+        settingsJson = JSON.parse(consultant.dataIn);
         
         // Get required settings from data_in - all are mandatory
         prompt = settingsJson.prompt;
@@ -695,13 +692,12 @@ export const createCustomHandlers = (worker: BotInterface) => {
       console.log('Selecting messages:', consultantMaid, human.haid, MESSAGES_FOR_ANSWER)
 
       try {
-        const recentMessages = await handlerWorker.d1Storage.execute(`
-          SELECT title, created_at, data_in 
-          FROM messages 
-          WHERE status_name='text' AND maid = ? AND xaid = ?
-          ORDER BY created_at DESC
-          LIMIT ?
-        `, [consultantMaid, human.haid, MESSAGES_FOR_ANSWER]);
+        const recentMessages = await handlerWorker.messageRepository.getRecentMessages(
+          consultantMaid,
+          human.haid,
+          'text',
+          MESSAGES_FOR_ANSWER
+        );
 
         if (recentMessages && recentMessages.length > 0) {
           // Reverse to get chronological order

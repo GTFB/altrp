@@ -151,5 +151,39 @@ export class MessageRepository {
       throw error;
     }
   }
+
+  /**
+   * Get recent messages by maid, xaid and status_name
+   * Returns messages ordered by created_at DESC with limit
+   */
+  async getRecentMessages(
+    maid: string, 
+    xaid: string, 
+    statusName: string = 'text', 
+    limit: number = 6
+  ): Promise<Array<{ title: string; created_at: string; data_in: string }>> {
+    try {
+      const result = await this.db.prepare(`
+        SELECT title, created_at, data_in 
+        FROM messages 
+        WHERE status_name = ? AND maid = ? AND xaid = ?
+        ORDER BY created_at DESC
+        LIMIT ?
+      `).bind(statusName, maid, xaid, limit).all();
+
+      if (!result.success || !result.results) {
+        return [];
+      }
+
+      return result.results.map((row: any) => ({
+        title: row.title as string || '',
+        created_at: row.created_at as string || '',
+        data_in: row.data_in as string || ''
+      }));
+    } catch (error) {
+      console.error(`❌ Error getting recent messages:`, error);
+      return [];
+    }
+  }
 }
 
