@@ -5,11 +5,13 @@ import { generateUuidV4 } from '../helpers/generateUuidV4';
 import { generateAid } from '../helpers/generateAid';
 import { HumanRepository } from '../repositories/HumanRepository';
 import { MessageRepository } from '../repositories/MessageRepository';
+import { UserContextManager } from '../core/user-context';
 
 export interface MessageLoggingServiceConfig {
   d1Storage: D1StorageService;
   humanRepository: HumanRepository;
   messageRepository: MessageRepository;
+  userContextManager: UserContextManager;
 }
 
 /**
@@ -20,11 +22,13 @@ export class MessageLoggingService {
   private d1Storage: D1StorageService;
   private humanRepository: HumanRepository;
   private messageRepository: MessageRepository;
+  private userContextManager: UserContextManager;
 
   constructor(config: MessageLoggingServiceConfig) {
     this.d1Storage = config.d1Storage;
     this.humanRepository = config.humanRepository;
     this.messageRepository = config.messageRepository;
+    this.userContextManager = config.userContextManager;
   }
 
   /**
@@ -49,6 +53,44 @@ export class MessageLoggingService {
         content = message.caption || `Document: ${message.document.file_name || 'Unknown'}`;
       }
       
+      // Determine status_name based on flowMode and message type
+      let statusName: string;
+      
+      // Check if user is in flow mode (only for incoming messages)
+      if (direction === 'incoming') {
+        const context = await this.userContextManager.getContext(userId);
+        if (context && context.flowMode) {
+          statusName = 'flow_mode';
+        } else {
+          // Determine status based on message type
+          // If title contains caption (text), status is 'text'
+          if (message.text || message.caption) {
+            statusName = 'text';
+          } else if (message.voice) {
+            statusName = 'voice';
+          } else if (message.photo && message.photo.length > 0) {
+            statusName = 'photo';
+          } else if (message.document) {
+            statusName = 'document';
+          } else {
+            statusName = 'text'; // Default fallback
+          }
+        }
+      } else {
+        // For outgoing messages, determine status based on message type
+        if (message.text || message.caption) {
+          statusName = 'text';
+        } else if (message.voice) {
+          statusName = 'voice';
+        } else if (message.photo && message.photo.length > 0) {
+          statusName = 'photo';
+        } else if (message.document) {
+          statusName = 'document';
+        } else {
+          statusName = 'text'; // Default fallback
+        }
+      }
+      
       const messageLog = {
         humanId: dbHumanId, // Use ID from humans table, not Telegram ID
         messageType,
@@ -58,6 +100,7 @@ export class MessageLoggingService {
         fileId: message.voice?.file_id || message.photo?.[0]?.file_id || message.document?.file_id || '',
         fileName: message.document?.file_name || '',
         caption: message.caption || '',
+        statusName,
         createdAt: new Date().toISOString()
       };
 
@@ -76,7 +119,17 @@ export class MessageLoggingService {
    */
   async logCallbackQuery(callbackQuery: TelegramCallbackQuery, dbHumanId: number): Promise<void> {
     try {
-      console.log(`🔘 Logging callback query from user ${callbackQuery.from.id} (DB Human ID: ${dbHumanId}): ${callbackQuery.data}`);
+      const userId = callbackQuery.from.id;
+      console.log(`🔘 Logging callback query from user ${userId} (DB Human ID: ${dbHumanId}): ${callbackQuery.data}`);
+      
+      // Determine status_name based on flowMode
+      let statusName: string;
+      const context = await this.userContextManager.getContext(userId);
+      if (context && context.flowMode) {
+        statusName = 'flow_mode';
+      } else {
+        statusName = 'text'; // Callback queries are treated as text interactions
+      }
       
       const messageLog = {
         humanId: dbHumanId, // Use ID from humans table, not Telegram ID
@@ -85,6 +138,7 @@ export class MessageLoggingService {
         content: callbackQuery.data || '',
         telegramMessageId: callbackQuery.message?.message_id || 0,
         callbackData: callbackQuery.data || '',
+        statusName,
         createdAt: new Date().toISOString()
       };
 

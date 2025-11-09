@@ -2,6 +2,7 @@ import type { D1Database } from '@cloudflare/workers-types';
 import { generateUuidV4 } from '../helpers/generateUuidV4';
 import { generateAid } from '../helpers/generateAid';
 import { HumanRepository } from './HumanRepository';
+import { MessageThreadRepository } from './MessageThreadRepository';
 
 export interface MessageData {
   id?: number;
@@ -17,12 +18,14 @@ export interface MessageData {
   caption?: string;
   topicId?: number;
   data?: string; // JSON string for additional data
+  statusName?: string; // Status name: 'flow_mode', 'text', 'voice', 'photo', 'document'
   createdAt?: string;
 }
 
 export interface MessageConfig {
   db: D1Database;
   humanRepository: HumanRepository;
+  messageThreadRepository: MessageThreadRepository;
 }
 
 /**
@@ -31,10 +34,12 @@ export interface MessageConfig {
 export class MessageRepository {
   private db: D1Database;
   private humanRepository: HumanRepository;
+  private messageThreadRepository: MessageThreadRepository;
 
   constructor(config: MessageConfig) {
     this.db = config.db;
     this.humanRepository = config.humanRepository;
+    this.messageThreadRepository = config.messageThreadRepository;
   }
 
   /**
@@ -50,7 +55,7 @@ export class MessageRepository {
         throw new Error('D1 database connection is not initialized');
       }
 
-      // Get human to get haid for maid field
+      // Get human to get haid and topic_id
       const human = await this.humanRepository.getHumanById(message.humanId);
       if (!human || !human.haid) {
         throw new Error(`Human with id ${message.humanId} not found or has no haid`);
@@ -58,10 +63,42 @@ export class MessageRepository {
 
       const uuid = generateUuidV4();
       const fullMaid = generateAid('m');
-      const maid = human.haid; // Use human's haid as maid to link messages
+      
+      // Try to get maid from topic (message_threads)
+      let maid: string | null = null;
+      
+      // Extract topic_id from human.dataIn
+      if (human.dataIn) {
+        try {
+          const dataInObj = JSON.parse(human.dataIn);
+          const topicId = dataInObj.topic_id;
+          
+          if (topicId) {
+            // Find message thread by value (topic_id)
+            const messageThread = await this.messageThreadRepository.getMessageThreadByValue(
+              topicId.toString(),
+              'leadsgen'
+            );
+            
+            if (messageThread && messageThread.maid) {
+              maid = messageThread.maid;
+              console.log(`✅ Found topic maid ${maid} for topic_id ${topicId}`);
+            } else {
+              console.log(`⚠️ Topic not found for topic_id ${topicId}, leaving maid empty`);
+            }
+          } else {
+            console.log(`⚠️ No topic_id in human.dataIn, leaving maid empty`);
+          }
+        } catch (e) {
+          console.warn(`Failed to parse human.dataIn for human ${message.humanId}, leaving maid empty:`, e);
+        }
+      } else {
+        console.log(`⚠️ No dataIn for human ${message.humanId}, leaving maid empty`);
+      }
 
       // Prepare title (content) and data_in
       const title = message.content || '';
+      const statusName = message.statusName || 'active'; // Use provided status_name or default to 'active'
       const dataIn = JSON.stringify({
         //userId: message.userId,
         messageType: message.messageType,
@@ -81,17 +118,19 @@ export class MessageRepository {
       
       const query = `
         INSERT INTO messages (
-          uuid, maid, full_maid, title, status_name, "order", gin, fts, data_in
-        ) VALUES (?, ?, ?, ?, 'active', 0, ?, '', ?)
+          uuid, maid, full_maid, title, status_name, "order", gin, fts, data_in, xaid
+        ) VALUES (?, ?, ?, ?, ?, 0, ?, '', ?, ?)
       `;
       
       const params = [
         uuid,
-        maid,
+        maid || null, // Use topic maid if found, otherwise null
         fullMaid,
         title,
-        maid, // Use maid for grouping (gin)
-        dataIn
+        statusName,
+        null, // gin - not used, leave empty
+        dataIn,
+        human.haid // Use human.haid for xaid
       ];
 
       console.log(`💾 D1: Executing query with params:`, params);

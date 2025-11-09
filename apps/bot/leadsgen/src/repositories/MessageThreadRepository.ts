@@ -79,6 +79,47 @@ export class MessageThreadRepository {
   }
 
   /**
+   * Get message thread by value (topic_id)
+   */
+  async getMessageThreadByValue(value: string, type: string = 'leadsgen'): Promise<MessageThreadData | null> {
+    try {
+      const result = await this.d1Storage.execute(`
+        SELECT id, uuid, maid, parent_maid, title, status_name, type, 
+               \`order\`, xaid, value, updated_at, created_at, deleted_at, gin, data_in
+        FROM message_threads 
+        WHERE value = ? AND type = ? AND deleted_at IS NULL
+        LIMIT 1
+      `, [value, type]);
+
+      if (!result || result.length === 0) {
+        return null;
+      }
+
+      const row = result[0] as any;
+      return {
+        id: row.id as number,
+        uuid: row.uuid as string,
+        maid: row.maid as string,
+        parentMaid: row.parent_maid as string | undefined,
+        title: row.title as string | undefined,
+        statusName: row.status_name as string | undefined,
+        type: row.type as string | undefined,
+        order: row.order as number | undefined,
+        xaid: row.xaid as string | undefined,
+        value: row.value as string | undefined,
+        updatedAt: row.updated_at as string | undefined,
+        createdAt: row.created_at as string | undefined,
+        deletedAt: row.deleted_at as number | undefined,
+        gin: row.gin as string | undefined,
+        dataIn: row.data_in as string | undefined
+      };
+    } catch (error) {
+      console.error(`Error getting message thread by value ${value}:`, error);
+      return null;
+    }
+  }
+
+  /**
    * Update message thread in database
    */
   async updateMessageThread(id: number, updates: Partial<MessageThreadData>): Promise<void> {

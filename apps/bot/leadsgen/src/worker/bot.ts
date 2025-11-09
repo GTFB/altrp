@@ -97,17 +97,27 @@ export class TelegramBotWorker {
     // Create human model
     this.humanRepository = new HumanRepository({ db: env.DB });
     
-    // Create message model
-    this.messageRepository = new MessageRepository({ db: env.DB, humanRepository: this.humanRepository });
-    
-    // Create message thread repository
+    // Create message thread repository (needed for message repository)
     this.messageThreadRepository = new MessageThreadRepository({ db: env.DB, d1Storage: this.d1Storage });
+    
+    // Create message model
+    this.messageRepository = new MessageRepository({ 
+      db: env.DB, 
+      humanRepository: this.humanRepository,
+      messageThreadRepository: this.messageThreadRepository
+    });
+    
+    // Initialize user context manager (needed for message logging service)
+    this.userContextManager = new UserContextManager();
+    this.userContextManager.setD1Storage(this.d1Storage);
+    this.userContextManager.setHumanRepository(this.humanRepository);
     
     // Create message logging service
     this.messageLoggingService = new MessageLoggingService({
       d1Storage: this.d1Storage,
       humanRepository: this.humanRepository,
-      messageRepository: this.messageRepository
+      messageRepository: this.messageRepository,
+      userContextManager: this.userContextManager
     });
     
     this.messageService = new MessageService({
@@ -123,11 +133,6 @@ export class TelegramBotWorker {
     // this.sessionService = new SessionService({
     //   d1Storage: this.d1Storage
     // });
-    
-    // Initialize new components
-    this.userContextManager = new UserContextManager();
-    this.userContextManager.setD1Storage(this.d1Storage);
-    this.userContextManager.setHumanRepository(this.humanRepository);
     
     // Initialize i18n service
     //this.i18nService = new I18nService(env.LOCALE);
