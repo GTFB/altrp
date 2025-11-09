@@ -235,46 +235,5 @@ export class MessageLoggingService {
     }
   }
 
-  /**
-   * Log message from topic to user
-   */
-  async logMessageFromTopic(userId: number, topicId: number, message: TelegramMessage): Promise<void> {
-    try {
-      // Get human to get haid and id
-      const human = await this.humanRepository.getHumanByTelegramId(userId);
-      if (!human || !human.id || !human.haid) {
-        console.warn(`Human ${userId} not found or has no haid, skipping message logging`);
-        return;
-      }
-
-      const uuid = generateUuidV4();
-      const fullMaid = generateAid('m');
-      const maid = human.haid;
-
-      // Prepare title (content) and data_in
-      const title = message.text || message.caption || '';
-      const dataIn = JSON.stringify({
-        humanId: human.id,
-        telegramId: userId,
-        messageType: getMessageType(message),
-        direction: 'outgoing',
-        telegramMessageId: message.message_id,
-        fileId: message.voice?.file_id || message.photo?.[0]?.file_id || message.document?.file_id,
-        fileName: message.document?.file_name,
-        caption: message.caption,
-        topicId: topicId,
-        createdAt: new Date().toISOString()
-      });
-
-      await this.d1Storage.execute(`
-        INSERT INTO messages (uuid, maid, full_maid, title, status_name, "order", gin, fts, data_in)
-        VALUES (?, ?, ?, ?, 'active', 0, ?, '', ?)
-      `, [uuid, maid, fullMaid, title, maid, dataIn]);
-
-      console.log(`✅ Message logged from topic: ${fullMaid} (linked to human ${maid})`);
-    } catch (error) {
-      console.error('❌ Error logging message from topic:', error);
-    }
-  }
 }
 

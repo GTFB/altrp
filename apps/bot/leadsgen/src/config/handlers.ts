@@ -2,6 +2,7 @@ import { BotInterface } from '../core/bot-interface';
 import { AIService } from '../integrations/ai-service';
 import { generateUuidV4 } from '../helpers/generateUuidV4';
 import { generateAid } from '../helpers/generateAid';
+import { UserContextManager } from '../core/user-context';
 
 interface Consultant {
   id: number;

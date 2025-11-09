@@ -146,10 +146,7 @@ export class TopicService {
         await this.messageService.sendDocumentToUser(userId, message.document.file_id, message.document.file_name, message.caption, dbUserId);
       }
 
-      // Log message from topic to user
-      if (topicId) {
-        await this.messageLoggingService.logMessageFromTopic(userId, topicId, message);
-      }
+      // Message is already logged in corresponding methods sendMessage/sendVoice/sendPhoto/sendDocument
     } catch (error) {
       console.error('Error forwarding message to user:', error);
     }
