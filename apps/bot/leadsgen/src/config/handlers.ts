@@ -467,8 +467,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
         return;
       }
 
-      // Extract topicId and chatId from message
-      const topicId = (message as any).message_thread_id;
+      // Extract chatId from message
       const chatId = message.chat.id;
       const messageFromId = message.from.id;
 
@@ -477,9 +476,44 @@ export const createCustomHandlers = (worker: BotInterface) => {
       //   return;
       // }
 
+      // Get human first to extract topic_id (needed for voice transcription error handling)
+      const human = await handlerWorker.humanRepository.getHumanByTelegramId(chatId);
+      if (!human || !human.dataIn) {
+        console.error(`❌ Human ${chatId} not found or has no dataIn`);
+        await handlerWorker.messageService.sendMessage(
+          chatId,
+          '❌ Human not found or has no configuration.'
+        );
+        return;
+      }
+
+      // Extract topic_id from human.dataIn
+      let humanTopicId: number | null = null;
+      try {
+        const dataInObj = JSON.parse(human.dataIn);
+        humanTopicId = dataInObj.topic_id;
+
+      } catch (e) {
+        console.error(`Failed to parse human.dataIn for human ${chatId}:`, e);
+        await handlerWorker.messageService.sendMessage(
+          chatId,
+          '❌ Error parsing human configuration.'
+        );
+        return;
+      }
+
+      if (!humanTopicId) {
+        console.error(`❌ No topic_id found for human ${chatId}`);
+        await handlerWorker.messageService.sendMessage(
+          chatId,
+          '❌ Topic ID not found for this human.'
+        );
+        return;
+      }
+
       // Check if message is voice -> transcribe and continue as text
       if (message.voice) {
-        console.log(`🎤 Voice message detected in topic ${topicId}`);
+        console.log(`🎤 Voice message detected in topic ${humanTopicId}`);
         try {
           const botToken = handlerWorker.env.BOT_TOKEN || '';
           if (!botToken) {
@@ -542,7 +576,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
           console.error('❌ Voice transcription failed:', e);
           await handlerWorker.messageService.sendMessageToTopic(
             adminChatId,
-            topicId,
+            humanTopicId,
             'Voice recognition failed. Please send the text or try again.'
           );
           return;
@@ -551,7 +585,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
 
       // Check if message has no text
       if (!message.text) {
-        console.log(`📭 No text in message in topic ${topicId}`);
+        console.log(`📭 No text in message in topic ${humanTopicId}`);
         await handlerWorker.messageService.sendMessage(
           chatId,
           'Send a text or voice message.'
@@ -562,13 +596,14 @@ export const createCustomHandlers = (worker: BotInterface) => {
       const messageText = message.text;
       console.log(`💬 Handling AI answer to human message: ${messageText}`);
 
-      // Get consultant from message_threads
+      // Get consultant (message_thread) from message_threads by topic_id
+      // human and humanTopicId already retrieved above
       const consultantResult = await handlerWorker.d1Storage.execute(`
       SELECT id, maid, title, data_in 
       FROM message_threads 
-      WHERE type = 'leadsgen' AND deleted_at IS NULL
+      WHERE value = ? AND deleted_at IS NULL
       LIMIT 1
-      `);
+      `, [humanTopicId.toString()]);
 
       if (!consultantResult || consultantResult.length === 0) {
         console.log(`No consultant found`);
@@ -653,8 +688,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
       // Read current summary if exists
       let context = '';
 
-      const human = await handlerWorker.humanRepository.getHumanByTelegramId(chatId);
-
+      // human already retrieved above, reuse it
       const dataInObj = JSON.parse(human.dataIn);
 
       console.log('Selecting messages:', consultantMaid, human.haid, MESSAGES_FOR_ANSWER)
@@ -663,7 +697,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
         const recentMessages = await handlerWorker.d1Storage.execute(`
           SELECT title, created_at, data_in 
           FROM messages 
-          WHERE maid = ? AND xaid = ?
+          WHERE status_name='text' AND maid = ? AND xaid = ?
           ORDER BY created_at DESC
           LIMIT ?
         `, [consultantMaid, human.haid, MESSAGES_FOR_ANSWER]);
@@ -696,9 +730,9 @@ export const createCustomHandlers = (worker: BotInterface) => {
       const duplicateCheck = await handlerWorker.d1Storage.execute(`
         SELECT full_maid
         FROM messages
-        WHERE maid = ? AND title = ? AND created_at > datetime('now', '-5 seconds')
+        WHERE status_name='text' AND maid = ? AND title = ? AND xaid = ? AND created_at > datetime('now', '-5 seconds')
         LIMIT 1
-      `, [consultantMaid, messageText]);
+      `, [consultantMaid, messageText, human.haid]);
       
       if (duplicateCheck && duplicateCheck.length > 0) {
         console.log(`⚠️ Duplicate message detected, skipping: ${messageText}`);
@@ -707,21 +741,21 @@ export const createCustomHandlers = (worker: BotInterface) => {
 
       // Save user message to database FIRST (before AI call)
       // Use consultantMaid in maid field to link messages with message_threads
-      const userMessageUuid = generateUuidV4();
-      const userMessageFullMaid = generateAid('m');
-      await handlerWorker.d1Storage.execute(`
-        INSERT INTO messages (uuid, maid, full_maid, title, status_name, "order", gin, fts, data_in, xaid)
-        VALUES (?, ?, ?, ?, 'active', 0, ?, '', ?, ?)
-      `, [
-        userMessageUuid,
-        consultantMaid, // Link to message_threads via maid
-        userMessageFullMaid,
-        messageText,
-        consultantMaid, // Use maid for grouping (gin is redundant)
-        JSON.stringify({ consultant: consultantMaid, fromId: messageFromId, text: messageText, createdAt: new Date().toISOString() }),
-        human.haid,
-      ]);
-      console.log(`✅ User message saved: ${userMessageFullMaid} (linked to consultant ${consultantMaid})`);
+      // const userMessageUuid = generateUuidV4();
+      // const userMessageFullMaid = generateAid('m');
+      // await handlerWorker.d1Storage.execute(`
+      //   INSERT INTO messages (uuid, maid, full_maid, title, status_name, "order", gin, fts, data_in, xaid)
+      //   VALUES (?, ?, ?, ?, 'active', 0, ?, '', ?, ?)
+      // `, [
+      //   userMessageUuid,
+      //   consultantMaid, // Link to message_threads via maid
+      //   userMessageFullMaid,
+      //   messageText,
+      //   consultantMaid, // Use maid for grouping (gin is redundant)
+      //   JSON.stringify({ consultant: consultantMaid, fromId: messageFromId, text: messageText, createdAt: new Date().toISOString() }),
+      //   human.haid,
+      // ]);
+      // console.log(`✅ User message saved: ${userMessageFullMaid} (linked to consultant ${consultantMaid})`);
 
       // Check if AI token is configured
       const aiApiToken = handlerWorker.env.AI_API_TOKEN;
@@ -774,7 +808,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
         const aiMessageFullMaid = generateAid('m');
         await handlerWorker.d1Storage.execute(`
           INSERT INTO messages (uuid, maid, full_maid, title, status_name, "order", gin, fts, data_in, xaid)
-          VALUES (?, ?, ?, ?, 'active', 0, ?, '', ?)
+          VALUES (?, ?, ?, ?, 'text', 0, ?, '', ?)
         `, [
           aiMessageUuid,
           consultantMaid, // Link to message_threads via maid
@@ -792,7 +826,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
 
       // Send AI response to topic
       try {
-        console.log(`📤 Sending AI response to topic ${topicId}`);
+        console.log(`📤 Sending AI response to topic ${humanTopicId}`);
         await handlerWorker.messageService.sendMessage(
           chatId,
           aiResponse
@@ -800,7 +834,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
 
         await handlerWorker.messageService.sendMessageToTopic(
           adminChatId,
-          dataInObj.topic_id,
+          humanTopicId,
           `<b>AI</b>
 
 ${aiResponse}`
