@@ -440,6 +440,10 @@ export const createCustomHandlers = (worker: BotInterface) => {
           topicId,
           `✅ Status updated to <b>${statusName}</b>`
         );
+
+        // Complete flow and exit flow mode (clears flowInTopic, topicId, etc.)
+        await handlerWorker.flowEngine.completeFlow(telegramId);
+
       } catch (error) {
         console.error(`❌ Error in setStatusHandler:`, error);
         await handlerWorker.messageService.sendMessageToTopic(
