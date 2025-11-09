@@ -9,14 +9,21 @@ export interface MessageType {
 }
 
 /**
- * Determines the type of incoming message from user
+ * Determines the type of message
  * Accepts any object with optional text, voice, photo, or document fields
+ * @param message - Message object
+ * @param direction - Message direction ('incoming' or 'outgoing')
  */
-export function getMessageType(message: MessageType): 'user_text' | 'user_voice' | 'user_photo' | 'user_document' {
-  if (message.text) return 'user_text';
-  if (message.voice) return 'user_voice';
-  if (message.photo && message.photo.length > 0) return 'user_photo';
-  if (message.document) return 'user_document';
-  return 'user_text';
+export function getMessageType(
+  message: MessageType, 
+  direction: 'incoming' | 'outgoing' = 'incoming'
+): 'user_text' | 'user_voice' | 'user_photo' | 'user_document' | 'bot_text' | 'bot_voice' | 'bot_photo' | 'bot_document' {
+  const prefix = direction === 'outgoing' ? 'bot_' : 'user_';
+  
+  if (message.text) return `${prefix}text` as any;
+  if (message.voice) return `${prefix}voice` as any;
+  if (message.photo && message.photo.length > 0) return `${prefix}photo` as any;
+  if (message.document) return `${prefix}document` as any;
+  return `${prefix}text` as any;
 }
 

@@ -187,7 +187,7 @@ export class TopicService {
       }
 
       // Log message to database
-      await this.messageLoggingService.logMessageToTopic(userId, topicId, message);
+      //await this.messageLoggingService.logMessageToTopic(userId, topicId, message);
 
     } catch (error) {
       console.error('Error forwarding message to user topic:', error);

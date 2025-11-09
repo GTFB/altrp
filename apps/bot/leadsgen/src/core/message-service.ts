@@ -43,10 +43,15 @@ export class MessageService {
       }
 
       const result = await response.json();
-      console.log('Message sent successfully:', (result as any).message_id);
+      const sentMessage = (result as any).ok && (result as any).result 
+        ? (result as any).result as TelegramMessage 
+        : null;
+      console.log('Message sent successfully:', sentMessage?.message_id);
 
-      // Log sent message
-      await this.messageLoggingService.logSentMessage(chatId, text, (result as any).message_id, dbUserId);
+      // Log sent message using unified logMessage
+      if (sentMessage) {
+        await this.messageLoggingService.logMessage(sentMessage, 'outgoing', dbUserId);
+      }
     } catch (error) {
       console.error('Error sending message:', error);
     }
@@ -77,10 +82,15 @@ export class MessageService {
       }
 
       const result = await response.json();
-      console.log('Message with keyboard sent successfully:', (result as any).message_id);
+      const sentMessage = (result as any).ok && (result as any).result 
+        ? (result as any).result as TelegramMessage 
+        : null;
+      console.log('Message with keyboard sent successfully:', sentMessage?.message_id);
 
-      // Log sent message
-      await this.messageLoggingService.logSentMessage(chatId, text, (result as any).message_id, dbUserId);
+      // Log sent message using unified logMessage
+      if (sentMessage) {
+        await this.messageLoggingService.logMessage(sentMessage, 'outgoing', dbUserId);
+      }
     } catch (error) {
       console.error('Error sending message with keyboard:', error);
     }
@@ -108,10 +118,15 @@ export class MessageService {
         console.error('Error sending voice to user:', errorData);
       } else {
         const result = await response.json();
+        const sentMessage = (result as any).ok && (result as any).result 
+          ? (result as any).result as TelegramMessage 
+          : null;
         console.log('Voice sent to user successfully');
         
-        // Log sent voice message
-        await this.messageLoggingService.logSentVoiceMessage(userId, fileId, (result as any).message_id, duration, dbUserId);
+        // Log sent voice message using unified logMessage
+        if (sentMessage) {
+          await this.messageLoggingService.logMessage(sentMessage, 'outgoing', dbUserId);
+        }
       }
     } catch (error) {
       console.error('Error sending voice to user:', error);
@@ -140,10 +155,15 @@ export class MessageService {
         console.error('Error sending photo to user:', errorData);
       } else {
         const result = await response.json();
+        const sentMessage = (result as any).ok && (result as any).result 
+          ? (result as any).result as TelegramMessage 
+          : null;
         console.log('Photo sent to user successfully');
         
-        // Log sent photo
-        await this.messageLoggingService.logSentPhotoMessage(userId, fileId, (result as any).message_id, caption, dbUserId);
+        // Log sent photo using unified logMessage
+        if (sentMessage) {
+          await this.messageLoggingService.logMessage(sentMessage, 'outgoing', dbUserId);
+        }
       }
     } catch (error) {
       console.error('Error sending photo to user:', error);
@@ -172,10 +192,15 @@ export class MessageService {
         console.error('Error sending document to user:', errorData);
       } else {
         const result = await response.json();
+        const sentMessage = (result as any).ok && (result as any).result 
+          ? (result as any).result as TelegramMessage 
+          : null;
         console.log('Document sent to user successfully');
         
-        // Log sent document
-        await this.messageLoggingService.logSentDocumentMessage(userId, fileId, (result as any).message_id, fileName, caption, dbUserId);
+        // Log sent document using unified logMessage
+        if (sentMessage) {
+          await this.messageLoggingService.logMessage(sentMessage, 'outgoing', dbUserId);
+        }
       }
     } catch (error) {
       console.error('Error sending document to user:', error);
