@@ -123,8 +123,8 @@ export class TopicService {
    */
   async forwardMessageToUser(userId: number, message: TelegramMessage, getDbUserId: (telegramId: number) => Promise<number | null>): Promise<void> {
     try {
-      const dbUserId = await getDbUserId(userId);
-      if (!dbUserId) {
+      const dbHumanId = await getDbUserId(userId);
+      if (!dbHumanId) {
         console.error(`Cannot forward message: user ${userId} not found in database`);
         return;
       }
@@ -133,17 +133,17 @@ export class TopicService {
 
       if (message.text) {
         // Forward text message
-        await this.messageService.sendMessage(userId, message.text, dbUserId);
+        await this.messageService.sendMessage(userId, message.text, dbHumanId);
       } else if (message.voice) {
         // Forward voice message
-        await this.messageService.sendVoiceToUser(userId, message.voice.file_id, message.voice.duration, dbUserId);
+        await this.messageService.sendVoiceToUser(userId, message.voice.file_id, message.voice.duration, dbHumanId);
       } else if (message.photo && message.photo.length > 0) {
         // Forward photo
         const photoFileId = message.photo?.[message.photo.length - 1]?.file_id;
-        await this.messageService.sendPhotoToUser(userId, photoFileId || '', message.caption, dbUserId);
+        await this.messageService.sendPhotoToUser(userId, photoFileId || '', message.caption, dbHumanId);
       } else if (message.document) {
         // Forward document
-        await this.messageService.sendDocumentToUser(userId, message.document.file_id, message.document.file_name, message.caption, dbUserId);
+        await this.messageService.sendDocumentToUser(userId, message.document.file_id, message.document.file_name, message.caption, dbHumanId);
       }
 
       // Message is already logged in corresponding methods sendMessage/sendVoice/sendPhoto/sendDocument
@@ -185,9 +185,6 @@ export class TopicService {
       if (fileId) {
         await this.forwardFileToTopic(topicId, fileId, message);
       }
-
-      // Log message to database
-      //await this.messageLoggingService.logMessageToTopic(userId, topicId, message);
 
     } catch (error) {
       console.error('Error forwarding message to user topic:', error);

@@ -258,10 +258,10 @@ export class FlowEngine {
     } else {
       // Regular flow mode - send to user
       if (keyboard) {
-        await this.messageService.sendMessageWithKeyboard(telegramId, message, keyboard, context.userId);
+        await this.messageService.sendMessageWithKeyboard(telegramId, message, keyboard, context.humanId);
         console.log(`⏳ Message with keyboard sent, waiting for user interaction...`);
       } else {
-        await this.messageService.sendMessage(telegramId, message, context.userId);
+        await this.messageService.sendMessage(telegramId, message, context.humanId);
         
         // If no keyboard, go to next step
         if (step.nextStepId) {
@@ -299,7 +299,7 @@ export class FlowEngine {
         message
       );
     } else {
-      await this.messageService.sendMessage(telegramId, message, context.userId);
+      await this.messageService.sendMessage(telegramId, message, context.humanId);
     }
   }
 
@@ -340,7 +340,7 @@ export class FlowEngine {
         telegramId, 
         message,
         keyboard, 
-        context.userId
+        context.humanId
       );
     }
   }
@@ -453,7 +453,7 @@ export class FlowEngine {
           await this.messageService.sendMessage(
             telegramId, 
             errorMessage, 
-            context.userId
+            context.humanId
           );
         }
         return;
@@ -524,13 +524,13 @@ export class FlowEngine {
               telegramId, 
               dynamicMessage, 
               keyboard, 
-              context.userId
+              context.humanId
             );
           } else {
             await this.messageService.sendMessage(
               telegramId, 
               dynamicMessage, 
-              context.userId
+              context.humanId
             );
           }
         }
@@ -617,7 +617,7 @@ export class FlowEngine {
             telegramId, 
             result.message, 
             keyboard, 
-            context.userId
+            context.humanId
           );
         }
 

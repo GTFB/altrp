@@ -31,10 +31,10 @@ export class MessageLoggingService {
    * Logs message (incoming or outgoing)
    * Handles all message types: text, voice, photo, document
    */
-  async logMessage(message: TelegramMessage, direction: 'incoming' | 'outgoing', dbUserId: number): Promise<void> {
+  async logMessage(message: TelegramMessage, direction: 'incoming' | 'outgoing', dbHumanId: number): Promise<void> {
     try {
       const userId = direction === 'incoming' ? message.from.id : message.chat.id;
-      console.log(`📝 Logging ${direction} message ${direction === 'incoming' ? 'from' : 'to'} user ${userId} (DB ID: ${dbUserId})`);
+      console.log(`📝 Logging ${direction} message ${direction === 'incoming' ? 'from' : 'to'} user ${userId} (DB Human ID: ${dbHumanId})`);
       
       // Determine message type based on direction
       const messageType = getMessageType(message, direction);
@@ -50,7 +50,7 @@ export class MessageLoggingService {
       }
       
       const messageLog = {
-        userId: dbUserId, // Use ID from users table, not Telegram ID
+        humanId: dbHumanId, // Use ID from humans table, not Telegram ID
         messageType,
         direction,
         content,
@@ -74,12 +74,12 @@ export class MessageLoggingService {
   /**
    * Logs callback query
    */
-  async logCallbackQuery(callbackQuery: TelegramCallbackQuery, dbUserId: number): Promise<void> {
+  async logCallbackQuery(callbackQuery: TelegramCallbackQuery, dbHumanId: number): Promise<void> {
     try {
-      console.log(`🔘 Logging callback query from user ${callbackQuery.from.id} (DB ID: ${dbUserId}): ${callbackQuery.data}`);
+      console.log(`🔘 Logging callback query from user ${callbackQuery.from.id} (DB Human ID: ${dbHumanId}): ${callbackQuery.data}`);
       
       const messageLog = {
-        userId: dbUserId, // Use ID from users table, not Telegram ID
+        humanId: dbHumanId, // Use ID from humans table, not Telegram ID
         messageType: 'user_callback' as const,
         direction: 'incoming' as const,
         content: callbackQuery.data || '',
@@ -97,49 +97,6 @@ export class MessageLoggingService {
       console.error('Error details:', error);
     }
   }
-
-
-  /**
-   * Log message from user to topic
-   */
-  // async logMessageToTopic(userId: number, topicId: number, message: TelegramMessage): Promise<void> {
-  //   try {
-  //     // Get human to get haid and id
-  //     const human = await this.humanRepository.getHumanByTelegramId(userId);
-  //     if (!human || !human.id || !human.haid) {
-  //       console.warn(`Human ${userId} not found or has no haid, skipping message logging`);
-  //       return;
-  //     }
-
-  //     const uuid = generateUuidV4();
-  //     const fullMaid = generateAid('m');
-  //     const maid = human.haid;
-
-  //     // Prepare title (content) and data_in
-  //     const title = message.text || message.caption || '';
-  //     const dataIn = JSON.stringify({
-  //       humanId: human.id,
-  //       telegramId: userId,
-  //       messageType: getMessageType(message),
-  //       direction: 'incoming',
-  //       telegramMessageId: message.message_id,
-  //       fileId: message.voice?.file_id || message.photo?.[0]?.file_id || message.document?.file_id,
-  //       fileName: message.document?.file_name,
-  //       caption: message.caption,
-  //       topicId: topicId,
-  //       createdAt: new Date().toISOString()
-  //     });
-
-  //     await this.d1Storage.execute(`
-  //       INSERT INTO messages (uuid, maid, full_maid, title, status_name, "order", gin, fts, data_in)
-  //       VALUES (?, ?, ?, ?, 'active', 0, ?, '', ?)
-  //     `, [uuid, maid, fullMaid, title, maid, dataIn]);
-
-  //     console.log(`✅ Message logged to topic: ${fullMaid} (linked to human ${maid})`);
-  //   } catch (error) {
-  //     console.error('❌ Error logging message to topic:', error);
-  //   }
-  // }
 
 }
 

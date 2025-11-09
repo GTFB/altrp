@@ -5,7 +5,7 @@ import { HumanRepository } from './HumanRepository';
 
 export interface MessageData {
   id?: number;
-  userId: number; // DB user ID (users.id) - auto-increment user ID
+  humanId: number; // DB human ID (humans.id) - auto-increment human ID
   messageType: 'user_text' | 'user_voice' | 'user_photo' | 'user_document' | 'user_callback' | 'bot_text' | 'bot_photo' | 'bot_voice' | 'bot_document' | 'command';
   direction: 'incoming' | 'outgoing';
   content?: string;
@@ -41,7 +41,7 @@ export class MessageRepository {
    * Add message to database
    */
   async addMessage(message: MessageData): Promise<number> {
-    console.log(`💾 D1: Adding message for user ${message.userId}, type: ${message.messageType}, direction: ${message.direction}`);
+    console.log(`💾 D1: Adding message for human ${message.humanId}, type: ${message.messageType}, direction: ${message.direction}`);
     console.log(`💾 D1: Message content: ${message.content?.substring(0, 100)}...`);
 
     try {
@@ -51,9 +51,9 @@ export class MessageRepository {
       }
 
       // Get human to get haid for maid field
-      const human = await this.humanRepository.getHumanById(message.userId);
+      const human = await this.humanRepository.getHumanById(message.humanId);
       if (!human || !human.haid) {
-        throw new Error(`Human with id ${message.userId} not found or has no haid`);
+        throw new Error(`Human with id ${message.humanId} not found or has no haid`);
       }
 
       const uuid = generateUuidV4();

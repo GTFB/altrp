@@ -420,9 +420,9 @@ export class TelegramBotWorker {
     
     if (!commandConfig) {
       console.log(`Unknown command: ${command}`);
-      const dbUserId = await this.getDbUserId(chatId);
-      if (dbUserId) {
-        await this.messageService.sendMessage(chatId, 'Unknown command. Use /help for list of commands.', dbUserId);
+      const dbHumanId = await this.getDbUserId(chatId);
+      if (dbHumanId) {
+        await this.messageService.sendMessage(chatId, 'Unknown command. Use /help for list of commands.', dbHumanId);
       }
       return;
     }

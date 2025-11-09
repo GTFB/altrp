@@ -22,7 +22,7 @@ export class MessageService {
   /**
    * Sends text message
    */
-  async sendMessage(chatId: number, text: string, dbUserId: number): Promise<void> {
+  async sendMessage(chatId: number, text: string, dbHumanId: number): Promise<void> {
     try {
       const response = await fetch(`https://api.telegram.org/bot${this.botToken}/sendMessage`, {
         method: 'POST',
@@ -50,7 +50,7 @@ export class MessageService {
 
       // Log sent message using unified logMessage
       if (sentMessage) {
-        await this.messageLoggingService.logMessage(sentMessage, 'outgoing', dbUserId);
+        await this.messageLoggingService.logMessage(sentMessage, 'outgoing', dbHumanId);
       }
     } catch (error) {
       console.error('Error sending message:', error);
@@ -60,7 +60,7 @@ export class MessageService {
   /**
    * Sends message with keyboard
    */
-  async sendMessageWithKeyboard(chatId: number, text: string, replyMarkup: any, dbUserId: number): Promise<void> {
+  async sendMessageWithKeyboard(chatId: number, text: string, replyMarkup: any, dbHumanId: number): Promise<void> {
     try {
       const response = await fetch(`https://api.telegram.org/bot${this.botToken}/sendMessage`, {
         method: 'POST',
@@ -89,7 +89,7 @@ export class MessageService {
 
       // Log sent message using unified logMessage
       if (sentMessage) {
-        await this.messageLoggingService.logMessage(sentMessage, 'outgoing', dbUserId);
+        await this.messageLoggingService.logMessage(sentMessage, 'outgoing', dbHumanId);
       }
     } catch (error) {
       console.error('Error sending message with keyboard:', error);
@@ -99,7 +99,7 @@ export class MessageService {
   /**
    * Sends voice message
    */
-  async sendVoiceToUser(userId: number, fileId: string, duration: number, dbUserId: number): Promise<void> {
+  async sendVoiceToUser(userId: number, fileId: string, duration: number, dbHumanId: number): Promise<void> {
     try {
       const response = await fetch(`https://api.telegram.org/bot${this.botToken}/sendVoice`, {
         method: 'POST',
@@ -125,7 +125,7 @@ export class MessageService {
         
         // Log sent voice message using unified logMessage
         if (sentMessage) {
-          await this.messageLoggingService.logMessage(sentMessage, 'outgoing', dbUserId);
+          await this.messageLoggingService.logMessage(sentMessage, 'outgoing', dbHumanId);
         }
       }
     } catch (error) {
@@ -136,7 +136,7 @@ export class MessageService {
   /**
    * Sends photo
    */
-  async sendPhotoToUser(userId: number, fileId: string, caption: string | undefined, dbUserId: number): Promise<void> {
+  async sendPhotoToUser(userId: number, fileId: string, caption: string | undefined, dbHumanId: number): Promise<void> {
     try {
       const response = await fetch(`https://api.telegram.org/bot${this.botToken}/sendPhoto`, {
         method: 'POST',
@@ -162,7 +162,7 @@ export class MessageService {
         
         // Log sent photo using unified logMessage
         if (sentMessage) {
-          await this.messageLoggingService.logMessage(sentMessage, 'outgoing', dbUserId);
+          await this.messageLoggingService.logMessage(sentMessage, 'outgoing', dbHumanId);
         }
       }
     } catch (error) {
@@ -173,7 +173,7 @@ export class MessageService {
   /**
    * Sends document
    */
-  async sendDocumentToUser(userId: number, fileId: string, fileName: string | undefined, caption: string | undefined, dbUserId: number): Promise<void> {
+  async sendDocumentToUser(userId: number, fileId: string, fileName: string | undefined, caption: string | undefined, dbHumanId: number): Promise<void> {
     try {
       const response = await fetch(`https://api.telegram.org/bot${this.botToken}/sendDocument`, {
         method: 'POST',
@@ -199,7 +199,7 @@ export class MessageService {
         
         // Log sent document using unified logMessage
         if (sentMessage) {
-          await this.messageLoggingService.logMessage(sentMessage, 'outgoing', dbUserId);
+          await this.messageLoggingService.logMessage(sentMessage, 'outgoing', dbHumanId);
         }
       }
     } catch (error) {
@@ -303,15 +303,15 @@ export class MessageService {
   /**
    * Handles callback query: logs and answers it
    */
-  async handleCallbackQuery(callbackQuery: any, dbUserId: number): Promise<void> {
+  async handleCallbackQuery(callbackQuery: any, dbHumanId: number): Promise<void> {
     try {
       // Log callback query
-      await this.messageLoggingService.logCallbackQuery(callbackQuery, dbUserId);
+      await this.messageLoggingService.logCallbackQuery(callbackQuery, dbHumanId);
       
       // Answer callback query to remove loading indicator
       await this.answerCallbackQuery(callbackQuery.id);
       
-      console.log(`✅ Callback query handled successfully for user with DB ID: ${dbUserId}`);
+      console.log(`✅ Callback query handled successfully for human with DB ID: ${dbHumanId}`);
     } catch (error) {
       console.error('❌ Error handling callback query:', error);
       throw error;

@@ -2,7 +2,7 @@ import { D1StorageService } from '../worker/d1-storage-service';
 import { HumanRepository } from '../repositories/HumanRepository';
 
 export interface UserContext {
-  userId: number;
+  humanId: number; // DB human ID (humans.id)
   telegramId: number;
   currentFlow: string;
   currentStep: number;
@@ -62,7 +62,7 @@ export class UserContextManager {
       }
       
       const context: UserContext = {
-        userId: human.id,
+        humanId: human.id,
         telegramId,
         currentFlow: savedData.currentFlow || '',
         currentStep: savedData.currentStep || 0,
@@ -89,10 +89,10 @@ export class UserContextManager {
     }
   }
   
-  async createContext(telegramId: number, userId: number): Promise<UserContext> {
-    console.log(`🔄 Creating new context for user ${telegramId} (DB ID: ${userId})`);
+  async createContext(telegramId: number, humanId: number): Promise<UserContext> {
+    console.log(`🔄 Creating new context for user ${telegramId} (DB Human ID: ${humanId})`);
     const context: UserContext = {
-      userId,
+      humanId,
       telegramId,
       currentFlow: '',
       currentStep: 0,
@@ -269,11 +269,11 @@ export class UserContextManager {
   }
 
   // Get or create context
-  async getOrCreateContext(telegramId: number, userId: number): Promise<UserContext> {
+  async getOrCreateContext(telegramId: number, humanId: number): Promise<UserContext> {
     let context = await this.getContext(telegramId);
     if (!context) {
       // Create new context
-      context = await this.createContext(telegramId, userId);
+      context = await this.createContext(telegramId, humanId);
     }
     return context;
   }
