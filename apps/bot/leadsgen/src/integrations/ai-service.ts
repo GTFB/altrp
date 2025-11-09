@@ -276,5 +276,101 @@ export class AIService {
   private sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
+
+  /**
+   * Validates and fixes HTML tags in AI response
+   * Removes unclosed opening tags and orphaned closing tags
+   * Supports Telegram HTML tags: <b>, <i>, <u>, <code>, <a href="...">
+   */
+  validateAndFixHTML(html: string): string {
+    // Allowed Telegram HTML tags
+    const allowedTags = ['b', 'i', 'u', 'code', 'a'];
+    
+    // Find all tags with their positions and types
+    interface TagInfo {
+      type: 'open' | 'close';
+      tag: string;
+      fullTag: string;
+      position: number;
+    }
+    
+    const tags: TagInfo[] = [];
+    const tagRegex = /<\/?(\w+)(?:\s+[^>]*)?>/g;
+    let match;
+    
+    while ((match = tagRegex.exec(html)) !== null) {
+      const tagName = match[1].toLowerCase();
+      if (allowedTags.includes(tagName)) {
+        tags.push({
+          type: match[0].startsWith('</') ? 'close' : 'open',
+          tag: tagName,
+          fullTag: match[0],
+          position: match.index
+        });
+      }
+    }
+    
+    // Determine which tags to keep using stack
+    const keepTags = new Set<number>();
+    const openTagsStack: Array<{ tag: string; index: number }> = [];
+    
+    // First pass: match closing tags with opening tags
+    for (let i = 0; i < tags.length; i++) {
+      const tagInfo = tags[i];
+      
+      if (tagInfo.type === 'open') {
+        openTagsStack.push({ tag: tagInfo.tag, index: i });
+        keepTags.add(i); // Tentatively keep opening tags
+      } else {
+        // Closing tag - find matching opening tag
+        let found = false;
+        for (let j = openTagsStack.length - 1; j >= 0; j--) {
+          if (openTagsStack[j].tag === tagInfo.tag) {
+            // Found matching opening tag
+            keepTags.add(i); // Keep this closing tag
+            openTagsStack.splice(j, 1); // Remove from stack
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          // Orphaned closing tag - don't keep it
+          console.log(`⚠️ Removing orphaned closing tag: ${tagInfo.fullTag}`);
+        }
+      }
+    }
+    
+    // Remove unclosed opening tags (those still in stack)
+    for (const { index } of openTagsStack) {
+      console.log(`⚠️ Removing unclosed opening tag: ${tags[index].fullTag}`);
+      keepTags.delete(index);
+    }
+    
+    // Build result string by reconstructing with only kept tags
+    const result: string[] = [];
+    let lastPos = 0;
+    
+    // Process tags in order of appearance
+    for (let i = 0; i < tags.length; i++) {
+      const tagInfo = tags[i];
+      
+      if (keepTags.has(i)) {
+        // Add text before this tag (from lastPos to current tag position)
+        result.push(html.substring(lastPos, tagInfo.position));
+        // Add the tag
+        result.push(tagInfo.fullTag);
+        lastPos = tagInfo.position + tagInfo.fullTag.length;
+      } else {
+        // Tag is being removed - add text up to this tag, but skip the tag itself
+        result.push(html.substring(lastPos, tagInfo.position));
+        lastPos = tagInfo.position + tagInfo.fullTag.length;
+      }
+    }
+    
+    // Add remaining text after last tag
+    result.push(html.substring(lastPos));
+    
+    return result.join('');
+  }
 }
 

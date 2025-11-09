@@ -162,22 +162,23 @@ export class TopicService {
       let fileId = '';
       
       if (message.text) {
-        messageDescription = `📝 Text: ${message.text}`;
+        messageDescription = `📝 <b>Text:</b> ${message.text}`;
       } else if (message.voice) {
-        messageDescription = `🎤 Voice message (${message.voice.duration}s)`;
+        messageDescription = `🎤 <b>Voice message:</b> (${message.voice.duration}s)`;
         fileId = message.voice.file_id;
       } else if (message.photo && message.photo.length > 0) {
-        messageDescription = `📷 Photo`;
+        messageDescription = `📷 <b>Photo</b>`;
         fileId = message.photo?.[message.photo.length - 1]?.file_id || ''; // Take largest photo
       } else if (message.document) {
-        messageDescription = `📄 Document: ${message.document.file_name || 'No name'}`;
+        messageDescription = `📄 <b>Document</b>: ${message.document.file_name || 'No name'}`;
         fileId = message.document.file_id;
       } else {
-        messageDescription = `📎 Media file`;
+        messageDescription = `📎 <b>Media file</b>`;
       }
 
       // Send message description to topic
-      const topicMessage = `👤 ${message.from.first_name} ${message.from.last_name || ''} (ID: ${userId})\n\n${messageDescription}`;
+      //const topicMessage = `<b>👤 ${message.from.first_name} ${message.from.last_name || ''}</b> (ID: ${userId})\n\n${messageDescription}`;
+      const topicMessage = `<b>👤 ${message.from.first_name} ${message.from.last_name || ''}</b>`;
       
       await this.messageService.sendMessageToTopic(this.adminChatId, topicId, topicMessage);
 

@@ -704,9 +704,51 @@ export const createCustomHandlers = (worker: BotInterface) => {
         `, [consultantMaid, human.haid, MESSAGES_FOR_ANSWER]);
 
         if (recentMessages && recentMessages.length > 0) {
-          const recent = recentMessages
-            .reverse()
-            .map((msg: any) => msg.title || '')
+          // Reverse to get chronological order
+          const reversedMessages = recentMessages.reverse();
+          
+          // Check if last message matches current messageText (to avoid duplication)
+          const lastMessage = reversedMessages[reversedMessages.length - 1];
+          const lastMessageTitle = lastMessage?.title || '';
+          const shouldExcludeLast = lastMessageTitle.trim() === messageText.trim();
+          
+          // Filter out last message if it matches current messageText
+          const messagesToProcess = shouldExcludeLast 
+            ? reversedMessages.slice(0, -1)
+            : reversedMessages;
+          
+          const recent = messagesToProcess
+            .map((msg: any) => {
+              const title = msg.title || '';
+              if (!title) return '';
+              
+              // Parse data_in to determine message direction
+              let direction = 'incoming'; // Default to incoming (User)
+              try {
+                if (msg.data_in) {
+                  const dataInObj = JSON.parse(msg.data_in);
+                  direction = dataInObj.direction || 'incoming';
+                  
+                  // Check if this is AI response
+                  if (dataInObj.data) {
+                    try {
+                      const dataObj = JSON.parse(dataInObj.data);
+                      if (dataObj.isAIResponse) {
+                        return `Assistant: ${title}`;
+                      }
+                    } catch (e) {
+                      // Ignore parse errors for nested data
+                    }
+                  }
+                }
+              } catch (e) {
+                console.warn(`Failed to parse data_in for message, using default direction:`, e);
+              }
+              
+              // Add prefix based on direction
+              const prefix = direction === 'outgoing' ? 'Assistant' : 'User';
+              return `${prefix}: ${title}`;
+            })
             .filter(text => text) // Remove empty
             .join('\n\n');
           
@@ -728,17 +770,17 @@ export const createCustomHandlers = (worker: BotInterface) => {
       const aiInput = `${validatedPrompt}\n\nRecent conversation:\n${context}\n\nUser: ${messageText}`;
 
       // Check for duplicate message (same text from same user in last 5 seconds)
-      const duplicateCheck = await handlerWorker.d1Storage.execute(`
-        SELECT full_maid
-        FROM messages
-        WHERE status_name='text' AND maid = ? AND title = ? AND xaid = ? AND created_at > datetime('now', '-5 seconds')
-        LIMIT 1
-      `, [consultantMaid, messageText, human.haid]);
+      // const duplicateCheck = await handlerWorker.d1Storage.execute(`
+      //   SELECT full_maid
+      //   FROM messages
+      //   WHERE status_name='text' AND maid = ? AND title = ? AND xaid = ? AND created_at > datetime('now', '-5 seconds')
+      //   LIMIT 1
+      // `, [consultantMaid, messageText, human.haid]);
       
-      if (duplicateCheck && duplicateCheck.length > 0) {
-        console.log(`⚠️ Duplicate message detected, skipping: ${messageText}`);
-        return;
-      }
+      // if (duplicateCheck && duplicateCheck.length > 0) {
+      //   console.log(`⚠️ Duplicate message detected, skipping: ${messageText}`);
+      //   return;
+      // }
 
       // Save user message to database FIRST (before AI call)
       // Use consultantMaid in maid field to link messages with message_threads
@@ -779,8 +821,14 @@ export const createCustomHandlers = (worker: BotInterface) => {
           aiApiToken
         );
 
-        aiResponse = await aiService.ask(validatedModel, aiInput);
-        console.log(`✅ AI Response received: ${aiResponse}`);
+        let rawAiResponse = await aiService.ask(validatedModel, aiInput);
+        console.log(`✅ AI Response received (raw): ${rawAiResponse}`);
+        
+        // Validate and fix HTML tags in AI response
+        aiResponse = aiService.validateAndFixHTML(rawAiResponse);
+        if (rawAiResponse !== aiResponse) {
+          console.log(`🔧 AI Response fixed (HTML validation): ${aiResponse}`);
+        }
       } catch (error) {
         console.error('❌ Error calling AI service:', error);
         console.error('Error details:', error?.message, error?.stack);
@@ -839,7 +887,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
         await handlerWorker.messageService.sendMessageToTopic(
           adminChatId,
           humanTopicId,
-          `<b>AI</b>
+          `🤖 <b>AI</b>
 
 ${aiResponse}`
         );
