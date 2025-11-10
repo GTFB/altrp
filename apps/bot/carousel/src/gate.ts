@@ -508,7 +508,7 @@ async function callGemini(model: string, inputText: string, apiKey: string) {
 		contents: [
 			{ role: 'user', parts: [{ text: inputText }] },
 		],
-		generationConfig: { maxOutputTokens: 1024 },
+		generationConfig: { maxOutputTokens: 2048 },
 	};
 	const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(googleReq) });
 	if (!res.ok) {
