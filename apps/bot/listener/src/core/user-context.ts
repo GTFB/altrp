@@ -1,8 +1,7 @@
 import { D1StorageService } from '../worker/d1-storage-service';
-import { HumanRepository } from '../repositories/HumanRepository';
 
 export interface UserContext {
-  humanId: number; // DB human ID (humans.id)
+  userId: number;
   telegramId: number;
   currentFlow: string;
   currentStep: number;
@@ -12,24 +11,13 @@ export interface UserContext {
   // New fields for forwarding management
   messageForwardingEnabled: boolean; // Whether forwarding to topic is enabled
   flowMode: boolean; // Whether user is in flow mode
-  
-  // Fields for topic flow mode (when admin manages flow in topic)
-  flowInTopic: boolean; // Whether flow is running in topic mode
-  topicId: number | null; // Topic ID where flow is running
-  adminChatId: number | null; // Admin chat ID where topic is located
-  targetUserId: number | null; // User ID (human) that admin is managing in this flow
 }
 
 export class UserContextManager {
   private d1Storage: D1StorageService | null = null;
-  private humanRepository: HumanRepository | null = null;
   
   setD1Storage(d1Storage: D1StorageService): void {
     this.d1Storage = d1Storage;
-  }
-
-  setHumanRepository(humanRepository: HumanRepository): void {
-    this.humanRepository = humanRepository;
   }
 
   async getContext(telegramId: number): Promise<UserContext | null> {
@@ -39,11 +27,7 @@ export class UserContextManager {
     }
     
     try {
-      if (!this.humanRepository) {
-        console.error('❌ HumanRepository not initialized');
-        return null;
-      }
-      const human = await this.humanRepository.getHumanByTelegramId(telegramId);
+      const human = await this.d1Storage.getHumanByTelegramId(telegramId);
       if (!human || !human.id) {
         console.log(`⚠️ Human ${telegramId} not found in database`);
         return null;
@@ -62,18 +46,14 @@ export class UserContextManager {
       }
       
       const context: UserContext = {
-        humanId: human.id,
+        userId: human.id,
         telegramId,
         currentFlow: savedData.currentFlow || '',
         currentStep: savedData.currentStep || 0,
         data: savedData.data || {},
         stepHistory: savedData.stepHistory || [],
         messageForwardingEnabled: savedData.messageForwardingEnabled ?? true,
-        flowMode: savedData.flowMode ?? false,
-        flowInTopic: savedData.flowInTopic ?? false,
-        topicId: savedData.topicId ?? null,
-        adminChatId: savedData.adminChatId ?? null,
-        targetUserId: savedData.targetUserId ?? null
+        flowMode: savedData.flowMode ?? false
       };
       
       console.log(`📚 Context loaded from DB for human ${telegramId}:`, {
@@ -89,21 +69,17 @@ export class UserContextManager {
     }
   }
   
-  async createContext(telegramId: number, humanId: number): Promise<UserContext> {
-    console.log(`🔄 Creating new context for user ${telegramId} (DB Human ID: ${humanId})`);
+  async createContext(telegramId: number, userId: number): Promise<UserContext> {
+    console.log(`🔄 Creating new context for user ${telegramId} (DB ID: ${userId})`);
     const context: UserContext = {
-      humanId,
+      userId,
       telegramId,
       currentFlow: '',
       currentStep: 0,
       data: {},
       stepHistory: [],
       messageForwardingEnabled: true, // Enabled by default
-      flowMode: false, // By default not in flow
-      flowInTopic: false, // By default not in topic flow
-      topicId: null,
-      adminChatId: null,
-      targetUserId: null
+      flowMode: false // By default not in flow
     };
     
     // Immediately save to DB
@@ -228,19 +204,11 @@ export class UserContextManager {
       data: context.data,
       stepHistory: context.stepHistory,
       messageForwardingEnabled: context.messageForwardingEnabled,
-      flowMode: context.flowMode,
-      flowInTopic: context.flowInTopic,
-      topicId: context.topicId,
-      adminChatId: context.adminChatId,
-      targetUserId: context.targetUserId
+      flowMode: context.flowMode
     };
     
     // Get existing human to preserve other data_in fields
-    if (!this.humanRepository) {
-      console.error('❌ HumanModel not initialized');
-      return;
-    }
-    const human = await this.humanRepository.getHumanByTelegramId(context.telegramId);
+    const human = await this.d1Storage.getHumanByTelegramId(context.telegramId);
     let dataInObj: any = {};
     
     if (human && human.dataIn) {
@@ -260,20 +228,16 @@ export class UserContextManager {
     dataInObj.context = contextData;
     
     console.log(`💾 Saving context to database for human ${context.telegramId}`);
-    if (!this.humanRepository) {
-      console.error('❌ HumanModel not initialized');
-      return;
-    }
-    await this.humanRepository.updateHumanDataIn(context.telegramId, JSON.stringify(dataInObj));
+    await this.d1Storage.updateHumanDataIn(context.telegramId, JSON.stringify(dataInObj));
     console.log(`✅ Context saved to database for human ${context.telegramId}`);
   }
 
   // Get or create context
-  async getOrCreateContext(telegramId: number, humanId: number): Promise<UserContext> {
+  async getOrCreateContext(telegramId: number, userId: number): Promise<UserContext> {
     let context = await this.getContext(telegramId);
     if (!context) {
       // Create new context
-      context = await this.createContext(telegramId, humanId);
+      context = await this.createContext(telegramId, userId);
     }
     return context;
   }
@@ -282,15 +246,11 @@ export class UserContextManager {
   async getUserLanguage(telegramId: number): Promise<string> {
     if (!this.d1Storage) {
       console.warn('D1Storage not set, using default locale');
-      return 'en';
+      return 'ru';
     }
 
     try {
-      if (!this.humanRepository) {
-        console.error('❌ HumanRepository not initialized');
-        return null;
-      }
-      const human = await this.humanRepository.getHumanByTelegramId(telegramId);
+      const human = await this.d1Storage.getHumanByTelegramId(telegramId);
       
       // Extract language from data_in JSON
       let userLanguage: string | undefined;
@@ -304,7 +264,7 @@ export class UserContextManager {
       }
       
       // Check that language is supported
-      // if (userLanguage && ['en', 'ru'].includes(userLanguage)) {
+      // if (userLanguage && ['ru', 'sr'].includes(userLanguage)) {
       //   return userLanguage;
       // }
       if (userLanguage) {
@@ -314,7 +274,7 @@ export class UserContextManager {
       return 'en'; // Default fallback
     } catch (error) {
       console.error(`Error getting human language for ${telegramId}:`, error);
-      return 'en';
+      return 'ru';
     }
   }
 }

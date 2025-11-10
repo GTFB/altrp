@@ -1,6 +1,8 @@
 import { BotInterface } from '../core/bot-interface';
-import { AIService } from '../core/ai-service';
-import { generateUuidV4, generateAid, generateFullId } from '../core/helpers';
+import { AIService } from '../integrations/ai-service';
+import { generateUuidV4 } from '../helpers/generateUuidV4';
+import { generateAid } from '../helpers/generateAid';
+import { UserContextManager } from '../core/user-context';
 
 interface Consultant {
   id: number;
@@ -26,6 +28,9 @@ interface MessageThread {
 export const createCustomHandlers = (worker: BotInterface) => {
   const handlerWorker = {
     d1Storage: worker['d1Storage'],
+    humanRepository: worker['humanRepository'],
+    messageRepository: worker['messageRepository'],
+    messageThreadRepository: worker['messageThreadRepository'],
     flowEngine: worker['flowEngine'],
     env: worker['env'],
     messageService: worker['messageService'],
@@ -34,7 +39,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
   
   return {
     /**
-     * Handle /start command - initialize consultants
+     * Handle /start command
      */
     handleStartCommand: async (message: any, bot: any) => {
       const userId = message.from.id;
@@ -43,7 +48,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
       console.log(`🚀 Handling /start command via flow for human ${userId}`);
 
       // Get or create human in database to get dbHumanId
-      let existingHuman = await handlerWorker.d1Storage.getHumanByTelegramId(userId);
+      let existingHuman = await handlerWorker.humanRepository.getHumanByTelegramId(userId);
       
       if (!existingHuman) {
         // Create topic in admin group for new human
@@ -69,11 +74,32 @@ export const createCustomHandlers = (worker: BotInterface) => {
           dataIn: dataIn
         };
 
-        await handlerWorker.d1Storage.addHuman(newHuman);
+        await handlerWorker.humanRepository.addHuman(newHuman);
         console.log(`✅ New human ${userId} registered for start flow`);
         
         // Update human reference
-        existingHuman = await handlerWorker.d1Storage.getHumanByTelegramId(userId);
+        existingHuman = await handlerWorker.humanRepository.getHumanByTelegramId(userId);
+      
+        // Create message_threads entry if topic was created and human has haid
+        if (topicId && existingHuman && existingHuman.haid) {
+          const topicName = fullName;
+          const threadDataIn = JSON.stringify({
+            prompt: "You are a technical support assistant providing troubleshooting help and technical guidance. Help users resolve technical issues, understand software functionality, and navigate system features. Always clarify that your assistance is for general troubleshooting and encourage users to contact official support channels for complex issues, account problems, or security concerns. Keep your answers brief and concise. Format your responses using HTML tags for Telegram only from this list: use <b> for bold, <i> for italics, <u> for underscores, <code> for code, and <a href=\"url\"> for links DO NOT use <br> tag. Respond clearly only to the user's message, taking into account the context, without unnecessary auxiliary information.",
+            model: "gemini-2.5-flash",
+            context_length: 6
+          });
+          
+          await handlerWorker.messageThreadRepository.addMessageThread({
+            value: topicId.toString(),
+            dataIn: threadDataIn,
+            xaid: existingHuman.haid,
+            statusName: 'active',
+            type: 'leadsgen',
+            title: topicName
+          });
+          
+          console.log(`✅ Message thread created for topic ${topicId}`);
+        }
       }
 
       if (!existingHuman || !existingHuman.id) {
@@ -116,7 +142,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
 
       try {
         // Find human by topic_id
-        const humanTelegramId = await handlerWorker.d1Storage.getHumanTelegramIdByTopic(topicId);
+        const humanTelegramId = await handlerWorker.humanRepository.getHumanTelegramIdByTopic(topicId);
         
         if (!humanTelegramId) {
           console.error(`❌ Human not found for topic ${topicId}`);
@@ -125,7 +151,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
         }
 
         // Get human to access current data_in
-        const human = await handlerWorker.d1Storage.getHumanByTelegramId(humanTelegramId);
+        const human = await handlerWorker.humanRepository.getHumanByTelegramId(humanTelegramId);
         
         if (!human) {
           console.error(`❌ Human ${humanTelegramId} not found in database`);
@@ -150,11 +176,25 @@ export const createCustomHandlers = (worker: BotInterface) => {
           dataInObj.topic_id = topicId;
         }
 
+        // Save original icon if not already saved
+        if (!dataInObj.original_topic_icon) {
+          dataInObj.original_topic_icon = {
+            icon_color: 0x6FB9F0, // Default blue color
+            icon_custom_emoji_id: null
+          };
+        }
+
         // Set ai_enabled to true
         dataInObj.ai_enabled = true;
 
         // Update data_in
-        await handlerWorker.d1Storage.updateHumanDataIn(humanTelegramId, JSON.stringify(dataInObj));
+        await handlerWorker.humanRepository.updateHumanDataIn(humanTelegramId, JSON.stringify(dataInObj));
+
+        // Change topic icon to AI emoji
+        const iconChanged = await handlerWorker.topicService.editTopicIcon(topicId, "5309832892262654231");
+        if (!iconChanged) {
+          console.warn(`⚠️ Failed to change topic icon for topic ${topicId}`);
+        }
 
         console.log(`✅ AI enabled for human ${humanTelegramId} in topic ${topicId}`);
         await handlerWorker.messageService.sendMessageToTopic(chatId, topicId, '✅ AI enabled.');
@@ -187,7 +227,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
 
       try {
         // Find human by topic_id
-        const humanTelegramId = await handlerWorker.d1Storage.getHumanTelegramIdByTopic(topicId);
+        const humanTelegramId = await handlerWorker.humanRepository.getHumanTelegramIdByTopic(topicId);
         
         if (!humanTelegramId) {
           console.error(`❌ Human not found for topic ${topicId}`);
@@ -196,7 +236,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
         }
 
         // Get human to access current data_in
-        const human = await handlerWorker.d1Storage.getHumanByTelegramId(humanTelegramId);
+        const human = await handlerWorker.humanRepository.getHumanByTelegramId(humanTelegramId);
         
         if (!human) {
           console.error(`❌ Human ${humanTelegramId} not found in database`);
@@ -225,7 +265,26 @@ export const createCustomHandlers = (worker: BotInterface) => {
         dataInObj.ai_enabled = false;
 
         // Update data_in
-        await handlerWorker.d1Storage.updateHumanDataIn(humanTelegramId, JSON.stringify(dataInObj));
+        await handlerWorker.humanRepository.updateHumanDataIn(humanTelegramId, JSON.stringify(dataInObj));
+
+        // Restore original topic icon
+        const originalIcon = dataInObj.original_topic_icon;
+        if (originalIcon) {
+          const iconRestored = await handlerWorker.topicService.editTopicIcon(
+            topicId, 
+            originalIcon.icon_custom_emoji_id, 
+            originalIcon.icon_color
+          );
+          if (!iconRestored) {
+            console.warn(`⚠️ Failed to restore topic icon for topic ${topicId}`);
+          }
+        } else {
+          // If no original icon saved, use default (blue color, no emoji)
+          const iconRestored = await handlerWorker.topicService.editTopicIcon(topicId, null, 0x6FB9F0);
+          if (!iconRestored) {
+            console.warn(`⚠️ Failed to restore default topic icon for topic ${topicId}`);
+          }
+        }
 
         console.log(`✅ AI disabled for human ${humanTelegramId} in topic ${topicId}`);
         await handlerWorker.messageService.sendMessageToTopic(chatId, topicId, '✅ AI disabled.');
@@ -271,7 +330,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
 
       try {
         // Find human by topic_id
-        const humanTelegramId = await handlerWorker.d1Storage.getHumanTelegramIdByTopic(topicId);
+        const humanTelegramId = await handlerWorker.humanRepository.getHumanTelegramIdByTopic(topicId);
         
         if (!humanTelegramId) {
           console.error(`❌ Human not found for topic ${topicId}`);
@@ -280,7 +339,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
         }
 
         // Get human to ensure it exists and get context
-        const human = await handlerWorker.d1Storage.getHumanByTelegramId(humanTelegramId);
+        const human = await handlerWorker.humanRepository.getHumanByTelegramId(humanTelegramId);
         
         if (!human || !human.id) {
           console.error(`❌ Human ${humanTelegramId} not found in database`);
@@ -288,16 +347,111 @@ export const createCustomHandlers = (worker: BotInterface) => {
           return;
         }
 
-        // Get or create human context
-        await bot.userContextManager.getOrCreateContext(humanTelegramId, human.id);
+        // Get or create admin context (admin who runs the command)
+        const adminHuman = await handlerWorker.humanRepository.getHumanByTelegramId(userId);
+        if (!adminHuman || !adminHuman.id) {
+          console.error(`❌ Admin ${userId} not found in database`);
+          await handlerWorker.messageService.sendMessageToTopic(chatId, topicId, 'Admin not found in database.');
+          return;
+        }
 
-        // Start set_status flow for the human associated with this topic
-        await handlerWorker.flowEngine.startFlow(humanTelegramId, 'set_status');
+        await bot.userContextManager.getOrCreateContext(userId, adminHuman.id);
 
-        console.log(`✅ Set status flow launched for human ${humanTelegramId} in topic ${topicId}`);
+        // Start set_status flow in topic mode for admin
+        await handlerWorker.flowEngine.startTopicFlow(userId, topicId, 'set_status', humanTelegramId, adminChatId);
+
+        console.log(`✅ Set status flow launched for admin ${userId} in topic ${topicId} (managing user ${humanTelegramId})`);
       } catch (error) {
         console.error(`❌ Error starting set_status flow for topic ${topicId}:`, error);
         await handlerWorker.messageService.sendMessageToTopic(chatId, topicId, '❌ Error starting set_status flow.');
+      }
+    },
+
+
+    setStatusHandler: async (telegramId: number, contextManager: UserContextManager, callbackData: string) => {
+      console.log(`🛠️ setStatusHandler called with callbackData: ${callbackData}`);
+      
+      // Get context to access topic flow information
+      const context = await contextManager.getContext(telegramId);
+      if (!context) {
+        console.error(`❌ Context not found for admin ${telegramId}`);
+        return;
+      }
+
+      // Get target user ID and topic ID from context
+      const targetUserId = context.targetUserId;
+      const topicId = context.topicId;
+      const adminChatId = context.adminChatId;
+
+      if (!targetUserId || !topicId || !adminChatId) {
+        console.error(`❌ Missing required context: targetUserId=${targetUserId}, topicId=${topicId}, adminChatId=${adminChatId}`);
+        return;
+      }
+
+      // Map callbackData to status name
+      const statusMap: Record<string, string> = {
+        'new_lead_status': 'NEW',
+        'hot_lead_status': 'HOT',
+        'sell_lead_status': 'SELL'
+      };
+
+      const statusName = statusMap[callbackData];
+      if (!statusName) {
+        console.error(`❌ Unknown callback data: ${callbackData}`);
+        return;
+      }
+
+      try {
+        // Update human status_name
+        await handlerWorker.humanRepository.updateHuman(targetUserId, {
+          statusName: statusName
+        });
+        console.log(`✅ Status updated to "${statusName}" for human ${targetUserId}`);
+
+        // Change topic icon based on status
+        let icon: string | null = null;
+        switch (statusName) {
+          case 'NEW':
+            icon = '5312536423851630001';
+            break;
+          case 'HOT':
+            icon = '5312241539987020022';
+            break;
+          case 'SELL':
+            icon = '5350452584119279096';
+            break;
+        }
+
+        console.log(`🎨 Setting status ${statusName} icon ${icon} for topic ${topicId}`);
+
+        if (icon) {
+          const iconChanged = await handlerWorker.topicService.editTopicIcon(topicId, icon);
+          if (!iconChanged) {
+            console.warn(`⚠️ Failed to change topic icon for topic ${topicId}`);
+          } else {
+            console.log(`✅ Topic icon updated to ${icon} for topic ${topicId}`);
+          }
+        } else {
+          console.warn(`⚠️ No icon defined for status ${statusName}`);
+        }
+
+        // Send confirmation message to topic
+        await handlerWorker.messageService.sendMessageToTopic(
+          adminChatId,
+          topicId,
+          `✅ Status updated to <b>${statusName}</b>`
+        );
+
+        // Complete flow and exit flow mode (clears flowInTopic, topicId, etc.)
+        await handlerWorker.flowEngine.completeFlow(telegramId);
+
+      } catch (error) {
+        console.error(`❌ Error in setStatusHandler:`, error);
+        await handlerWorker.messageService.sendMessageToTopic(
+          adminChatId,
+          topicId,
+          `❌ Error updating status: ${error instanceof Error ? error.message : 'Unknown error'}`
+        );
       }
     },
 
@@ -314,19 +468,53 @@ export const createCustomHandlers = (worker: BotInterface) => {
         return;
       }
 
-      // Extract topicId and chatId from message
-      const topicId = (message as any).message_thread_id;
+      // Extract chatId from message
       const chatId = message.chat.id;
       const messageFromId = message.from.id;
 
-      if (!topicId) {
-        console.log('No topic ID in message');
+      // if (!topicId) {
+      //   console.log('No topic ID in message');
+      //   return;
+      // }
+
+      // Get human first to extract topic_id (needed for voice transcription error handling)
+      const human = await handlerWorker.humanRepository.getHumanByTelegramId(chatId);
+      if (!human || !human.dataIn) {
+        console.error(`❌ Human ${chatId} not found or has no dataIn`);
+        await handlerWorker.messageService.sendMessage(
+          chatId,
+          '❌ Human not found or has no configuration.'
+        );
+        return;
+      }
+
+      // Extract topic_id from human.dataIn
+      let humanTopicId: number | null = null;
+      try {
+        const dataInObj = JSON.parse(human.dataIn);
+        humanTopicId = dataInObj.topic_id;
+
+      } catch (e) {
+        console.error(`Failed to parse human.dataIn for human ${chatId}:`, e);
+        await handlerWorker.messageService.sendMessage(
+          chatId,
+          '❌ Error parsing human configuration.'
+        );
+        return;
+      }
+
+      if (!humanTopicId) {
+        console.error(`❌ No topic_id found for human ${chatId}`);
+        await handlerWorker.messageService.sendMessage(
+          chatId,
+          '❌ Topic ID not found for this human.'
+        );
         return;
       }
 
       // Check if message is voice -> transcribe and continue as text
       if (message.voice) {
-        console.log(`🎤 Voice message detected in topic ${topicId}`);
+        console.log(`🎤 Voice message detected in topic ${humanTopicId}`);
         try {
           const botToken = handlerWorker.env.BOT_TOKEN || '';
           if (!botToken) {
@@ -389,7 +577,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
           console.error('❌ Voice transcription failed:', e);
           await handlerWorker.messageService.sendMessageToTopic(
             adminChatId,
-            topicId,
+            humanTopicId,
             'Voice recognition failed. Please send the text or try again.'
           );
           return;
@@ -398,34 +586,31 @@ export const createCustomHandlers = (worker: BotInterface) => {
 
       // Check if message has no text
       if (!message.text) {
-        console.log(`📭 No text in message in topic ${topicId}`);
-        await handlerWorker.messageService.sendMessageToTopic(
-          adminChatId,
-          topicId,
+        console.log(`📭 No text in message in topic ${humanTopicId}`);
+        await handlerWorker.messageService.sendMessage(
+          chatId,
           'Send a text or voice message.'
         );
         return;
       }
 
       const messageText = message.text;
-      console.log(`💬 Handling consultant message in topic ${topicId}: ${messageText}`);
+      console.log(`💬 Handling AI answer to human message: ${messageText}`);
 
-      // Get consultant by topic_id from message_threads
-      const consultantResult = await handlerWorker.d1Storage.execute(`
-      SELECT id, maid, title, data_in 
-      FROM message_threads 
-      WHERE value = ? AND type = 'consultant' AND deleted_at IS NULL
-      LIMIT 1
-      `, [topicId.toString()]);
+      // Get consultant (message_thread) from message_threads by topic_id
+      // human and humanTopicId already retrieved above
+      const consultant = await handlerWorker.messageThreadRepository.getMessageThreadByValue(
+        humanTopicId.toString(),
+        'leadsgen'
+      );
 
-      if (!consultantResult || consultantResult.length === 0) {
-        console.log(`No consultant found for topic ${topicId}`);
+      if (!consultant) {
+        console.log(`No consultant found`);
         return;
       }
 
-      const consultant = consultantResult[0];
-      const consultantMaid = consultant.maid as string;
-      const consultantTitle = consultant.title as string;
+      const consultantMaid = consultant.maid;
+      const consultantTitle = consultant.title || '';
 
       console.log(`Found consultant: ${consultantTitle} (${consultantMaid})`);
 
@@ -439,18 +624,17 @@ export const createCustomHandlers = (worker: BotInterface) => {
       let historySummaryUpdatedAt: string | null = null;
       let historySummaryLastFullMaid: string | null = null;
 
-      if (!consultant.data_in) {
+      if (!consultant.dataIn) {
         console.error(`No data_in found for consultant ${consultantMaid}`);
-        await handlerWorker.messageService.sendMessageToTopic(
+        await handlerWorker.messageService.sendMessage(
           adminChatId,
-          topicId,
           '❌ Consultant configuration error: settings not found.'
         );
         return;
       }
 
       try {
-        settingsJson = JSON.parse(consultant.data_in);
+        settingsJson = JSON.parse(consultant.dataIn);
         
         // Get required settings from data_in - all are mandatory
         prompt = settingsJson.prompt;
@@ -464,13 +648,12 @@ export const createCustomHandlers = (worker: BotInterface) => {
             model: !!model,
             context_length: !!contextLength
           });
-          await handlerWorker.messageService.sendMessageToTopic(
+          await handlerWorker.messageService.sendMessage(
             adminChatId,
-            topicId,
             '❌ Consultant configuration error: missing required settings (prompt, model, or context_length).'
           );
-      return;
-    }
+          return;
+        }
 
         // Get existing summary if any
         if (settingsJson.history_summary && settingsJson.history_summary.text) {
@@ -480,12 +663,11 @@ export const createCustomHandlers = (worker: BotInterface) => {
         historySummaryLastFullMaid = settingsJson.history_summary_last_full_maid || null;
       } catch (error) {
         console.error('Error parsing consultant settings:', error);
-        await handlerWorker.messageService.sendMessageToTopic(
+        await handlerWorker.messageService.sendMessage(
           adminChatId,
-          topicId,
           '❌ Consultant configuration error: invalid JSON in settings.'
         );
-      return;
+        return;
       }
 
       // At this point all values are guaranteed to be non-null after validation above
@@ -501,77 +683,144 @@ export const createCustomHandlers = (worker: BotInterface) => {
       const MESSAGES_FOR_ANSWER = validatedContextLength;
 
       // Get last context_length messages for answer
-      // Read current summary if exists
-      let context = '';
-      try {
-        const recentMessages = await handlerWorker.d1Storage.execute(`
-          SELECT title, created_at, data_in 
-          FROM messages 
-          WHERE maid = ?
-          ORDER BY created_at DESC
-          LIMIT ?
-        `, [consultantMaid, MESSAGES_FOR_ANSWER]);
+      // Build contents array for recent conversation history
+      const contents: Array<{ role: string; parts: Array<{ text: string }> }> = [];
 
+      // human already retrieved above, reuse it
+      const dataInObj = JSON.parse(human.dataIn);
+
+      console.log('Selecting messages:', consultantMaid, human.haid, MESSAGES_FOR_ANSWER)
+
+      try {
+        const recentMessages = await handlerWorker.messageRepository.getRecentMessages(
+          consultantMaid,
+          human.haid,
+          'text',
+          MESSAGES_FOR_ANSWER
+        );
+        
         if (recentMessages && recentMessages.length > 0) {
-          const recent = recentMessages
-            .reverse()
-            .map((msg: any) => msg.title || '')
-            .filter(text => text) // Remove empty
-            .join('\n\n');
+          // Reverse to get chronological order
+          const reversedMessages = recentMessages.reverse();
           
-          // Answer format: summary (if exists) + last 6 messages
-          context = historySummaryText 
-            ? `Summary:\n${historySummaryText}\n\n${recent}`
-            : recent;
-        } else if (historySummaryText) {
-          // If no recent messages but summary exists
-          context = `Summary:\n${historySummaryText}`;
+          // Check if last message matches current messageText (to avoid duplication)
+          const lastMessage = reversedMessages[reversedMessages.length - 1];
+          const lastMessageTitle = lastMessage?.title || '';
+          const shouldExcludeLast = lastMessageTitle.trim() === messageText.trim();
+          
+          // Filter out last message if it matches current messageText
+          const messagesToProcess = shouldExcludeLast 
+            ? reversedMessages.slice(0, -1)
+            : reversedMessages;
+          
+          // Add recent messages to contents array
+          for (const msg of messagesToProcess) {
+            const text = (msg.title || '').trim();
+            if (!text) continue;
+            
+            // Parse data_in to determine message direction
+            let role = 'user'; // Default to user
+            try {
+              if (msg.data_in) {
+                const dataInObj = JSON.parse(msg.data_in);
+                const direction = dataInObj.direction || 'incoming';
+                
+                // Check if this is AI response
+                if (dataInObj.data) {
+                  try {
+                    const dataObj = JSON.parse(dataInObj.data);
+                    if (dataObj.isAIResponse) {
+                      role = 'model';
+                    } else {
+                      role = direction === 'outgoing' ? 'model' : 'user';
+                    }
+                  } catch (e) {
+                    // If parse fails, use direction
+                    role = direction === 'outgoing' ? 'model' : 'user';
+                  }
+                } else {
+                  role = direction === 'outgoing' ? 'model' : 'user';
+                }
+              }
+            } catch (e) {
+              console.warn(`Failed to parse data_in for message, using default role:`, e);
+              // Default to 'user' if parsing fails
+            }
+            
+            contents.push({
+              role: role,
+              parts: [{ text: text }]
+            });
+          }
         }
       } catch (error) {
         console.error('Error getting recent messages:', error);
-        context = ''; // Continue without context if error
+        // Continue with empty contents if error
       }
 
-      // Prepare AI input
-      const aiInput = `${validatedPrompt}\n\nRecent conversation:\n${context}\n\nUser: ${messageText}\n\nConsultant:`;
+      // Add current user message to contents
+      contents.push({
+        role: 'user',
+        parts: [{ text: messageText }]
+      });
+
+      // Build system instruction with prompt and summary (if exists)
+      let systemInstructionText = validatedPrompt;
+      if (historySummaryText) {
+        systemInstructionText = `${validatedPrompt}\n\nCONTEXT_SUMMARY: ${historySummaryText}`;
+      }
+
+      // Prepare AI input as object with system_instruction and contents
+      const aiInput = {
+        system_instruction: {
+          role: 'system',
+          parts: [
+            { text: systemInstructionText }
+          ]
+        },
+        contents: contents,
+        generationConfig: {
+          maxOutputTokens: 2048
+        }
+      };
 
       // Check for duplicate message (same text from same user in last 5 seconds)
-      const duplicateCheck = await handlerWorker.d1Storage.execute(`
-        SELECT full_maid
-        FROM messages
-        WHERE maid = ? AND title = ? AND created_at > datetime('now', '-5 seconds')
-        LIMIT 1
-      `, [consultantMaid, messageText]);
+      // const duplicateCheck = await handlerWorker.d1Storage.execute(`
+      //   SELECT full_maid
+      //   FROM messages
+      //   WHERE status_name='text' AND maid = ? AND title = ? AND xaid = ? AND created_at > datetime('now', '-5 seconds')
+      //   LIMIT 1
+      // `, [consultantMaid, messageText, human.haid]);
       
-      if (duplicateCheck && duplicateCheck.length > 0) {
-        console.log(`⚠️ Duplicate message detected, skipping: ${messageText}`);
-        return;
-      }
+      // if (duplicateCheck && duplicateCheck.length > 0) {
+      //   console.log(`⚠️ Duplicate message detected, skipping: ${messageText}`);
+      //   return;
+      // }
 
       // Save user message to database FIRST (before AI call)
       // Use consultantMaid in maid field to link messages with message_threads
-      const userMessageUuid = generateUuidV4();
-      const userMessageFullMaid = generateFullId('m');
-      await handlerWorker.d1Storage.execute(`
-        INSERT INTO messages (uuid, maid, full_maid, title, status_name, "order", gin, fts, data_in)
-        VALUES (?, ?, ?, ?, 'active', 0, ?, '', ?)
-      `, [
-        userMessageUuid,
-        consultantMaid, // Link to message_threads via maid
-        userMessageFullMaid,
-        messageText,
-        consultantMaid, // Use maid for grouping (gin is redundant)
-        JSON.stringify({ consultant: consultantMaid, fromId: messageFromId, text: messageText, createdAt: new Date().toISOString() })
-      ]);
-      console.log(`✅ User message saved: ${userMessageFullMaid} (linked to consultant ${consultantMaid})`);
+      // const userMessageUuid = generateUuidV4();
+      // const userMessageFullMaid = generateAid('m');
+      // await handlerWorker.d1Storage.execute(`
+      //   INSERT INTO messages (uuid, maid, full_maid, title, status_name, "order", gin, fts, data_in, xaid)
+      //   VALUES (?, ?, ?, ?, 'active', 0, ?, '', ?, ?)
+      // `, [
+      //   userMessageUuid,
+      //   consultantMaid, // Link to message_threads via maid
+      //   userMessageFullMaid,
+      //   messageText,
+      //   consultantMaid, // Use maid for grouping (gin is redundant)
+      //   JSON.stringify({ consultant: consultantMaid, fromId: messageFromId, text: messageText, createdAt: new Date().toISOString() }),
+      //   human.haid,
+      // ]);
+      // console.log(`✅ User message saved: ${userMessageFullMaid} (linked to consultant ${consultantMaid})`);
 
       // Check if AI token is configured
       const aiApiToken = handlerWorker.env.AI_API_TOKEN;
       if (!aiApiToken) {
         console.error('AI_API_TOKEN is not configured! Set it with: wrangler secret put AI_API_TOKEN');
-        await handlerWorker.messageService.sendMessageToTopic(
+        await handlerWorker.messageService.sendMessage(
           adminChatId,
-          topicId,
           '❌ AI service is not configured. Please set AI_API_TOKEN secret.'
         );
         return;
@@ -587,8 +836,14 @@ export const createCustomHandlers = (worker: BotInterface) => {
           aiApiToken
         );
 
-        aiResponse = await aiService.ask(validatedModel, aiInput);
-        console.log(`✅ AI Response received: ${aiResponse}`);
+        let rawAiResponse = await aiService.ask(validatedModel, aiInput);
+        console.log(`✅ AI Response received (raw): ${rawAiResponse}`);
+        
+        // Validate and fix HTML tags in AI response
+        aiResponse = aiService.validateAndFixHTML(rawAiResponse);
+        if (rawAiResponse !== aiResponse) {
+          console.log(`🔧 AI Response fixed (HTML validation): ${aiResponse}`);
+        }
       } catch (error) {
         console.error('❌ Error calling AI service:', error);
         console.error('Error details:', error?.message, error?.stack);
@@ -596,12 +851,11 @@ export const createCustomHandlers = (worker: BotInterface) => {
         // Send error message to user
         const errorMessage = 'Sorry, I encountered an error while processing your request. Please try again later.';
         try {
-          await handlerWorker.messageService.sendMessageToTopic(
-            adminChatId,
-            topicId,
+          await handlerWorker.messageService.sendMessage(
+            chatId,
             errorMessage
           );
-          console.log(`⚠️ Error message sent to topic ${topicId}`);
+          console.log(`⚠️ Error message sent to human ${chatId}`);
         } catch (sendError) {
           console.error('❌ Failed to send error message to topic:', sendError);
         }
@@ -611,191 +865,241 @@ export const createCustomHandlers = (worker: BotInterface) => {
         return;
       }
 
-      // Save AI response to database
+      // Save AI response to database using MessageRepository
       // Use consultantMaid in maid field to link messages with message_threads
       try {
-        const aiMessageUuid = generateUuidV4();
-        const aiMessageFullMaid = generateFullId('m');
-        await handlerWorker.d1Storage.execute(`
-          INSERT INTO messages (uuid, maid, full_maid, title, status_name, "order", gin, fts, data_in)
-          VALUES (?, ?, ?, ?, 'active', 0, ?, '', ?)
-        `, [
-          aiMessageUuid,
-          consultantMaid, // Link to message_threads via maid
-          aiMessageFullMaid,
-          aiResponse,
-          consultantMaid, // Use maid for grouping (gin is redundant)
-          JSON.stringify({ consultant: consultantMaid, response: aiResponse, createdAt: new Date().toISOString() })
-        ]);
-        console.log(`✅ AI message saved: ${aiMessageFullMaid} (linked to consultant ${consultantMaid})`);
+        if (!human.id) {
+          throw new Error(`Human ${chatId} has no id`);
+        }
+
+        await handlerWorker.messageRepository.addMessage({
+          humanId: human.id,
+          messageType: 'bot_text',
+          direction: 'outgoing',
+          content: aiResponse,
+          statusName: 'text',
+          data: JSON.stringify({ 
+            consultant: consultantMaid, 
+            response: aiResponse, 
+            isAIResponse: true,
+            createdAt: new Date().toISOString() 
+          })
+        });
+        console.log(`✅ AI message saved (linked to consultant ${consultantMaid})`);
       } catch (error) {
         console.error('❌ Error saving AI response to database:', error);
         // Continue execution to send response even if DB save fails
       }
 
-        // Send AI response to topic
+      // Send AI response to topic
+      //TO DO disable logging this messages
       try {
-        console.log(`📤 Sending AI response to topic ${topicId}`);
-        await handlerWorker.messageService.sendMessageToTopic(
-          adminChatId,
-          topicId,
+        console.log(`📤 Sending AI response to topic ${humanTopicId}`);
+        await handlerWorker.messageService.sendMessage(
+          chatId,
           aiResponse
         );
-        console.log(`✅ Message sent to topic ${topicId}`);
+
+        await handlerWorker.messageService.sendMessageToTopic(
+          adminChatId,
+          humanTopicId,
+          `🤖 <b>AI</b>
+
+${aiResponse}`
+        );
+
+        console.log(`✅ Message sent to human ${chatId}`);
       } catch (error) {
         console.error('❌ Error sending AI response to topic:', error);
         // Don't return here - summary check should still happen
       }
-        
-      // Create/update summary after AI response if total messages divisible by context_length
+
+      // ================== CREATE / UPDATE SUMMARY ==================
       try {
-        // Count total messages after saving both user and AI messages
-        const allMessages = await handlerWorker.d1Storage.execute(`
-          SELECT created_at, full_maid
-          FROM messages
-          WHERE maid = ?
-          ORDER BY created_at ASC
-        `, [consultantMaid]);
+        console.log('Start summarization logic...');
 
-        const totalMessageCount = allMessages?.length || 0;
-        console.log(`📊 Total messages after saving: ${totalMessageCount} (expected: ${totalMessageCount % MESSAGES_FOR_SUMMARY === 0 ? 'CREATE SUMMARY' : 'NO SUMMARY'})`);
+        const MAX_MESSAGES_FOR_SUMMARY = 10; // can change
+        const allMessages = await handlerWorker.messageRepository.getAllMessagesByMaid(
+          consultantMaid,
+          human.haid,
+          'text'
+        );
 
-        // Check if we need to create/update summary (every context_length messages)
-        if (totalMessageCount > 0 && totalMessageCount % MESSAGES_FOR_SUMMARY === 0) {
-          console.log(`🧾 SUMMARY TRIGGER: totalMessageCount=${totalMessageCount}, MESSAGES_FOR_SUMMARY=${MESSAGES_FOR_SUMMARY}, ${totalMessageCount % MESSAGES_FOR_SUMMARY} === 0`);
-          console.log(`🧾 Creating/updating summary after message ${totalMessageCount} (every ${MESSAGES_FOR_SUMMARY} messages)`);
+        const totalMessages = allMessages.length;
+        const contextLength = validatedContextLength;
+        const currentSummaryVersion = settingsJson.summary_version || 0;
+        const latestSummaryVersion = Math.floor(totalMessages / contextLength);
 
-          let messagesToSummarize: any[] = [];
+        if (latestSummaryVersion <= currentSummaryVersion) {
+          console.log('⛔️ No new messages for Summary, skip it.');
+          return;
+        }
+
+        // Calculating the message range for summary
+        let startIndex = currentSummaryVersion * contextLength;
+        let endIndex = latestSummaryVersion * contextLength;
+
+        // Limiting the batch of recent messages to MAX_MESSAGES_FOR_SUMMARY
+        if (endIndex - startIndex > MAX_MESSAGES_FOR_SUMMARY) {
+          startIndex = endIndex - MAX_MESSAGES_FOR_SUMMARY;
+        }
+
+        const messagesToSummarize = allMessages
+          .slice(startIndex, endIndex)
+          .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+
+        if (messagesToSummarize.length === 0) {
+          console.log('⛔️ There are no messages to create summary after filtering');
+          return;
+        }
+
+        // Build contents array for chat history (alternating user/model roles)
+        const contents: Array<{ role: string; parts: Array<{ text: string }> }> = [];
+        
+        // Add conversation history
+        for (const msg of messagesToSummarize) {
+          const text = (msg.title || '').trim();
+          if (!text) continue;
           
-          if (!historySummaryText) {
-            // First summary: first context_length messages
-            const firstMessages = await handlerWorker.d1Storage.execute(`
-              SELECT title, full_maid, data_in
-              FROM messages
-              WHERE maid = ?
-              ORDER BY created_at ASC
-              LIMIT ?
-            `, [consultantMaid, MESSAGES_FOR_SUMMARY]);
-            
-            messagesToSummarize = firstMessages || [];
-            console.log(`📝 First summary: ${messagesToSummarize.length} messages`);
-          } else {
-            // Subsequent summaries: next context_length messages after last summary
-            const nextMessages = await handlerWorker.d1Storage.execute(`
-              SELECT title, full_maid, data_in
-              FROM messages
-              WHERE maid = ? AND created_at > ?
-              ORDER BY created_at ASC
-              LIMIT ?
-            `, [consultantMaid, historySummaryUpdatedAt || '1970-01-01', MESSAGES_FOR_SUMMARY]);
-            
-            messagesToSummarize = nextMessages || [];
-            console.log(`📝 Next summary batch: ${messagesToSummarize.length} messages`);
-          }
-
-          if (messagesToSummarize.length > 0) {
-            const messagesText = messagesToSummarize
-              .map((msg: any) => {
-                const text = (msg.title || '').trim();
-                if (!text) return '';
-                
-                // Determine message author from data_in
-                let author = 'User';
+          // Parse data_in to determine message direction (same logic as lines 716-749)
+          let role = 'user'; // Default to user
+          try {
+            if (msg.data_in) {
+              const dataInObj = JSON.parse(msg.data_in);
+              const direction = dataInObj.direction || 'incoming';
+              
+              // Check if this is AI response
+              if (dataInObj.data) {
                 try {
-                  if (msg.data_in) {
-                    const data = JSON.parse(msg.data_in);
-                    // If data_in has 'response' field, it's from AI/Consultant
-                    // If data_in has 'text' field, it's from user
-                    if (data.response !== undefined) {
-                      author = 'Consultant';
-                    } else if (data.text !== undefined) {
-                      author = 'User';
-                    }
+                  const dataObj = JSON.parse(dataInObj.data);
+                  if (dataObj.isAIResponse) {
+                    role = 'model';
+                  } else {
+                    role = direction === 'outgoing' ? 'model' : 'user';
                   }
                 } catch (e) {
-                  // If parsing fails, default to 'User'
-                  console.warn('Failed to parse data_in for message:', msg.full_maid);
+                  // If parse fails, use direction
+                  role = direction === 'outgoing' ? 'model' : 'user';
                 }
-                
-                return `${author}: ${text}`;
-              })
-              .filter(Boolean)
-              .join('\n\n');
-
-            const summaryPrompt = historySummaryText
-            ? [
-                'Summarize the conversation briefly and informatively.',
-                'Preserve facts, agreements, intentions, definitions and terms.',
-                'Do not make up facts. Use neutral tone.',
-                'IMPORTANT: Complete all sentences fully. Do not cut phrases in the middle.',
-                '',
-                'Previous summary:',
-                historySummaryText,
-                '',
-                `New ${MESSAGES_FOR_SUMMARY} replies to add:`,
-                messagesText,
-                '',
-                'Merge the previous summary with new replies into one complete summary. Each sentence must be completed.'
-              ].join('\n')
-            : [
-                `Summarize the first ${MESSAGES_FOR_SUMMARY} messages of the conversation briefly and informatively.`,
-                'Preserve facts, agreements, intentions, definitions and terms.',
-                'Do not make up facts. Use neutral tone.',
-                'IMPORTANT: Complete all sentences fully. Do not cut phrases in the middle.',
-                '',
-                'Messages:',
-                messagesText
-              ].join('\n');
-
-            const aiApiToken = handlerWorker.env.AI_API_TOKEN;
-            if (aiApiToken) {
-              const aiServiceForSummary = new AIService(
-                handlerWorker.env.AI_API_URL,
-                aiApiToken
-              );
-
-              let newSummaryText = await aiServiceForSummary.ask(validatedModel, summaryPrompt);
+              } else {
+                role = direction === 'outgoing' ? 'model' : 'user';
+              }
+            }
+          } catch (e) {
+            console.warn('Failed to parse data_in for message:', msg.full_maid);
+            // Default to 'user' if parsing fails
+          }
+          
+          contents.push({
+            role: role,
+            parts: [{ text: text }]
+          });
+        }
+        
+        // Add summary instruction as the last user message
+        let summaryInstruction: string;
+        
+        if (currentSummaryVersion === 0 || !historySummaryText) {
+          // First summary - just summarize the messages
+          summaryInstruction = `Summarize the first ${messagesToSummarize.length} messages of the conversation briefly and informatively.\nPreserve facts, agreements, intentions, definitions and terms.\nDo not make up facts. Use neutral tone.\nIMPORTANT: Complete all sentences fully. Do not cut phrases in the middle.`;
+        } else {
+          // Update existing summary - include previous summary and new messages
+          // Build text representation of new messages for instruction
+          const newMessagesText = messagesToSummarize
+            .map(msg => {
+              const text = (msg.title || '').trim();
+              if (!text) return '';
               
-              // Fix incomplete sentences at the end
-              newSummaryText = newSummaryText.trim();
-              const lastChar = newSummaryText.slice(-1);
-              
-              if (!['.', '!', '?', '\n'].includes(lastChar)) {
-                const lastSentenceEnd = Math.max(
-                  newSummaryText.lastIndexOf('.'),
-                  newSummaryText.lastIndexOf('!'),
-                  newSummaryText.lastIndexOf('?'),
-                  newSummaryText.lastIndexOf('\n')
-                );
-                
-                if (lastSentenceEnd > 0 && (newSummaryText.length - lastSentenceEnd) < 200) {
-                  newSummaryText = newSummaryText.substring(0, lastSentenceEnd + 1).trim();
-                  console.log('⚠️ Trimmed incomplete summary to last complete sentence');
+              // Use same logic as above to determine role
+              let role = 'user';
+              try {
+                if (msg.data_in) {
+                  const dataInObj = JSON.parse(msg.data_in);
+                  const direction = dataInObj.direction || 'incoming';
+                  
+                  if (dataInObj.data) {
+                    try {
+                      const dataObj = JSON.parse(dataInObj.data);
+                      if (dataObj.isAIResponse) {
+                        role = 'model';
+                      } else {
+                        role = direction === 'outgoing' ? 'model' : 'user';
+                      }
+                    } catch (e) {
+                      role = direction === 'outgoing' ? 'model' : 'user';
+                    }
+                  } else {
+                    role = direction === 'outgoing' ? 'model' : 'user';
+                  }
                 }
+              } catch (e) {
+                // Default to user
               }
               
-              // Find last message full_maid for tracking
-              const lastMessage = allMessages[allMessages.length - 1]; // Use allMessages for last full_maid
-              const lastMessageFullMaid = lastMessage?.full_maid || historySummaryLastFullMaid;
+              const prefix = role === 'model' ? 'Assistant' : 'User';
+              return `${prefix}: ${text}`;
+            })
+            .filter(Boolean)
+            .join('\n\n');
+          
+          summaryInstruction = `Summarize the conversation briefly and informatively.\nPreserve facts, agreements, intentions, definitions and terms.\nDo not make up facts. Use neutral tone.\nIMPORTANT: Complete all sentences fully. Do not cut phrases in the middle.\n\nPrevious summary:\n${historySummaryText}\n\nNew ${messagesToSummarize.length} replies to add:\n${newMessagesText}\n\nMerge the previous summary with new replies into one complete summary. Each sentence must be completed.`;
+        }
+        
+        contents.push({
+          role: 'user',
+          parts: [{ text: summaryInstruction }]
+        });
+        
+        // Create prompt object with contents array
+        const summaryPrompt = {
+          contents: contents,
+          generationConfig: {
+            maxOutputTokens: 2048
+          }
+        };
 
-              // Update settings.data_in with new summary
-              settingsJson.history_summary = { text: newSummaryText, version: 1 };
-              settingsJson.history_summary_last_full_maid = lastMessageFullMaid;
-              settingsJson.history_summary_updated_at = new Date().toISOString();
+        const aiServiceForSummary = new AIService(handlerWorker.env.AI_API_URL, aiApiToken);
+        let newSummaryText = await aiServiceForSummary.ask(validatedModel, summaryPrompt);
 
-              await handlerWorker.d1Storage.execute(`
-                UPDATE message_threads
-                SET data_in = ?, updated_at = datetime('now')
-                WHERE id = ?
-              `, [JSON.stringify(settingsJson), consultant.id]);
-
-              console.log('✅ Summary updated in settings');
-            }
+        // Trim incomplete sentences
+        newSummaryText = newSummaryText.trim();
+        const lastChar = newSummaryText.slice(-1);
+        if (!['.', '!', '?', '\n'].includes(lastChar)) {
+          const lastSentenceEnd = Math.max(
+            newSummaryText.lastIndexOf('.'),
+            newSummaryText.lastIndexOf('!'),
+            newSummaryText.lastIndexOf('?'),
+            newSummaryText.lastIndexOf('\n')
+          );
+          if (lastSentenceEnd > 0 && (newSummaryText.length - lastSentenceEnd) < 200) {
+            newSummaryText = newSummaryText.substring(0, lastSentenceEnd + 1).trim();
+            console.log('⚠️ Trimmed incomplete summary to last complete sentence');
           }
         }
+
+        // Last batch message
+        const lastMessage = messagesToSummarize[messagesToSummarize.length - 1];
+        const lastMessageFullMaid = lastMessage?.full_maid || null;
+
+        // Updating settingsJson
+        settingsJson.history_summary = { text: newSummaryText, version: latestSummaryVersion };
+        settingsJson.history_summary_last_full_maid = lastMessageFullMaid;
+        settingsJson.summary_version = latestSummaryVersion;
+        settingsJson.history_summary_updated_at = new Date().toISOString();
+
+        // Update message thread using repository
+        if (!consultant.id) {
+          throw new Error('Consultant id is missing');
+        }
+        await handlerWorker.messageThreadRepository.updateMessageThread(consultant.id, {
+          dataIn: JSON.stringify(settingsJson)
+        });
+
+        console.log(`✅ Summary updated to version ${latestSummaryVersion}`);
       } catch (error) {
-        console.error('Error creating summary after AI response:', error);
+        console.error('❌ Error creating summary after AI response:', error);
       }
+
       
     } catch (error) {
       console.error('❌ Error in handleConsultantTopicMessage:', error);

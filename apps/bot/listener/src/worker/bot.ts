@@ -1,15 +1,15 @@
 import type { Env } from './worker';
-import { HumanRepository } from '../repositories/HumanRepository';
-import { MessageRepository } from '../repositories/MessageRepository';
-import { MessageThreadRepository } from '../repositories/MessageThreadRepository';
-import { FlowEngine } from '../core/flow-engine';
-import { TopicService } from '../core/topic-service';
-import { D1StorageService } from './d1-storage-service';
+import { KVStorageService } from './kv-storage-service';
+import { D1StorageService, type Human } from './d1-storage-service';
 import { MessageService } from '../core/message-service';
+import { TopicService } from '../core/topic-service';
+import { SessionService } from '../core/session-service';
+import { UserContextManager, type UserContext } from '../core/user-context';
+import { FlowEngine } from '../core/flow-engine';
+import { I18nService } from '../core/i18n';
+import { isVKLink, normalizeVKLink } from '../core/helpers';
 import { createCustomHandlers } from '../config/handlers';
 import { commands, findCommand } from '../config/commands';
-import { MessageLoggingService } from '../core/message-logging-service';
-import { UserContextManager, type UserContext } from '../core/user-context';
 
 export interface TelegramUpdate {
   update_id: number;
@@ -77,82 +77,51 @@ export class TelegramBotWorker {
   private env: Env;
   //private kvStorage: KVStorageService;
   private d1Storage: D1StorageService;
-  private humanRepository: HumanRepository;
-  private messageRepository: MessageRepository;
-  private messageThreadRepository: MessageThreadRepository;
-  private messageLoggingService: MessageLoggingService;
   private messageService: MessageService;
   private topicService: TopicService;
   //private sessionService: SessionService;
   private userContextManager: UserContextManager;
   private flowEngine: FlowEngine;
-  //private i18nService: I18nService;
+  private i18nService: I18nService;
 
   //constructor(env: Env, kvStorage: KVStorageService) {
   constructor(env: Env) {
     this.env = env;
     //this.kvStorage = kvStorage;
     this.d1Storage = new D1StorageService(env.DB);
-    
-    // Create human model
-    this.humanRepository = new HumanRepository({ db: env.DB });
-    
-    // Create message thread repository (needed for message repository)
-    this.messageThreadRepository = new MessageThreadRepository({ db: env.DB, d1Storage: this.d1Storage });
-    
-    // Create message model
-    this.messageRepository = new MessageRepository({ 
-      db: env.DB, 
-      humanRepository: this.humanRepository,
-      messageThreadRepository: this.messageThreadRepository
-    });
-    
-    // Initialize user context manager (needed for message logging service)
-    this.userContextManager = new UserContextManager();
-    this.userContextManager.setD1Storage(this.d1Storage);
-    this.userContextManager.setHumanRepository(this.humanRepository);
-    
-    // Create message logging service
-    this.messageLoggingService = new MessageLoggingService({
-      d1Storage: this.d1Storage,
-      humanRepository: this.humanRepository,
-      messageRepository: this.messageRepository,
-      userContextManager: this.userContextManager
-    });
-    
     this.messageService = new MessageService({
       botToken: env.BOT_TOKEN,
-      messageLoggingService: this.messageLoggingService
+      d1Storage: this.d1Storage
     });
     this.topicService = new TopicService({
       botToken: env.BOT_TOKEN,
       adminChatId: parseInt(env.ADMIN_CHAT_ID),
       messageService: this.messageService,
-      messageLoggingService: this.messageLoggingService
+      d1Storage: this.d1Storage
     });
     // this.sessionService = new SessionService({
     //   d1Storage: this.d1Storage
     // });
     
+    // Initialize new components
+    this.userContextManager = new UserContextManager();
+    this.userContextManager.setD1Storage(this.d1Storage);
+    
     // Initialize i18n service
-    //this.i18nService = new I18nService(env.LOCALE);
+    this.i18nService = new I18nService(env.LOCALE);
     
     // Create FlowEngine without handlers first
     this.flowEngine = new FlowEngine(
       this.userContextManager,
       this.messageService,
-      //this.i18nService,
-      {}, // Empty handlers object for now
-      parseInt(env.ADMIN_CHAT_ID) // Pass admin chat ID for topic flows
+      this.i18nService,
+      {} // Empty handlers object for now
     );
     
     // Теперь создаем обработчики с доступом к flowEngine
     // Создаем адаптер для совместимости с BotInterface
     const botAdapter = {
       d1Storage: this.d1Storage,
-      humanRepository: this.humanRepository,
-      messageRepository: this.messageRepository,
-      messageThreadRepository: this.messageThreadRepository,
       flowEngine: this.flowEngine,
       env: this.env,
       messageService: this.messageService,
@@ -171,7 +140,7 @@ export class TelegramBotWorker {
    */
   private async getDbUserId(telegramUserId: number): Promise<number | null> {
     try {
-      const human = await this.humanRepository.getHumanByTelegramId(telegramUserId);
+      const human = await this.d1Storage.getHumanByTelegramId(telegramUserId);
       return human && human.id ? human.id : null;
     } catch (error) {
       console.error(`Error getting DB human ID for Telegram user ${telegramUserId}:`, error);
@@ -195,6 +164,9 @@ export class TelegramBotWorker {
 
       // Check D1 connection
       console.log('🗄️ D1 database connection:', this.d1Storage ? 'OK' : 'FAILED');
+      
+      // Initialize D1 Storage (check tables)
+      await this.d1Storage.initialize();
 
       // Process update
       await this.processUpdate(update);
@@ -302,28 +274,20 @@ export class TelegramBotWorker {
 
     // Check if message came to admin group (topic)
     if (chatId === adminChatId && (message as any).message_thread_id) {
-      const topicId = (message as any).message_thread_id;
-      
-      // Check if admin is in topic flow mode
-      const adminContext = await this.userContextManager.getContext(userId);
-      if (adminContext && adminContext.flowInTopic && adminContext.topicId === topicId && message.text) {
-        // Admin is managing flow in this topic - process through FlowEngine
-        console.log(`🎯 Admin ${userId} is in topic flow mode, processing message through FlowEngine`);
-        await this.flowEngine.handleTopicMessage(userId, message.text);
-        return;
-      }
-      
-      // Otherwise, forward message to human (normal topic behavior)
+      // This is a message in admin group topic - forward to human
       await this.topicService.handleMessageFromTopic(
         message, 
-        this.humanRepository.getHumanTelegramIdByTopic.bind(this.humanRepository),
+        this.d1Storage.getHumanTelegramIdByTopic.bind(this.d1Storage),
         this.getDbUserId.bind(this)
       );
       return;
     }
 
+    // Add human to database
+    await this.ensureHumanExists(message.from);
+
     // Get dbHumanId for logging
-    const human = await this.humanRepository.getHumanByTelegramId(message.from.id);
+    const human = await this.d1Storage.getHumanByTelegramId(message.from.id);
     if (!human) {
       console.error(`Human ${message.from.id} not found in database for logging`);
       return;
@@ -331,7 +295,7 @@ export class TelegramBotWorker {
 
     // Log message
     if (human.id) {
-      await this.messageLoggingService.logMessage(message, 'incoming', human.id);
+      await this.messageService.logMessage(message, 'incoming', human.id);
     }
 
     // Get or create human context
@@ -356,29 +320,11 @@ export class TelegramBotWorker {
   private async processCallbackQuery(callbackQuery: TelegramCallbackQuery): Promise<void> {
     const userId = callbackQuery.from.id;
     const data = callbackQuery.data;
-    const adminChatId = parseInt(this.env.ADMIN_CHAT_ID);
 
     console.log(`Processing callback query from human ${userId}: ${data}`);
 
-    // Check if callback is from admin group topic
-    const message = callbackQuery.message;
-    const chatId = message?.chat?.id;
-    const topicId = (message as any)?.message_thread_id;
-
-    // Check if admin is in topic flow mode
-    if (chatId === adminChatId && topicId) {
-      const adminContext = await this.userContextManager.getContext(userId);
-      if (adminContext && adminContext.flowInTopic && adminContext.topicId === topicId && data) {
-        // Admin is managing flow in this topic - process through FlowEngine
-        console.log(`🎯 Admin ${userId} is in topic flow mode, processing callback through FlowEngine`);
-        await this.messageService.answerCallbackQuery(callbackQuery.id);
-        await this.flowEngine.handleTopicCallback(userId, data);
-        return;
-      }
-    }
-
     // Get dbHumanId for logging
-    const human = await this.humanRepository.getHumanByTelegramId(callbackQuery.from.id);
+    const human = await this.d1Storage.getHumanByTelegramId(callbackQuery.from.id);
     if (!human) {
       console.error(`Human ${callbackQuery.from.id} not found in database for logging`);
       return;
@@ -409,6 +355,19 @@ export class TelegramBotWorker {
     }
   }
 
+  private async ensureHumanExists(user: TelegramUser): Promise<void> {
+    try {
+      const exists = await this.d1Storage.humanExists(user.id);
+      
+      if (!exists) {
+        // Human will be registered on /start command
+        console.log(`Human ${user.id} not found in database - will be registered on /start command`);
+      }
+    } catch (error) {
+      console.error(`Error checking if human exists:`, error);
+    }
+  }
+
   private async handleCommand(message: TelegramMessage): Promise<void> {
     let command = message.text?.split(' ')[0];
     const userId = message.from.id;
@@ -426,9 +385,9 @@ export class TelegramBotWorker {
     
     if (!commandConfig) {
       console.log(`Unknown command: ${command}`);
-      const dbHumanId = await this.getDbUserId(chatId);
-      if (dbHumanId) {
-        await this.messageService.sendMessage(chatId, 'Unknown command. Use /help for list of commands.', dbHumanId);
+      const dbUserId = await this.getDbUserId(chatId);
+      if (dbUserId) {
+        await this.messageService.sendMessage(chatId, 'Unknown command. Use /help for list of commands.', dbUserId);
       }
       return;
     }
@@ -473,8 +432,10 @@ export class TelegramBotWorker {
   private async handleAllMessages(message: TelegramMessage): Promise<void> {
     const userId = message.from.id;
 
+    console.log(`YYYYYYYYY`);
+
     // Get human information
-    const human = await this.humanRepository.getHumanByTelegramId(userId);
+    const human = await this.d1Storage.getHumanByTelegramId(userId);
     
     if (!human) {
       console.log(`Human ${userId} not found`);
@@ -483,16 +444,17 @@ export class TelegramBotWorker {
     
     // Extract topicId from data_in JSON
     let topicId: number | undefined;
-    let dataInObj: any = null;
     if (human.dataIn) {
       try {
-        dataInObj = JSON.parse(human.dataIn);
-        topicId = dataInObj?.topic_id;
+        const dataInObj = JSON.parse(human.dataIn);
+        topicId = dataInObj.topic_id;
       } catch (e) {
         console.warn(`Failed to parse data_in for human ${userId}, topic_id not available`);
       }
     }
 
+    console.log(`OKKKKKKK`);
+    
     // Check if message forwarding is enabled
     const forwardingEnabled = await this.userContextManager.isMessageForwardingEnabled(userId);
     
@@ -500,15 +462,6 @@ export class TelegramBotWorker {
       // Forward message to human's topic only if forwarding is enabled
       await this.topicService.forwardMessageToUserTopic(userId, topicId, message);
       console.log(`📬 Message forwarded to topic for human ${userId}`);
-
-      console.log(`human.dataIn ${userId}`, dataInObj?.ai_enabled, dataInObj?.dataIn);
-
-      // Get handlers and call handleConsultantTopicMessage
-      const handlers = this.flowEngine['customHandlers'] || {};
-      if (handlers.handleConsultantTopicMessage && dataInObj?.topic_id && dataInObj?.ai_enabled) {
-        await handlers.handleConsultantTopicMessage(message);
-      }
-
     } else {
       console.log(`📪 Message forwarding disabled for human ${userId} - not forwarding to topic`);
     }

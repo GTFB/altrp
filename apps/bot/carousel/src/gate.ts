@@ -98,9 +98,24 @@ export interface Env {
     USE_LOCAL_ASYNC?: string;
 }
 
+type PromptObject = {
+	system_instruction?: {
+		role: string;
+		parts: Array<{ text: string }>;
+	};
+	contents: Array<{
+		role: string;
+		parts: Array<{ text: string }>;
+	}>;
+	generationConfig: {
+		maxOutputTokens: number;
+	};
+};
+
 type AskBody = {
 	model: string;
-	input?: string;
+	prompt?: PromptObject;
+	input?: string; // deprecated, kept for backward compatibility
 	messages?: Array<{ role: 'user' | 'system' | 'assistant'; content: string }>;
 	stream?: boolean;
 	audio?: string; // base64 encoded audio data
@@ -417,8 +432,8 @@ app.post('/ask', async (c) => {
 		return c.json({ error: 'Invalid JSON' }, 400);
 	}
 
-	if (!body.input && !body.messages && !body.audio) {
-		return c.json({ error: 'Provide input, messages, or audio' }, 400);
+	if (!body.prompt && !body.input && !body.messages && !body.audio) {
+		return c.json({ error: 'Provide prompt, input, messages, or audio' }, 400);
 	}
 
 	// Auth: simple API key in Authorization: Bearer <key>
@@ -458,8 +473,13 @@ app.post('/ask', async (c) => {
 	await c.env.RATE_LIMITS.put(rlKey, String(count + 1), { expirationTtl: 120 });
 
 	// Cache (optional): prompt hash within model
-	const inputText = body.input ?? body.messages?.map((m) => `${m.role}: ${m.content}`).join('\n') ?? '';
-	const cacheKey = `resp:${model}:${await sha256(inputText)}`;
+	let cacheInputText: string;
+	if (body.prompt) {
+		cacheInputText = JSON.stringify(body.prompt);
+	} else {
+		cacheInputText = body.input ?? body.messages?.map((m) => `${m.role}: ${m.content}`).join('\n') ?? '';
+	}
+	const cacheKey = `resp:${model}:${await sha256(cacheInputText)}`;
 	const cached = await c.env.CACHE.get(cacheKey);
 	if (cached) {
 		return c.json(JSON.parse(cached));
@@ -485,6 +505,7 @@ app.post('/ask', async (c) => {
 	const payload = {
 		provider,
 		model,
+		prompt: body.prompt,
 		input: body.input,
 		messages: body.messages,
 		stream: Boolean(body.stream),
@@ -502,14 +523,18 @@ app.post('/ask', async (c) => {
 	return c.json({ requestId: payload.requestId }, 202);
 });
 
-async function callGemini(model: string, inputText: string, apiKey: string) {
+async function callGemini(model: string, prompt: PromptObject, apiKey: string) {
 	const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
-	const googleReq = {
-		contents: [
-			{ role: 'user', parts: [{ text: inputText }] },
-		],
-		generationConfig: { maxOutputTokens: 1024 },
+	const googleReq: any = {
+		contents: prompt.contents,
+		generationConfig: prompt.generationConfig,
 	};
+	
+	// Add system_instruction if present
+	if (prompt.system_instruction) {
+		googleReq.systemInstruction = prompt.system_instruction;
+	}
+	
 	const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(googleReq) });
 	if (!res.ok) {
 		throw new Error(await res.text());
@@ -538,7 +563,7 @@ async function callGemini(model: string, inputText: string, apiKey: string) {
 	return { text };
 }
 
-async function callGeminiWithKeyRotation(env: Env, projectId: string, model: string, inputText: string): Promise<{ text: string }> {
+async function callGeminiWithKeyRotation(env: Env, projectId: string, model: string, prompt: PromptObject): Promise<{ text: string }> {
 	const keyManager = new KeyManagerService(env);
 	
 	// Try to get a valid key and make the API call
@@ -546,7 +571,7 @@ async function callGeminiWithKeyRotation(env: Env, projectId: string, model: str
 	
 	try {
 		console.log(`[KeyRotation] Trying key ${keyId} for Gemini API call`);
-		const result = await callGemini(model, inputText, key);
+		const result = await callGemini(model, prompt, key);
 		
 		// Mark key as valid if API call succeeds
 		await keyManager.markKeyAsValid(keyId);
@@ -615,7 +640,7 @@ async function callGeminiWithKeyRotation(env: Env, projectId: string, model: str
 			await keyManager.markKeyAsInvalid(keyId);
 			
 			// Try with the next key
-			return await callGeminiWithKeyRotation(env, projectId, model, inputText);
+			return await callGeminiWithKeyRotation(env, projectId, model, prompt);
 		}
 		
 		// If it's not an auth error, re-throw
@@ -771,8 +796,24 @@ async function callWhisper(audioBase64: string, audioFormat: string, apiKey: str
 }
 
 async function processTask(message: { id: string; body: any }, env: Env) {
-	const { provider, model, input, messages, audio, audioFormat, requestId, projectId } = message.body as any;
-	const inputText: string = input ?? (messages?.map((m: any) => `${m.role}: ${m.content}`).join('\n') ?? '');
+	const { provider, model, prompt, input, messages, audio, audioFormat, requestId, projectId } = message.body as any;
+	
+	// Calculate input text for token estimation and caching
+	let inputText: string;
+	if (prompt) {
+		// Extract text from prompt for token estimation
+		const allTexts: string[] = [];
+		if (prompt.system_instruction?.parts) {
+			allTexts.push(...prompt.system_instruction.parts.map((p: any) => p.text).filter(Boolean));
+		}
+		if (prompt.contents) {
+			allTexts.push(...prompt.contents.flatMap((c: any) => c.parts?.map((p: any) => p.text).filter(Boolean) || []));
+		}
+		inputText = allTexts.join('\n');
+	} else {
+		inputText = input ?? (messages?.map((m: any) => `${m.role}: ${m.content}`).join('\n') ?? '');
+	}
+	
 	const t0 = Date.now();
 	let status = 'SUCCESS';
 	let text = '';
@@ -783,7 +824,19 @@ async function processTask(message: { id: string; body: any }, env: Env) {
 		
 		if (provider === PROVIDERS.GOOGLE) {
 			// Use key rotation for Google with automatic retry on invalid keys
-			out = await callGeminiWithKeyRotation(env, projectId, model, inputText);
+			if (prompt) {
+				out = await callGeminiWithKeyRotation(env, projectId, model, prompt);
+			} else {
+				// Fallback for old format - convert input/messages to prompt format
+				const fallbackPrompt: PromptObject = {
+					contents: messages?.map((m: any) => ({
+						role: m.role,
+						parts: [{ text: m.content }]
+					})) || [{ role: 'user', parts: [{ text: input || '' }] }],
+					generationConfig: { maxOutputTokens: 2048 }
+				};
+				out = await callGeminiWithKeyRotation(env, projectId, model, fallbackPrompt);
+			}
 		} else if (provider === PROVIDERS.GROQ) {
 			// Use key rotation for Groq
 			// Check if this is a Whisper request (audio transcription)
@@ -836,7 +889,7 @@ async function processTask(message: { id: string; body: any }, env: Env) {
 		promptTokens,
 		completionTokens,
 		latencyMs: latency,
-		requestBody: { model, input, messages },
+		requestBody: { model, prompt, input, messages },
 		responseBody: { content: text },
 		original_log_id: requestId,
 		original_projectId: projectId

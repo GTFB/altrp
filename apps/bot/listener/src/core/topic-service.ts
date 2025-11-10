@@ -1,28 +1,130 @@
 import { MessageService } from './message-service';
-import { MessageLoggingService } from './message-logging-service';
 import type { TelegramMessage, TelegramUser } from '../worker/bot';
+import { generateUuidV4, generateFullId } from '../core/helpers';
 
 export interface TopicServiceConfig {
   botToken: string;
   adminChatId: number;
   messageService: MessageService;
-  messageLoggingService: MessageLoggingService;
+  d1Storage?: any; // D1StorageService for logging messages
 }
 
 export class TopicService {
   private botToken: string;
   private adminChatId: number;
   private messageService: MessageService;
-  private messageLoggingService: MessageLoggingService;
+  private d1Storage?: any; // D1StorageService for logging messages
 
   constructor(config: TopicServiceConfig) {
     this.botToken = config.botToken;
     this.adminChatId = config.adminChatId;
     this.messageService = config.messageService;
-    this.messageLoggingService = config.messageLoggingService;
+    this.d1Storage = config.d1Storage;
   }
 
+  /**
+   * Get message type from TelegramMessage
+   */
+  private getMessageType(message: TelegramMessage): 'user_text' | 'user_voice' | 'user_photo' | 'user_document' {
+    if (message.voice) return 'user_voice';
+    if (message.photo && message.photo.length > 0) return 'user_photo';
+    if (message.document) return 'user_document';
+    return 'user_text';
+  }
 
+  /**
+   * Log message from user to topic
+   */
+  private async logMessageToTopic(userId: number, topicId: number, message: TelegramMessage): Promise<void> {
+    if (!this.d1Storage) {
+      console.warn('d1Storage not available, skipping message logging');
+      return;
+    }
+
+    try {
+      // Get human to get haid and id
+      const human = await this.d1Storage.getHumanByTelegramId(userId);
+      if (!human || !human.id || !human.haid) {
+        console.warn(`Human ${userId} not found or has no haid, skipping message logging`);
+        return;
+      }
+
+      const uuid = generateUuidV4();
+      const fullMaid = generateFullId('m');
+      const maid = human.haid;
+
+      // Prepare title (content) and data_in
+      const title = message.text || message.caption || '';
+      const dataIn = JSON.stringify({
+        humanId: human.id,
+        telegramId: userId,
+        messageType: this.getMessageType(message),
+        direction: 'incoming',
+        telegramMessageId: message.message_id,
+        fileId: message.voice?.file_id || message.photo?.[0]?.file_id || message.document?.file_id,
+        fileName: message.document?.file_name,
+        caption: message.caption,
+        topicId: topicId,
+        createdAt: new Date().toISOString()
+      });
+
+      await this.d1Storage.execute(`
+        INSERT INTO messages (uuid, maid, full_maid, title, status_name, "order", gin, fts, data_in)
+        VALUES (?, ?, ?, ?, 'active', 0, ?, '', ?)
+      `, [uuid, maid, fullMaid, title, maid, dataIn]);
+
+      console.log(`✅ Message logged to topic: ${fullMaid} (linked to human ${maid})`);
+    } catch (error) {
+      console.error('❌ Error logging message to topic:', error);
+    }
+  }
+
+  /**
+   * Log message from topic to user
+   */
+  private async logMessageFromTopic(userId: number, topicId: number, message: TelegramMessage): Promise<void> {
+    if (!this.d1Storage) {
+      console.warn('d1Storage not available, skipping message logging');
+      return;
+    }
+
+    try {
+      // Get human to get haid and id
+      const human = await this.d1Storage.getHumanByTelegramId(userId);
+      if (!human || !human.id || !human.haid) {
+        console.warn(`Human ${userId} not found or has no haid, skipping message logging`);
+        return;
+      }
+
+      const uuid = generateUuidV4();
+      const fullMaid = generateFullId('m');
+      const maid = human.haid;
+
+      // Prepare title (content) and data_in
+      const title = message.text || message.caption || '';
+      const dataIn = JSON.stringify({
+        humanId: human.id,
+        telegramId: userId,
+        messageType: this.getMessageType(message),
+        direction: 'outgoing',
+        telegramMessageId: message.message_id,
+        fileId: message.voice?.file_id || message.photo?.[0]?.file_id || message.document?.file_id,
+        fileName: message.document?.file_name,
+        caption: message.caption,
+        topicId: topicId,
+        createdAt: new Date().toISOString()
+      });
+
+      await this.d1Storage.execute(`
+        INSERT INTO messages (uuid, maid, full_maid, title, status_name, "order", gin, fts, data_in)
+        VALUES (?, ?, ?, ?, 'active', 0, ?, '', ?)
+      `, [uuid, maid, fullMaid, title, maid, dataIn]);
+
+      console.log(`✅ Message logged from topic: ${fullMaid} (linked to human ${maid})`);
+    } catch (error) {
+      console.error('❌ Error logging message from topic:', error);
+    }
+  }
 
   /**
    * Creates topic in admin group for new user
@@ -78,53 +180,12 @@ export class TopicService {
   }
 
   /**
-   * Edits topic icon
-   */
-  async editTopicIcon(topicId: number, iconCustomEmojiId: string | null, iconColor?: number): Promise<boolean> {
-    try {
-      const body: any = {
-        chat_id: this.adminChatId,
-        message_thread_id: topicId
-      };
-
-      if (iconCustomEmojiId !== null) {
-        body.icon_custom_emoji_id = iconCustomEmojiId;
-      } else {
-        body.icon_custom_emoji_id = null;
-        if (iconColor !== undefined) {
-          body.icon_color = iconColor;
-        }
-      }
-
-      const response = await fetch(`https://api.telegram.org/bot${this.botToken}/editForumTopic`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body)
-      });
-
-      if (!response.ok) {
-        const errorData = await response.text();
-        console.error('Error editing topic icon:', errorData);
-        return false;
-      }
-
-      console.log(`✅ Topic icon updated for topic ${topicId}`);
-      return true;
-    } catch (error) {
-      console.error('Error editing topic icon:', error);
-      return false;
-    }
-  }
-
-  /**
    * Forwards message to user from admin group topic
    */
   async forwardMessageToUser(userId: number, message: TelegramMessage, getDbUserId: (telegramId: number) => Promise<number | null>): Promise<void> {
     try {
-      const dbHumanId = await getDbUserId(userId);
-      if (!dbHumanId) {
+      const dbUserId = await getDbUserId(userId);
+      if (!dbUserId) {
         console.error(`Cannot forward message: user ${userId} not found in database`);
         return;
       }
@@ -133,20 +194,23 @@ export class TopicService {
 
       if (message.text) {
         // Forward text message
-        await this.messageService.sendMessage(userId, message.text, dbHumanId);
+        await this.messageService.sendMessage(userId, message.text, dbUserId);
       } else if (message.voice) {
         // Forward voice message
-        await this.messageService.sendVoiceToUser(userId, message.voice.file_id, message.voice.duration, dbHumanId);
+        await this.messageService.sendVoiceToUser(userId, message.voice.file_id, message.voice.duration, dbUserId);
       } else if (message.photo && message.photo.length > 0) {
         // Forward photo
         const photoFileId = message.photo?.[message.photo.length - 1]?.file_id;
-        await this.messageService.sendPhotoToUser(userId, photoFileId || '', message.caption, dbHumanId);
+        await this.messageService.sendPhotoToUser(userId, photoFileId || '', message.caption, dbUserId);
       } else if (message.document) {
         // Forward document
-        await this.messageService.sendDocumentToUser(userId, message.document.file_id, message.document.file_name, message.caption, dbHumanId);
+        await this.messageService.sendDocumentToUser(userId, message.document.file_id, message.document.file_name, message.caption, dbUserId);
       }
 
-      // Message is already logged in corresponding methods sendMessage/sendVoice/sendPhoto/sendDocument
+      // Log message from topic to user
+      if (topicId) {
+        await this.logMessageFromTopic(userId, topicId, message);
+      }
     } catch (error) {
       console.error('Error forwarding message to user:', error);
     }
@@ -162,23 +226,22 @@ export class TopicService {
       let fileId = '';
       
       if (message.text) {
-        messageDescription = `📝 <b>Text:</b> ${message.text}`;
+        messageDescription = `📝 Text: ${message.text}`;
       } else if (message.voice) {
-        messageDescription = `🎤 <b>Voice message:</b> (${message.voice.duration}s)`;
+        messageDescription = `🎤 Voice message (${message.voice.duration}s)`;
         fileId = message.voice.file_id;
       } else if (message.photo && message.photo.length > 0) {
-        messageDescription = `📷 <b>Photo</b>`;
+        messageDescription = `📷 Photo`;
         fileId = message.photo?.[message.photo.length - 1]?.file_id || ''; // Take largest photo
       } else if (message.document) {
-        messageDescription = `📄 <b>Document</b>: ${message.document.file_name || 'No name'}`;
+        messageDescription = `📄 Document: ${message.document.file_name || 'No name'}`;
         fileId = message.document.file_id;
       } else {
-        messageDescription = `📎 <b>Media file</b>`;
+        messageDescription = `📎 Media file`;
       }
 
       // Send message description to topic
-      //const topicMessage = `<b>👤 ${message.from.first_name} ${message.from.last_name || ''}</b> (ID: ${userId})\n\n${messageDescription}`;
-      const topicMessage = `<b>👤 ${message.from.first_name} ${message.from.last_name || ''}</b>\n\n${messageDescription}`;
+      const topicMessage = `👤 ${message.from.first_name} ${message.from.last_name || ''} (ID: ${userId})\n\n${messageDescription}`;
       
       await this.messageService.sendMessageToTopic(this.adminChatId, topicId, topicMessage);
 
@@ -186,6 +249,9 @@ export class TopicService {
       if (fileId) {
         await this.forwardFileToTopic(topicId, fileId, message);
       }
+
+      // Log message to database
+      await this.logMessageToTopic(userId, topicId, message);
 
     } catch (error) {
       console.error('Error forwarding message to user topic:', error);
