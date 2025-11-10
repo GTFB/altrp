@@ -14,26 +14,6 @@ export const commands: BotCommand[] = [
     handlerName: "handleStartCommand",
     description: "Initialize and create topics"
   },
-  {
-    name: "/enable_ai",
-    handlerName: "handleEnableAICommand",
-    description: "Enable AI assistent"
-  },
-  {
-    name: "/disable_ai",
-    handlerName: "handleDisableAICommand",
-    description: "Disable AI assistent"
-  },
-  {
-    name: "/set_status",
-    handlerName: "handleSetStatusCommand",
-    description: "Set status"
-  },
-  {
-    name: "/menu",
-    handlerName: "handleMenuCommand",
-    description: "Open menu"
-  }
 ];
 
 // Helper function to find command by name
