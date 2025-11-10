@@ -4,7 +4,7 @@ import type { Service } from '@cloudflare/workers-types';
 
 interface AIAskRequest {
   model: string;
-  input: string;
+  prompt: any; // Can be string or object (contents array)
 }
 
 interface AIAskResponse {
@@ -41,12 +41,14 @@ export class AIService {
 
   /**
    * Send a request to AI API
+   * @param model - Model name
+   * @param prompt - Can be a string or an object (e.g., contents array for chat history)
    */
-  async ask(model: string, prompt: string): Promise<string> {
+  async ask(model: string, prompt: any): Promise<string> {
     try {
       const requestBody = {
         model,
-        input: prompt
+        prompt: prompt
       };
       
       console.log(`AI Request: model=${model}, token=${this.apiToken ? 'SET' : 'MISSING'}`);

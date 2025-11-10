@@ -683,8 +683,8 @@ export const createCustomHandlers = (worker: BotInterface) => {
       const MESSAGES_FOR_ANSWER = validatedContextLength;
 
       // Get last context_length messages for answer
-      // Read current summary if exists
-      let context = '';
+      // Build contents array for recent conversation history
+      const contents: Array<{ role: string; parts: Array<{ text: string }> }> = [];
 
       // human already retrieved above, reuse it
       const dataInObj = JSON.parse(human.dataIn);
@@ -698,7 +698,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
           'text',
           MESSAGES_FOR_ANSWER
         );
-
+        
         if (recentMessages && recentMessages.length > 0) {
           // Reverse to get chronological order
           const reversedMessages = recentMessages.reverse();
@@ -713,57 +713,76 @@ export const createCustomHandlers = (worker: BotInterface) => {
             ? reversedMessages.slice(0, -1)
             : reversedMessages;
           
-          const recent = messagesToProcess
-            .map((msg: any) => {
-              const title = msg.title || '';
-              if (!title) return '';
-              
-              // Parse data_in to determine message direction
-              let direction = 'incoming'; // Default to incoming (User)
-              try {
-                if (msg.data_in) {
-                  const dataInObj = JSON.parse(msg.data_in);
-                  direction = dataInObj.direction || 'incoming';
-                  
-                  // Check if this is AI response
-                  if (dataInObj.data) {
-                    try {
-                      const dataObj = JSON.parse(dataInObj.data);
-                      if (dataObj.isAIResponse) {
-                        return `Assistant: ${title}`;
-                      }
-                    } catch (e) {
-                      // Ignore parse errors for nested data
+          // Add recent messages to contents array
+          for (const msg of messagesToProcess) {
+            const text = (msg.title || '').trim();
+            if (!text) continue;
+            
+            // Parse data_in to determine message direction
+            let role = 'user'; // Default to user
+            try {
+              if (msg.data_in) {
+                const dataInObj = JSON.parse(msg.data_in);
+                const direction = dataInObj.direction || 'incoming';
+                
+                // Check if this is AI response
+                if (dataInObj.data) {
+                  try {
+                    const dataObj = JSON.parse(dataInObj.data);
+                    if (dataObj.isAIResponse) {
+                      role = 'model';
+                    } else {
+                      role = direction === 'outgoing' ? 'model' : 'user';
                     }
+                  } catch (e) {
+                    // If parse fails, use direction
+                    role = direction === 'outgoing' ? 'model' : 'user';
                   }
+                } else {
+                  role = direction === 'outgoing' ? 'model' : 'user';
                 }
-              } catch (e) {
-                console.warn(`Failed to parse data_in for message, using default direction:`, e);
               }
-              
-              // Add prefix based on direction
-              const prefix = direction === 'outgoing' ? 'Assistant' : 'User';
-              return `${prefix}: ${title}`;
-            })
-            .filter(text => text) // Remove empty
-            .join('\n\n');
-          
-          // Answer format: summary (if exists) + last 6 messages
-          context = historySummaryText 
-            ? `Summary:\n${historySummaryText}\n\n${recent}`
-            : recent;
-        } else if (historySummaryText) {
-          // If no recent messages but summary exists
-          context = `Summary:\n${historySummaryText}`;
+            } catch (e) {
+              console.warn(`Failed to parse data_in for message, using default role:`, e);
+              // Default to 'user' if parsing fails
+            }
+            
+            contents.push({
+              role: role,
+              parts: [{ text: text }]
+            });
+          }
         }
       } catch (error) {
         console.error('Error getting recent messages:', error);
-        context = ''; // Continue without context if error
+        // Continue with empty contents if error
       }
 
-      // Prepare AI input
-      //const aiInput = `${validatedPrompt}\n\nRecent conversation:\n${context}\n\nUser: ${messageText}\n\nConsultant:`;
-      const aiInput = `${validatedPrompt}\n\nRecent conversation:\n${context}\n\nUser: ${messageText}`;
+      // Add current user message to contents
+      contents.push({
+        role: 'user',
+        parts: [{ text: messageText }]
+      });
+
+      // Build system instruction with prompt and summary (if exists)
+      let systemInstructionText = validatedPrompt;
+      if (historySummaryText) {
+        systemInstructionText = `${validatedPrompt}\n\nCONTEXT_SUMMARY: ${historySummaryText}`;
+      }
+
+      // Prepare AI input as object with system_instruction and contents
+      const aiInput = {
+        system_instruction: {
+          role: 'system',
+          parts: [
+            { text: systemInstructionText }
+          ]
+        },
+        contents: contents,
+        generationConfig: {
+          maxOutputTokens: 2048
+        }
+      };
 
       // Check for duplicate message (same text from same user in last 5 seconds)
       // const duplicateCheck = await handlerWorker.d1Storage.execute(`
@@ -934,67 +953,110 @@ ${aiResponse}`
           return;
         }
 
-        // We collect the text of messages for the model
-        const messagesText = messagesToSummarize
-          .map(msg => {
-            const text = (msg.title || '').trim();
-            if (!text) return '';
-            
-            // Parse data_in to determine message direction (same logic as lines 716-749)
-            let direction = 'incoming'; // Default to incoming (User)
-            try {
-              if (msg.data_in) {
-                const dataInObj = JSON.parse(msg.data_in);
-                direction = dataInObj.direction || 'incoming';
-                
-                // Check if this is AI response
-                if (dataInObj.data) {
-                  try {
-                    const dataObj = JSON.parse(dataInObj.data);
-                    if (dataObj.isAIResponse) {
-                      return `Assistant: ${text}`;
+        // Build contents array for chat history (alternating user/model roles)
+        const contents: Array<{ role: string; parts: Array<{ text: string }> }> = [];
+        
+        // Add conversation history
+        for (const msg of messagesToSummarize) {
+          const text = (msg.title || '').trim();
+          if (!text) continue;
+          
+          // Parse data_in to determine message direction (same logic as lines 716-749)
+          let role = 'user'; // Default to user
+          try {
+            if (msg.data_in) {
+              const dataInObj = JSON.parse(msg.data_in);
+              const direction = dataInObj.direction || 'incoming';
+              
+              // Check if this is AI response
+              if (dataInObj.data) {
+                try {
+                  const dataObj = JSON.parse(dataInObj.data);
+                  if (dataObj.isAIResponse) {
+                    role = 'model';
+                  } else {
+                    role = direction === 'outgoing' ? 'model' : 'user';
+                  }
+                } catch (e) {
+                  // If parse fails, use direction
+                  role = direction === 'outgoing' ? 'model' : 'user';
+                }
+              } else {
+                role = direction === 'outgoing' ? 'model' : 'user';
+              }
+            }
+          } catch (e) {
+            console.warn('Failed to parse data_in for message:', msg.full_maid);
+            // Default to 'user' if parsing fails
+          }
+          
+          contents.push({
+            role: role,
+            parts: [{ text: text }]
+          });
+        }
+        
+        // Add summary instruction as the last user message
+        let summaryInstruction: string;
+        
+        if (currentSummaryVersion === 0 || !historySummaryText) {
+          // First summary - just summarize the messages
+          summaryInstruction = `Summarize the first ${messagesToSummarize.length} messages of the conversation briefly and informatively.\nPreserve facts, agreements, intentions, definitions and terms.\nDo not make up facts. Use neutral tone.\nIMPORTANT: Complete all sentences fully. Do not cut phrases in the middle.`;
+        } else {
+          // Update existing summary - include previous summary and new messages
+          // Build text representation of new messages for instruction
+          const newMessagesText = messagesToSummarize
+            .map(msg => {
+              const text = (msg.title || '').trim();
+              if (!text) return '';
+              
+              // Use same logic as above to determine role
+              let role = 'user';
+              try {
+                if (msg.data_in) {
+                  const dataInObj = JSON.parse(msg.data_in);
+                  const direction = dataInObj.direction || 'incoming';
+                  
+                  if (dataInObj.data) {
+                    try {
+                      const dataObj = JSON.parse(dataInObj.data);
+                      if (dataObj.isAIResponse) {
+                        role = 'model';
+                      } else {
+                        role = direction === 'outgoing' ? 'model' : 'user';
+                      }
+                    } catch (e) {
+                      role = direction === 'outgoing' ? 'model' : 'user';
                     }
-                  } catch (e) {
-                    // Ignore parse errors for nested data
+                  } else {
+                    role = direction === 'outgoing' ? 'model' : 'user';
                   }
                 }
+              } catch (e) {
+                // Default to user
               }
-            } catch (e) {
-              console.warn('Failed to parse data_in for message:', msg.full_maid);
-            }
-            
-            // Add prefix based on direction
-            const prefix = direction === 'outgoing' ? 'Assistant' : 'User';
-            return `${prefix}: ${text}`;
-          })
-          .filter(Boolean)
-          .join('\n\n');
-
-        // Creating a prompt for AI
-        const summaryPrompt = currentSummaryVersion === 0 || !historySummaryText
-          ? [
-              `Summarize the first ${messagesToSummarize.length} messages of the conversation briefly and informatively.`,
-              'Preserve facts, agreements, intentions, definitions and terms.',
-              'Do not make up facts. Use neutral tone.',
-              'IMPORTANT: Complete all sentences fully. Do not cut phrases in the middle.',
-              '',
-              'Messages:',
-              messagesText
-            ].join('\n')
-          : [
-              'Summarize the conversation briefly and informatively.',
-              'Preserve facts, agreements, intentions, definitions and terms.',
-              'Do not make up facts. Use neutral tone.',
-              'IMPORTANT: Complete all sentences fully. Do not cut phrases in the middle.',
-              '',
-              'Previous summary:',
-              historySummaryText,
-              '',
-              `New ${messagesToSummarize.length} replies to add:`,
-              messagesText,
-              '',
-              'Merge the previous summary with new replies into one complete summary. Each sentence must be completed.'
-            ].join('\n');
+              
+              const prefix = role === 'model' ? 'Assistant' : 'User';
+              return `${prefix}: ${text}`;
+            })
+            .filter(Boolean)
+            .join('\n\n');
+          
+          summaryInstruction = `Summarize the conversation briefly and informatively.\nPreserve facts, agreements, intentions, definitions and terms.\nDo not make up facts. Use neutral tone.\nIMPORTANT: Complete all sentences fully. Do not cut phrases in the middle.\n\nPrevious summary:\n${historySummaryText}\n\nNew ${messagesToSummarize.length} replies to add:\n${newMessagesText}\n\nMerge the previous summary with new replies into one complete summary. Each sentence must be completed.`;
+        }
+        
+        contents.push({
+          role: 'user',
+          parts: [{ text: summaryInstruction }]
+        });
+        
+        // Create prompt object with contents array
+        const summaryPrompt = {
+          contents: contents,
+          generationConfig: {
+            maxOutputTokens: 2048
+          }
+        };
 
         const aiServiceForSummary = new AIService(handlerWorker.env.AI_API_URL, aiApiToken);
         let newSummaryText = await aiServiceForSummary.ask(validatedModel, summaryPrompt);
