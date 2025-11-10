@@ -183,6 +183,53 @@ export class HumanRepository {
   }
 
   /**
+   * Get human by haid
+   */
+  async getHumanByHaid(haid: string): Promise<HumanData | null> {
+    console.log(`Getting human by haid ${haid} from D1 database`);
+
+    try {
+      const result = await this.db.prepare(`
+        SELECT * FROM humans 
+        WHERE haid = ? AND deleted_at IS NULL
+      `).bind(haid).first();
+
+      if (result) {
+        const human: HumanData = {
+          id: result.id as number,
+          uuid: result.uuid as string,
+          haid: result.haid as string,
+          fullName: result.full_name as string,
+          birthday: result.birthday as string || undefined,
+          email: result.email as string || undefined,
+          sex: result.sex as string || undefined,
+          statusName: result.status_name as string || undefined,
+          type: result.type as string || undefined,
+          cityName: result.city_name as string || undefined,
+          order: result.order as number || 0,
+          xaid: result.xaid as string || undefined,
+          mediaId: result.media_id as string || undefined,
+          updatedAt: result.updated_at as string,
+          createdAt: result.created_at as string,
+          deletedAt: result.deleted_at as number || undefined,
+          gin: result.gin as string || undefined,
+          fts: result.fts as string || undefined,
+          dataIn: result.data_in as string || undefined,
+          dataOut: result.data_out as string || undefined
+        };
+        console.log(`Human with haid ${haid} found with DB ID: ${human.id}`);
+        return human;
+      } else {
+        console.log(`Human with haid ${haid} not found in D1 database`);
+        return null;
+      }
+    } catch (error) {
+      console.error(`Error getting human by haid ${haid}:`, error);
+      throw error;
+    }
+  }
+
+  /**
    * Update human
    */
   async updateHuman(telegramId: number, updates: Partial<HumanData>): Promise<void> {

@@ -313,6 +313,24 @@ export class TelegramBotWorker {
         return;
       }
       
+      // Check if this is an assistant topic (type='assistent')
+      // If yes, handle with AI assistant
+      const handlers = this.flowEngine['customHandlers'] || {};
+      if (handlers.handleAssistantTopicMessage) {
+        // Check if topic is an assistant topic by trying to find it
+        const messageThread = await this.messageThreadRepository.getMessageThreadByValue(
+          topicId.toString(),
+          'assistent'
+        );
+        
+        if (messageThread) {
+          // This is an assistant topic - handle with AI
+          console.log(`🤖 Message in assistant topic ${topicId}, processing with AI`);
+          await handlers.handleAssistantTopicMessage(message);
+          return;
+        }
+      }
+      
       // Otherwise, forward message to human (normal topic behavior)
       await this.topicService.handleMessageFromTopic(
         message, 
@@ -500,15 +518,6 @@ export class TelegramBotWorker {
       // Forward message to human's topic only if forwarding is enabled
       await this.topicService.forwardMessageToUserTopic(userId, topicId, message);
       console.log(`📬 Message forwarded to topic for human ${userId}`);
-
-      console.log(`human.dataIn ${userId}`, dataInObj?.ai_enabled, dataInObj?.dataIn);
-
-      // Get handlers and call handleAssistantTopicMessage
-      const handlers = this.flowEngine['customHandlers'] || {};
-      if (handlers.handleAssistantTopicMessage && dataInObj?.topic_id && dataInObj?.ai_enabled) {
-        await handlers.handleAssistantTopicMessage(message);
-      }
-
     } else {
       console.log(`📪 Message forwarding disabled for human ${userId} - not forwarding to topic`);
     }
