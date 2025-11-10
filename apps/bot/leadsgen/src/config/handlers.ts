@@ -42,7 +42,9 @@ export const createCustomHandlers = (worker: BotInterface) => {
   const aiRepository = new AIRepository({
     env: {
       AI_API_URL: handlerWorker.env.AI_API_URL,
-      AI_API_TOKEN: handlerWorker.env.AI_API_TOKEN
+      AI_API_TOKEN: handlerWorker.env.AI_API_TOKEN,
+      BOT_TOKEN: handlerWorker.env.BOT_TOKEN,
+      TRANSCRIPTION_MODEL: handlerWorker.env.TRANSCRIPTION_MODEL
     }
   });
   
@@ -466,9 +468,9 @@ export const createCustomHandlers = (worker: BotInterface) => {
 
 
     /**
-     * Handle messages in consultant topics
+     * Handle messages for AI assistant
      */
-    handleConsultantTopicMessage: async (message: any) => {
+    handleAssistantTopicMessage: async (message: any) => {
       try {
         // Get ADMIN_CHAT_ID from env
         const adminChatId = parseInt(handlerWorker.env.ADMIN_CHAT_ID || '');
@@ -525,61 +527,34 @@ export const createCustomHandlers = (worker: BotInterface) => {
       if (message.voice) {
         console.log(`🎤 Voice message detected in topic ${humanTopicId}`);
         try {
-          const botToken = handlerWorker.env.BOT_TOKEN || '';
-          if (!botToken) {
-            throw new Error('BOT_TOKEN is not configured');
-          }
-
-          // 1) Get file path by file_id
-          const getFileResp = await fetch(`https://api.telegram.org/bot${botToken}/getFile?file_id=${message.voice.file_id}`);
-          if (!getFileResp.ok) {
-            throw new Error(`getFile failed: ${getFileResp.status}`);
-          }
-          const getFileJson = await getFileResp.json();
-          const filePath = getFileJson?.result?.file_path;
-          if (!filePath) {
-            throw new Error('file_path not found in getFile response');
-          }
-
-          // 2) Download the file
-          const fileUrl = `https://api.telegram.org/file/bot${botToken}/${filePath}`;
-          const fileResp = await fetch(fileUrl);
-          if (!fileResp.ok) {
-            throw new Error(`file download failed: ${fileResp.status}`);
-          }
-          const arrayBuffer = await fileResp.arrayBuffer();
           const mimeType = (message.voice.mime_type as string) || 'audio/ogg';
-          const blob = new Blob([arrayBuffer], { type: mimeType });
-
-          // 3) Transcribe via AIService.upload
-          const aiApiToken = handlerWorker.env.AI_API_TOKEN;
-          if (!aiApiToken) {
-            throw new Error('AI_API_TOKEN is not configured');
+          const transcript = await aiRepository.transcribeVoice(message.voice.file_id, mimeType);
+          
+          // Save transcribed voice message to database
+          if (human.id && transcript) {
+            try {
+              await handlerWorker.messageRepository.addMessage({
+                humanId: human.id,
+                messageType: 'user_text',
+                direction: 'incoming',
+                content: transcript,
+                telegramMessageId: message.message_id,
+                statusName: 'text',
+                data: JSON.stringify({
+                  fileId: message.voice.file_id,
+                  mimeType: mimeType,
+                  isTranscribed: true,
+                  originalType: 'voice',
+                  createdAt: new Date().toISOString()
+                })
+              });
+              console.log(`✅ Transcribed voice message saved to database`);
+            } catch (saveError) {
+              console.error('❌ Error saving transcribed voice message:', saveError);
+              // Continue execution even if save fails
+            }
           }
-          const aiService = new AIService(
-            handlerWorker.env.AI_API_URL,
-            aiApiToken
-          );
-          const transcriptionModel = handlerWorker.env.TRANSCRIPTION_MODEL || 'whisper-large-v3';
           
-          // Ensure filename has valid extension for API (allowed: flac mp3 mp4 mpeg mpga m4a ogg opus wav webm)
-          let filename = filePath.split('/').pop() || 'voice';
-          const allowedExtensions = ['flac', 'mp3', 'mp4', 'mpeg', 'mpga', 'm4a', 'ogg', 'opus', 'wav', 'webm'];
-          const fileExtension = filename.split('.').pop()?.toLowerCase();
-          
-          if (!fileExtension || !allowedExtensions.includes(fileExtension)) {
-            // Default to .ogg for Telegram voice messages
-            filename = filename.includes('.') 
-              ? filename.split('.').slice(0, -1).join('.') + '.ogg'
-              : filename + '.ogg';
-          }
-          
-          console.log(`📁 Using filename: ${filename}`);
-
-          console.log(`📝 Transcribing voice using model: ${transcriptionModel}`);
-          const transcript = await aiService.upload(transcriptionModel, blob, filename);
-          console.log(`📝 Transcript: ${transcript}`);
-
           // Put transcript into message.text and continue normal text flow
           message.text = transcript || '';
         } catch (e) {
@@ -864,7 +839,7 @@ ${aiResponse}`
 
       
     } catch (error) {
-      console.error('❌ Error in handleConsultantTopicMessage:', error);
+      console.error('❌ Error in handleAssistantTopicMessage:', error);
       console.error('Error details:', error?.message, error?.stack);
     }
   },

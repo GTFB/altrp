@@ -4,6 +4,8 @@ export interface AIRepositoryConfig {
   env: {
     AI_API_URL: string;
     AI_API_TOKEN: string;
+    BOT_TOKEN: string;
+    TRANSCRIPTION_MODEL?: string;
   };
 }
 
@@ -26,6 +28,8 @@ export class AIRepository {
   private env: {
     AI_API_URL: string;
     AI_API_TOKEN: string;
+    BOT_TOKEN: string;
+    TRANSCRIPTION_MODEL?: string;
   };
 
   constructor(config: AIRepositoryConfig) {
@@ -314,6 +318,72 @@ export class AIRepository {
     }
 
     return newSummaryText;
+  }
+
+  /**
+   * Transcribe voice message to text
+   * @param fileId - Telegram voice file_id
+   * @param mimeType - MIME type of the voice file (default: 'audio/ogg')
+   * @returns Transcribed text
+   */
+  async transcribeVoice(fileId: string, mimeType: string = 'audio/ogg'): Promise<string> {
+    const botToken = this.env.BOT_TOKEN;
+    if (!botToken) {
+      throw new Error('BOT_TOKEN is not configured');
+    }
+
+    // 1) Get file path by file_id
+    const getFileResp = await fetch(`https://api.telegram.org/bot${botToken}/getFile?file_id=${fileId}`);
+    if (!getFileResp.ok) {
+      throw new Error(`getFile failed: ${getFileResp.status}`);
+    }
+    const getFileJson = await getFileResp.json();
+    const filePath = getFileJson?.result?.file_path;
+    if (!filePath) {
+      throw new Error('file_path not found in getFile response');
+    }
+
+    // 2) Download the file
+    const fileUrl = `https://api.telegram.org/file/bot${botToken}/${filePath}`;
+    const fileResp = await fetch(fileUrl);
+    if (!fileResp.ok) {
+      throw new Error(`file download failed: ${fileResp.status}`);
+    }
+    const arrayBuffer = await fileResp.arrayBuffer();
+    const blob = new Blob([arrayBuffer], { type: mimeType });
+
+    // 3) Transcribe via AIService.upload
+    const aiApiToken = this.env.AI_API_TOKEN;
+    if (!aiApiToken) {
+      throw new Error('AI_API_TOKEN is not configured');
+    }
+
+    const transcriptionModel = this.env.TRANSCRIPTION_MODEL || 'whisper-large-v3';
+    
+    // Ensure filename has valid extension for API (allowed: flac mp3 mp4 mpeg mpga m4a ogg opus wav webm)
+    let filename = filePath.split('/').pop() || 'voice';
+    const allowedExtensions = ['flac', 'mp3', 'mp4', 'mpeg', 'mpga', 'm4a', 'ogg', 'opus', 'wav', 'webm'];
+    const fileExtension = filename.split('.').pop()?.toLowerCase();
+    
+    if (!fileExtension || !allowedExtensions.includes(fileExtension)) {
+      // Default to .ogg for Telegram voice messages
+      filename = filename.includes('.') 
+        ? filename.split('.').slice(0, -1).join('.') + '.ogg'
+        : filename + '.ogg';
+    }
+    
+    console.log(`📁 Using filename: ${filename}`);
+    console.log(`📝 Transcribing voice using model: ${transcriptionModel}`);
+
+    const aiService = new AIService(
+      this.env.AI_API_URL,
+      aiApiToken
+    );
+
+    const transcript = await aiService.upload(transcriptionModel, blob, filename);
+    console.log(`📝 Transcript: ${transcript}`);
+
+    return transcript;
   }
 }
 

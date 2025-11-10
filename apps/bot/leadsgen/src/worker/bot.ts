@@ -503,10 +503,10 @@ export class TelegramBotWorker {
 
       console.log(`human.dataIn ${userId}`, dataInObj?.ai_enabled, dataInObj?.dataIn);
 
-      // Get handlers and call handleConsultantTopicMessage
+      // Get handlers and call handleAssistantTopicMessage
       const handlers = this.flowEngine['customHandlers'] || {};
-      if (handlers.handleConsultantTopicMessage && dataInObj?.topic_id && dataInObj?.ai_enabled) {
-        await handlers.handleConsultantTopicMessage(message);
+      if (handlers.handleAssistantTopicMessage && dataInObj?.topic_id && dataInObj?.ai_enabled) {
+        await handlers.handleAssistantTopicMessage(message);
       }
 
     } else {
