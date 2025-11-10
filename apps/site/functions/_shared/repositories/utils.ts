@@ -1,27 +1,12 @@
 import { drizzle, type DrizzleD1Database } from "drizzle-orm/d1";
 import type { D1Database } from "@cloudflare/workers-types";
-import { env } from "cloudflare:workers";
 import { schema } from "../schema/schema";
 
 export type SiteDb = DrizzleD1Database<typeof schema>;
 
-export function resolveDbBinding(db?: D1Database | null): D1Database {
-  if (db) {
-    return db;
-  }
 
-  const bindings = env as unknown as Record<string, unknown>;
-  const binding = bindings.DB;
-
-  if (!binding) {
-    throw new Error("D1 binding 'DB' is not configured in Cloudflare environment");
-  }
-
-  return binding as D1Database;
-}
-
-export function createDb(db?: D1Database | null): SiteDb {
-  return drizzle(resolveDbBinding(db), { schema });
+export function createDb(db: D1Database): SiteDb {
+  return drizzle(db, { schema });
 }
 
 export function parseJson<T>(value: string | null | undefined, fallback: T): T {

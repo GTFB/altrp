@@ -14,11 +14,11 @@ export class MeRepository {
   private db: SiteDb
   private static instance: MeRepository | null = null
 
-  private constructor(db: D1Database | null = null) {
+  private constructor(db: D1Database) {
     this.db = createDb(db)
   }
 
-  public static getInstance(db: D1Database | null = null): MeRepository {
+  public static getInstance(db: D1Database): MeRepository {
     if (!MeRepository.instance) {
       MeRepository.instance = new MeRepository(db)
     }

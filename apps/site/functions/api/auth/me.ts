@@ -28,7 +28,7 @@ export const onRequestGet = async (context: { request: Request; env: Env }) => {
 
   try {
     // Initialize repository
-    const meRepository = MeRepository.getInstance()
+    const meRepository = MeRepository.getInstance(env.DB as D1Database)
 
     // Get user with roles from database
     const userWithRoles = await meRepository.findByIdWithRoles(Number(sessionUser.id))

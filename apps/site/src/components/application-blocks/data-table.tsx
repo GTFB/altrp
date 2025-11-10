@@ -289,7 +289,10 @@ function generateColumns(schema: ColumnSchemaExtended[], onDeleteRequest: (row: 
         }
         // For price type (stored as integer cents), show as decimal with 2 digits
         if (col.fieldType === 'price') {
-          const cents = typeof value === 'number' ? value : Number(value || 0)
+          const cents =
+            value === null || value === undefined || value === ''
+              ? NaN
+              : Number(value)
           const amount = isFinite(cents) ? (cents / 100).toFixed(2) : '-'
           return <div className={`${col.primary ? "font-mono font-medium" : "font-mono"}`}>{amount}</div>
         }
