@@ -178,7 +178,7 @@ export class TopicService {
 
       // Send message description to topic
       //const topicMessage = `<b>👤 ${message.from.first_name} ${message.from.last_name || ''}</b> (ID: ${userId})\n\n${messageDescription}`;
-      const topicMessage = `<b>👤 ${message.from.first_name} ${message.from.last_name || ''}</b>`;
+      const topicMessage = `<b>👤 ${message.from.first_name} ${message.from.last_name || ''}</b>\n\n${messageDescription}`;
       
       await this.messageService.sendMessageToTopic(this.adminChatId, topicId, topicMessage);
 
