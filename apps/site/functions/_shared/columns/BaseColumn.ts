@@ -3,6 +3,17 @@ export default class BaseColumn {
     constructor(public options: BaseColumnOptions) {
 
     }
+    async prepare(value: any): Promise<any> {
+        if(this.options.prepare) {
+            return await this.options.prepare(value, this)
+        }
+        if(this.options.type === 'json' && typeof value === 'object') {
+            return JSON.stringify(value)
+        }
+        return value
+    }
+
+
 }
 
 export type RelationConfig = {
@@ -23,6 +34,7 @@ export type BaseColumnOptions = {
     required?: boolean;
     readOnly?: boolean;
     unique?: boolean;
+    prepare?: (value: any, column: BaseColumn) => any;
     virtual?: boolean;  // Virtual field, computed on backend
     value?: (instance: any) => Promise<any> | any;  // Required if virtual = true
     type?: 'text' | 'number' | 'email' | 'phone' | 'password' | 'boolean' | 'date' | 'time' | 'datetime' | 'json' | 'array' | 'object' | 'price' | 'enum';

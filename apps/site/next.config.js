@@ -1,6 +1,10 @@
+const withPWA = require('next-pwa')({
+  dest: 'public',
+  customWorkerDir: 'worker'
+})
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-
+  reactStrictMode: true,
   ...(process.env.STATIC_EXPORT === 'true' && {
     output: 'export',
     trailingSlash: true,
@@ -26,7 +30,7 @@ const nextConfig = {
     externalDir: true,
     // inlineCss: true,
     // Exclude Cloudflare Pages Functions from tracing/bundle
-    
+
 
   },
   //  
@@ -36,4 +40,4 @@ const nextConfig = {
 
 }
 
-module.exports = nextConfig
+module.exports = withPWA(nextConfig)

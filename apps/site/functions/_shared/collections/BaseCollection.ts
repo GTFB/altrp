@@ -69,4 +69,12 @@ export default class BaseCollection {
 
         return parsed
     }
+    async prepare(data: any): Promise<void> {
+        for (const key in this) {
+            if(this[key] instanceof BaseColumn) {
+
+                data[key] = await this[key].prepare(data[key])
+            }
+        }
+    }
   }

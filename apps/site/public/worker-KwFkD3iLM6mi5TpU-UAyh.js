@@ -1,0 +1,1 @@
+(()=>{"use strict";self.addEventListener("push",function(i){const o=i.data.json();console.log("New notification!",o);const t={body:o.body,icon:"/images/favicon.jpg",badge:"/images/favicon.jpg"};i.waitUntil(self.registration.showNotification(o.title,t))})})();
