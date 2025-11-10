@@ -3,6 +3,7 @@ import { AIService } from '../integrations/ai-service';
 import { generateUuidV4 } from '../helpers/generateUuidV4';
 import { generateAid } from '../helpers/generateAid';
 import { UserContextManager } from '../core/user-context';
+import { AIRepository, type RecentMessage } from '../repositories/AIRepository';
 
 interface Consultant {
   id: number;
@@ -36,6 +37,14 @@ export const createCustomHandlers = (worker: BotInterface) => {
     messageService: worker['messageService'],
     topicService: worker['topicService']
   };
+  
+  // Create AI repository (can be created here since we have access to env)
+  const aiRepository = new AIRepository({
+    env: {
+      AI_API_URL: handlerWorker.env.AI_API_URL,
+      AI_API_TOKEN: handlerWorker.env.AI_API_TOKEN
+    }
+  });
   
   return {
     /**
@@ -683,167 +692,36 @@ export const createCustomHandlers = (worker: BotInterface) => {
       const MESSAGES_FOR_ANSWER = validatedContextLength;
 
       // Get last context_length messages for answer
-      // Build contents array for recent conversation history
-      const contents: Array<{ role: string; parts: Array<{ text: string }> }> = [];
-
-      // human already retrieved above, reuse it
-      const dataInObj = JSON.parse(human.dataIn);
-
       console.log('Selecting messages:', consultantMaid, human.haid, MESSAGES_FOR_ANSWER)
 
+      let recentMessages: RecentMessage[] = [];
       try {
-        const recentMessages = await handlerWorker.messageRepository.getRecentMessages(
+        const messages = await handlerWorker.messageRepository.getRecentMessages(
           consultantMaid,
           human.haid,
           'text',
           MESSAGES_FOR_ANSWER
         );
-        
-        if (recentMessages && recentMessages.length > 0) {
-          // Reverse to get chronological order
-          const reversedMessages = recentMessages.reverse();
-          
-          // Check if last message matches current messageText (to avoid duplication)
-          const lastMessage = reversedMessages[reversedMessages.length - 1];
-          const lastMessageTitle = lastMessage?.title || '';
-          const shouldExcludeLast = lastMessageTitle.trim() === messageText.trim();
-          
-          // Filter out last message if it matches current messageText
-          const messagesToProcess = shouldExcludeLast 
-            ? reversedMessages.slice(0, -1)
-            : reversedMessages;
-          
-          // Add recent messages to contents array
-          for (const msg of messagesToProcess) {
-            const text = (msg.title || '').trim();
-            if (!text) continue;
-            
-            // Parse data_in to determine message direction
-            let role = 'user'; // Default to user
-            try {
-              if (msg.data_in) {
-                const dataInObj = JSON.parse(msg.data_in);
-                const direction = dataInObj.direction || 'incoming';
-                
-                // Check if this is AI response
-                if (dataInObj.data) {
-                  try {
-                    const dataObj = JSON.parse(dataInObj.data);
-                    if (dataObj.isAIResponse) {
-                      role = 'model';
-                    } else {
-                      role = direction === 'outgoing' ? 'model' : 'user';
-                    }
-                  } catch (e) {
-                    // If parse fails, use direction
-                    role = direction === 'outgoing' ? 'model' : 'user';
-                  }
-                } else {
-                  role = direction === 'outgoing' ? 'model' : 'user';
-                }
-              }
-            } catch (e) {
-              console.warn(`Failed to parse data_in for message, using default role:`, e);
-              // Default to 'user' if parsing fails
-            }
-            
-            contents.push({
-              role: role,
-              parts: [{ text: text }]
-            });
-          }
-        }
+        recentMessages = messages.map(msg => ({
+          title: msg.title,
+          data_in: msg.data_in
+        }));
       } catch (error) {
         console.error('Error getting recent messages:', error);
-        // Continue with empty contents if error
+        // Continue with empty array if error
       }
 
-      // Add current user message to contents
-      contents.push({
-        role: 'user',
-        parts: [{ text: messageText }]
-      });
-
-      // Build system instruction with prompt and summary (if exists)
-      let systemInstructionText = validatedPrompt;
-      if (historySummaryText) {
-        systemInstructionText = `${validatedPrompt}\n\nCONTEXT_SUMMARY: ${historySummaryText}`;
-      }
-
-      // Prepare AI input as object with system_instruction and contents
-      const aiInput = {
-        system_instruction: {
-          role: 'system',
-          parts: [
-            { text: systemInstructionText }
-          ]
-        },
-        contents: contents,
-        generationConfig: {
-          maxOutputTokens: 2048
-        }
-      };
-
-      // Check for duplicate message (same text from same user in last 5 seconds)
-      // const duplicateCheck = await handlerWorker.d1Storage.execute(`
-      //   SELECT full_maid
-      //   FROM messages
-      //   WHERE status_name='text' AND maid = ? AND title = ? AND xaid = ? AND created_at > datetime('now', '-5 seconds')
-      //   LIMIT 1
-      // `, [consultantMaid, messageText, human.haid]);
-      
-      // if (duplicateCheck && duplicateCheck.length > 0) {
-      //   console.log(`⚠️ Duplicate message detected, skipping: ${messageText}`);
-      //   return;
-      // }
-
-      // Save user message to database FIRST (before AI call)
-      // Use consultantMaid in maid field to link messages with message_threads
-      // const userMessageUuid = generateUuidV4();
-      // const userMessageFullMaid = generateAid('m');
-      // await handlerWorker.d1Storage.execute(`
-      //   INSERT INTO messages (uuid, maid, full_maid, title, status_name, "order", gin, fts, data_in, xaid)
-      //   VALUES (?, ?, ?, ?, 'active', 0, ?, '', ?, ?)
-      // `, [
-      //   userMessageUuid,
-      //   consultantMaid, // Link to message_threads via maid
-      //   userMessageFullMaid,
-      //   messageText,
-      //   consultantMaid, // Use maid for grouping (gin is redundant)
-      //   JSON.stringify({ consultant: consultantMaid, fromId: messageFromId, text: messageText, createdAt: new Date().toISOString() }),
-      //   human.haid,
-      // ]);
-      // console.log(`✅ User message saved: ${userMessageFullMaid} (linked to consultant ${consultantMaid})`);
-
-      // Check if AI token is configured
-      const aiApiToken = handlerWorker.env.AI_API_TOKEN;
-      if (!aiApiToken) {
-        console.error('AI_API_TOKEN is not configured! Set it with: wrangler secret put AI_API_TOKEN');
-        await handlerWorker.messageService.sendMessage(
-          adminChatId,
-          '❌ AI service is not configured. Please set AI_API_TOKEN secret.'
-        );
-        return;
-      }
-
-      // Get AI response with error handling
-      console.log(`🤖 Calling AI service with model: ${validatedModel}`);
+      // Get AI response using AIRepository
       let aiResponse: string;
       
       try {
-        const aiService = new AIService(
-          handlerWorker.env.AI_API_URL,
-          aiApiToken
+        aiResponse = await aiRepository.getAIResponse(
+          recentMessages,
+          messageText,
+          validatedPrompt,
+          validatedModel,
+          historySummaryText || undefined
         );
-
-        let rawAiResponse = await aiService.ask(validatedModel, aiInput);
-        console.log(`✅ AI Response received (raw): ${rawAiResponse}`);
-        
-        // Validate and fix HTML tags in AI response
-        aiResponse = aiService.validateAndFixHTML(rawAiResponse);
-        if (rawAiResponse !== aiResponse) {
-          console.log(`🔧 AI Response fixed (HTML validation): ${aiResponse}`);
-        }
       } catch (error) {
         console.error('❌ Error calling AI service:', error);
         console.error('Error details:', error?.message, error?.stack);

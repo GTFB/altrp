@@ -162,7 +162,8 @@ export class TopicService {
       let fileId = '';
       
       if (message.text) {
-        messageDescription = `📝 <b>Text:</b> ${message.text}`;
+        //messageDescription = `📝 <b>Text:</b> ${message.text}`;
+        messageDescription = `${message.text}`;
       } else if (message.voice) {
         messageDescription = `🎤 <b>Voice message:</b> (${message.voice.duration}s)`;
         fileId = message.voice.file_id;
