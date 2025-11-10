@@ -10,7 +10,7 @@ export const contractors = sqliteTable('contractors', {
 	statusName: text('status_name'),
 	type: text('type'),
 	cityName: text('city_name'),
-	order: numeric('order').default(0),
+	order: numeric('order').default('0'),
 	xaid: text('xaid'),
 	mediaId: text('media_id'),
 	updatedAt: text('updated_at').notNull().default("(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"),

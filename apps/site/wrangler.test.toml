@@ -1,0 +1,7 @@
+main = "functions/_worker.js"
+compatibility_date="2025-10-13"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "altrp-site-db" 
+database_id = "303ce694-3be1-436a-a36d-8cdf6ee03504"

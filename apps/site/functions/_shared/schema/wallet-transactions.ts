@@ -8,7 +8,7 @@ export const walletTransactions = sqliteTable('wallet_transactions', {
 	targetAid: text('target_aid'),
 	amount: numeric('amount').notNull(),
 	statusName: text('status_name'),
-	order: numeric('order').default(0),
+	order: numeric('order').default('0'),
 	xaid: text('xaid'),
 	createdAt: text('created_at').notNull().default("(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"),
 	updatedAt: text('updated_at').notNull().default("(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"),

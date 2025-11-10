@@ -15,11 +15,11 @@ export class SeedRepository {
   private static instance: SeedRepository | null = null
   private readonly db: SiteDb
 
-  private constructor(db: D1Database | null = null) {
+  private constructor(db: D1Database) {
     this.db = createDb(db)
   }
 
-  public static getInstance(db: D1Database | null = null): SeedRepository {
+  public static getInstance(db: D1Database): SeedRepository {
     if (!SeedRepository.instance) {
       SeedRepository.instance = new SeedRepository(db)
     }
