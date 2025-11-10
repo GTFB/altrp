@@ -831,129 +831,13 @@ ${aiResponse}`
           return;
         }
 
-        // Build contents array for chat history (alternating user/model roles)
-        const contents: Array<{ role: string; parts: Array<{ text: string }> }> = [];
-        
-        // Add conversation history
-        for (const msg of messagesToSummarize) {
-          const text = (msg.title || '').trim();
-          if (!text) continue;
-          
-          // Parse data_in to determine message direction (same logic as lines 716-749)
-          let role = 'user'; // Default to user
-          try {
-            if (msg.data_in) {
-              const dataInObj = JSON.parse(msg.data_in);
-              const direction = dataInObj.direction || 'incoming';
-              
-              // Check if this is AI response
-              if (dataInObj.data) {
-                try {
-                  const dataObj = JSON.parse(dataInObj.data);
-                  if (dataObj.isAIResponse) {
-                    role = 'model';
-                  } else {
-                    role = direction === 'outgoing' ? 'model' : 'user';
-                  }
-                } catch (e) {
-                  // If parse fails, use direction
-                  role = direction === 'outgoing' ? 'model' : 'user';
-                }
-              } else {
-                role = direction === 'outgoing' ? 'model' : 'user';
-              }
-            }
-          } catch (e) {
-            console.warn('Failed to parse data_in for message:', msg.full_maid);
-            // Default to 'user' if parsing fails
-          }
-          
-          contents.push({
-            role: role,
-            parts: [{ text: text }]
-          });
-        }
-        
-        // Add summary instruction as the last user message
-        let summaryInstruction: string;
-        
-        if (currentSummaryVersion === 0 || !historySummaryText) {
-          // First summary - just summarize the messages
-          summaryInstruction = `Summarize the first ${messagesToSummarize.length} messages of the conversation briefly and informatively.\nPreserve facts, agreements, intentions, definitions and terms.\nDo not make up facts. Use neutral tone.\nIMPORTANT: Complete all sentences fully. Do not cut phrases in the middle.`;
-        } else {
-          // Update existing summary - include previous summary and new messages
-          // Build text representation of new messages for instruction
-          const newMessagesText = messagesToSummarize
-            .map(msg => {
-              const text = (msg.title || '').trim();
-              if (!text) return '';
-              
-              // Use same logic as above to determine role
-              let role = 'user';
-              try {
-                if (msg.data_in) {
-                  const dataInObj = JSON.parse(msg.data_in);
-                  const direction = dataInObj.direction || 'incoming';
-                  
-                  if (dataInObj.data) {
-                    try {
-                      const dataObj = JSON.parse(dataInObj.data);
-                      if (dataObj.isAIResponse) {
-                        role = 'model';
-                      } else {
-                        role = direction === 'outgoing' ? 'model' : 'user';
-                      }
-                    } catch (e) {
-                      role = direction === 'outgoing' ? 'model' : 'user';
-                    }
-                  } else {
-                    role = direction === 'outgoing' ? 'model' : 'user';
-                  }
-                }
-              } catch (e) {
-                // Default to user
-              }
-              
-              const prefix = role === 'model' ? 'Assistant' : 'User';
-              return `${prefix}: ${text}`;
-            })
-            .filter(Boolean)
-            .join('\n\n');
-          
-          summaryInstruction = `Summarize the conversation briefly and informatively.\nPreserve facts, agreements, intentions, definitions and terms.\nDo not make up facts. Use neutral tone.\nIMPORTANT: Complete all sentences fully. Do not cut phrases in the middle.\n\nPrevious summary:\n${historySummaryText}\n\nNew ${messagesToSummarize.length} replies to add:\n${newMessagesText}\n\nMerge the previous summary with new replies into one complete summary. Each sentence must be completed.`;
-        }
-        
-        contents.push({
-          role: 'user',
-          parts: [{ text: summaryInstruction }]
-        });
-        
-        // Create prompt object with contents array
-        const summaryPrompt = {
-          contents: contents,
-          generationConfig: {
-            maxOutputTokens: 2048
-          }
-        };
-
-        const aiServiceForSummary = new AIService(handlerWorker.env.AI_API_URL, aiApiToken);
-        let newSummaryText = await aiServiceForSummary.ask(validatedModel, summaryPrompt);
-
-        // Trim incomplete sentences
-        newSummaryText = newSummaryText.trim();
-        const lastChar = newSummaryText.slice(-1);
-        if (!['.', '!', '?', '\n'].includes(lastChar)) {
-          const lastSentenceEnd = Math.max(
-            newSummaryText.lastIndexOf('.'),
-            newSummaryText.lastIndexOf('!'),
-            newSummaryText.lastIndexOf('?'),
-            newSummaryText.lastIndexOf('\n')
-          );
-          if (lastSentenceEnd > 0 && (newSummaryText.length - lastSentenceEnd) < 200) {
-            newSummaryText = newSummaryText.substring(0, lastSentenceEnd + 1).trim();
-            console.log('⚠️ Trimmed incomplete summary to last complete sentence');
-          }
-        }
+        // Generate summary using AIRepository
+        const newSummaryText = await aiRepository.generateSummary(
+          messagesToSummarize,
+          validatedModel,
+          currentSummaryVersion,
+          historySummaryText || undefined
+        );
 
         // Last batch message
         const lastMessage = messagesToSummarize[messagesToSummarize.length - 1];

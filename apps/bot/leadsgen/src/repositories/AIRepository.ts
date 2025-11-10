@@ -12,6 +12,13 @@ export interface RecentMessage {
   data_in: string;
 }
 
+export interface MessageToSummarize {
+  title: string;
+  data_in: string;
+  full_maid: string;
+  created_at: string;
+}
+
 /**
  * Repository for working with AI API
  */
@@ -157,6 +164,156 @@ export class AIRepository {
     }
 
     return aiResponse;
+  }
+
+  /**
+   * Generate summary for conversation history
+   * @param messagesToSummarize - Array of messages to summarize
+   * @param model - AI model name
+   * @param currentSummaryVersion - Current summary version number
+   * @param historySummaryText - Optional previous summary text
+   * @returns Generated summary string
+   */
+  async generateSummary(
+    messagesToSummarize: MessageToSummarize[],
+    model: string,
+    currentSummaryVersion: number,
+    historySummaryText?: string
+  ): Promise<string> {
+    // Build contents array for chat history (alternating user/model roles)
+    const contents: Array<{ role: string; parts: Array<{ text: string }> }> = [];
+    
+    // Add conversation history
+    for (const msg of messagesToSummarize) {
+      const text = (msg.title || '').trim();
+      if (!text) continue;
+      
+      // Parse data_in to determine message direction
+      let role = 'user'; // Default to user
+      try {
+        if (msg.data_in) {
+          const dataInObj = JSON.parse(msg.data_in);
+          const direction = dataInObj.direction || 'incoming';
+          
+          // Check if this is AI response
+          if (dataInObj.data) {
+            try {
+              const dataObj = JSON.parse(dataInObj.data);
+              if (dataObj.isAIResponse) {
+                role = 'model';
+              } else {
+                role = direction === 'outgoing' ? 'model' : 'user';
+              }
+            } catch (e) {
+              // If parse fails, use direction
+              role = direction === 'outgoing' ? 'model' : 'user';
+            }
+          } else {
+            role = direction === 'outgoing' ? 'model' : 'user';
+          }
+        }
+      } catch (e) {
+        console.warn('Failed to parse data_in for message:', msg.full_maid);
+        // Default to 'user' if parsing fails
+      }
+      
+      contents.push({
+        role: role,
+        parts: [{ text: text }]
+      });
+    }
+    
+    // Add summary instruction as the last user message
+    let summaryInstruction: string;
+    
+    if (currentSummaryVersion === 0 || !historySummaryText) {
+      // First summary - just summarize the messages
+      summaryInstruction = `Summarize the first ${messagesToSummarize.length} messages of the conversation briefly and informatively.\nPreserve facts, agreements, intentions, definitions and terms.\nDo not make up facts. Use neutral tone.\nIMPORTANT: Complete all sentences fully. Do not cut phrases in the middle.`;
+    } else {
+      // Update existing summary - include previous summary and new messages
+      // Build text representation of new messages for instruction
+      const newMessagesText = messagesToSummarize
+        .map(msg => {
+          const text = (msg.title || '').trim();
+          if (!text) return '';
+          
+          // Use same logic as above to determine role
+          let role = 'user';
+          try {
+            if (msg.data_in) {
+              const dataInObj = JSON.parse(msg.data_in);
+              const direction = dataInObj.direction || 'incoming';
+              
+              if (dataInObj.data) {
+                try {
+                  const dataObj = JSON.parse(dataInObj.data);
+                  if (dataObj.isAIResponse) {
+                    role = 'model';
+                  } else {
+                    role = direction === 'outgoing' ? 'model' : 'user';
+                  }
+                } catch (e) {
+                  role = direction === 'outgoing' ? 'model' : 'user';
+                }
+              } else {
+                role = direction === 'outgoing' ? 'model' : 'user';
+              }
+            }
+          } catch (e) {
+            // Default to user
+          }
+          
+          const prefix = role === 'model' ? 'Assistant' : 'User';
+          return `${prefix}: ${text}`;
+        })
+        .filter(Boolean)
+        .join('\n\n');
+      
+      summaryInstruction = `Summarize the conversation briefly and informatively.\nPreserve facts, agreements, intentions, definitions and terms.\nDo not make up facts. Use neutral tone.\nIMPORTANT: Complete all sentences fully. Do not cut phrases in the middle.\n\nPrevious summary:\n${historySummaryText}\n\nNew ${messagesToSummarize.length} replies to add:\n${newMessagesText}\n\nMerge the previous summary with new replies into one complete summary. Each sentence must be completed.`;
+    }
+    
+    contents.push({
+      role: 'user',
+      parts: [{ text: summaryInstruction }]
+    });
+    
+    // Create prompt object with contents array
+    const summaryPrompt = {
+      contents: contents,
+      generationConfig: {
+        maxOutputTokens: 2048
+      }
+    };
+
+    // Get AI API URL and token from env
+    const aiApiUrl = this.env.AI_API_URL;
+    const aiApiToken = this.env.AI_API_TOKEN;
+
+    // Check if AI token is configured
+    if (!aiApiToken) {
+      throw new Error('AI_API_TOKEN is not configured');
+    }
+
+    const aiService = new AIService(aiApiUrl, aiApiToken);
+    let newSummaryText = await aiService.ask(model, summaryPrompt);
+
+    // Trim incomplete sentences
+    newSummaryText = newSummaryText.trim();
+    const lastChar = newSummaryText.slice(-1);
+    if (!['.', '!', '?', '\n'].includes(lastChar)) {
+      const lastSentenceEnd = Math.max(
+        newSummaryText.lastIndexOf('.'),
+        newSummaryText.lastIndexOf('!'),
+        newSummaryText.lastIndexOf('?'),
+        newSummaryText.lastIndexOf('\n')
+      );
+      if (lastSentenceEnd > 0 && (newSummaryText.length - lastSentenceEnd) < 200) {
+        newSummaryText = newSummaryText.substring(0, lastSentenceEnd + 1).trim();
+        console.log('⚠️ Trimmed incomplete summary to last complete sentence');
+      }
+    }
+
+    return newSummaryText;
   }
 }
 
