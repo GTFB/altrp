@@ -23,14 +23,11 @@ export class TopicService {
   }
 
 
-
   /**
-   * Creates topic in admin group for new user
+   * Creates topic in admin group with specified name
    */
-  async createTopicInAdminGroup(userId: number, user: TelegramUser): Promise<number | null> {
+  async createTopic(topicName: string, iconColor: number = 0x6FB9F0): Promise<number | null> {
     try {
-      const topicName = `${user.first_name} ${user.last_name || ''}`.trim();
-      
       console.log(`Creating topic "${topicName}" in admin group ${this.adminChatId}`);
 
       const response = await fetch(`https://api.telegram.org/bot${this.botToken}/createForumTopic`, {
@@ -41,7 +38,7 @@ export class TopicService {
         body: JSON.stringify({
           chat_id: this.adminChatId,
           name: topicName,
-          icon_color: 0x6FB9F0, // Blue icon color
+          icon_color: iconColor,
           icon_custom_emoji_id: undefined
         })
       });
@@ -56,16 +53,7 @@ export class TopicService {
       const topicId = (result as any).result?.message_thread_id;
       
       if (topicId) {
-        console.log(`Topic created successfully with ID: ${topicId}`);
-        
-        // Send welcome message to topic
-        await this.messageService.sendMessageToTopic(this.adminChatId, topicId, 
-          `👋 New user!\n\n` +
-          `Name: ${user.first_name} ${user.last_name || ''}\n` +
-          `Username: @${user.username || 'not specified'}\n` +
-          `ID: ${userId}\n\n`
-        );
-        
+        console.log(`Topic "${topicName}" created successfully with ID: ${topicId}`);
         return topicId;
       } else {
         console.error('No topic ID in response:', result);

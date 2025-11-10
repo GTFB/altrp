@@ -1,6 +1,4 @@
 // Schedule configuration
-// This file contains all the scheduled tasks
-
 export interface BotSchedule {
   cron: string;
   handlerName: string;

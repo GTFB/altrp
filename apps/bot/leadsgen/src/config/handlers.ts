@@ -62,13 +62,26 @@ export const createCustomHandlers = (worker: BotInterface) => {
       let existingHuman = await handlerWorker.humanRepository.getHumanByTelegramId(userId);
       
       if (!existingHuman) {
-        // Create topic in admin group for new human
-        const topicId = await handlerWorker.topicService.createTopicInAdminGroup(userId, message.from);
-        
         // Compose full name from first and last name
         const fullName = [message.from.first_name, message.from.last_name]
           .filter(Boolean)
           .join(' ') || message.from.first_name || 'Unknown';
+        
+        // Create topic in admin group for new human
+        const topicId = await handlerWorker.topicService.createTopic(fullName);
+        
+        // Send welcome message to topic if it was created
+        if (topicId) {
+          const adminChatId = parseInt(handlerWorker.env.ADMIN_CHAT_ID || '');
+          if (adminChatId) {
+            await handlerWorker.messageService.sendMessageToTopic(adminChatId, topicId, 
+              `👋 New user!\n\n` +
+              `Name: ${message.from.first_name} ${message.from.last_name || ''}\n` +
+              `Username: @${message.from.username || 'not specified'}\n` +
+              `ID: ${userId}\n\n`
+            );
+          }
+        }
         
         // Prepare data_in JSON with telegram_id and topic_id
         const dataIn = JSON.stringify({
