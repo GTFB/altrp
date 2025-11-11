@@ -21,6 +21,8 @@ export type {
 	NewWallet,
 	NewWalletTransaction,
 	NewLocation,
+	NewJournal,
+	Journal,
 } from './schema/types';
 
 import * as schemaExports from './schema/index';

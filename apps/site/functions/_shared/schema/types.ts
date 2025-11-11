@@ -14,6 +14,7 @@ import { roles } from './roles'
 import { userRoles } from './user-roles'
 import { humans } from './humans'
 import { taxonomy } from './taxonomy'
+import { journals } from './journals'
 
 export type BaseMove = InferSelectModel<typeof baseMoves>
 export type Product = InferSelectModel<typeof products>
@@ -30,6 +31,7 @@ export type Role = InferSelectModel<typeof roles>
 export type UserRole = InferSelectModel<typeof userRoles>
 export type Human = InferSelectModel<typeof humans>
 export type Taxonomy = InferSelectModel<typeof taxonomy>
+export type Journal = InferSelectModel<typeof journals>
 
 export type NewBaseMove = InferInsertModel<typeof baseMoves>
 export type NewProduct = InferInsertModel<typeof products>
@@ -46,3 +48,4 @@ export type NewRole = InferInsertModel<typeof roles>
 export type NewUserRole = InferInsertModel<typeof userRoles>
 export type NewHuman = InferInsertModel<typeof humans>
 export type NewTaxonomy = InferInsertModel<typeof taxonomy>
+export type NewJournal = InferInsertModel<typeof journals>
