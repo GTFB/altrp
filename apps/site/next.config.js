@@ -1,16 +1,13 @@
 const withPWA = require('next-pwa')({
-  dest: 'public',
+  dest: 'public/pwa',
   customWorkerDir: 'worker'
 })
 /** @type {import('next').NextConfig} */
+
+const STATIC_EXPORT = process.env.STATIC_EXPORT === 'true'
+
+
 const nextConfig = {
-  reactStrictMode: true,
-  ...(process.env.STATIC_EXPORT === 'true' && {
-    output: 'export',
-    trailingSlash: true,
-    skipTrailingSlashRedirect: true,
-    distDir: 'dist',
-  }),
   transpilePackages: [],
   images: {
     unoptimized: process.env.NODE_ENV === 'production',
@@ -40,4 +37,12 @@ const nextConfig = {
 
 }
 
-module.exports = withPWA(nextConfig)
+
+if (STATIC_EXPORT) {
+  nextConfig.output = 'export'
+  nextConfig.trailingSlash = false
+  nextConfig.skipTrailingSlashRedirect = true
+  nextConfig.distDir = 'dist'
+  nextConfig.reactStrictMode = true
+}
+module.exports = STATIC_EXPORT ? withPWA(nextConfig) : nextConfig

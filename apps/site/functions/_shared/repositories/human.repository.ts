@@ -1,8 +1,9 @@
 import { eq } from "drizzle-orm";
 import { schema } from "../schema";
 import  BaseRepository  from "./BaseRepositroy";
+import { Human } from "../schema/types";
 
-export class HumanRepository extends BaseRepository{
+export class HumanRepository extends BaseRepository<Human>{
     
     public static getInstance(db: D1Database): HumanRepository {
         return new HumanRepository(db, schema);

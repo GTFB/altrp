@@ -4,7 +4,7 @@ import type { Base } from "../schema/types";
 import { schema } from "../schema/schema";
 import BaseRepository from "./BaseRepositroy";
 
-export class BasesRepository extends BaseRepository {
+export class BasesRepository extends BaseRepository<Base> {
   private static instance: BasesRepository | null = null;
   private constructor(db: D1Database) {
     super(db, schema.bases);
