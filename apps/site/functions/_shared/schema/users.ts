@@ -13,6 +13,8 @@ export const users = sqliteTable('users', {
   createdAt: text('created_at').notNull().default("(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"),
   updatedAt: text('updated_at').notNull().default("(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"),
   deletedAt: text('deleted_at'),
-  dataIn: text('data_in'),
+  dataIn: text('data_in', {
+    mode: 'json'
+  }),
 })
 

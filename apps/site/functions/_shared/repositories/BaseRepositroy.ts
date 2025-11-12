@@ -1,7 +1,5 @@
 import { eq, } from "drizzle-orm";
 import { createDb, SiteDb } from "./utils";
-import Humans from "../collections/humans";
-import { schema } from "../schema";
 import BaseCollection from "../collections/BaseCollection";
 
 export default class BaseRepository<T> {
@@ -11,6 +9,13 @@ export default class BaseRepository<T> {
         this.db = createDb(db);
         this.d1DB = db;
     }
+    protected async beforeCreate(data: Partial<T>): Promise<void> {}
+    protected async afterCreate(entity: T): Promise<void> {}
+    protected async beforeUpdate(uuid: string, data: Partial<T>): Promise<void> {}
+    protected async afterUpdate(entity: T): Promise<void> {}
+    protected async beforeDelete(uuid: string, force: boolean): Promise<void> {}
+    protected async afterDelete(uuid: string, force: boolean): Promise<void> {}
+    
     public static getInstance(db: D1Database, schema: any): BaseRepository<any> {
         return new BaseRepository(db, schema);
     }
@@ -26,8 +31,11 @@ export default class BaseRepository<T> {
         if (!data.uuid) {
             data.uuid = crypto.randomUUID();
         }
+        await this.beforeCreate(data as Partial<T>);
         await this.db.insert(this.schema).values(data).execute();
-        return this.findByUuid(data.uuid);
+        const entity = await this.findByUuid(data.uuid);
+        await this.afterCreate(entity);
+        return entity;
     }
     async update(uuid: string, data: any, collection: BaseCollection | null = null ): Promise<T> {
 
@@ -35,8 +43,27 @@ export default class BaseRepository<T> {
             collection = new BaseCollection();
         }
         await collection.prepare(data);
-
+        await this.beforeUpdate(uuid, data as Partial<T>);
         await this.db.update(this.schema).set(data).where(eq(this.schema.uuid, uuid)).execute();
-        return this.findByUuid(uuid);
+        const entity = await this.findByUuid(uuid);
+        await this.afterUpdate(entity);
+        return entity;
+    }
+    async deleteByUuid(uuid: string, force: boolean= false): Promise<D1Result> {
+        await this.beforeDelete(uuid, force);
+        const result = force ? await this._forceDeleteByUuid(uuid) : await this._softDeleteByUuid(uuid);
+        await this.afterDelete(uuid, force);
+        return result;
+    }
+    protected async _forceDeleteByUuid(uuid: string){
+        return await this.db.delete(this.schema).where(eq(this.schema.uuid, uuid)).execute();
+    }
+    protected async _softDeleteByUuid(uuid: string){
+
+        if(this.schema.deletedAt){
+            return await this.db.update(this.schema).set({ deletedAt: Date.now() }).where(eq(this.schema.uuid, uuid)).execute();
+        }
+
+       return await this.db.delete(this.schema).where(eq(this.schema.uuid, uuid)).execute();
     }
 }
