@@ -428,7 +428,8 @@ export const sendPushNotification = async (
   title: string,
   body: string,
   env?: Env,
-  log?: PushLogger
+  log?: PushLogger,
+  url?: string
 ) => {
   await log?.('vapid_config_start', {
     status: 'info',
@@ -442,7 +443,7 @@ export const sendPushNotification = async (
     message: 'VAPID config resolved',
   })
 
-  const payload = JSON.stringify({ title, body })
+  const payload = JSON.stringify({ title, body, url })
 
   await log?.('payload_prepared', {
     status: 'info',
@@ -497,7 +498,8 @@ export const sendPushNotificationToHuman = async (
   haid: string,
   title: string,
   body: string,
-  context: { env: Env }
+  context: { env: Env },
+  url?: string
 ) => {
   const { env } = context
   const humanRepository = HumanRepository.getInstance(env.DB as D1Database)
@@ -557,7 +559,7 @@ export const sendPushNotificationToHuman = async (
   })
 
   try {
-    await sendPushNotification(subscription, title, body, env, log)
+    await sendPushNotification(subscription, title, body, env, log, url)
     await log('completed', {
       status: 'success',
       message: 'Push notification sent successfully',
