@@ -21,8 +21,7 @@
     "d1:query:local": "wrangler d1 execute altrp-site-db --local",
     "d1:query:remote": "wrangler d1 execute altrp-site-db --remote",
     "hash-password": "node scripts/hash-password.mjs",
-    "test:int": "vitest run --config ./vitest.config.ts -- test/int",
-    "test:int:repo": "vitest run --config ./vitest.config.ts  --pool workers"
+    "test:int": "bun test --config ./tsconfig.json test/int/"
   },
   "dependencies": {
     "@cloudflare/vitest-pool-workers": "^0.10.5",
