@@ -10,3 +10,5 @@ TELEGRAM_CHAT_ID=your_telegram_chat_id_here
 # You can use: openssl rand -base64 32
 AUTH_SECRET=your_secure_random_string_here
 
+VAPID_PUBLIC_KEY=your_vapid_public_key
+VAPID_PRIVATE_KEY=your_vapid_private_key

@@ -23,12 +23,6 @@ export const ScriptOptimizer = () => {
               });
             }
             
-            // Preload critical resources
-            const preloadLink = document.createElement('link');
-            preloadLink.rel = 'preload';
-            preloadLink.href = '/images/tanya.png';
-            preloadLink.as = 'image';
-            document.head.appendChild(preloadLink);
           `,
         }}
       />

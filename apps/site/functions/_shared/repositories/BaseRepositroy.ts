@@ -31,6 +31,12 @@ export default class BaseRepository<T> {
         if (!data.uuid) {
             data.uuid = crypto.randomUUID();
         }
+        if(this.schema.createdAt){
+            data.createdAt = Date.now()
+        }
+        if(this.schema.updatedAt){
+            data.updatedAt = Date.now()
+        }
         await this.beforeCreate(data as Partial<T>);
         await this.db.insert(this.schema).values(data).execute();
         const entity = await this.findByUuid(data.uuid);
@@ -42,7 +48,10 @@ export default class BaseRepository<T> {
         if (!collection) {
             collection = new BaseCollection();
         }
-        await collection.prepare(data);
+
+        if(this.schema.updatedAt){
+            data.updatedAt = Date.now()
+        }
         await this.beforeUpdate(uuid, data as Partial<T>);
         await this.db.update(this.schema).set(data).where(eq(this.schema.uuid, uuid)).execute();
         const entity = await this.findByUuid(uuid);
