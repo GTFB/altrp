@@ -143,6 +143,7 @@ temp/
 build/
 dist/
 out/
+apps/site/public/pwa/
 
 # Database
 *.db

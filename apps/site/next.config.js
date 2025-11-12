@@ -1,12 +1,13 @@
+const withPWA = require('next-pwa')({
+  dest: 'public/pwa',
+  customWorkerDir: 'worker'
+})
 /** @type {import('next').NextConfig} */
-const nextConfig = {
 
-  ...(process.env.STATIC_EXPORT === 'true' && {
-    output: 'export',
-    trailingSlash: true,
-    skipTrailingSlashRedirect: true,
-    distDir: 'dist',
-  }),
+const STATIC_EXPORT = process.env.STATIC_EXPORT === 'true'
+
+
+const nextConfig = {
   transpilePackages: [],
   images: {
     unoptimized: process.env.NODE_ENV === 'production',
@@ -26,7 +27,7 @@ const nextConfig = {
     externalDir: true,
     // inlineCss: true,
     // Exclude Cloudflare Pages Functions from tracing/bundle
-    
+
 
   },
   //  
@@ -36,4 +37,12 @@ const nextConfig = {
 
 }
 
-module.exports = nextConfig
+
+if (STATIC_EXPORT) {
+  nextConfig.output = 'export'
+  nextConfig.trailingSlash = false
+  nextConfig.skipTrailingSlashRedirect = true
+  nextConfig.distDir = 'dist'
+  nextConfig.reactStrictMode = true
+}
+module.exports = STATIC_EXPORT ? withPWA(nextConfig) : nextConfig

@@ -10,6 +10,8 @@ export const dealProducts = sqliteTable('deal_products', {
 	order: numeric('order').default('0'),
 	updatedAt: text('updated_at').notNull().default("(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"),
 	createdAt: text('created_at').notNull().default("(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"),
-	dataIn: text('data_in'),
+	dataIn: text('data_in', {
+		mode: 'json'
+	}),
 });
 
