@@ -32,10 +32,10 @@ export default class BaseRepository<T> {
             data.uuid = crypto.randomUUID();
         }
         if(this.schema.createdAt){
-            data.createdAt = Date.now()
+            data.createdAt = new Date().toISOString()
         }
         if(this.schema.updatedAt){
-            data.updatedAt = Date.now()
+            data.updatedAt = new Date().toISOString()
         }
         await this.beforeCreate(data as Partial<T>);
         await this.db.insert(this.schema).values(data).execute();
@@ -50,7 +50,7 @@ export default class BaseRepository<T> {
         }
 
         if(this.schema.updatedAt){
-            data.updatedAt = Date.now()
+            data.updatedAt = new Date().toISOString()
         }
         await this.beforeUpdate(uuid, data as Partial<T>);
         await this.db.update(this.schema).set(data).where(eq(this.schema.uuid, uuid)).execute();
