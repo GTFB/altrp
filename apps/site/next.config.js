@@ -1,6 +1,8 @@
 const withPWA = require('next-pwa')({
   dest: 'public/pwa',
-  customWorkerDir: 'worker'
+  customWorkerDir: 'worker',
+  buildExcludes: [/app-build-manifest\.json$/]
+
 })
 /** @type {import('next').NextConfig} */
 

@@ -70,7 +70,7 @@ export default class BaseRepository<T> {
     protected async _softDeleteByUuid(uuid: string){
 
         if(this.schema.deletedAt){
-            return await this.db.update(this.schema).set({ deletedAt: Date.now() }).where(eq(this.schema.uuid, uuid)).execute();
+            return await this.db.update(this.schema).set({ deletedAt: new Date().toISOString() }).where(eq(this.schema.uuid, uuid)).execute();
         }
 
        return await this.db.delete(this.schema).where(eq(this.schema.uuid, uuid)).execute();

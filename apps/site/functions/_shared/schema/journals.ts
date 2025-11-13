@@ -4,7 +4,7 @@ export const journals = sqliteTable('journals', {
     id: integer('id').primaryKey({ autoIncrement: true }),
     user_id: integer('user_id'),
     uuid: text('uuid').notNull(),
-    details: text('details').notNull(),
+    details: text('details', { mode: 'json' }).notNull(),
     action: text('action').notNull(),
     xaid: text('xaid'),
     created_at: text('created_at'),
