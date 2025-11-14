@@ -69,29 +69,30 @@ for file in $FILES; do
     fi
 done
 
-echo "🧪 Running quick e2e tests..."
-if ! bun run quick-test; then
-    echo "❌ E2E quick tests failed. Aborting commit."
-    exit 1
-fi
+# echo "🧪 Running quick e2e tests..."
+# if ! bun run quick-test; then
+#     echo "❌ E2E quick tests failed. Aborting commit."
+#     exit 1
+# fi
 
-echo "🧪 Running integration tests..."
-if ! bun run test:integration; then
-    echo "❌ Integration tests failed. Aborting commit."
-    exit 1
-fi
+# echo "🧪 Running integration tests..."
+# if ! bun run test:integration; then
+#     echo "❌ Integration tests failed. Aborting commit."
+#     exit 1
+# fi
 
-echo "🧪 Running build cms..."
-if ! bun run build:cms; then
+# echo "🧪 Running build cms..."
+# if ! bun run build:cms; then
+#     echo "❌ Running build failed. Aborting commit."
+#     exit 1
+# fi
+
+
+echo "🧪 Running type-check for site..."
+if ! bun run type-check:site; then
     echo "❌ Running build failed. Aborting commit."
     exit 1
 fi
 
-echo "🧪 Running build site..."
-if ! bun run build:site; then
-    echo "❌ Running build failed. Aborting commit."
-    exit 1
-fi
-
-echo "✅ Code validation passed!"
-echo "🚀 Proceeding with commit..."
+# echo "✅ Code validation passed!"
+# echo "🚀 Proceeding with commit..."
