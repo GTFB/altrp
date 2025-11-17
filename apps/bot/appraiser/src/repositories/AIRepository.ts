@@ -385,5 +385,65 @@ export class AIRepository {
 
     return transcript;
   }
+
+  /**
+   * Simple AI request with ready-made prompt
+   * @param systemPrompt - System instruction/role prompt
+   * @param userMessage - User message content (optional, can be empty string)
+   * @param model - AI model name
+   * @returns AI response string
+   */
+  async getSimpleAIResponse(systemPrompt: string, userMessage: string, model: string): Promise<string> {
+    // Get AI API URL and token from env
+    const aiApiUrl = this.env.AI_API_URL;
+    const aiApiToken = this.env.AI_API_TOKEN;
+
+    // Check if AI token is configured
+    if (!aiApiToken) {
+      throw new Error('AI_API_TOKEN is not configured');
+    }
+
+    // Prepare contents array - add user message if provided
+    const contents: Array<{ role: string; parts: Array<{ text: string }> }> = [];
+    if (userMessage && userMessage.trim()) {
+      contents.push({
+        role: 'user',
+        parts: [{ text: userMessage }]
+      });
+    }
+
+    // Prepare AI input with system instruction and user message
+    const aiInput = {
+      system_instruction: {
+        role: 'system',
+        parts: [
+          { text: systemPrompt }
+        ]
+      },
+      contents: contents,
+      generationConfig: {
+        maxOutputTokens: 2048
+      }
+    };
+
+    // Get AI response with error handling
+    console.log(`🤖 Calling AI service with model: ${model} (simple prompt)`);
+    
+    const aiService = new AIService(
+      aiApiUrl,
+      aiApiToken
+    );
+
+    let rawAiResponse = await aiService.ask(model, aiInput);
+    console.log(`✅ AI Response received (raw): ${rawAiResponse}`);
+    
+    // Validate and fix HTML tags in AI response
+    const aiResponse = aiService.validateAndFixHTML(rawAiResponse);
+    if (rawAiResponse !== aiResponse) {
+      console.log(`🔧 AI Response fixed (HTML validation): ${aiResponse}`);
+    }
+
+    return aiResponse;
+  }
 }
 

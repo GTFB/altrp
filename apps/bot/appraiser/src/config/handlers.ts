@@ -48,6 +48,68 @@ export const createCustomHandlers = (worker: BotInterface) => {
       TRANSCRIPTION_MODEL: handlerWorker.env.TRANSCRIPTION_MODEL
     }
   });
+
+  // Get default AI model from env or use default
+  const defaultAIModel = handlerWorker.env.AI_MODEL || 'gemini-2.5-flash';
+
+  /**
+   * Evaluate qualification answers using AI
+   */
+  const evaluateQualification = async (telegramId: number, answers: Array<{step: number, text: string, answer: string}>) => {
+    console.log(`📊 Evaluating qualification for user ${telegramId} with ${answers.length} answers`);
+    
+    // Get human to extract topic_id
+    const human = await handlerWorker.humanRepository.getHumanByTelegramId(telegramId);
+    if (!human || !human.dataIn) {
+      console.error(`❌ Human ${telegramId} not found or has no dataIn`);
+      return;
+    }
+
+    // Extract topic_id from human.dataIn
+    let topicId: number | null = null;
+    try {
+      const dataInObj = JSON.parse(human.dataIn);
+      topicId = dataInObj.topic_id;
+    } catch (e) {
+      console.error(`Failed to parse human.dataIn for human ${telegramId}:`, e);
+      return;
+    }
+
+    if (!topicId) {
+      console.error(`❌ No topic_id found for human ${telegramId}`);
+      return;
+    }
+
+    // Build system prompt (role and context)
+    const systemRole = `You are a strict but fair business analyst and venture partner, an "AI Mentor". Your task is to objectively evaluate the business in Serbia based on the participant's questionnaire. Context: Serbia, 2025`;
+
+    const contextInstruction = `You have to evaluate the business according to 10 criteria and write to Sammari.`;
+
+    const systemPrompt = `${systemRole}\n\n${contextInstruction}`;
+
+    // Format questions and answers from User
+    // Each question-answer pair is sent as User message with clear marking
+    const userMessage = answers
+      .sort((a, b) => a.step - b.step)
+      .map(qa => `Question ${qa.step}: ${qa.text}\nAnswer: ${qa.answer}`)
+      .join('\n\n');
+
+    // Get AI response
+    const aiResponse = await aiRepository.getSimpleAIResponse(systemPrompt, userMessage, defaultAIModel);
+    
+    // Send response to topic
+    const adminChatId = parseInt(handlerWorker.env.ADMIN_CHAT_ID || '');
+    if (adminChatId) {
+      await handlerWorker.messageService.sendMessageToTopic(
+        adminChatId,
+        topicId,
+        `🤖 <b>AI Business Assessment</b>\n\n${aiResponse}`
+      );
+      console.log(`✅ Qualification evaluation sent to topic ${topicId}`);
+    } else {
+      console.error(`❌ ADMIN_CHAT_ID not configured`);
+    }
+  };
   
   return {
     /**
@@ -894,6 +956,18 @@ ${aiResponse}`
           // Complete flow and transition to thanks flow
           await handlerWorker.flowEngine.completeFlow(telegramId);
           await handlerWorker.flowEngine.startFlow(telegramId, 'thanks');
+
+          // Get qualification answers and send to AI for evaluation
+          const qualificationAnswers = await contextManager.getVariable(telegramId, 'qualification.answers') || [];
+          if (qualificationAnswers.length > 0) {
+            try {
+              await evaluateQualification(telegramId, qualificationAnswers);
+            } catch (error) {
+              console.error(`❌ Error evaluating qualification:`, error);
+              // Continue even if evaluation fails
+            }
+          }
+
           return;
         }
         
