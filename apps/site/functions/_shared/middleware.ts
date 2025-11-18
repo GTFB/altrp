@@ -2,6 +2,7 @@
  * Middleware utilities for Cloudflare Pages Functions
  */
 
+import { MeRepository } from './repositories/me.repository'
 import { getSession, isAdmin, forbiddenResponse, unauthorizedResponse,  } from './session'
 import { Context, AuthenticatedContext } from './types'
 
@@ -48,7 +49,12 @@ export async function requireAdmin(
     return unauthorizedResponse()
   }
   
-  if (!isAdmin(user)) {
+  const meRepository = MeRepository.getInstance(context.env.DB)
+  const userWithRoles = await meRepository.findByIdWithRoles(Number(user.id), {
+    includeHuman: false,
+    includeEmployee: false,
+  })
+  if (!isAdmin(userWithRoles)) {
     return forbiddenResponse()
   }
   

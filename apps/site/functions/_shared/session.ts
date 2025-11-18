@@ -2,7 +2,8 @@
  * Encrypted session management utilities for Cloudflare Workers
  * Uses Web Crypto API for encryption/decryption
  */
-import { User, SessionData } from './types'
+import { UserWithRoles, SessionData, SessionUser } from './types'
+
 const COOKIE_NAME = 'session'
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7 // 7 days in seconds
 
@@ -99,7 +100,7 @@ async function decrypt(encrypted: string, secret: string): Promise<string | null
 /**
  * Creates an encrypted session cookie
  */
-export async function createSession(user: User, secret: string): Promise<string> {
+export async function createSession(user: SessionUser, secret: string): Promise<string> {
   const sessionData: SessionData = {
     user,
     expiresAt: Date.now() + COOKIE_MAX_AGE * 1000,
@@ -113,7 +114,7 @@ export async function createSession(user: User, secret: string): Promise<string>
 /**
  * Retrieves and validates session from cookie
  */
-export async function getSession(request: Request, secret: string): Promise<User | null> {
+export async function getSession(request: Request, secret: string): Promise<SessionUser | null> {
   const cookieHeader = request.headers.get('Cookie')
   if (!cookieHeader) return null
   
@@ -157,8 +158,8 @@ export function clearSession(): string {
 /**
  * Checks if user has admin role
  */
-export function isAdmin(user: User | null): boolean {
-  return user?.role === 'admin'
+export function isAdmin(user: UserWithRoles | null): boolean {
+  return user?.roles.some(role => role.name === 'Administrator') || false
 }
 
 /**

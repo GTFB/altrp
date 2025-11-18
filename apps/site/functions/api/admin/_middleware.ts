@@ -1,5 +1,6 @@
 /// <reference types="@cloudflare/workers-types" />
 
+import { MeRepository } from '../../_shared/repositories/me.repository'
 import { getSession, isAdmin, forbiddenResponse, unauthorizedResponse } from '../../_shared/session'
 import { Env } from '../../_shared/types'
 /**
@@ -21,14 +22,19 @@ export const onRequest = async (context: {
 
   // Get user from session
   const user = await getSession(request, env.AUTH_SECRET)
-
   // Check if user is authenticated
   if (!user) {
     return unauthorizedResponse()
   }
 
+  const meRepository = MeRepository.getInstance(env.DB)
+  const userWithRoles = await meRepository.findByIdWithRoles(Number(user.id), {
+    includeHuman: false,
+    includeEmployee: false,
+  })
+
   // Check if user has admin role
-  if (!isAdmin(user)) {
+  if (!isAdmin(userWithRoles)) {
     return forbiddenResponse()
   }
 

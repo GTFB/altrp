@@ -1,31 +1,49 @@
 /// <reference types="@cloudflare/workers-types" />
 
+import { User, Role, Human, Employee } from './schema/types'
 export interface Env {
     AUTH_SECRET: string
     DB: D1Database
     [key: string]: any
 }
 
+export interface TableInfo {
+    name: string
+    type: string
+  }
+  
+export interface CollectionGroup {
+    category: string
+    collections: string[]
+  }
 export interface Context {
     request: Request
     env: Env
     params?: Record<string, string>
 }
 
-export interface User {
-    id: string
-    email: string
-    name: string
-    role: string
+
+export interface UserWithRoles extends User {
+    roles: Role[]
+    human?: Human
+    employee?: Employee
 }
 
+export interface SessionUser {
+    id: number | string
+    email: string
+    name?: string
+    role?: string
+}
+
+
 export interface SessionData {
-    user: User
+    user: SessionUser
     expiresAt: number
 }
 
 export interface AuthenticatedContext extends Context {
-    user: User
+    user: SessionUser
 }
 
 export interface CollectionStats {
