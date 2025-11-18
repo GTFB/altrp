@@ -50,7 +50,7 @@ export class UserContextManager {
       }
       
       // Parse data_in JSON to extract context and other data
-      let savedData = {};
+      let savedData: any = {};
       if (human.dataIn) {
         try {
           const dataInObj = JSON.parse(human.dataIn);

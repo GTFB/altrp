@@ -19,5 +19,5 @@ export const schedules: BotSchedule[] = [
 
 // Helper function to get all schedules
 export function getAllSchedules(): string[] {
-  return schedules;
+  return schedules as any;
 }
