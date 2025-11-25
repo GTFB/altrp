@@ -1,0 +1,23 @@
+name = "YOUR_WORKER_NAME"
+main = "src/worker/worker.ts"
+compatibility_date = "2024-01-01"
+workers_dev = true
+account_id = "YOUR_ACCOUNT_ID_HERE"
+
+[observability.logs]
+enabled = true
+
+# Environment variables
+[vars]
+BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"
+BOT_TYPE = "matcher"
+NODE_ENV = "production"
+LOCALE = "ru"
+AI_API_URL = "YOUR_AI_API_URL_HERE"
+AI_API_TOKEN = "YOUR_AI_API_TOKEN_HERE"
+
+# D1 Database
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "YOUR_DATABASE_NAME"
+# database_id = "YOUR_DATABASE_ID_HERE"
