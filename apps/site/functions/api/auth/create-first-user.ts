@@ -117,7 +117,7 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
       
       await env.DB.prepare(
         `INSERT INTO roles (uuid, raid, name, title, is_system, "order", created_at, updated_at) 
-         VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
       )
         .bind(
           roleUuid, 
@@ -125,7 +125,9 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
           'Administrator',
           'Administrator', 
           1, 
-          0
+          0,
+          new Date().toISOString(),
+          new Date().toISOString(),
         )
         .run()
       
@@ -134,10 +136,10 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
 
     // Insert user into database
     await env.DB.prepare(
-      `INSERT INTO users (uuid, human_aid, email, password_hash, salt, is_active, created_at, updated_at) 
-       VALUES (?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'), strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`
+      `INSERT INTO users (uuid, human_aid, email, password_hash, salt, is_active, created_at, updated_at, email_verified_at) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
-      .bind(userUuid, humanAid, email, hashedPassword, salt, 1)
+      .bind(userUuid, humanAid, email, hashedPassword, salt, 1, new Date().toISOString(), new Date().toISOString(), new Date().toISOString())
       .run()
 
     // Create user_role relationship

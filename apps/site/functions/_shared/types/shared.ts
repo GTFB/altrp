@@ -34,3 +34,18 @@ export interface DbPaginatedResult<T> {
     docs: T[];
     pagination: DbPaginationResult;
 }
+export interface MeUser {
+    id: string
+    uuid: string
+    email: string
+    name: string
+    roles: Array<{
+      uuid: string
+      raid: string
+      title: string
+      name: string
+      description: string | null
+      isSystem: boolean
+      dataIn: any
+    }>
+  }

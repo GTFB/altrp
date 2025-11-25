@@ -21,8 +21,15 @@ export default class BaseRepository<T> {
     public static getInstance(db: D1Database, schema: any): BaseRepository<any> {
         return new BaseRepository(db, schema);
     }
+    public getSelectQuery(){
+        return this.db.select().from(this.schema)   
+    }
     async findByUuid(uuid: string): Promise<T> {
         const [row] = await this.db.select().from(this.schema).where(eq(this.schema.uuid, uuid)).execute();
+        return row;
+    }
+    async findById(id: number): Promise<T> {
+        const [row] = await this.db.select().from(this.schema).where(eq(this.schema.id, id)).execute();
         return row;
     }
     async findAll(): Promise<T[]> {
@@ -39,10 +46,11 @@ export default class BaseRepository<T> {
         if (this.schema.updatedAt) {
             data.updatedAt = new Date().toISOString()
         }
+
         await this.beforeCreate(data as Partial<T>);
-        await this.db.insert(this.schema).values(data).execute();
-        const entity = await this.findByUuid(data.uuid);
-        await this.afterCreate(entity);
+        const result = await this.db.insert(this.schema).values(data).execute();
+        const entity = await this.findById(result.meta.last_row_id);
+        await this.afterCreate(entity as T);
         return entity;
     }
     async update(uuid: string, data: any, collection: BaseCollection | null = null): Promise<T> {
@@ -78,9 +86,6 @@ export default class BaseRepository<T> {
         return await this.db.delete(this.schema).where(eq(this.schema.uuid, uuid)).execute();
     }
     
-    public getSelectQuery(){
-        return this.db.select().from(this.schema)   
-    }
     public async getFiltered(filters: DbFilters, orders: DbOrders, pagination: DbPagination): Promise<DbPaginatedResult<T>> {
         const query = this.getSelectQuery()
         const where = buildDbFilters(this.schema, filters)

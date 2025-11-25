@@ -1,0 +1,98 @@
+# Build stage
+FROM node:20-slim AS builder
+
+# Install build dependencies for native modules (lightningcss, etc.)
+RUN apt-get update && apt-get install -y python3 make g++ unzip curl && \
+    npm install -g bun
+
+WORKDIR /app
+
+# Copy root files for dependency installation
+COPY package.json bun.lock tsconfig.json settings.ts ./
+
+# Copy site package.json to correct location for workspace detection
+COPY apps/site/package.json ./apps/site/
+
+# Install dependencies at root (this hoists dependencies so shared packages can find them)
+# Using --no-frozen-lockfile because we are only building one workspace member
+RUN bun install  --no-frozen-lockfile
+
+# Rebuild lightningcss for the current architecture
+# This is necessary because the pre-built binary might not match the Alpine environment perfectly
+# or was installed for a different architecture/platform during bun install
+# RUN cd node_modules/lightningcss && npm rebuild
+
+# Explicitly install linux-x64-gnu version of lightningcss and tailwindcss-oxide
+# This ensures the correct binary is present for the debian-slim environment
+RUN bun add -d lightningcss-linux-x64-gnu @tailwindcss/oxide-linux-x64-gnu
+
+# Copy packages directory (shared dependencies)
+COPY packages ./packages
+
+# Copy all site files
+COPY apps/site ./apps/site
+
+# Build the Next.js application
+WORKDIR /app/apps/site
+RUN bun run build
+
+# Copy migrations
+WORKDIR /app
+COPY migrations/site ./migrations/site
+
+# Production stage
+FROM node:20-slim AS runner
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Install SQLite (required for D1 local database)
+RUN apt-get update && apt-get install -y sqlite3 && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN groupadd --system --gid 1001 nodejs && \
+    useradd --system --uid 1001 --gid nodejs nextjs
+
+# Copy built application
+COPY --from=builder --chown=nextjs:nodejs /app/apps/site/.next ./.next
+COPY --from=builder --chown=nextjs:nodejs /app/apps/site/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/apps/site/package.json ./package.json
+COPY --from=builder --chown=nextjs:nodejs /app/apps/site/next.config.js ./next.config.js
+COPY --from=builder --chown=nextjs:nodejs /app/apps/site/wrangler.toml ./wrangler.toml
+
+# Copy functions (Cloudflare Pages Functions)
+COPY --from=builder --chown=nextjs:nodejs /app/apps/site/functions ./functions
+
+# Copy source files needed for functions (TypeScript files)
+COPY --from=builder --chown=nextjs:nodejs /app/apps/site/src ./src
+COPY --from=builder --chown=nextjs:nodejs /app/apps/site/tsconfig.json ./tsconfig.json
+
+# Copy scripts (entrypoint, etc.)
+COPY --from=builder --chown=nextjs:nodejs /app/apps/site/scripts ./scripts
+# Copy migrations (applied via wrangler d1 execute in entrypoint)
+COPY --from=builder --chown=nextjs:nodejs /app/migrations/site ./migrations
+
+# Install all dependencies (wrangler is needed for runtime)
+# Note: wrangler is in devDependencies but needed for runtime in Docker
+# We need to install dependencies in the final image as well, but focused on production
+# Since we are in /app, we need to be careful. The entrypoint script expects to run from /app
+# and the next.js app is in /app (copied from apps/site/.next to ./.next)
+RUN npm install --legacy-peer-deps && npm cache clean --force
+
+# Make entrypoint script executable
+RUN chmod +x ./scripts/docker-entrypoint.sh
+
+# Prepare writable directory for D1 local database
+RUN mkdir -p /data/.wrangler/state/v3/d1 && chown -R nextjs:nodejs /data
+
+USER nextjs
+
+EXPOSE 3100
+
+ENV PORT=3100
+ENV HOSTNAME="0.0.0.0"
+ENV WRANGLER_D1_DB_PATH="/data/.wrangler/state/v3/d1/miniflare-D1DatabaseObject/altrp-site-db.sqlite"
+
+ENTRYPOINT ["./scripts/docker-entrypoint.sh"]
