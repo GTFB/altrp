@@ -1,6 +1,9 @@
 import { sqliteTable, text, integer, numeric } from 'drizzle-orm/sqlite-core';
+import { pgTable, serial, varchar, numeric as pgNumeric, timestamp, jsonb } from 'drizzle-orm/pg-core';
+import { isPostgres } from '../utils/db';
 
-export const wallets = sqliteTable('wallets', {
+// SQLite schema definition
+const createWalletsSqlite = () => sqliteTable('wallets', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
 	uuid: text('uuid'),
 	waid: text('waid'),
@@ -26,4 +29,26 @@ export const wallets = sqliteTable('wallets', {
 		mode: 'json'
 	}),
 });
+
+// PostgreSQL schema definition
+const createWalletsPostgres = () => pgTable('wallets', {
+	id: serial('id').primaryKey(),
+	uuid: varchar('uuid'),
+	waid: varchar('waid'),
+	fullWaid: varchar('full_waid'),
+	targetAid: varchar('target_aid'),
+	title: varchar('title'),
+	statusName: varchar('status_name'),
+	order: pgNumeric('order').default('0'),
+	xaid: varchar('xaid'),
+	createdAt: timestamp('created_at').notNull().defaultNow(),
+	updatedAt: timestamp('updated_at').notNull().defaultNow(),
+	deletedAt: timestamp('deleted_at'),
+	gin: jsonb('gin'),
+	fts: jsonb('fts'),
+	dataIn: jsonb('data_in'),
+	dataOut: jsonb('data_out'),
+});
+
+export const wallets = isPostgres() ? createWalletsPostgres() : createWalletsSqlite();
 

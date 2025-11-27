@@ -1,6 +1,9 @@
-import { sqliteTable, text, integer, numeric } from 'drizzle-orm/sqlite-core'
+import { sqliteTable, text, integer, numeric } from 'drizzle-orm/sqlite-core';
+import { pgTable, serial, varchar, numeric as pgNumeric, timestamp, jsonb } from 'drizzle-orm/pg-core';
+import { isPostgres } from '../utils/db';
 
-export const humans = sqliteTable('humans', {
+// SQLite schema definition
+const createHumansSqlite = () => sqliteTable('humans', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   uuid: text('uuid').notNull(),
   haid: text('haid').notNull(),
@@ -29,5 +32,31 @@ export const humans = sqliteTable('humans', {
   dataOut: text('data_out', {
     mode: 'json'
   }),
-})
+});
+
+// PostgreSQL schema definition
+const createHumansPostgres = () => pgTable('humans', {
+  id: serial('id').primaryKey(),
+  uuid: varchar('uuid').notNull(),
+  haid: varchar('haid').notNull(),
+  fullName: varchar('full_name').notNull(),
+  birthday: varchar('birthday'),
+  email: varchar('email'),
+  sex: varchar('sex'),
+  statusName: varchar('status_name'),
+  type: varchar('type'),
+  cityName: varchar('city_name'),
+  order: pgNumeric('order').default('0'),
+  xaid: varchar('xaid'),
+  mediaId: varchar('media_id'),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  deletedAt: timestamp('deleted_at'),
+  gin: jsonb('gin'),
+  fts: jsonb('fts'),
+  dataIn: jsonb('data_in'),
+  dataOut: jsonb('data_out'),
+});
+
+export const humans = isPostgres() ? createHumansPostgres() : createHumansSqlite();
 

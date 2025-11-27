@@ -1,6 +1,9 @@
 import { sqliteTable, text, integer, numeric } from 'drizzle-orm/sqlite-core';
+import { pgTable, serial, varchar, numeric as pgNumeric, timestamp, jsonb } from 'drizzle-orm/pg-core';
+import { isPostgres } from '../utils/db';
 
-export const baseMoves = sqliteTable('base_moves', {
+// SQLite schema definition
+const createBaseMovesSqlite = () => sqliteTable('base_moves', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
 	uuid: text('uuid').notNull(),
 	baid: text('baid'),
@@ -30,4 +33,30 @@ export const baseMoves = sqliteTable('base_moves', {
 		mode: 'json'
 	}),
 });
+
+// PostgreSQL schema definition
+const createBaseMovesPostgres = () => pgTable('base_moves', {
+	id: serial('id').primaryKey(),
+	uuid: varchar('uuid').notNull(),
+	baid: varchar('baid'),
+	fullBaid: varchar('full_baid'),
+	fullDaid: varchar('full_daid'),
+	number: varchar('number'),
+	title: varchar('title'),
+	laidFrom: varchar('laid_from'),
+	laidTo: varchar('laid_to'),
+	cycle: varchar('cycle'),
+	statusName: varchar('status_name'),
+	order: pgNumeric('order').default('0'),
+	xaid: varchar('xaid'),
+	updatedAt: timestamp('updated_at').notNull().defaultNow(),
+	createdAt: timestamp('created_at').notNull().defaultNow(),
+	deletedAt: timestamp('deleted_at'),
+	gin: jsonb('gin'),
+	fts: jsonb('fts'),
+	dataIn: jsonb('data_in'),
+	dataOut: jsonb('data_out'),
+});
+
+export const baseMoves = isPostgres() ? createBaseMovesPostgres() : createBaseMovesSqlite();
 

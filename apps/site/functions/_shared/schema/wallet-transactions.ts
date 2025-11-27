@@ -1,6 +1,9 @@
 import { sqliteTable, text, integer, numeric } from 'drizzle-orm/sqlite-core';
+import { pgTable, serial, varchar, numeric as pgNumeric, timestamp, jsonb } from 'drizzle-orm/pg-core';
+import { isPostgres } from '../utils/db';
 
-export const walletTransactions = sqliteTable('wallet_transactions', {
+// SQLite schema definition
+const createWalletTransactionsSqlite = () => sqliteTable('wallet_transactions', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
 	uuid: text('uuid'),
 	wcaid: text('wcaid').notNull(),
@@ -17,4 +20,23 @@ export const walletTransactions = sqliteTable('wallet_transactions', {
 		mode: 'json'
 	}),
 });
+
+// PostgreSQL schema definition
+const createWalletTransactionsPostgres = () => pgTable('wallet_transactions', {
+	id: serial('id').primaryKey(),
+	uuid: varchar('uuid'),
+	wcaid: varchar('wcaid').notNull(),
+	fullWaid: varchar('full_waid'),
+	targetAid: varchar('target_aid'),
+	amount: pgNumeric('amount').notNull(),
+	statusName: varchar('status_name'),
+	order: pgNumeric('order').default('0'),
+	xaid: varchar('xaid'),
+	createdAt: timestamp('created_at').notNull().defaultNow(),
+	updatedAt: timestamp('updated_at').notNull().defaultNow(),
+	deletedAt: timestamp('deleted_at'),
+	dataIn: jsonb('data_in'),
+});
+
+export const walletTransactions = isPostgres() ? createWalletTransactionsPostgres() : createWalletTransactionsSqlite();
 

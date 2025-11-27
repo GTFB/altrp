@@ -1,4 +1,5 @@
 import { drizzle, type DrizzleD1Database } from "drizzle-orm/d1";
+import { drizzle as drizzlePostgres, PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import type { D1Database } from "@cloudflare/workers-types";
 import { schema } from "../schema/schema";
 import {
@@ -21,8 +22,13 @@ import {
   isNotNull,
 } from "drizzle-orm";
 import type { DbFilters, DbOrders } from "../types/shared";
+import  postgres from "postgres";
+import { isPostgres } from "../utils/db";
 
-export type SiteDb = DrizzleD1Database<typeof schema>;
+export type SiteDbPostgres = PostgresJsDatabase<typeof schema>;
+export type SiteDbD1 = DrizzleD1Database<typeof schema>;
+export type SiteDb = SiteDbD1;
+
 
 
 function isSiteDb(db: D1Database | SiteDb): db is SiteDb {
@@ -30,10 +36,33 @@ function isSiteDb(db: D1Database | SiteDb): db is SiteDb {
 }
 
 export function createDb(db: D1Database | SiteDb): SiteDb {
+  if (isPostgres()) {
+    // @ts-ignore
+    return createDbPostgres(db);
+  }
   if (isSiteDb(db)) {
     return db;
   }
   return drizzle(db as D1Database, { schema }) as SiteDb;
+}
+let globalConnection: postgres.Sql | undefined;
+
+export function createDbPostgres(dbOrEnv?: any): SiteDbPostgres {
+  // If we are passed a Drizzle instance, return it (though typing might be tricky if it was typed as D1)
+  if (dbOrEnv && "select" in dbOrEnv) {
+    return dbOrEnv as SiteDbPostgres;
+  }
+
+  // If we already have a connection, reuse it (optional optimization)
+  if (!globalConnection) {
+    const connectionString = process.env.DATABASE_URL;
+    if (!connectionString) {
+      throw new Error("DATABASE_URL environment variable is not defined");
+    }
+    globalConnection = postgres(connectionString);
+  }
+
+  return drizzlePostgres(globalConnection, { schema }) as SiteDbPostgres;
 }
 
 export function parseJson<T>(value: string | null | undefined, fallback: T): T {

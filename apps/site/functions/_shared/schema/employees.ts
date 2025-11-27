@@ -1,6 +1,9 @@
-import { sqliteTable, text, integer, numeric } from 'drizzle-orm/sqlite-core'
+import { sqliteTable, text, integer, numeric } from 'drizzle-orm/sqlite-core';
+import { pgTable, serial, varchar, numeric as pgNumeric, timestamp, jsonb } from 'drizzle-orm/pg-core';
+import { isPostgres } from '../utils/db';
 
-export const employees = sqliteTable('employees', {
+// SQLite schema definition
+const createEmployeesSqlite = () => sqliteTable('employees', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   uuid: text('uuid').notNull(),
   eaid: text('eaid'),
@@ -30,4 +33,31 @@ export const employees = sqliteTable('employees', {
   dataOut: text('data_out', {
     mode: 'json'
   }),
-})
+});
+
+// PostgreSQL schema definition
+const createEmployeesPostgres = () => pgTable('employees', {
+  id: serial('id').primaryKey(),
+  uuid: varchar('uuid').notNull(),
+  eaid: varchar('eaid'),
+  fullEaid: varchar('full_eaid'),
+  haid: varchar('haid'),
+  position: varchar('position'),
+  department: varchar('department'),
+  salary: pgNumeric('salary'),
+  hireDate: varchar('hire_date'),
+  terminationDate: varchar('termination_date'),
+  statusName: varchar('status_name'),
+  email: varchar('email'),
+  order: pgNumeric('order').default('0'),
+  xaid: varchar('xaid'),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  deletedAt: timestamp('deleted_at'),
+  gin: jsonb('gin'),
+  fts: jsonb('fts'),
+  dataIn: jsonb('data_in'),
+  dataOut: jsonb('data_out'),
+});
+
+export const employees = isPostgres() ? createEmployeesPostgres() : createEmployeesSqlite();

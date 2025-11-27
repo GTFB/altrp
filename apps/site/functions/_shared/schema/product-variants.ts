@@ -1,6 +1,9 @@
 import { sqliteTable, text, integer, numeric } from 'drizzle-orm/sqlite-core';
+import { pgTable, serial, varchar, numeric as pgNumeric, timestamp, jsonb } from 'drizzle-orm/pg-core';
+import { isPostgres } from '../utils/db';
 
-export const productVariants = sqliteTable('product_variants', {
+// SQLite schema definition
+const createProductVariantsSqlite = () => sqliteTable('product_variants', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
 	uuid: text('uuid').notNull(),
 	pvaid: text('pvaid').notNull(),
@@ -27,4 +30,27 @@ export const productVariants = sqliteTable('product_variants', {
 		mode: 'json'
 	}),
 });
+
+// PostgreSQL schema definition
+const createProductVariantsPostgres = () => pgTable('product_variants', {
+	id: serial('id').primaryKey(),
+	uuid: varchar('uuid').notNull(),
+	pvaid: varchar('pvaid').notNull(),
+	fullPaid: varchar('full_paid').notNull(),
+	vendorAid: varchar('vendor_aid'),
+	sku: varchar('sku'),
+	title: varchar('title'),
+	statusName: varchar('status_name'),
+	order: pgNumeric('order').default('0'),
+	xaid: varchar('xaid'),
+	createdAt: timestamp('created_at').notNull().defaultNow(),
+	updatedAt: timestamp('updated_at').notNull().defaultNow(),
+	deletedAt: timestamp('deleted_at'),
+	gin: jsonb('gin'),
+	fts: jsonb('fts'),
+	dataIn: jsonb('data_in'),
+	dataOut: jsonb('data_out'),
+});
+
+export const productVariants = isPostgres() ? createProductVariantsPostgres() : createProductVariantsSqlite();
 

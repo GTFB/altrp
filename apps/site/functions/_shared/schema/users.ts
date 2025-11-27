@@ -1,6 +1,9 @@
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core'
+import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+import { pgTable, serial, varchar, boolean, timestamp, jsonb } from 'drizzle-orm/pg-core';
+import { isPostgres } from '../utils/db';
 
-export const users = sqliteTable('users', {
+// SQLite schema definition
+const createUsersSqlite = () => sqliteTable('users', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   uuid: text('uuid').notNull(),
   humanAid: text('human_aid'),
@@ -16,5 +19,24 @@ export const users = sqliteTable('users', {
   dataIn: text('data_in', {
     mode: 'json'
   }),
-})
+});
+
+// PostgreSQL schema definition
+const createUsersPostgres = () => pgTable('users', {
+  id: serial('id').primaryKey(),
+  uuid: varchar('uuid').notNull(),
+  humanAid: varchar('human_aid'),
+  email: varchar('email').notNull(),
+  passwordHash: varchar('password_hash').notNull(),
+  salt: varchar('salt').notNull(),
+  isActive: boolean('is_active').default(true),
+  lastLoginAt: timestamp('last_login_at'),
+  emailVerifiedAt: timestamp('email_verified_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  deletedAt: timestamp('deleted_at'),
+  dataIn: jsonb('data_in'),
+});
+
+export const users = isPostgres() ? createUsersPostgres() : createUsersSqlite();
 

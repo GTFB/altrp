@@ -1,6 +1,9 @@
 import { sqliteTable, text, integer, numeric } from 'drizzle-orm/sqlite-core';
+import { pgTable, serial, varchar, numeric as pgNumeric, timestamp, jsonb, boolean } from 'drizzle-orm/pg-core';
+import { isPostgres } from '../utils/db';
 
-export const locations = sqliteTable('locations', {
+// SQLite schema definition
+const createLocationsSqlite = () => sqliteTable('locations', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
 	uuid: text('uuid').notNull(),
 	laid: text('laid').notNull(),
@@ -28,4 +31,28 @@ export const locations = sqliteTable('locations', {
 		mode: 'json'
 	}),
 });
+
+// PostgreSQL schema definition
+const createLocationsPostgres = () => pgTable('locations', {
+	id: serial('id').primaryKey(),
+	uuid: varchar('uuid').notNull(),
+	laid: varchar('laid').notNull(),
+	fullLaid: varchar('full_laid'),
+	title: varchar('title'),
+	city: varchar('city'),
+	type: varchar('type'),
+	statusName: varchar('status_name'),
+	isPublic: boolean('is_public').default(true),
+	order: pgNumeric('order').default('0'),
+	xaid: varchar('xaid'),
+	updatedAt: timestamp('updated_at').notNull().defaultNow(),
+	createdAt: timestamp('created_at').notNull().defaultNow(),
+	deletedAt: timestamp('deleted_at'),
+	gin: jsonb('gin'),
+	fts: jsonb('fts'),
+	dataIn: jsonb('data_in'),
+	dataOut: jsonb('data_out'),
+});
+
+export const locations = isPostgres() ? createLocationsPostgres() : createLocationsSqlite();
 
