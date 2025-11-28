@@ -26,7 +26,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { Database, Loader2, CheckCircle2, XCircle, AlertCircle, Eye } from "lucide-react"
+import { Database, Loader2, CheckCircle2, XCircle, AlertCircle, Eye, RotateCcw } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { seeds, type SeedMeta } from "../../../../functions/_shared/seeds"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -43,16 +43,30 @@ type SeedResult = {
   errors: number
 }
 
+type RollbackResult = {
+  deleted: number
+  notFound: number
+  errors: number
+}
+
 export default function SeedPage() {
   const [loading] = React.useState(false)
   const [seeding, setSeeding] = React.useState(false)
+  const [rollingBack, setRollingBack] = React.useState(false)
   const [dialogOpen, setDialogOpen] = React.useState(false)
+  const [rollbackDialogOpen, setRollbackDialogOpen] = React.useState(false)
   const [exploreDialogOpen, setExploreDialogOpen] = React.useState(false)
   const [selectedSeed, setSelectedSeed] = React.useState<SeedItem | null>(null)
+  const [rollbackSeed, setRollbackSeed] = React.useState<SeedItem | null>(null)
   const [exploreSeed, setExploreSeed] = React.useState<SeedItem | null>(null)
   const [result, setResult] = React.useState<{
     success: boolean
     results?: Record<string, SeedResult>
+    error?: string
+  } | null>(null)
+  const [rollbackResult, setRollbackResult] = React.useState<{
+    success: boolean
+    results?: Record<string, RollbackResult>
     error?: string
   } | null>(null)
 
@@ -128,10 +142,80 @@ export default function SeedPage() {
     }
   }
 
+  const handleRollbackClick = (seed: SeedItem, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setRollbackSeed(seed)
+    setRollbackDialogOpen(true)
+    setRollbackResult(null)
+  }
+
+  const handleConfirmRollback = async () => {
+    if (!rollbackSeed) return
+
+    setRollingBack(true)
+    setRollbackResult(null)
+
+    try {
+      const response = await fetch('/api/admin/seed', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          seedId: rollbackSeed.id,
+        }),
+      })
+
+      const data = await response.json() as {
+        success?: boolean
+        results?: Record<string, RollbackResult>
+        error?: string
+      }
+
+      if (data.success) {
+        setRollbackResult({
+          success: true,
+          results: data.results,
+        })
+      } else {
+        setRollbackResult({
+          success: false,
+          error: data.error || 'Unknown error occurred',
+        })
+      }
+    } catch (error) {
+      setRollbackResult({
+        success: false,
+        error: String(error),
+      })
+    } finally {
+      setRollingBack(false)
+    }
+  }
+
   const handleCloseDialog = () => {
     setDialogOpen(false)
     setSelectedSeed(null)
     setResult(null)
+  }
+
+  const handleCloseRollbackDialog = () => {
+    setRollbackDialogOpen(false)
+    setRollbackSeed(null)
+    setRollbackResult(null)
+  }
+
+  const getTotalRollbackStats = (results?: Record<string, RollbackResult>) => {
+    if (!results) return { deleted: 0, notFound: 0, errors: 0 }
+
+    return Object.values(results).reduce(
+      (acc, result) => ({
+        deleted: acc.deleted + result.deleted,
+        notFound: acc.notFound + result.notFound,
+        errors: acc.errors + result.errors,
+      }),
+      { deleted: 0, notFound: 0, errors: 0 }
+    )
   }
 
   const getTotalStats = (results?: Record<string, SeedResult>) => {
@@ -215,6 +299,14 @@ export default function SeedPage() {
                           >
                             <Database className="mr-2 h-4 w-4" />
                             Seed Database
+                          </Button>
+                          <Button
+                            onClick={(e) => handleRollbackClick(seed, e)}
+                            className="flex-1"
+                            variant="destructive"
+                          >
+                            <RotateCcw className="mr-2 h-4 w-4" />
+                            Rollback
                           </Button>
                           <Button
                             onClick={(e) => handleExploreClick(seed, e)}
@@ -382,6 +474,121 @@ export default function SeedPage() {
               </>
             ) : (
               <Button onClick={handleCloseDialog}>Close</Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={rollbackDialogOpen} onOpenChange={setRollbackDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>
+              {rollbackResult ? 'Rollback Results' : 'Confirm Database Rollback'}
+            </DialogTitle>
+            <DialogDescription>
+              {!rollbackResult && rollbackSeed && rollbackSeed.meta?.name}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="py-4">
+            {!rollbackResult && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Warning</AlertTitle>
+                <AlertDescription>
+                  This action will permanently delete data from your database. Records from the seed file will be removed. For taxonomy: deleted by entity and name. For other entities: deleted by UUID.
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {rollingBack && (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <span className="ml-3 text-sm text-muted-foreground">
+                  Rolling back database...
+                </span>
+              </div>
+            )}
+
+            {rollbackResult && (
+              <div className="space-y-4">
+                {rollbackResult.success ? (
+                  <>
+                    <Alert className="border-green-200 bg-green-50">
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      <AlertTitle className="text-green-900">Success</AlertTitle>
+                      <AlertDescription className="text-green-800">
+                        Database rollback completed successfully
+                      </AlertDescription>
+                    </Alert>
+
+                    {rollbackResult.results && (
+                      <div className="space-y-3">
+                        <div className="text-sm font-medium">Summary:</div>
+                        {Object.entries(rollbackResult.results).map(([collection, stats]) => (
+                          <div
+                            key={collection}
+                            className="rounded-lg border p-3 text-sm space-y-1"
+                          >
+                            <div className="font-medium capitalize">{collection}</div>
+                            <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground">
+                              <div className="flex items-center gap-1">
+                                <CheckCircle2 className="h-3 w-3 text-green-600" />
+                                {stats.deleted} deleted
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <AlertCircle className="h-3 w-3 text-yellow-600" />
+                                {stats.notFound} not found
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <XCircle className="h-3 w-3 text-red-600" />
+                                {stats.errors} errors
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+
+                        {(() => {
+                          const totals = getTotalRollbackStats(rollbackResult.results)
+                          return (
+                            <div className="rounded-lg border-2 border-primary/20 bg-primary/5 p-3 text-sm font-medium">
+                              <div>Total: {totals.deleted} deleted, {totals.notFound} not found, {totals.errors} errors</div>
+                            </div>
+                          )
+                        })()}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <Alert variant="destructive">
+                    <XCircle className="h-4 w-4" />
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>{rollbackResult.error}</AlertDescription>
+                  </Alert>
+                )}
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            {!rollbackResult ? (
+              <>
+                <Button variant="outline" onClick={handleCloseRollbackDialog} disabled={rollingBack}>
+                  Cancel
+                </Button>
+                <Button onClick={handleConfirmRollback} disabled={rollingBack} variant="destructive">
+                  {rollingBack ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Rolling back...
+                    </>
+                  ) : (
+                    'Confirm Rollback'
+                  )}
+                </Button>
+              </>
+            ) : (
+              <Button onClick={handleCloseRollbackDialog}>Close</Button>
             )}
           </DialogFooter>
         </DialogContent>

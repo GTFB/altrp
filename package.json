@@ -14,6 +14,7 @@
     "dev:wrangler:migrate:site": "bun run db:site:migrate:local && bun run --filter=altrp-site dev:all",
     "build:site": "bun run --filter=altrp-site build:static",
     "start:site": "bun run --filter=altrp-site start",
+    "start:site:migrate": "bun run db:site:migrate && bun run --filter=altrp-site start",
     "dev:cms": "bun run --filter=altrp-cms dev",
     "build:cms": "bun run --filter=altrp-cms build",
     "start:cms": "bun run --filter=altrp-cms start",
@@ -38,6 +39,7 @@
     "db:site:reset-migrate": "node scripts/reset-d1-local.mjs && node scripts/migrate-site.mjs --local",
     "db:site:migrate:local": "node scripts/migrate-site.mjs --local",
     "db:site:migrate:remote": "node scripts/migrate-site.mjs --remote",
+    "db:site:migrate": "node scripts/migrate-site.mjs",
     "cms:up": "node scripts/cms-sqlite-up.js",
     "dev:kill": "taskkill /F /IM node.exe",
     "prepare": "husky"

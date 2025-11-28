@@ -114,12 +114,81 @@ export async function onRequestPost(context: { request: Request; env: Env }): Pr
   }
 }
 
+/**
+ * DELETE /api/admin/seed
+ * Body: { seedId: 'system' } - rollbacks (deletes) data from specified seed
+ */
+export async function onRequestDelete(context: { request: Request; env: Env }): Promise<Response> {
+  const { request, env } = context
+
+  try {
+    const body = (await request.json().catch(() => ({}))) as {
+      seedId?: string
+    }
+
+    if (!body.seedId) {
+      return new Response(
+        JSON.stringify({ error: 'seedId is required in request body' }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
+    }
+
+    // Find seed by id
+    const seed = seeds.find((s) => s.id === body.seedId)
+    if (!seed) {
+      return new Response(
+        JSON.stringify({
+          error: `Seed '${body.seedId}' not found`,
+        }),
+        {
+          status: 404,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      )
+    }
+
+    // Extract data without __meta__
+    const { __meta__, ...seedData } = seed.data
+    
+    // Use SeedRepository to handle all rollback logic
+    const seedRepository = SeedRepository.getInstance(env.DB)
+    const results = await seedRepository.rollbackMultiple(seedData as SeedData)
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        seedId: body.seedId,
+        results,
+      }),
+      {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
+  } catch (error) {
+    console.error('Rollback data error:', error)
+    return new Response(
+      JSON.stringify({
+        error: 'Failed to rollback data',
+        details: String(error),
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
+  }
+}
+
 export const onRequestOptions = async () =>
   new Response(null, {
     status: 204,
     headers: {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type',
       'Access-Control-Allow-Credentials': 'true',
     },

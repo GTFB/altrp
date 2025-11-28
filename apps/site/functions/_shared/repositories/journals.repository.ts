@@ -20,9 +20,11 @@ export type JournalLogInput = {
 
 export class JournalsRepository extends BaseRepository<Journal> {
   private ensureTablePromise?: Promise<void>
+  private d1DB: D1Database
 
   private constructor(db: D1Database) {
-    super(db, schema.journals)
+    super(schema.journals, db)
+    this.d1DB = db
   }
 
   public static getInstance(db: D1Database): JournalsRepository {

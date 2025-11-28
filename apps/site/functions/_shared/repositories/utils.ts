@@ -1,3 +1,4 @@
+import type { Pool } from "pg";
 import { drizzle, type DrizzleD1Database } from "drizzle-orm/d1";
 import { drizzle as drizzlePostgres, PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import type { D1Database } from "@cloudflare/workers-types";
@@ -31,11 +32,11 @@ export type SiteDb = SiteDbD1;
 
 
 
-function isSiteDb(db: D1Database | SiteDb): db is SiteDb {
+function isSiteDb(db: D1Database | SiteDb | null | undefined): db is SiteDb {
   return typeof db === "object" && db !== null && "select" in db && typeof (db as SiteDb).select === "function";
 }
 
-export function createDb(db: D1Database | SiteDb): SiteDb {
+export function createDb(db?: D1Database | SiteDb | null | undefined): SiteDb {
   if (isPostgres()) {
     // @ts-ignore
     return createDbPostgres(db);
@@ -245,4 +246,34 @@ export function buildDbOrders(schema: Record<string, any>, orders?: DbOrders){
   })
   .filter((expr): expr is ReturnType<typeof asc> => Boolean(expr));
   return (orderExpressions.length ? orderExpressions : [desc(schema.id)])
+}
+
+/**
+ * Get the underlying postgres client from a Drizzle instance
+ * This is needed for raw SQL queries that can't be done with Drizzle's query builder
+ */
+export function getPostgresClient(db: SiteDbPostgres): postgres.Sql {
+  // In drizzle-orm/postgres-js, the client is stored in the internal _ property
+  // We need to access it for raw queries
+  return (db as any).client || (db as any)._?.client || globalConnection!;
+}
+
+/**
+ * Execute a raw SQL query using the appropriate client API
+ * Works with both node-postgres (Pool) and postgres-js (Sql)
+ */
+export async function executeRawQuery<T extends Record<string, any> = Record<string, any>>(
+  client: postgres.Sql | Pool,
+  sql: string,
+  params: any[] = []
+): Promise<T[]> {
+  // Check if it's postgres-js (has unsafe method)
+  if ('unsafe' in client && typeof (client as any).unsafe === 'function') {
+    const result = await (client as postgres.Sql).unsafe<T[]>(sql, params);
+    return Array.isArray(result) ? result : [];
+  }
+  
+  // Otherwise it's node-postgres Pool
+  const result = await (client as Pool).query<T>(sql, params);
+  return result.rows || [];
 }

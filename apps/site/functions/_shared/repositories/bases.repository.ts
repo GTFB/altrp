@@ -7,7 +7,7 @@ import BaseRepository from "./BaseRepositroy";
 export class BasesRepository extends BaseRepository<Base> {
   private static instance: BasesRepository | null = null;
   private constructor(db: D1Database) {
-    super(db, schema.bases);
+    super(schema.bases, db);
   }
   public static getInstance(db: D1Database): BasesRepository {
     if (!BasesRepository.instance) {

@@ -3,11 +3,17 @@ import type { D1Database } from '@cloudflare/workers-types'
 import { schema } from '../schema'
 import { createDb, stringifyJson, type SiteDb } from './utils'
 
-type SeedRecord = Record<string, unknown> & { uuid: string }
+type SeedRecord = Record<string, unknown> & { uuid?: string }
 
 export type SeedResult = {
   inserted: number
   skipped: number
+  errors: number
+}
+
+export type RollbackResult = {
+  deleted: number
+  notFound: number
   errors: number
 }
 
@@ -163,6 +169,110 @@ export class SeedRepository {
     }
 
     return prepared
+  }
+
+  /**
+   * Rollbacks (deletes) data for a specific collection
+   * For taxonomy: deletes by entity and name
+   * For other entities: deletes by uuid
+   */
+  async rollbackCollection(
+    collectionName: string,
+    records: SeedRecord[]
+  ): Promise<RollbackResult> {
+    const result: RollbackResult = { deleted: 0, notFound: 0, errors: 0 }
+
+    // Map collection name to schema table
+    const table = (schema as Record<string, unknown>)[collectionName]
+    if (!table) {
+      console.warn(`Collection '${collectionName}' not found in schema`)
+      result.errors = records.length
+      return result
+    }
+
+    // Process each record
+    for (const record of records) {
+      try {
+        let exists = false
+
+        if (collectionName === 'taxonomy' && !(table as any).uuid) {
+          // For taxonomy: check existence and delete by entity and name
+          const entity = (record as any).entity
+          const name = (record as any).name
+          if (!entity || !name) {
+            console.warn(`Record in 'taxonomy' missing entity or name, skipping`)
+            result.errors++
+            continue
+          }
+
+          const existing = await this.db
+            .select()
+            .from(table as any)
+            .where(and(eq((table as any).entity, entity), eq((table as any).name, name)))
+            .limit(1)
+
+          exists = existing.length > 0
+
+          if (exists) {
+            await this.db
+              .delete(table as any)
+              .where(and(eq((table as any).entity, entity), eq((table as any).name, name)))
+          }
+        } else {
+          // For other entities: check existence and delete by uuid
+          const uuid = record.uuid
+          if (!uuid) {
+            console.warn(`Record in '${collectionName}' missing uuid, skipping`)
+            result.errors++
+            continue
+          }
+
+          const existing = await this.db
+            .select()
+            .from(table as any)
+            .where(eq((table as any).uuid, uuid))
+            .limit(1)
+
+          exists = existing.length > 0
+
+          if (exists) {
+            await this.db
+              .delete(table as any)
+              .where(eq((table as any).uuid, uuid))
+          }
+        }
+
+        if (exists) {
+          result.deleted++
+        } else {
+          result.notFound++
+        }
+      } catch (error) {
+        console.error(
+          `Error deleting record from '${collectionName}':`,
+          error,
+          record
+        )
+        result.errors++
+      }
+    }
+
+    return result
+  }
+
+  /**
+   * Rollbacks (deletes) multiple collections from data object
+   */
+  async rollbackMultiple(
+    data: Record<string, SeedRecord[]>
+  ): Promise<Record<string, RollbackResult>> {
+    const results: Record<string, RollbackResult> = {}
+
+    for (const [collectionName, records] of Object.entries(data)) {
+      results[collectionName] = await this.rollbackCollection(collectionName, records)
+    }
+
+    return results
   }
 
   /**
