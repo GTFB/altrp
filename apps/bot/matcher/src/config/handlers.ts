@@ -222,7 +222,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
 
   const formatSearchResults = (products: Array<{ title?: string; dataIn?: string }>) => {
     if (!products.length) {
-      return 'We haven't found anything yet. Your request has been accepted, and you will receive a response later.';
+      return 'Not found anything yet. Your request has been accepted, and you will receive a response later.';
     }
 
     const lines = products.map((product, index) => {
