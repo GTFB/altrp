@@ -14,18 +14,24 @@ export const onboardingFlow: BotFlow = {
       type: 'wait_input',
       id: 'onboarding_asking_name',
       text: 'Как вас зовут?',
-      saveToVariable: 'onboarding.name',
+      saveToVariable: 'hmn.name',
       nextStepId: 'onboarding_asking_email'
     },
     {
       type: 'wait_input',
       id: 'onboarding_asking_email',
       text: 'Укажите email для связи:',
-      saveToVariable: 'onboarding.email',
+      saveToVariable: 'hmn.email',
       validation: {
         type: 'email',
         errorMessage: 'Пожалуйста, укажите корректный email'
       },
+      nextStepId: 'onboarding_save_user_data'
+    },
+    {
+      type: 'handler',
+      id: 'onboarding_save_user_data',
+      handlerName: 'matcherSaveUserDataHandler',
       nextStepId: 'onboarding_choose_role'
     },
     {

@@ -1,4 +1,5 @@
 import type { D1Database } from '@cloudflare/workers-types';
+import type { PostgresD1Adapter } from '../nodejs/postgres-d1-adapter';
 import { generateUuidV4 } from '../helpers/generateUuidV4';
 import { generateAid } from '../helpers/generateAid';
 import { D1StorageService } from '../worker/d1-storage-service';
@@ -22,20 +23,41 @@ export interface MessageThreadData {
 }
 
 export interface MessageThreadConfig {
-  db: D1Database;
+  db: D1Database | PostgresD1Adapter;
   d1Storage: D1StorageService;
 }
 
 /**
  * Repository for working with message_threads table
+ * Uses D1Database API (or PostgresD1Adapter which mimics it)
  */
 export class MessageThreadRepository {
-  private db: D1Database;
+  private db: D1Database | PostgresD1Adapter;
   private d1Storage: D1StorageService;
 
   constructor(config: MessageThreadConfig) {
     this.db = config.db;
     this.d1Storage = config.d1Storage;
+  }
+
+  private mapRowToMessageThread(row: any): MessageThreadData {
+    return {
+      id: row.id as number,
+      uuid: row.uuid as string,
+      maid: row.maid as string,
+      parentMaid: row.parent_maid as string | undefined,
+      title: row.title as string | undefined,
+      statusName: row.status_name as string | undefined,
+      type: row.type as string | undefined,
+      order: row.order as number | undefined,
+      xaid: row.xaid as string | undefined,
+      value: row.value as string | undefined,
+      updatedAt: row.updated_at as string | undefined,
+      createdAt: row.created_at as string | undefined,
+      deletedAt: row.deleted_at as number | undefined,
+      gin: row.gin as string | undefined,
+      dataIn: row.data_in as string | undefined
+    };
   }
 
   /**
@@ -96,25 +118,50 @@ export class MessageThreadRepository {
       }
 
       const row = result[0] as any;
-      return {
-        id: row.id as number,
-        uuid: row.uuid as string,
-        maid: row.maid as string,
-        parentMaid: row.parent_maid as string | undefined,
-        title: row.title as string | undefined,
-        statusName: row.status_name as string | undefined,
-        type: row.type as string | undefined,
-        order: row.order as number | undefined,
-        xaid: row.xaid as string | undefined,
-        value: row.value as string | undefined,
-        updatedAt: row.updated_at as string | undefined,
-        createdAt: row.created_at as string | undefined,
-        deletedAt: row.deleted_at as number | undefined,
-        gin: row.gin as string | undefined,
-        dataIn: row.data_in as string | undefined
-      };
+      return this.mapRowToMessageThread(row);
     } catch (error) {
       console.error(`Error getting message thread by value ${value}:`, error);
+      return null;
+    }
+  }
+
+  async getParentThreadsByType(type: string): Promise<MessageThreadData[]> {
+    try {
+      const result = await this.d1Storage.execute(`
+        SELECT id, uuid, maid, parent_maid, title, status_name, type, 
+               \`order\`, xaid, value, updated_at, created_at, deleted_at, gin, data_in
+        FROM message_threads 
+        WHERE type = ? AND parent_maid IS NULL AND deleted_at IS NULL
+      `, [type]);
+
+      if (!result || result.length === 0) {
+        return [];
+      }
+
+      return (result as any[]).map(row => this.mapRowToMessageThread(row));
+    } catch (error) {
+      console.error(`Error getting parent message threads for type ${type}:`, error);
+      return [];
+    }
+  }
+
+  async getThreadByXaidAndStatus(xaid: string, statusName: string, type: string): Promise<MessageThreadData | null> {
+    try {
+      const result = await this.d1Storage.execute(`
+        SELECT id, uuid, maid, parent_maid, title, status_name, type, 
+               \`order\`, xaid, value, updated_at, created_at, deleted_at, gin, data_in
+        FROM message_threads 
+        WHERE xaid = ? AND status_name = ? AND type = ? AND deleted_at IS NULL
+        LIMIT 1
+      `, [xaid, statusName, type]);
+
+      if (!result || result.length === 0) {
+        return null;
+      }
+
+      return this.mapRowToMessageThread(result[0]);
+    } catch (error) {
+      console.error(`Error getting thread by xaid ${xaid} and status ${statusName}:`, error);
       return null;
     }
   }

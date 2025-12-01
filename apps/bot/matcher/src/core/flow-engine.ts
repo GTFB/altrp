@@ -72,6 +72,12 @@ export class FlowEngine {
       return;
     }
 
+    // Exit dialog mode if user is in dialog
+    const handlers = this.customHandlers || {};
+    if (handlers.exitDialogMode) {
+      await handlers.exitDialogMode(telegramId);
+    }
+
     // Automatically enter flow mode when starting any flow
     await this.userContextManager.enterFlowMode(telegramId);
 

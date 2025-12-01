@@ -1,4 +1,5 @@
 import type { D1Database } from '@cloudflare/workers-types';
+import type { PostgresD1Adapter } from '../nodejs/postgres-d1-adapter';
 
 export interface TextData {
   id?: number; // Auto-increment ID from texts table
@@ -21,14 +22,15 @@ export interface TextData {
 }
 
 export interface TextConfig {
-  db: D1Database;
+  db: D1Database | PostgresD1Adapter;
 }
 
 /**
  * Repository for working with texts table
+ * Uses D1Database API (or PostgresD1Adapter which mimics it)
  */
 export class TextRepository {
-  private db: D1Database;
+  private db: D1Database | PostgresD1Adapter;
 
   constructor(config: TextConfig) {
     this.db = config.db;

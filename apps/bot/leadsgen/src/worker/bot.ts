@@ -75,6 +75,7 @@ export interface TelegramCallbackQuery {
 
 export class TelegramBotWorker {
   private env: Env;
+  private botType: string;
   //private kvStorage: KVStorageService;
   private d1Storage: D1StorageService;
   private humanRepository: HumanRepository;
@@ -86,11 +87,18 @@ export class TelegramBotWorker {
   //private sessionService: SessionService;
   private userContextManager: UserContextManager;
   private flowEngine: FlowEngine;
+  private defaultAdminChatId?: number;
+  private cachedAdminChatIds: number[] | null = null;
   //private i18nService: I18nService;
 
   //constructor(env: Env, kvStorage: KVStorageService) {
   constructor(env: Env) {
     this.env = env;
+    this.botType = env.BOT_TYPE || 'leadsgen';
+    this.defaultAdminChatId = env.ADMIN_CHAT_ID ? parseInt(env.ADMIN_CHAT_ID) : undefined;
+    if (typeof this.defaultAdminChatId === 'number' && Number.isNaN(this.defaultAdminChatId)) {
+      this.defaultAdminChatId = undefined;
+    }
     //this.kvStorage = kvStorage;
     this.d1Storage = new D1StorageService(env.DB);
     
@@ -126,7 +134,7 @@ export class TelegramBotWorker {
     });
     this.topicService = new TopicService({
       botToken: env.BOT_TOKEN,
-      adminChatId: parseInt(env.ADMIN_CHAT_ID),
+      adminChatId: this.defaultAdminChatId,
       messageService: this.messageService,
       messageLoggingService: this.messageLoggingService
     });
@@ -143,7 +151,7 @@ export class TelegramBotWorker {
       this.messageService,
       //this.i18nService,
       {}, // Empty handlers object for now
-      parseInt(env.ADMIN_CHAT_ID) // Pass admin chat ID for topic flows
+      this.defaultAdminChatId // Pass admin chat ID for topic flows
     );
     
     // Теперь создаем обработчики с доступом к flowEngine
@@ -290,7 +298,7 @@ export class TelegramBotWorker {
   private async processMessage(message: TelegramMessage): Promise<void> {
     const userId = message.from.id;
     const chatId = message.chat.id;
-    const adminChatId = parseInt(this.env.ADMIN_CHAT_ID);
+    const isAdminChat = await this.isAdminChat(chatId);
 
     console.log(`Processing message from user ${userId} in chat ${chatId}`);
 
@@ -301,7 +309,7 @@ export class TelegramBotWorker {
     }
 
     // Check if message came to admin group (topic)
-    if (chatId === adminChatId && (message as any).message_thread_id) {
+    if (isAdminChat && (message as any).message_thread_id) {
       const topicId = (message as any).message_thread_id;
       
       // Check if admin is in topic flow mode
@@ -316,7 +324,7 @@ export class TelegramBotWorker {
       // Otherwise, forward message to human (normal topic behavior)
       await this.topicService.handleMessageFromTopic(
         message, 
-        this.humanRepository.getHumanTelegramIdByTopic.bind(this.humanRepository),
+        this.resolveHumanTelegramIdByTopic.bind(this),
         this.getDbUserId.bind(this)
       );
       return;
@@ -356,7 +364,6 @@ export class TelegramBotWorker {
   private async processCallbackQuery(callbackQuery: TelegramCallbackQuery): Promise<void> {
     const userId = callbackQuery.from.id;
     const data = callbackQuery.data;
-    const adminChatId = parseInt(this.env.ADMIN_CHAT_ID);
 
     console.log(`Processing callback query from human ${userId}: ${data}`);
 
@@ -364,9 +371,10 @@ export class TelegramBotWorker {
     const message = callbackQuery.message;
     const chatId = message?.chat?.id;
     const topicId = (message as any)?.message_thread_id;
+    const isAdminChat = chatId ? await this.isAdminChat(chatId) : false;
 
     // Check if admin is in topic flow mode
-    if (chatId === adminChatId && topicId) {
+    if (isAdminChat && topicId) {
       const adminContext = await this.userContextManager.getContext(userId);
       if (adminContext && adminContext.flowInTopic && adminContext.topicId === topicId && data) {
         // Admin is managing flow in this topic - process through FlowEngine
@@ -483,11 +491,13 @@ export class TelegramBotWorker {
     
     // Extract topicId from data_in JSON
     let topicId: number | undefined;
+    let topicChatId: number | undefined;
     let dataInObj: any = null;
     if (human.dataIn) {
       try {
         dataInObj = JSON.parse(human.dataIn);
         topicId = dataInObj?.topic_id;
+        topicChatId = dataInObj?.topic_chat_id;
       } catch (e) {
         console.warn(`Failed to parse data_in for human ${userId}, topic_id not available`);
       }
@@ -498,7 +508,7 @@ export class TelegramBotWorker {
     
     if (forwardingEnabled && topicId) {
       // Forward message to human's topic only if forwarding is enabled
-      await this.topicService.forwardMessageToUserTopic(userId, topicId, message);
+      await this.topicService.forwardMessageToUserTopic(userId, topicId, message, topicChatId);
       console.log(`📬 Message forwarded to topic for human ${userId}`);
 
       console.log(`human.dataIn ${userId}`, dataInObj?.ai_enabled, dataInObj?.dataIn);
@@ -514,4 +524,68 @@ export class TelegramBotWorker {
     }
   }
 
+  private async getAdminChatIds(): Promise<number[]> {
+    if (this.cachedAdminChatIds) {
+      return this.cachedAdminChatIds;
+    }
+
+    const ids = new Set<number>();
+    if (typeof this.defaultAdminChatId === 'number' && !Number.isNaN(this.defaultAdminChatId)) {
+      ids.add(this.defaultAdminChatId);
+    }
+
+    try {
+      const parentThreads = await this.messageThreadRepository.getParentThreadsByType(this.botType);
+      parentThreads.forEach(thread => {
+        if (thread.value) {
+          const parsed = parseInt(thread.value, 10);
+          if (!Number.isNaN(parsed)) {
+            ids.add(parsed);
+          }
+        }
+      });
+    } catch (error) {
+      console.error('Error loading admin chat IDs from message_threads:', error);
+    }
+
+    this.cachedAdminChatIds = Array.from(ids);
+    return this.cachedAdminChatIds;
+  }
+
+  private async isAdminChat(chatId: number): Promise<boolean> {
+    const adminIds = await this.getAdminChatIds();
+    return adminIds.includes(chatId);
+  }
+
+  private async resolveHumanTelegramIdByTopic(topicId: number): Promise<number | null> {
+    try {
+      const directId = await this.humanRepository.getHumanTelegramIdByTopic(topicId);
+      if (directId) {
+        return directId;
+      }
+
+      const thread = await this.messageThreadRepository.getMessageThreadByValue(
+        topicId.toString(),
+        this.botType
+      );
+      if (thread && thread.xaid) {
+        const human = await this.humanRepository.getHumanByHaid(thread.xaid);
+        if (!human || !human.dataIn) {
+          return null;
+        }
+        try {
+          const data = JSON.parse(human.dataIn);
+          return data?.telegram_id ?? null;
+        } catch (error) {
+          console.warn('Failed to parse human.dataIn while resolving telegram_id by topic:', error);
+          return null;
+        }
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Error resolving human telegram_id by topic:', error);
+      return null;
+    }
+  }
 }

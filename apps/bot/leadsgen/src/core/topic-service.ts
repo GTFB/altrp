@@ -4,14 +4,14 @@ import type { TelegramMessage, TelegramUser } from '../worker/bot';
 
 export interface TopicServiceConfig {
   botToken: string;
-  adminChatId: number;
+  adminChatId?: number;
   messageService: MessageService;
   messageLoggingService: MessageLoggingService;
 }
 
 export class TopicService {
   private botToken: string;
-  private adminChatId: number;
+  private adminChatId?: number;
   private messageService: MessageService;
   private messageLoggingService: MessageLoggingService;
 
@@ -22,13 +22,32 @@ export class TopicService {
     this.messageLoggingService = config.messageLoggingService;
   }
 
+  private resolveChatId(chatId?: number): number | null {
+    const resolved = typeof chatId === 'number' && !Number.isNaN(chatId)
+      ? chatId
+      : typeof this.adminChatId === 'number' && !Number.isNaN(this.adminChatId)
+        ? this.adminChatId
+        : null;
+
+    if (resolved === null) {
+      console.error('Admin chat ID is not configured');
+    }
+
+    return resolved;
+  }
+
 
   /**
    * Creates topic in admin group with specified name
    */
-  async createTopic(topicName: string, iconColor: number = 0x6FB9F0): Promise<number | null> {
+  async createTopic(topicName: string, iconColor: number = 0x6FB9F0, chatId?: number): Promise<number | null> {
     try {
-      console.log(`Creating topic "${topicName}" in admin group ${this.adminChatId}`);
+      const targetChatId = this.resolveChatId(chatId);
+      if (!targetChatId) {
+        return null;
+      }
+
+      console.log(`Creating topic "${topicName}" in admin group ${targetChatId}`);
 
       const response = await fetch(`https://api.telegram.org/bot${this.botToken}/createForumTopic`, {
         method: 'POST',
@@ -36,7 +55,7 @@ export class TopicService {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          chat_id: this.adminChatId,
+          chat_id: targetChatId,
           name: topicName,
           icon_color: iconColor,
           icon_custom_emoji_id: undefined
@@ -68,10 +87,15 @@ export class TopicService {
   /**
    * Edits topic icon
    */
-  async editTopicIcon(topicId: number, iconCustomEmojiId: string | null, iconColor?: number): Promise<boolean> {
+  async editTopicIcon(topicId: number, iconCustomEmojiId: string | null, iconColor?: number, chatId?: number): Promise<boolean> {
     try {
+      const targetChatId = this.resolveChatId(chatId);
+      if (!targetChatId) {
+        return false;
+      }
+
       const body: any = {
-        chat_id: this.adminChatId,
+        chat_id: targetChatId,
         message_thread_id: topicId
       };
 
@@ -143,8 +167,13 @@ export class TopicService {
   /**
    * Forwards user message to their topic in admin group
    */
-  async forwardMessageToUserTopic(userId: number, topicId: number, message: TelegramMessage): Promise<void> {
+  async forwardMessageToUserTopic(userId: number, topicId: number, message: TelegramMessage, chatId?: number): Promise<void> {
     try {
+      const targetChatId = this.resolveChatId(chatId);
+      if (!targetChatId) {
+        return;
+      }
+
       // Determine message type and create appropriate description
       let messageDescription = '';
       let fileId = '';
@@ -169,11 +198,11 @@ export class TopicService {
       //const topicMessage = `<b>👤 ${message.from.first_name} ${message.from.last_name || ''}</b> (ID: ${userId})\n\n${messageDescription}`;
       const topicMessage = `<b>👤 ${message.from.first_name} ${message.from.last_name || ''}</b>\n\n${messageDescription}`;
       
-      await this.messageService.sendMessageToTopic(this.adminChatId, topicId, topicMessage);
+      await this.messageService.sendMessageToTopic(targetChatId, topicId, topicMessage);
 
       // If there is a file, forward it
       if (fileId) {
-        await this.forwardFileToTopic(topicId, fileId, message);
+        await this.forwardFileToTopic(topicId, fileId, message, targetChatId);
       }
 
     } catch (error) {
@@ -184,11 +213,16 @@ export class TopicService {
   /**
    * Forwards file to admin group topic
    */
-  async forwardFileToTopic(topicId: number, fileId: string, message: TelegramMessage): Promise<void> {
+  async forwardFileToTopic(topicId: number, fileId: string, message: TelegramMessage, chatId?: number): Promise<void> {
     try {
+      const targetChatId = this.resolveChatId(chatId);
+      if (!targetChatId) {
+        return;
+      }
+
       let method = '';
       let body: any = {
-        chat_id: this.adminChatId,
+        chat_id: targetChatId,
         message_thread_id: topicId,
         from_chat_id: message.chat.id,
         message_id: message.message_id
@@ -198,21 +232,21 @@ export class TopicService {
       if (message.voice) {
         method = 'sendVoice';
         body = {
-          chat_id: this.adminChatId,
+          chat_id: targetChatId,
           message_thread_id: topicId,
           voice: fileId
         };
       } else if (message.photo) {
         method = 'sendPhoto';
         body = {
-          chat_id: this.adminChatId,
+          chat_id: targetChatId,
           message_thread_id: topicId,
           photo: fileId
         };
       } else if (message.document) {
         method = 'sendDocument';
         body = {
-          chat_id: this.adminChatId,
+          chat_id: targetChatId,
           message_thread_id: topicId,
           document: fileId
         };
@@ -220,7 +254,7 @@ export class TopicService {
         // Use general forwarding method
         method = 'forwardMessage';
         body = {
-          chat_id: this.adminChatId,
+          chat_id: targetChatId,
           message_thread_id: topicId,
           from_chat_id: message.chat.id,
           message_id: message.message_id

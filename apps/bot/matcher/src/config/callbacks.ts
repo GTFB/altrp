@@ -31,8 +31,8 @@ export const keyboards = {
 
 export const callbackActions = {
   start_onboarding_button: {
-    action: "go_to_step",
-    nextStepId: "onboarding_asking_name"
+    action: "handler",
+    handlerName: "matcherStartOnboardingHandler"
   },
   matcher_role_offer: {
     action: "handler",

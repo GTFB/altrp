@@ -1,4 +1,5 @@
 import type { D1Database } from '@cloudflare/workers-types';
+import type { PostgresD1Adapter } from '../nodejs/postgres-d1-adapter';
 import { generateUuidV4 } from '../helpers/generateUuidV4';
 import { generateAid } from '../helpers/generateAid';
 
@@ -26,14 +27,16 @@ export interface HumanData {
 }
 
 export interface HumanConfig {
-  db: D1Database;
+  db: D1Database | PostgresD1Adapter;
 }
 
 /**
  * Repository for working with humans table
+ * Uses D1Database API (or PostgresD1Adapter which mimics it)
+ * PostgresD1Adapter automatically converts SQLite syntax to PostgreSQL
  */
 export class HumanRepository {
-  private db: D1Database;
+  private db: D1Database | PostgresD1Adapter;
 
   constructor(config: HumanConfig) {
     this.db = config.db;
@@ -94,9 +97,13 @@ export class HumanRepository {
     console.log(`Getting human by telegram_id ${telegramId} from D1 database`);
 
     try {
+      // Check that data_in is not NULL before using json_extract
+      // Cast the extracted value to INTEGER for proper comparison
+      // Note: json_valid() may not be available in D1, so we rely on NULL check and error handling
       const result = await this.db.prepare(`
         SELECT * FROM humans 
-        WHERE json_extract(data_in, '$.telegram_id') = ?
+        WHERE data_in IS NOT NULL
+        AND CAST(json_extract(data_in, '$.telegram_id') AS INTEGER) = ?
         AND deleted_at IS NULL
       `).bind(telegramId).first();
 
@@ -301,7 +308,8 @@ export class HumanRepository {
       const result = await this.db.prepare(`
         UPDATE humans 
         SET ${setParts.join(', ')} 
-        WHERE json_extract(data_in, '$.telegram_id') = ?
+        WHERE data_in IS NOT NULL
+        AND CAST(json_extract(data_in, '$.telegram_id') AS INTEGER) = ?
         AND deleted_at IS NULL
       `).bind(...values).run();
 
@@ -327,7 +335,8 @@ export class HumanRepository {
       const result = await this.db.prepare(`
         UPDATE humans 
         SET data_in = ?, updated_at = ?
-        WHERE json_extract(data_in, '$.telegram_id') = ?
+        WHERE data_in IS NOT NULL
+        AND CAST(json_extract(data_in, '$.telegram_id') AS INTEGER) = ?
         AND deleted_at IS NULL
       `).bind(dataIn, new Date().toISOString(), telegramId).run();
 
@@ -351,9 +360,10 @@ export class HumanRepository {
 
     try {
       const result = await this.db.prepare(`
-        SELECT json_extract(data_in, '$.telegram_id') as telegram_id
+        SELECT CAST(json_extract(data_in, '$.telegram_id') AS INTEGER) as telegram_id
         FROM humans 
-        WHERE json_extract(data_in, '$.topic_id') = ?
+        WHERE data_in IS NOT NULL
+        AND CAST(json_extract(data_in, '$.topic_id') AS INTEGER) = ?
         AND deleted_at IS NULL
       `).bind(topicId).first();
 

@@ -1,4 +1,5 @@
 import type { D1Database } from '@cloudflare/workers-types';
+import type { PostgresD1Adapter } from '../nodejs/postgres-d1-adapter';
 import { generateUuidV4 } from '../helpers/generateUuidV4';
 import { generateAid } from '../helpers/generateAid';
 import { HumanRepository } from './HumanRepository';
@@ -23,16 +24,17 @@ export interface MessageData {
 }
 
 export interface MessageConfig {
-  db: D1Database;
+  db: D1Database | PostgresD1Adapter;
   humanRepository: HumanRepository;
   messageThreadRepository: MessageThreadRepository;
 }
 
 /**
  * Repository for working with messages table
+ * Uses D1Database API (or PostgresD1Adapter which mimics it)
  */
 export class MessageRepository {
-  private db: D1Database;
+  private db: D1Database | PostgresD1Adapter;
   private humanRepository: HumanRepository;
   private messageThreadRepository: MessageThreadRepository;
 

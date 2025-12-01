@@ -137,10 +137,30 @@ class PostgresPreparedStatement {
     // Convert backticks to double quotes (PostgreSQL style)
     converted = converted.replace(/`([^`]+)`/g, '"$1"');
 
+    // Convert CAST(json_extract(column, '$.path') AS INTEGER) to PostgreSQL
+    // This pattern handles: CAST(json_extract(...) AS INTEGER)
+    // Must be done BEFORE converting plain json_extract
+    converted = converted.replace(
+      /CAST\s*\(\s*json_extract\(\s*([^)]+?)\s*,\s*'([^']+)'\s*\)\s*AS\s+INTEGER\s*\)/gi,
+      (match, columnExpr, path) => {
+        const cleanPath = path.replace(/^\$\./, '');
+        const segments = cleanPath.split('.');
+        let expr = `${columnExpr.trim()}::jsonb`;
+        segments.forEach((segment, index) => {
+          const accessor = /^\d+$/.test(segment) ? segment : `'${segment}'`;
+          const operator = index === segments.length - 1 ? '->>' : '->';
+          expr = `(${expr} ${operator} ${accessor})`;
+        });
+        // Cast to bigint for PostgreSQL (INTEGER in SQLite = BIGINT in PostgreSQL)
+        return `(${expr})::bigint`;
+      }
+    );
+
     // Convert json_extract(column, '$.path.to.field') to PostgreSQL JSON operators
+    // (for cases without CAST - only if not already converted above)
     converted = converted.replace(
       /json_extract\(\s*([^)]+?)\s*,\s*'([^']+)'\s*\)/gi,
-      (_, columnExpr, path) => {
+      (match, columnExpr, path) => {
         const cleanPath = path.replace(/^\$\./, '');
         const segments = cleanPath.split('.');
         let expr = `${columnExpr.trim()}::jsonb`;

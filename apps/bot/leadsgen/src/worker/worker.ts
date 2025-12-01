@@ -8,7 +8,8 @@ export interface Env {
   DB: D1Database;
   BOT_STORAGE: R2Bucket;
   BOT_TOKEN: string;
-  ADMIN_CHAT_ID: string;
+  ADMIN_CHAT_ID?: string;
+  BOT_TYPE?: string;
   TRANSCRIPTION_API_TOKEN: string;
   NODE_ENV: string;
   LOCALE: string;
