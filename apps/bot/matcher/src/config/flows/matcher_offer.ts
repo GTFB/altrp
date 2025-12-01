@@ -7,25 +7,25 @@ export const matcherOfferFlow: BotFlow = {
     {
       type: 'wait_input',
       id: 'matcher_offer_title',
-      text: 'Укажите название',
+      text: 'Please provide a title',
       saveToVariable: 'matcher.offer.title',
       nextStepId: 'matcher_offer_description'
     },
     {
       type: 'wait_input',
       id: 'matcher_offer_description',
-      text: 'Опишите предложение подробнее:',
+      text: 'Describe your offer in detail:',
       saveToVariable: 'matcher.offer.description',
       nextStepId: 'matcher_offer_price'
     },
     {
       type: 'wait_input',
       id: 'matcher_offer_price',
-      text: 'Укажите стоимость:',
+      text: 'Please provide the price:',
       saveToVariable: 'matcher.offer.price',
       validation: {
         type: 'number',
-        errorMessage: 'Цена должна быть числом'
+        errorMessage: 'Price must be a number'
       },
       nextStepId: 'matcher_offer_summary'
     },

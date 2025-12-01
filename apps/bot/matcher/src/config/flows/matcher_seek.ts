@@ -7,7 +7,7 @@ export const matcherSeekFlow: BotFlow = {
     {
       type: 'wait_input',
       id: 'matcher_seek_description',
-      text: 'Опишите, что именно вы ищете:',
+      text: 'Describe what you are looking for:',
       saveToVariable: 'matcher.seek.description',
       nextStepId: 'matcher_seek_process'
     },

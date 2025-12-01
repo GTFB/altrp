@@ -7,24 +7,24 @@ export const onboardingFlow: BotFlow = {
     {
       type: 'message',
       id: 'send_welcome',
-      text: '👋 <b>Matcher</b> поможет найти товары или услуги внутри сообщества.\nНажмите кнопку, чтобы пройти короткий онбординг.',
+      text: '👋 <b>Matcher</b> will help you find products or services within the community.\nClick the button to complete a short onboarding.',
       keyboardKey: 'start_onboarding_button'
     },
     {
       type: 'wait_input',
       id: 'onboarding_asking_name',
-      text: 'Как вас зовут?',
+      text: 'What is your name?',
       saveToVariable: 'hmn.name',
       nextStepId: 'onboarding_asking_email'
     },
     {
       type: 'wait_input',
       id: 'onboarding_asking_email',
-      text: 'Укажите email для связи:',
+      text: 'Please provide your email:',
       saveToVariable: 'hmn.email',
       validation: {
         type: 'email',
-        errorMessage: 'Пожалуйста, укажите корректный email'
+        errorMessage: 'Please provide a valid email'
       },
       nextStepId: 'onboarding_save_user_data'
     },
@@ -37,7 +37,7 @@ export const onboardingFlow: BotFlow = {
     {
       type: 'message',
       id: 'onboarding_choose_role',
-      text: 'В какой роли вы регистрируетесь?',
+      text: 'Choose role',
       keyboardKey: 'matcher_role_keyboard'
     }
   ]

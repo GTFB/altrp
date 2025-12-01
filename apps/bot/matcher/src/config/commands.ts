@@ -12,12 +12,12 @@ export const commands: BotCommand[] = [
   {
     name: "/start",
     handlerName: "handleStartCommand",
-    description: "Запустить онбординг"
+    description: "Start onboarding"
   },
   {
     name: "/menu",
     handlerName: "handleMenuCommand",
-    description: "Открыть меню"
+    description: "Open menu"
   }
 ];
 

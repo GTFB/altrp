@@ -7,7 +7,7 @@ export const menuFlow: BotFlow = {
     {
       type: 'message',
       id: 'show_main_menu',
-      text: 'Если хотите добавить ещё один товар или запрос — отправьте команду /start и повторите онбординг.',
+      text: 'If you want to add another product or request — send the /start command and repeat the onboarding.',
     }
   ]
 };

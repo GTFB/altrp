@@ -2,7 +2,7 @@ export const keyboards = {
   start_onboarding_button: {
     inline_keyboard: [[
       {
-        text: "🚀 Начать",
+        text: "🚀 Start",
         callback_data: "start_onboarding_button"
       }
     ]]
@@ -10,11 +10,11 @@ export const keyboards = {
   matcher_role_keyboard: {
     inline_keyboard: [[
       {
-        text: "Предлагаю",
+        text: "I'm offering",
         callback_data: "matcher_role_offer"
       },
       {
-        text: "Ищу",
+        text: "I'm looking for",
         callback_data: "matcher_role_search"
       }
     ]]
@@ -22,7 +22,7 @@ export const keyboards = {
   matcher_offer_summary: {
     inline_keyboard: [[
       {
-        text: "Подтвердить",
+        text: "Confirm",
         callback_data: "matcher_offer_confirm"
       }
     ]]

@@ -2,6 +2,7 @@ import { BotInterface } from '../core/bot-interface';
 import { UserContextManager } from '../core/user-context';
 import { ProductRepository } from '../repositories/ProductRepository';
 import { keyboards } from './callbacks';
+import type { MessageThreadData } from '../repositories/MessageThreadRepository';
 
 type MatcherRole = 'offer' | 'seek';
 
@@ -41,15 +42,15 @@ const safeParseJson = <T>(json?: string): T | undefined => {
 
 export const createCustomHandlers = (worker: BotInterface) => {
   const handlerWorker = {
-    d1Storage: worker['d1Storage'],
-    humanRepository: worker['humanRepository'],
-    messageRepository: worker['messageRepository'],
-    messageThreadRepository: worker['messageThreadRepository'],
-    flowEngine: worker['flowEngine'],
-    env: worker['env'],
-    messageService: worker['messageService'],
-    topicService: worker['topicService'],
-    userContextManager: worker['userContextManager']
+    d1Storage: worker.d1Storage,
+    humanRepository: worker.humanRepository,
+    messageRepository: worker.messageRepository,
+    messageThreadRepository: worker.messageThreadRepository,
+    flowEngine: worker.flowEngine,
+    env: worker.env,
+    messageService: worker.messageService,
+    topicService: worker.topicService,
+    userContextManager: worker.userContextManager
   };
   
   const productRepository = new ProductRepository({ db: handlerWorker.env.DB });
@@ -95,7 +96,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
   };
 
   const sendGroupKeyboard = async (telegramId: number, role: MatcherRole, context: any) => {
-    const groups = await handlerWorker.messageThreadRepository.getMatcherGroupsByType(role);
+    const groups: MessageThreadData[] = await handlerWorker.messageThreadRepository.getMatcherGroupsByType(role);
     const humanId = context?.humanId;
 
     if (!groups.length) {
@@ -107,17 +108,17 @@ export const createCustomHandlers = (worker: BotInterface) => {
         return;
       }
 
-    const inline_keyboard = groups.map(group => {
+    const inline_keyboard = [groups.map((group: MessageThreadData) => {
       const payload = JSON.stringify({
         action: 'handler',
         h: 'mGrp',
         m: group.maid
       });
-      return [{
+      return {
         text: group.title || 'Group with no name',
         callback_data: payload
-      }];
-    });
+      };
+    })];
 
     await handlerWorker.messageService.sendMessageWithKeyboard(
       telegramId,
@@ -605,9 +606,33 @@ export const createCustomHandlers = (worker: BotInterface) => {
       await handlerWorker.flowEngine.startFlow(userId, 'onboarding');
     },
 
-    handleMenuCommand: async (message: any) => {
+    handleMenuCommand: async (message: any, bot: any) => {
       const userId = message.from.id;
-      await handlerWorker.flowEngine.startFlow(userId, 'menu');
+      const human = await getOrCreateHuman(message);
+
+      if (!human?.id) {
+        console.error(`❌ Failed to register human ${userId}`);
+        return;
+      }
+
+      await bot.userContextManager.getOrCreateContext(userId, human.id);
+      
+      // Exit dialog mode if user is in dialog
+      await exitDialogMode(userId);
+
+      // Set up flow context without executing first step
+      await bot.userContextManager.enterFlowMode(userId);
+      await bot.userContextManager.updateContext(userId, {
+        currentFlow: 'onboarding',
+        currentStep: 0,
+        flowInTopic: false,
+        topicId: null,
+        adminChatId: null,
+        targetUserId: null
+      });
+
+      // Go directly to role selection step
+      await handlerWorker.flowEngine.goToStep(userId, 'onboarding_choose_role');
     },
 
     matcherHandleRoleOffer: async (telegramId: number, contextManager: UserContextManager) => {
@@ -752,7 +777,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
         await handlerWorker.messageService.sendMessageToTopic(
           chatId,
           topicId,
-          `🔎 Запрос: ${description}`
+          `🔎 Request: ${description}`
         );
       }
 
