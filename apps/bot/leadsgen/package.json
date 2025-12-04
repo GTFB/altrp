@@ -16,11 +16,14 @@
     "deploy": "npm run generate-flows-index && wrangler deploy",
     "deploy:dev": "npm run generate-flows-index && wrangler deploy --env development",
     "deploy:prod": "npm run generate-flows-index && wrangler deploy --env production",
-    "d1:create": "wrangler d1 create altrp-db",
+    "d1:create": "node scripts/create-db.mjs",
     "d1:migrate": "wrangler d1 migrations apply altrp-db",
     "d1:local": "wrangler d1 execute altrp-db --local --file=./schema.sql",
     "d1:remote": "wrangler d1 execute altrp-db --file=./schema.sql",
-    "migrate:postgres": "node scripts/migrate-postgres.mjs"
+    "migrate:postgres": "node scripts/migrate-postgres.mjs",
+    "migrate:site": "node scripts/migrate-site.mjs",
+    "migrate:site:local": "node scripts/migrate-site.mjs --local",
+    "migrate:site:remote": "node scripts/migrate-site.mjs --remote"
   },
   "keywords": [
     "telegram",
@@ -38,16 +41,16 @@
     "@cloudflare/workers-types": "^4.20231218.0",
     "@types/node": "^20.10.0",
     "@types/pg": "^8.10.0",
+    "nodemon": "^3.0.0",
     "typescript": "^5.3.0",
-    "wrangler": "^3.19.0",
-    "nodemon": "^3.0.0"
+    "wrangler": "^4.52.1"
   },
   "dependencies": {
     "axios": "^1.12.2",
+    "dotenv": "^16.0.0",
     "express": "^4.18.0",
-    "pg": "^8.11.0",
-    "redis": "^4.6.0",
     "node-cron": "^3.0.0",
-    "dotenv": "^16.0.0"
+    "pg": "^8.11.0",
+    "redis": "^4.6.0"
   }
 }

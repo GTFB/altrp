@@ -5,8 +5,12 @@
   "main": "src/gate.ts",
   "scripts": {
     "deploy": "wrangler deploy",
+    "d1:create": "node scripts/create-db.mjs",
     "d1:local": "wrangler d1 execute altrp-db --local --file=./schema.sql",
     "d1:remote": "wrangler d1 execute altrp-db --file=./schema.sql",
+    "migrate:site": "node scripts/migrate-site.mjs",
+    "migrate:site:local": "node scripts/migrate-site.mjs --local",
+    "migrate:site:remote": "node scripts/migrate-site.mjs --remote",
     "test": "bun test",
     "test:watch": "bun test --watch",
     "typecheck": "tsc --noEmit"

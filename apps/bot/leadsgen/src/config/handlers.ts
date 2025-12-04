@@ -35,7 +35,8 @@ export const createCustomHandlers = (worker: BotInterface) => {
     flowEngine: worker['flowEngine'],
     env: worker['env'],
     messageService: worker['messageService'],
-    topicService: worker['topicService']
+    topicService: worker['topicService'],
+    userContextManager: worker['userContextManager']
   };
   
   // Create AI repository (can be created here since we have access to env)
@@ -856,6 +857,28 @@ ${aiResponse}`
       console.error('Error details:', error?.message, error?.stack);
     }
   },
+
+    /**
+     * Exit dialog mode (if user is in dialog)
+     * For leadsgen, this is a stub as dialog mode is specific to matcher
+     */
+    exitDialogMode: async (telegramId: number) => {
+      const context = await handlerWorker.userContextManager.getContext(telegramId);
+      if (!context) return;
+
+      // For leadsgen, dialog mode is not used, but we keep the function for compatibility
+      // If needed in the future, dialog state can be stored in context.data.leadsgen.dialog
+      console.log(`🚪 exitDialogMode called for user ${telegramId} (leadsgen - no dialog mode)`);
+    },
+
+    /**
+     * Handle dialog message (if user is in dialog)
+     * For leadsgen, this is a stub as dialog mode is specific to matcher
+     */
+    handleDialogMessage: async (telegramId: number, messageText: string) => {
+      // For leadsgen, dialog mode is not used, so always return false (not handled)
+      return false;
+    }
 
   };
 };

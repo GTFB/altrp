@@ -16,10 +16,13 @@
     "deploy": "npm run generate:content && npm run generate-flows-index && wrangler deploy",
     "deploy:dev": "npm run generate:content && npm run generate-flows-index && wrangler deploy --env development",
     "deploy:prod": "npm run generate:content && npm run generate-flows-index && wrangler deploy --env production",
-    "d1:create": "wrangler d1 create altrp-db",
+    "d1:create": "node scripts/create-db.mjs",
     "d1:migrate": "wrangler d1 migrations apply altrp-db",
     "d1:local": "wrangler d1 execute altrp-db --local --file=./schema.sql",
-    "d1:remote": "wrangler d1 execute altrp-db --file=./schema.sql"
+    "d1:remote": "wrangler d1 execute altrp-db --file=./schema.sql",
+    "migrate:site": "node scripts/migrate-site.mjs",
+    "migrate:site:local": "node scripts/migrate-site.mjs --local",
+    "migrate:site:remote": "node scripts/migrate-site.mjs --remote"
   },
   "keywords": [
     "telegram",

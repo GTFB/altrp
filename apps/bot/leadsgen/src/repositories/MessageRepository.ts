@@ -27,6 +27,7 @@ export interface MessageConfig {
   db: D1Database | PostgresD1Adapter;
   humanRepository: HumanRepository;
   messageThreadRepository: MessageThreadRepository;
+  botType?: string; // Bot type: 'leadsgen', 'matcher', etc.
 }
 
 /**
@@ -37,11 +38,13 @@ export class MessageRepository {
   private db: D1Database | PostgresD1Adapter;
   private humanRepository: HumanRepository;
   private messageThreadRepository: MessageThreadRepository;
+  private botType: string;
 
   constructor(config: MessageConfig) {
     this.db = config.db;
     this.humanRepository = config.humanRepository;
     this.messageThreadRepository = config.messageThreadRepository;
+    this.botType = config.botType || 'leadsgen';
   }
 
   /**

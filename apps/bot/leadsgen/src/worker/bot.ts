@@ -112,7 +112,8 @@ export class TelegramBotWorker {
     this.messageRepository = new MessageRepository({ 
       db: env.DB, 
       humanRepository: this.humanRepository,
-      messageThreadRepository: this.messageThreadRepository
+      messageThreadRepository: this.messageThreadRepository,
+      botType: this.botType
     });
     
     // Initialize user context manager (needed for message logging service)
@@ -164,7 +165,8 @@ export class TelegramBotWorker {
       flowEngine: this.flowEngine,
       env: this.env,
       messageService: this.messageService,
-      topicService: this.topicService
+      topicService: this.topicService,
+      userContextManager: this.userContextManager
     };
     const customHandlers = createCustomHandlers(botAdapter);
     
@@ -347,6 +349,18 @@ export class TelegramBotWorker {
       await this.userContextManager.getOrCreateContext(message.from.id, human.id);
     }
     
+    // Check if human is in dialog mode
+    if (message.text) {
+      const handlers = this.flowEngine['customHandlers'] || {};
+      if (handlers.handleDialogMessage) {
+        const handled = await handlers.handleDialogMessage(message.from.id, message.text);
+        if (handled) {
+          console.log(`💬 Message handled as dialog message for user ${message.from.id}`);
+          return;
+        }
+      }
+    }
+
     // Check if human is in flow mode
     const isInFlow = await this.userContextManager.isInFlowMode(message.from.id);
     
@@ -429,6 +443,12 @@ export class TelegramBotWorker {
 
     console.log(`Handling command: ${command} from user ${userId}`);
 
+    // Exit dialog mode if user is in dialog
+    const handlers = this.flowEngine['customHandlers'] || {};
+    if (handlers.exitDialogMode) {
+      await handlers.exitDialogMode(userId);
+    }
+
     // Find command in configuration
     const commandConfig = findCommand(command || '');
     
@@ -445,8 +465,7 @@ export class TelegramBotWorker {
     const handlerName = commandConfig.handlerName;
     console.log(`Executing command handler: ${handlerName}`);
 
-    // Get handlers from FlowEngine
-    const handlers = this.flowEngine['customHandlers'] || {};
+    // Get handler from FlowEngine (handlers already declared above)
     const handler = handlers[handlerName];
     
     if (handler) {

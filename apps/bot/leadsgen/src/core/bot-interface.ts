@@ -1,3 +1,5 @@
+import type { UserContextManager } from './user-context';
+
 export interface BotInterface {
   d1Storage: any;
   humanRepository: any;
@@ -7,5 +9,6 @@ export interface BotInterface {
   env: any;
   messageService: any;
   topicService: any;
+  userContextManager: UserContextManager;
 }
 
