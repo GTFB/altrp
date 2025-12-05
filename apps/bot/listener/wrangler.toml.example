@@ -10,7 +10,6 @@ enabled = true
 # Environment variables
 [vars]
 BOT_TOKEN = "YOUR_BOT_TOKEN_HERE"
-ADMIN_CHAT_ID = "YOUR_ADMIN_CHAT_ID_HERE"
 NODE_ENV = "production"
 LOCALE = "ru"
 AI_API_URL = "YOUR_AI_API_URL_HERE"

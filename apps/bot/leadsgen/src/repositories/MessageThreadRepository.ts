@@ -246,5 +246,28 @@ export class MessageThreadRepository {
       throw error;
     }
   }
+
+  async getThreadByParentAndXaid(parentMaid: string, xaid: string): Promise<MessageThreadData | null> {
+    try {
+      const result = await this.d1Storage.execute(`
+        SELECT id, uuid, maid, parent_maid, title, status_name, type,
+               \`order\`, xaid, value, updated_at, created_at, deleted_at, gin, data_in
+        FROM message_threads
+        WHERE parent_maid = ?
+          AND xaid = ?
+          AND deleted_at IS NULL
+        LIMIT 1
+      `, [parentMaid, xaid]);
+
+      if (!result || result.length === 0) {
+        return null;
+      }
+
+      return this.mapRowToMessageThread(result[0]);
+    } catch (error) {
+      console.error(`Error getting message thread by parent ${parentMaid} and xaid ${xaid}:`, error);
+      return null;
+    }
+  }
 }
 

@@ -94,7 +94,7 @@ export class TelegramBotWorker {
   //constructor(env: Env, kvStorage: KVStorageService) {
   constructor(env: Env) {
     this.env = env;
-    this.botType = env.BOT_TYPE || 'leadsgen';
+    this.botType = env.BOT_TYPE || '';
     this.defaultAdminChatId = env.ADMIN_CHAT_ID ? parseInt(env.ADMIN_CHAT_ID) : undefined;
     if (typeof this.defaultAdminChatId === 'number' && Number.isNaN(this.defaultAdminChatId)) {
       this.defaultAdminChatId = undefined;

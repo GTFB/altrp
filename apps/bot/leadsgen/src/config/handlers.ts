@@ -49,6 +49,98 @@ export const createCustomHandlers = (worker: BotInterface) => {
     }
   });
   
+  /**
+   * Get leadsgen group from message_threads
+   * Returns the first (and should be only) group with type = 'leadsgen'
+   */
+  const getLeadsgenGroup = async () => {
+    try {
+      const groups = await handlerWorker.messageThreadRepository.getParentThreadsByType('leadsgen');
+      if (!groups || groups.length === 0) {
+        console.warn('⚠️ No leadsgen group found in message_threads. Falling back to ADMIN_CHAT_ID from env.');
+        return null;
+      }
+      
+      // Return first group (should be only one)
+      const group = groups[0];
+      if (!group.value) {
+        console.error('❌ Leadsgen group found but has no value (chat_id)');
+        return null;
+      }
+      
+      const chatId = parseInt(group.value, 10);
+      if (Number.isNaN(chatId)) {
+        console.error(`❌ Invalid chat_id in leadsgen group: ${group.value}`);
+        return null;
+      }
+      
+      return { ...group, chatId };
+    } catch (error) {
+      console.error('❌ Error getting leadsgen group:', error);
+      return null;
+    }
+  };
+
+  /**
+   * Ensure topic exists for user in leadsgen group
+   * Similar to ensureTopicForGroup in matcher, but simplified for single group
+   */
+  const ensureTopicForLeadsgenGroup = async (telegramId: number, group: any) => {
+    const human = await handlerWorker.humanRepository.getHumanByTelegramId(telegramId);
+    if (!human || !human.haid) {
+      throw new Error('Human not found for topic assignment');
+    }
+
+    if (!group || !group.value) {
+      throw new Error('Group not found or missing chat id');
+    }
+
+    const chatId = parseInt(group.value, 10);
+    if (Number.isNaN(chatId)) {
+      throw new Error('Invalid chat id in group thread');
+    }
+
+    // Check if topic already exists for this user in this group
+    const existingThread = await handlerWorker.messageThreadRepository.getThreadByParentAndXaid(
+      group.maid,
+      human.haid
+    );
+
+    let topicId = existingThread?.value ? parseInt(existingThread.value, 10) : null;
+
+    if (!topicId) {
+      // Create new topic in the group
+      const fullName = human.fullName || human.uuid || 'Participant';
+      const topicTitle = `${fullName} • ${group.title || 'Leadsgen'}`;
+      topicId = await handlerWorker.topicService.createTopic(topicTitle, 0x6FB9F0, chatId);
+      
+      if (!topicId) {
+        throw new Error('Failed to create Telegram topic');
+      }
+
+      // Create message_thread entry for the topic
+      const threadDataIn = JSON.stringify({
+        prompt: "You are a technical support assistant providing troubleshooting help and technical guidance. Help users resolve technical issues, understand software functionality, and navigate system features. Always clarify that your assistance is for general troubleshooting and encourage users to contact official support channels for complex issues, account problems, or security concerns. Keep your answers brief and concise. Format your responses using HTML tags for Telegram only from this list: use <b> for bold, <i> for italics, <u> for underscores, <code> for code, and <a href=\"url\"> for links DO NOT use <br> tag. Respond clearly only to the user's message, taking into account the context, without unnecessary auxiliary information.",
+        model: "gemini-2.5-flash",
+        context_length: 6
+      });
+
+      await handlerWorker.messageThreadRepository.addMessageThread({
+        parentMaid: group.maid,
+        title: topicTitle,
+        statusName: 'active',
+        type: 'leadsgen',
+        xaid: human.haid,
+        value: topicId.toString(),
+        dataIn: threadDataIn
+      });
+      
+      console.log(`✅ Created new topic ${topicId} for user ${telegramId} in group ${group.maid}`);
+    }
+
+    return { topicId, chatId, group, human };
+  };
+
   return {
     /**
      * Handle /start command
@@ -59,6 +151,29 @@ export const createCustomHandlers = (worker: BotInterface) => {
 
       console.log(`🚀 Handling /start command via flow for human ${userId}`);
 
+      // Get leadsgen group from message_threads
+      const group = await getLeadsgenGroup();
+      let groupChatId: number | null = null;
+      
+      // Fallback to ADMIN_CHAT_ID from env if group not found
+      if (!group) {
+        console.warn('⚠️ Using ADMIN_CHAT_ID from env as fallback');
+        const envAdminChatId = handlerWorker.env.ADMIN_CHAT_ID ? parseInt(handlerWorker.env.ADMIN_CHAT_ID) : null;
+        if (!envAdminChatId || Number.isNaN(envAdminChatId)) {
+          console.error('❌ No leadsgen group found and ADMIN_CHAT_ID is not set');
+          await handlerWorker.messageService.sendMessage(
+            chatId,
+            '❌ Configuration error: group not found. Please contact administrator.',
+            null
+          );
+          return;
+        }
+        groupChatId = envAdminChatId;
+      } else {
+        groupChatId = group.chatId;
+        console.log(`✅ Found leadsgen group: ${group.title} (chat_id: ${groupChatId})`);
+      }
+
       // Get or create human in database to get dbHumanId
       let existingHuman = await handlerWorker.humanRepository.getHumanByTelegramId(userId);
       
@@ -68,32 +183,15 @@ export const createCustomHandlers = (worker: BotInterface) => {
           .filter(Boolean)
           .join(' ') || message.from.first_name || 'Unknown';
         
-        // Create topic in admin group for new human
-        const topicId = await handlerWorker.topicService.createTopic(fullName);
-        
-        // Send welcome message to topic if it was created
-        if (topicId) {
-          const adminChatId = parseInt(handlerWorker.env.ADMIN_CHAT_ID || '');
-          if (adminChatId) {
-            await handlerWorker.messageService.sendMessageToTopic(adminChatId, topicId, 
-              `👋 New user!\n\n` +
-              `Name: ${message.from.first_name} ${message.from.last_name || ''}\n` +
-              `Username: @${message.from.username || 'not specified'}\n` +
-              `ID: ${userId}\n\n`
-            );
-          }
-        }
-        
-        // Prepare data_in JSON with telegram_id and topic_id
+        // Register human minimally to get dbHumanId and haid
         const dataIn = JSON.stringify({
           telegram_id: userId,
-          topic_id: topicId || 0,
+          topic_id: 0, // Will be set after topic creation
           first_name: message.from.first_name,
           last_name: message.from.last_name || '',
           username: message.from.username || ''
         });
         
-        // Register human minimally to get dbHumanId
         const newHuman = {
           fullName: fullName,
           dataIn: dataIn
@@ -104,27 +202,6 @@ export const createCustomHandlers = (worker: BotInterface) => {
         
         // Update human reference
         existingHuman = await handlerWorker.humanRepository.getHumanByTelegramId(userId);
-      
-        // Create message_threads entry if topic was created and human has haid
-        if (topicId && existingHuman && existingHuman.haid) {
-          const topicName = fullName;
-          const threadDataIn = JSON.stringify({
-            prompt: "You are a technical support assistant providing troubleshooting help and technical guidance. Help users resolve technical issues, understand software functionality, and navigate system features. Always clarify that your assistance is for general troubleshooting and encourage users to contact official support channels for complex issues, account problems, or security concerns. Keep your answers brief and concise. Format your responses using HTML tags for Telegram only from this list: use <b> for bold, <i> for italics, <u> for underscores, <code> for code, and <a href=\"url\"> for links DO NOT use <br> tag. Respond clearly only to the user's message, taking into account the context, without unnecessary auxiliary information.",
-            model: "gemini-2.5-flash",
-            context_length: 6
-          });
-          
-          await handlerWorker.messageThreadRepository.addMessageThread({
-            value: topicId.toString(),
-            dataIn: threadDataIn,
-            xaid: existingHuman.haid,
-            statusName: 'active',
-            type: 'leadsgen',
-            title: topicName
-          });
-          
-          console.log(`✅ Message thread created for topic ${topicId}`);
-        }
       }
 
       if (!existingHuman || !existingHuman.id) {
@@ -132,8 +209,109 @@ export const createCustomHandlers = (worker: BotInterface) => {
         return;
       }
 
+      // Ensure topic exists for user in group (if group found)
+      let topicId: number | null = null;
+      if (group) {
+        try {
+          const topicInfo = await ensureTopicForLeadsgenGroup(userId, group);
+          topicId = topicInfo.topicId;
+          
+          // Update human.dataIn with topic_id and group info
+          let dataInObj: any = {};
+          if (existingHuman.dataIn) {
+            try {
+              dataInObj = JSON.parse(existingHuman.dataIn);
+            } catch (e) {
+              console.warn(`Failed to parse existing data_in for human ${userId}`);
+            }
+          }
+          
+          dataInObj.telegram_id = userId;
+          dataInObj.topic_id = topicId;
+          dataInObj.topic_chat_id = groupChatId;
+          dataInObj.group_maid = group.maid;
+          dataInObj.first_name = message.from.first_name;
+          dataInObj.last_name = message.from.last_name || '';
+          dataInObj.username = message.from.username || '';
+          
+          await handlerWorker.humanRepository.updateHumanDataIn(userId, JSON.stringify(dataInObj));
+          
+          // Send welcome message to topic
+          if (topicId && groupChatId) {
+            await handlerWorker.messageService.sendMessageToTopic(groupChatId, topicId, 
+              `👋 New user!\n\n` +
+              `Name: ${message.from.first_name} ${message.from.last_name || ''}\n` +
+              `Username: @${message.from.username || 'not specified'}\n` +
+              `ID: ${userId}\n\n`
+            );
+          }
+          
+          console.log(`✅ Topic ${topicId} ensured for user ${userId} in group ${group.maid}`);
+        } catch (error) {
+          console.error(`❌ Error ensuring topic for user ${userId}:`, error);
+          // Continue with flow even if topic creation fails
+        }
+      } else {
+        // Fallback: create topic using old method if group not found
+        const fullName = existingHuman.fullName || [message.from.first_name, message.from.last_name]
+          .filter(Boolean)
+          .join(' ') || message.from.first_name || 'Unknown';
+        
+        topicId = await handlerWorker.topicService.createTopic(fullName);
+        
+        if (topicId && groupChatId) {
+          await handlerWorker.messageService.sendMessageToTopic(groupChatId, topicId, 
+            `👋 New user!\n\n` +
+            `Name: ${message.from.first_name} ${message.from.last_name || ''}\n` +
+            `Username: @${message.from.username || 'not specified'}\n` +
+            `ID: ${userId}\n\n`
+          );
+          
+          // Update human.dataIn
+          let dataInObj: any = {};
+          if (existingHuman.dataIn) {
+            try {
+              dataInObj = JSON.parse(existingHuman.dataIn);
+            } catch (e) {
+              console.warn(`Failed to parse existing data_in for human ${userId}`);
+            }
+          }
+          
+          dataInObj.telegram_id = userId;
+          dataInObj.topic_id = topicId;
+          dataInObj.topic_chat_id = groupChatId;
+          
+          await handlerWorker.humanRepository.updateHumanDataIn(userId, JSON.stringify(dataInObj));
+          
+          // Create message_threads entry if human has haid
+          if (existingHuman.haid) {
+            const threadDataIn = JSON.stringify({
+              prompt: "You are a technical support assistant providing troubleshooting help and technical guidance. Help users resolve technical issues, understand software functionality, and navigate system features. Always clarify that your assistance is for general troubleshooting and encourage users to contact official support channels for complex issues, account problems, or security concerns. Keep your answers brief and concise. Format your responses using HTML tags for Telegram only from this list: use <b> for bold, <i> for italics, <u> for underscores, <code> for code, and <a href=\"url\"> for links DO NOT use <br> tag. Respond clearly only to the user's message, taking into account the context, without unnecessary auxiliary information.",
+              model: "gemini-2.5-flash",
+              context_length: 6
+            });
+            
+            await handlerWorker.messageThreadRepository.addMessageThread({
+              value: topicId.toString(),
+              dataIn: threadDataIn,
+              xaid: existingHuman.haid,
+              statusName: 'active',
+              type: 'leadsgen',
+              title: fullName
+            });
+          }
+        }
+      }
+
       // Get or create human context
       await bot.userContextManager.getOrCreateContext(userId, existingHuman.id);
+      
+      // Save group info to context
+      if (group) {
+        await bot.userContextManager.setVariable(userId, 'leadsgen.groupMaid', group.maid);
+        await bot.userContextManager.setVariable(userId, 'leadsgen.groupChatId', groupChatId);
+        await bot.userContextManager.setVariable(userId, 'leadsgen.topicId', topicId);
+      }
       
       // Save info about the current message for handlers
       await bot.userContextManager.setVariable(userId, '_system.currentMessage', message);
@@ -486,12 +664,21 @@ export const createCustomHandlers = (worker: BotInterface) => {
      */
     handleAssistantTopicMessage: async (message: any) => {
       try {
-        // Get ADMIN_CHAT_ID from env
-        const adminChatId = parseInt(handlerWorker.env.ADMIN_CHAT_ID || '');
-        if (!adminChatId) {
-          console.error('ADMIN_CHAT_ID is not configured!');
-        return;
-      }
+        // Get leadsgen group from message_threads (fallback to ADMIN_CHAT_ID from env)
+        const group = await getLeadsgenGroup();
+        let adminChatId: number | null = null;
+        
+        if (group) {
+          adminChatId = group.chatId;
+        } else {
+          // Fallback to ADMIN_CHAT_ID from env
+          adminChatId = handlerWorker.env.ADMIN_CHAT_ID ? parseInt(handlerWorker.env.ADMIN_CHAT_ID) : null;
+        }
+        
+        if (!adminChatId || Number.isNaN(adminChatId)) {
+          console.error('❌ No leadsgen group found and ADMIN_CHAT_ID is not configured!');
+          return;
+        }
 
       // Extract chatId from message
       const chatId = message.chat.id;
