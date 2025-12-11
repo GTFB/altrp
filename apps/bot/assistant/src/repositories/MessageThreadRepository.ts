@@ -199,6 +199,46 @@ export class MessageThreadRepository {
   }
 
   /**
+   * Get assistants by parent_maid where value IS NULL (not yet created topics)
+   */
+  async getAssistantsByParentMaid(parentMaid: string, type: string): Promise<MessageThreadData[]> {
+    try {
+      const result = await this.d1Storage.execute(`
+        SELECT id, uuid, maid, parent_maid, title, status_name, type, 
+               \`order\`, xaid, value, updated_at, created_at, deleted_at, gin, data_in
+        FROM message_threads 
+        WHERE parent_maid = ? AND type = ? AND value IS NULL AND deleted_at IS NULL
+        ORDER BY \`order\`, created_at
+      `, [parentMaid, type]);
+
+      if (!result || result.length === 0) {
+        return [];
+      }
+
+      return result.map((row: any) => ({
+        id: row.id as number,
+        uuid: row.uuid as string,
+        maid: row.maid as string,
+        parentMaid: row.parent_maid as string | undefined,
+        title: row.title as string | undefined,
+        statusName: row.status_name as string | undefined,
+        type: row.type as string | undefined,
+        order: row.order as number | undefined,
+        xaid: row.xaid as string | undefined,
+        value: row.value as string | undefined,
+        updatedAt: row.updated_at as string | undefined,
+        createdAt: row.created_at as string | undefined,
+        deletedAt: row.deleted_at as number | undefined,
+        gin: row.gin as string | undefined,
+        dataIn: row.data_in as string | undefined
+      }));
+    } catch (error) {
+      console.error(`Error getting assistants by parent_maid ${parentMaid} and type ${type}:`, error);
+      return [];
+    }
+  }
+
+  /**
    * Update message thread in database
    */
   async updateMessageThread(id: number, updates: Partial<MessageThreadData>): Promise<void> {

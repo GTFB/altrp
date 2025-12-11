@@ -138,117 +138,79 @@ export const createCustomHandlers = (worker: BotInterface) => {
         return;
       }
 
-      // Get bot type from env (default to 'assistent' for backward compatibility)
-      const botType = handlerWorker.env.BOT_TYPE || 'assistent';
+      // Get bot type from env
+      const botType = handlerWorker.env.BOT_TYPE || 'assistant';
 
-      // Define three assistants
-      const assistants = [
-        {
-          title: 'Financial Consultant',
-          type: botType,
-          dataIn: {
-            prompt: "You are a financial consultant with 15 years of experience. Provide clear, professional advice on personal finance, investments, budgeting, and financial planning. Always be helpful, ethical, and encourage users to consult certified financial advisors for major decisions. Keep your answers brief and concise. Format your responses using HTML tags for Telegram only from this list: use <b> for bold, <i> for italics, <u> for underscores, <code> for code, and <a href=\"url\"> for links DO NOT use <br> tag. Respond clearly only to the user's message, taking into account the context, without unnecessary auxiliary information.",
-            model: "gemini-2.5-flash",
-            context_length: 6
-          }
-        },
-        {
-          title: 'Nutritionist',
-          type: botType,
-          dataIn: {
-            prompt: "You are a nutritionist and dietitian with extensive knowledge of healthy eating, meal planning, nutritional science, and weight management. Provide evidence-based dietary advice, suggest balanced meal plans, and help users develop healthy eating habits. Always emphasize consultation with healthcare providers for medical conditions. Keep your answers brief and concise. Format your responses using HTML tags for Telegram only from this list: use <b> for bold, <i> for italics, <u> for underscores, <code> for code, and <a href=\"url\"> for links DO NOT use <br> tag. Respond clearly only to the user's message, taking into account the context, without unnecessary auxiliary information.",
-            model: "gemini-2.5-flash",
-            context_length: 6
-          }
-        },
-        {
-          title: 'Legal Advisor',
-          type: botType,
-          dataIn: {
-            prompt: "You are a legal advisor providing general legal information and guidance. Help users understand legal concepts, rights, and obligations. Always clarify that your advice is informational only and encourage users to consult licensed attorneys for specific legal representation. Keep your answers brief and concise. Format your responses using HTML tags for Telegram only from this list: use <b> for bold, <i> for italics, <u> for underscores, <code> for code, and <a href=\"url\"> for links DO NOT use <br> tag. Respond clearly only to the user's message, taking into account the context, without unnecessary auxiliary information.",
-            model: "gemini-2.5-flash",
-            context_length: 6
-          }
-        }
-      ];
+      // Get assistant group from message_threads
+      const group = await getAssistantGroup();
+      if (!group || !group.maid) {
+        console.error('❌ No assistant group found. Cannot create assistant topics.');
+        await handlerWorker.messageService.sendMessage(
+          chatId,
+          '❌ Assistant group is not configured. Please contact administrator.',
+          existingHuman.id
+        );
+        return;
+      }
 
-      // Check if assistants already exist for this user
-      const existingThreads = await handlerWorker.messageThreadRepository.getMessageThreadsByXaidAndType(
-        existingHuman.haid,
+      const groupChatId = group.chatId;
+      if (!groupChatId || Number.isNaN(groupChatId)) {
+        console.error('❌ Invalid assistant group chat_id. Cannot create assistant topics.');
+        await handlerWorker.messageService.sendMessage(
+          chatId,
+          '❌ Assistant group is not configured. Please contact administrator.',
+          existingHuman.id
+        );
+        return;
+      }
+
+      // Find assistants from database with parent_maid = group.maid and value IS NULL
+      const assistantsToCreate = await handlerWorker.messageThreadRepository.getAssistantsByParentMaid(
+        group.maid,
         botType
       );
 
-      // Create assistants if they don't exist
-      if (existingThreads.length < assistants.length) {
-        console.log(`Creating ${assistants.length - existingThreads.length} assistant(s) for user ${userId}`);
-        
-        // Get assistant group for creating topics
-        const group = await getAssistantGroup();
-        let groupChatId: number | null = null;
-        
-        if (group) {
-          groupChatId = group.chatId;
-        } else {
-          // Fallback to ADMIN_CHAT_ID from env
-          groupChatId = handlerWorker.env.ADMIN_CHAT_ID ? parseInt(handlerWorker.env.ADMIN_CHAT_ID) : null;
-        }
-        
-        if (!groupChatId || Number.isNaN(groupChatId)) {
-          console.error('❌ No assistant group found and ADMIN_CHAT_ID is not configured. Cannot create assistant topics.');
-          await handlerWorker.messageService.sendMessage(
-            chatId,
-            '❌ Assistant group is not configured. Please contact administrator.',
-            existingHuman.id
-          );
-          return;
-        }
-        
-        for (const assistant of assistants) {
-          // Check if this assistant already exists
-          const existingAssistant = existingThreads.find(
-            thread => thread.title === assistant.title
-          );
-          
-          if (existingAssistant) {
-            console.log(`Assistant "${assistant.title}" already exists for user ${userId}`);
-            continue;
-          }
-
-          // Create topic in Telegram with group chatId
-          const topicId = await handlerWorker.topicService.createTopic(assistant.title, 0x6FB9F0, groupChatId);
-          
-          if (!topicId) {
-            console.error(`Failed to create topic for assistant "${assistant.title}"`);
-            continue;
-          }
-
-          // Create message_thread entry
-          try {
-            await handlerWorker.messageThreadRepository.addMessageThread({
-              value: topicId.toString(),
-              dataIn: JSON.stringify(assistant.dataIn),
-              xaid: existingHuman.haid,
-              statusName: 'active',
-              type: assistant.type,
-              title: assistant.title,
-              order: assistants.indexOf(assistant)
-            });
-            
-            console.log(`✅ Assistant "${assistant.title}" created with topic ${topicId}`);
-          } catch (error) {
-            console.error(`Error creating message thread for assistant "${assistant.title}":`, error);
-          }
-        }
-      } else {
-        console.log(`All assistants already exist for user ${userId}`);
+      if (assistantsToCreate.length === 0) {
+        console.log(`No new assistants to create for user ${userId}`);
+        return;
       }
 
-      // Get or create human context
-      // await bot.userContextManager.getOrCreateContext(userId, existingHuman.id);
-      
-      // // Save info about the current message for handlers
-      // await bot.userContextManager.setVariable(userId, '_system.currentMessage', message);
+      console.log(`Found ${assistantsToCreate.length} assistant(s) to create for user ${userId}`);
 
+      // Create topics for each assistant
+      for (const assistant of assistantsToCreate) {
+        if (!assistant.title) {
+          console.error(`Assistant ${assistant.maid} has no title, skipping`);
+          continue;
+        }
+
+        // Create topic in Telegram with group chatId
+        const topicId = await handlerWorker.topicService.createTopic(assistant.title, 0x6FB9F0, groupChatId);
+        
+        if (!topicId) {
+          console.error(`Failed to create topic for assistant "${assistant.title}"`);
+          continue;
+        }
+
+        // Update assistant's value with topicId
+        if (!assistant.id) {
+          console.error(`Assistant ${assistant.maid} has no id, cannot update`);
+          continue;
+        }
+
+        try {
+          await handlerWorker.messageThreadRepository.updateMessageThread(assistant.id, {
+            value: topicId.toString(),
+            xaid: existingHuman.haid
+          });
+          
+          console.log(`✅ Assistant "${assistant.title}" topic ${topicId} created and linked to user ${userId}`);
+        } catch (error) {
+          console.error(`Error updating assistant "${assistant.title}" with topicId:`, error);
+        }
+      }
+
+      console.log(`✅ Completed creating ${assistantsToCreate.length} assistant topic(s) for user ${userId}`);
     },
 
 
