@@ -77,7 +77,7 @@ export class MessageRepository {
             // Find message thread by value (topic_id)
             const messageThread = await this.messageThreadRepository.getMessageThreadByValue(
               topicId.toString(),
-              'leadsgen'
+              'assistent'
             );
             
             if (messageThread && messageThread.maid) {

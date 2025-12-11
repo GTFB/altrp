@@ -567,7 +567,7 @@ await handlerWorker.messageThreadRepository.updateMessageThread(threadId, {
 // Get message thread by value (topic ID)
 const thread = await handlerWorker.messageThreadRepository.getMessageThreadByValue(
   topicId.toString(),
-  'leadsgen'
+  'assistant'
 );
 ```
 

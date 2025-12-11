@@ -35,7 +35,8 @@ export const createCustomHandlers = (worker: BotInterface) => {
     flowEngine: worker['flowEngine'],
     env: worker['env'],
     messageService: worker['messageService'],
-    topicService: worker['topicService']
+    topicService: worker['topicService'],
+    userContextManager: worker['userContextManager']
   };
   
   // Create AI repository (can be created here since we have access to env)
@@ -47,6 +48,50 @@ export const createCustomHandlers = (worker: BotInterface) => {
       TRANSCRIPTION_MODEL: handlerWorker.env.TRANSCRIPTION_MODEL
     }
   });
+  
+  // Get assistant group from message_threads
+  const getAssistantGroup = async () => {
+    try {
+      console.log('🔍 Searching for assistant group in message_threads...');
+      console.log('🔍 messageThreadRepository type:', typeof handlerWorker.messageThreadRepository);
+      console.log('🔍 getParentThreadsByType type:', typeof handlerWorker.messageThreadRepository.getParentThreadsByType);
+      console.log('🔍 messageThreadRepository methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(handlerWorker.messageThreadRepository)));
+      
+      if (!handlerWorker.messageThreadRepository || typeof handlerWorker.messageThreadRepository.getParentThreadsByType !== 'function') {
+        console.error('❌ getParentThreadsByType is not a function on messageThreadRepository');
+        return null;
+      }
+      
+      const groups = await handlerWorker.messageThreadRepository.getParentThreadsByType('assistant');
+      console.log(`📊 Found ${groups?.length || 0} assistant group(s):`, JSON.stringify(groups, null, 2));
+      
+      if (!groups || groups.length === 0) {
+        console.warn('⚠️ No assistant group found in message_threads. Falling back to ADMIN_CHAT_ID from env.');
+        return null;
+      }
+      
+      // Return first group (should be only one)
+      const group = groups[0];
+      console.log('✅ Using assistant group:', JSON.stringify(group, null, 2));
+      
+      if (!group.value) {
+        console.error('❌ Assistant group found but has no value (chat_id)');
+        return null;
+      }
+      
+      const chatId = parseInt(group.value, 10);
+      if (Number.isNaN(chatId)) {
+        console.error(`❌ Invalid chat_id in assistant group: ${group.value}`);
+        return null;
+      }
+      
+      console.log(`✅ Assistant group chat_id: ${chatId}`);
+      return { ...group, chatId };
+    } catch (error) {
+      console.error('❌ Error getting assistant group:', error);
+      return null;
+    }
+  };
   
   return {
     /**
@@ -93,11 +138,14 @@ export const createCustomHandlers = (worker: BotInterface) => {
         return;
       }
 
+      // Get bot type from env (default to 'assistent' for backward compatibility)
+      const botType = handlerWorker.env.BOT_TYPE || 'assistent';
+
       // Define three assistants
       const assistants = [
         {
           title: 'Financial Consultant',
-          type: 'assistent',
+          type: botType,
           dataIn: {
             prompt: "You are a financial consultant with 15 years of experience. Provide clear, professional advice on personal finance, investments, budgeting, and financial planning. Always be helpful, ethical, and encourage users to consult certified financial advisors for major decisions. Keep your answers brief and concise. Format your responses using HTML tags for Telegram only from this list: use <b> for bold, <i> for italics, <u> for underscores, <code> for code, and <a href=\"url\"> for links DO NOT use <br> tag. Respond clearly only to the user's message, taking into account the context, without unnecessary auxiliary information.",
             model: "gemini-2.5-flash",
@@ -106,7 +154,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
         },
         {
           title: 'Nutritionist',
-          type: 'assistent',
+          type: botType,
           dataIn: {
             prompt: "You are a nutritionist and dietitian with extensive knowledge of healthy eating, meal planning, nutritional science, and weight management. Provide evidence-based dietary advice, suggest balanced meal plans, and help users develop healthy eating habits. Always emphasize consultation with healthcare providers for medical conditions. Keep your answers brief and concise. Format your responses using HTML tags for Telegram only from this list: use <b> for bold, <i> for italics, <u> for underscores, <code> for code, and <a href=\"url\"> for links DO NOT use <br> tag. Respond clearly only to the user's message, taking into account the context, without unnecessary auxiliary information.",
             model: "gemini-2.5-flash",
@@ -115,7 +163,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
         },
         {
           title: 'Legal Advisor',
-          type: 'assistent',
+          type: botType,
           dataIn: {
             prompt: "You are a legal advisor providing general legal information and guidance. Help users understand legal concepts, rights, and obligations. Always clarify that your advice is informational only and encourage users to consult licensed attorneys for specific legal representation. Keep your answers brief and concise. Format your responses using HTML tags for Telegram only from this list: use <b> for bold, <i> for italics, <u> for underscores, <code> for code, and <a href=\"url\"> for links DO NOT use <br> tag. Respond clearly only to the user's message, taking into account the context, without unnecessary auxiliary information.",
             model: "gemini-2.5-flash",
@@ -127,12 +175,33 @@ export const createCustomHandlers = (worker: BotInterface) => {
       // Check if assistants already exist for this user
       const existingThreads = await handlerWorker.messageThreadRepository.getMessageThreadsByXaidAndType(
         existingHuman.haid,
-        'assistent'
+        botType
       );
 
       // Create assistants if they don't exist
       if (existingThreads.length < assistants.length) {
         console.log(`Creating ${assistants.length - existingThreads.length} assistant(s) for user ${userId}`);
+        
+        // Get assistant group for creating topics
+        const group = await getAssistantGroup();
+        let groupChatId: number | null = null;
+        
+        if (group) {
+          groupChatId = group.chatId;
+        } else {
+          // Fallback to ADMIN_CHAT_ID from env
+          groupChatId = handlerWorker.env.ADMIN_CHAT_ID ? parseInt(handlerWorker.env.ADMIN_CHAT_ID) : null;
+        }
+        
+        if (!groupChatId || Number.isNaN(groupChatId)) {
+          console.error('❌ No assistant group found and ADMIN_CHAT_ID is not configured. Cannot create assistant topics.');
+          await handlerWorker.messageService.sendMessage(
+            chatId,
+            '❌ Assistant group is not configured. Please contact administrator.',
+            existingHuman.id
+          );
+          return;
+        }
         
         for (const assistant of assistants) {
           // Check if this assistant already exists
@@ -145,8 +214,8 @@ export const createCustomHandlers = (worker: BotInterface) => {
             continue;
           }
 
-          // Create topic in Telegram
-          const topicId = await handlerWorker.topicService.createTopic(assistant.title);
+          // Create topic in Telegram with group chatId
+          const topicId = await handlerWorker.topicService.createTopic(assistant.title, 0x6FB9F0, groupChatId);
           
           if (!topicId) {
             console.error(`Failed to create topic for assistant "${assistant.title}"`);
@@ -188,10 +257,19 @@ export const createCustomHandlers = (worker: BotInterface) => {
      */
     handleAssistantTopicMessage: async (message: any) => {
       try {
-        // Get ADMIN_CHAT_ID from env
-        const adminChatId = parseInt(handlerWorker.env.ADMIN_CHAT_ID || '');
-        if (!adminChatId) {
-          console.error('ADMIN_CHAT_ID is not configured!');
+        // Get assistant group dynamically
+        const group = await getAssistantGroup();
+        let adminChatId: number | null = null;
+        
+        if (group) {
+          adminChatId = group.chatId;
+        } else {
+          // Fallback to ADMIN_CHAT_ID from env
+          adminChatId = handlerWorker.env.ADMIN_CHAT_ID ? parseInt(handlerWorker.env.ADMIN_CHAT_ID) : null;
+        }
+        
+        if (!adminChatId || Number.isNaN(adminChatId)) {
+          console.error('❌ No assistant group found and ADMIN_CHAT_ID is not configured!');
           return;
         }
 
@@ -205,10 +283,13 @@ export const createCustomHandlers = (worker: BotInterface) => {
         const userId = message.from.id;
         console.log(`💬 Processing assistant message from user ${userId} in topic ${topicId}`);
 
-        // Get message_thread (assistant) by topicId and type 'assistent'
+        // Get bot type from env (default to 'assistent' for backward compatibility)
+        const botType = handlerWorker.env.BOT_TYPE || 'assistent';
+        
+        // Get message_thread (assistant) by topicId and type from BOT_TYPE
         const assistant = await handlerWorker.messageThreadRepository.getMessageThreadByValue(
           topicId.toString(),
-          'assistent'
+          botType
         );
 
         if (!assistant) {

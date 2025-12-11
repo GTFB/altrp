@@ -72,6 +72,12 @@ export class FlowEngine {
       return;
     }
 
+    // Exit dialog mode if user is in dialog
+    const handlers = this.customHandlers || {};
+    if (handlers.exitDialogMode) {
+      await handlers.exitDialogMode(telegramId);
+    }
+
     // Automatically enter flow mode when starting any flow
     await this.userContextManager.enterFlowMode(telegramId);
 
@@ -813,6 +819,28 @@ export class FlowEngine {
             await this.goToStepInternal(telegramId, data.nextStepId);
           }
           break;
+
+        case 'handler': {
+          const handlerKey = data.handlerName || data.h;
+          if (handlerKey) {
+            const handler = this.customHandlers[handlerKey];
+            if (handler) {
+              try {
+                await handler(telegramId, this.userContextManager, data);
+              } catch (error) {
+                console.error(`❌ Error in custom handler "${handlerKey}":`, error);
+              }
+            } else {
+              console.error(`❌ Custom handler "${handlerKey}" not found`);
+            }
+          }
+          if (data.nextFlow) {
+            await this.startFlow(telegramId, data.nextFlow);
+          } else if (data.nextStepId) {
+            await this.goToStepInternal(telegramId, data.nextStepId);
+          }
+          break;
+        }
           
         default:
           // Legacy support for old format (saveToVariable)
