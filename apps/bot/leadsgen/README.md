@@ -1,8 +1,15 @@
 # 🤖 Telegram Bot Builder
 
-**A powerful builder for creating Telegram bots with modular architecture on Cloudflare Workers.**
+**A powerful builder for creating Telegram bots with modular architecture.**
 
 This is not just a bot, but a full-featured **bot builder** - a tool that allows bot builders to easily create, configure, and deploy their own bots without deep programming knowledge.
+
+## 🚀 Deployment Options
+
+The bot supports two deployment options:
+
+- **Cloudflare Workers** - Serverless deployment on Cloudflare's edge network (uses D1 Database)
+- **Node.js** - Traditional server deployment with PostgreSQL support (Docker-ready)
 
 ## 🎯 What is this?
 
@@ -19,34 +26,50 @@ This is not just a bot, but a full-featured **bot builder** - a tool that allows
 ### 📁 Project Structure
 
 ```
-/apps/bot
+/apps/bot/leadsgen
 ├── /src
-│   ├── /core                         # System core
+│   ├── /core                         # System core (shared)
+│   │   ├── bot.ts                    # Main bot controller (shared)
+│   │   ├── env.ts                    # Common environment interface
 │   │   ├── flow-engine.ts            # Flow engine
 │   │   ├── message-service.ts        # Message service
+│   │   ├── message-logging-service.ts # Message logging
+│   │   ├── topic-service.ts          # Topic management
 │   │   ├── user-context.ts           # User context
-│   │   └── i18n.ts                   # Internationalization
+│   │   └── bot-interface.ts          # Bot interface
 │   │
 │   ├── /config                       # Configuration (configured by builder)
 │   │   ├── /flows                    # Bot flows (auto-generated)
 │   │   │   ├── index.ts              # Automatically generated
-│   │   │   ├── start_registration.ts
 │   │   │   ├── onboarding.ts
 │   │   │   └── ...                   # Other flows
 │   │   ├── commands.ts               # Bot commands
 │   │   ├── callbacks.ts              # Callback buttons
 │   │   └── handlers.ts               # Logic handlers
 │   │
-│   ├── /worker                       # External services layer
-│   │   ├── bot.ts                    # Main controller
-│   │   ├── d1-storage-service.ts
-│   │   └── kv-storage-service.ts
+│   ├── /repositories                 # Data repositories (shared)
+│   │   ├── HumanRepository.ts
+│   │   ├── MessageRepository.ts
+│   │   └── ...
+│   │
+│   ├── /worker                       # Cloudflare Workers specific
+│   │   ├── worker.ts                 # Worker entry point
+│   │   └── d1-storage-service.ts     # D1 storage service
+│   │
+│   ├── /nodejs                       # Node.js specific
+│   │   ├── server.mjs                # Express server entry point
+│   │   ├── postgres-d1-adapter.ts    # PostgreSQL adapter (D1 API compatible)
+│   │   └── postgres-storage-service.ts
 │   │
 │   └── /scripts                      # Builder tools
-│       └── generate-flows-index.js   # Flow auto-generation
+│       ├── generate-flows-index.js   # Flow auto-generation
+│       └── migrate-postgres.mjs      # PostgreSQL migrations
 │
-├── wrangler.toml                     # Cloudflare configuration
-├── DEPLOYMENT.md                     # Deployment instructions
+├── Dockerfile                         # Docker configuration for Node.js
+├── wrangler.toml                     # Cloudflare Workers configuration
+├── docs/
+│   ├── DEPLOYMENT.md                 # Deployment instructions
+│   └── BOT_BUILDER_GUIDE.md          # Builder guide
 └── README.md                         # This file
 ```
 
@@ -160,18 +183,25 @@ const message = await i18nService.getMessage('welcome_message', 'en');
 ```
 
 ### ✅ **Data storage**
-- **D1 Database** - main database
-- **KV Storage** - cache and sessions
-- **R2 Storage** - files and documents
+- **Cloudflare Workers**: D1 Database (SQLite), KV Storage, R2 Storage
+- **Node.js**: PostgreSQL (via adapter that mimics D1 API)
 
 ## 🛠️ Tech stack
 
+### Cloudflare Workers
 - **Runtime**: Cloudflare Workers (V8 Isolates)
 - **Database**: SQLite (Cloudflare D1)
 - **Cache**: Cloudflare KV
 - **Files**: Cloudflare R2
 - **Language**: TypeScript
 - **Build**: Wrangler CLI
+
+### Node.js
+- **Runtime**: Node.js 20+
+- **Database**: PostgreSQL (with D1 API adapter)
+- **Server**: Express.js
+- **Language**: TypeScript
+- **Deployment**: Docker-ready
 
 ## 📋 Quick start for builders
 
@@ -201,9 +231,27 @@ handleMyCommand: async (message, bot) => {
 ```
 
 ### 4. **Deploy**
+
+#### Cloudflare Workers
 ```bash
 npm run deploy
 ```
+
+#### Node.js with PostgreSQL
+```bash
+# Using Docker
+docker build -t telegram-bot .
+docker run -p 3100:3100 \
+  -e DATABASE_URL=postgresql://user:pass@host:5432/db \
+  -e BOT_TOKEN=your_token \
+  telegram-bot
+
+# Or directly with Node.js
+npm run build:nodejs
+npm run start:nodejs
+```
+
+See [DEPLOYMENT.md](./docs/DEPLOYMENT.md) for detailed instructions.
 
 ## 🎯 Builder advantages
 
@@ -222,9 +270,34 @@ npm run deploy
 
 ## 📚 Documentation
 
-- **[DEPLOYMENT.md](./DEPLOYMENT.md)** - Detailed deployment instructions
+- **[DEPLOYMENT.md](./docs/DEPLOYMENT.md)** - Detailed deployment instructions
+- **[BOT_BUILDER_GUIDE.md](./docs/BOT_BUILDER_GUIDE.md)** - Guide for bot builders
 - **[Flow Architecture](./src/core/flow-types.ts)** - Types and interfaces
 - **[Flow Examples](./src/config/flows/)** - Ready-made examples
+
+## 🔧 Architecture Highlights
+
+### Unified Codebase
+- **Single `bot.ts`** in `core/` - shared between Worker and Node.js versions
+- **Common `Env` interface** - supports both D1Database and PostgresD1Adapter
+- **Shared repositories** - work with both databases via adapter pattern
+
+### Database Adapter Pattern
+The `PostgresD1Adapter` allows PostgreSQL to work with the same API as D1 Database:
+- Automatic SQL syntax conversion (SQLite → PostgreSQL)
+- Placeholder conversion (`?` → `$1, $2, ...`)
+- JSON function conversion (`json_extract` → PostgreSQL JSON operators)
+- Same interface for repositories - no code duplication needed
+
+### Environment Configuration
+```typescript
+// Common interface works for both
+interface Env {
+  DB: D1Database | PostgresD1Adapter; // Unified type
+  BOT_TOKEN: string;
+  // ... other fields
+}
+```
 
 ## 🤝 Contributing
 

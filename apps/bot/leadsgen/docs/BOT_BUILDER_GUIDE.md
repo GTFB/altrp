@@ -25,12 +25,16 @@
 ```bash
 # Clone and install
 git clone <repository>
-cd apps/bot
+cd apps/bot/leadsgen
 npm install
 
-# Configure settings
+# For Cloudflare Workers: Configure settings
 cp wrangler.toml.example wrangler.toml
 # Edit wrangler.toml with your data
+
+# For Node.js: Configure environment
+cp env.example .env
+# Edit .env with your PostgreSQL connection and bot token
 ```
 
 ### 2. Create Your First Bot
@@ -42,7 +46,15 @@ cp wrangler.toml.example wrangler.toml
 npm run generate-flows-index
 
 # 5. Deploy the bot
+# For Cloudflare Workers:
 npm run deploy
+
+# For Node.js:
+npm run build:nodejs
+npm run start:nodejs
+# Or use Docker:
+docker build -t telegram-bot .
+docker run -p 3100:3100 -e DATABASE_URL=... -e BOT_TOKEN=... telegram-bot
 ```
 
 ## 🏗️ Architecture Overview
@@ -59,6 +71,8 @@ The bot builder follows a **modular architecture** with clear separation of conc
 
 2. **Core Services** (`src/core/`)
    - Business logic and orchestration
+   - `bot.ts`: Main bot controller (shared between Worker and Node.js)
+   - `env.ts`: Common environment interface
    - `FlowEngine`: Manages conversational flows
    - `MessageService`: Sends messages to Telegram
    - `MessageLoggingService`: Logs all messages to database
@@ -85,14 +99,15 @@ Services and repositories are injected through the `BotInterface`:
 
 ```typescript
 export interface BotInterface {
-  d1Storage: D1StorageService;           // Generic database executor
+  d1Storage: D1StorageService;           // Generic database executor (works with D1 or PostgreSQL)
   humanRepository: HumanRepository;      // Humans table operations
   messageRepository: MessageRepository;  // Messages table operations
   messageThreadRepository: MessageThreadRepository; // Message threads operations
   flowEngine: FlowEngine;                 // Flow orchestration
-  env: Env;                               // Environment variables
+  env: Env;                               // Environment variables (supports both D1Database and PostgresD1Adapter)
   messageService: MessageService;         // Message sending
   topicService: TopicService;             // Topic management
+  userContextManager: UserContextManager;  // User context management
 }
 ```
 
@@ -101,18 +116,19 @@ All handlers receive this interface and can access any service or repository.
 ## 📁 Project Structure
 
 ```
-/apps/bot/src/
+/apps/bot/leadsgen/src/
 ├── /config/                    # Bot configuration (configured by builder)
 │   ├── commands.ts             # Bot commands (/start, /help, etc.)
 │   ├── callbacks.ts            # Buttons and keyboards
 │   ├── handlers.ts             # Business logic and handlers
 │   └── flows/                  # Bot flows (dialogs)
 │       ├── index.ts           # Auto-generated
-│       ├── start_registration.ts
 │       ├── onboarding.ts
 │       └── ...
 │
-├── /core/                      # System core (business logic)
+├── /core/                      # System core (shared between Worker and Node.js)
+│   ├── bot.ts                  # Main bot controller (shared)
+│   ├── env.ts                  # Common environment interface
 │   ├── flow-engine.ts          # Flow orchestration engine
 │   ├── message-service.ts      # Message sending service
 │   ├── message-logging-service.ts # Message logging service
@@ -120,7 +136,7 @@ All handlers receive this interface and can access any service or repository.
 │   ├── user-context.ts         # User context and state management
 │   └── bot-interface.ts       # Interface for dependency injection
 │
-├── /repositories/              # Database repositories (one per table)
+├── /repositories/              # Database repositories (shared, work with both D1 and PostgreSQL)
 │   ├── HumanRepository.ts      # Humans table operations
 │   ├── MessageRepository.ts    # Messages table operations
 │   ├── MessageThreadRepository.ts # Message threads operations
@@ -135,10 +151,14 @@ All handlers receive this interface and can access any service or repository.
 │   ├── generateUuidV4.ts       # Generate UUIDs
 │   └── getMessageType.ts       # Message type detection
 │
-└── /worker/                     # Worker layer
-    ├── bot.ts                  # Main bot controller
-    ├── worker.ts               # Cloudflare Worker entry point
-    └── d1-storage-service.ts   # Generic database executor
+├── /worker/                     # Cloudflare Workers specific
+│   ├── worker.ts               # Cloudflare Worker entry point
+│   └── d1-storage-service.ts   # Generic database executor (works with D1 or PostgreSQL adapter)
+│
+└── /nodejs/                     # Node.js specific
+    ├── server.mjs              # Express server entry point
+    ├── postgres-d1-adapter.ts   # PostgreSQL adapter (mimics D1Database API)
+    └── postgres-storage-service.ts # PostgreSQL storage service
 ```
 
 ## 🎯 Creating Commands
@@ -977,7 +997,9 @@ await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {...});
 
 ## 🔧 Deployment
 
-### 1. Configure wrangler.toml
+### Cloudflare Workers Deployment
+
+#### 1. Configure wrangler.toml
 
 ```toml
 name = "my-bot"
@@ -996,7 +1018,7 @@ binding = "BOT_STORAGE"
 bucket_name = "my-bot-storage"
 ```
 
-### 2. Set secrets
+#### 2. Set secrets
 
 ```bash
 # Bot token
@@ -1011,7 +1033,7 @@ wrangler secret put AI_API_TOKEN
 wrangler secret put TRANSCRIPTION_MODEL
 ```
 
-### 3. Deploy
+#### 3. Deploy
 
 ```bash
 # Generate flows
@@ -1021,7 +1043,7 @@ npm run generate-flows-index
 npm run deploy
 ```
 
-### 4. Configure webhook
+#### 4. Configure webhook
 
 ```bash
 # After deployment
@@ -1029,6 +1051,67 @@ curl -X POST "https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook" \
   -H "Content-Type: application/json" \
   -d '{"url": "https://your-worker.your-subdomain.workers.dev"}'
 ```
+
+### Node.js Deployment with PostgreSQL
+
+#### 1. Configure environment
+
+```bash
+# Copy example environment file
+cp env.example .env
+
+# Edit .env with your settings:
+# DATABASE_URL=postgresql://user:password@host:5432/database
+# BOT_TOKEN=your_bot_token
+# ADMIN_CHAT_ID=your_admin_chat_id
+# PORT=3100
+```
+
+#### 2. Run migrations
+
+```bash
+# Migrations run automatically on container start
+# Or manually:
+npm run migrate:postgres
+```
+
+#### 3. Build and run
+
+```bash
+# Build TypeScript
+npm run build:nodejs
+
+# Run directly
+npm run start:nodejs
+
+# Or use Docker
+docker build -t telegram-bot .
+docker run -p 3100:3100 \
+  -e DATABASE_URL=postgresql://user:pass@host:5432/db \
+  -e BOT_TOKEN=your_token \
+  -e ADMIN_CHAT_ID=your_chat_id \
+  telegram-bot
+```
+
+#### 4. Configure webhook
+
+```bash
+# After deployment
+curl -X POST "https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook" \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://your-domain.com/"}'
+```
+
+### Database Adapter Pattern
+
+The bot uses a **unified codebase** that works with both D1 Database (Cloudflare Workers) and PostgreSQL (Node.js):
+
+- **Repositories** work with both databases via adapter pattern
+- **PostgresD1Adapter** automatically converts SQLite syntax to PostgreSQL
+- **No code duplication** - same repositories work for both
+- **D1StorageService** accepts both `D1Database` and `PostgresD1Adapter`
+
+See [README.md](./README.md) for more details on the architecture.
 
 ## 📚 Example Bots
 
@@ -1061,7 +1144,26 @@ curl -X POST "https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook" \
 
 **🎉 Ready! You can now create powerful Telegram bots with our builder!**
 
+## 📚 Additional Resources
+
 For help, refer to:
-- [README.md](./README.md) - general information
-- [DEPLOYMENT.md](./DEPLOYMENT.md) - deployment
-- [Flow examples](./src/config/flows/) - ready examples
+- [README.md](../README.md) - general information and architecture
+- [DEPLOYMENT.md](./DEPLOYMENT.md) - detailed deployment instructions
+- [Flow examples](../src/config/flows/) - ready-made flow examples
+
+## 🔑 Key Architecture Points
+
+### Unified Codebase
+- **Single `bot.ts`** in `core/` - shared between Worker and Node.js
+- **Common `Env` interface** - `DB: D1Database | PostgresD1Adapter`
+- **Shared repositories** - work with both databases via adapter
+
+### Database Compatibility
+- Repositories use D1 API: `db.prepare().bind().run()/.all()/.first()`
+- `PostgresD1Adapter` converts SQLite syntax to PostgreSQL automatically
+- No code changes needed when switching between databases
+
+### Deployment Flexibility
+- **Cloudflare Workers**: Serverless, uses D1 Database
+- **Node.js**: Traditional server, uses PostgreSQL
+- Same codebase, different deployment targets
