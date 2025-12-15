@@ -1,4 +1,4 @@
-import type { D1Database, R2Bucket } from '@cloudflare/workers-types';
+import type { D1Database } from '@cloudflare/workers-types';
 import type { PostgresD1Adapter } from '../nodejs/postgres-d1-adapter';
 
 /**
@@ -7,11 +7,8 @@ import type { PostgresD1Adapter } from '../nodejs/postgres-d1-adapter';
  */
 export interface Env {
   DB: D1Database | PostgresD1Adapter;
-  BOT_STORAGE?: R2Bucket; // Optional, only for Workers
   BOT_TOKEN: string;
-  ADMIN_CHAT_ID?: string;
   BOT_TYPE?: string;
-  TRANSCRIPTION_API_TOKEN?: string;
   NODE_ENV?: string;
   LOCALE?: string;
   AI_API_URL?: string;

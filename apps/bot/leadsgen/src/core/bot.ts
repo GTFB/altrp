@@ -87,7 +87,6 @@ export class TelegramBotWorker {
   //private sessionService: SessionService;
   private userContextManager: UserContextManager;
   private flowEngine: FlowEngine;
-  private defaultAdminChatId?: number;
   private cachedAdminChatIds: number[] | null = null;
   //private i18nService: I18nService;
 
@@ -95,10 +94,6 @@ export class TelegramBotWorker {
   constructor(env: Env) {
     this.env = env;
     this.botType = env.BOT_TYPE || '';
-    this.defaultAdminChatId = env.ADMIN_CHAT_ID ? parseInt(env.ADMIN_CHAT_ID) : undefined;
-    if (typeof this.defaultAdminChatId === 'number' && Number.isNaN(this.defaultAdminChatId)) {
-      this.defaultAdminChatId = undefined;
-    }
     //this.kvStorage = kvStorage;
     this.d1Storage = new D1StorageService(env.DB);
     
@@ -135,7 +130,8 @@ export class TelegramBotWorker {
     });
     this.topicService = new TopicService({
       botToken: env.BOT_TOKEN,
-      adminChatId: this.defaultAdminChatId,
+      // Admin chat will be resolved dynamically via message_threads; no static ADMIN_CHAT_ID
+      adminChatId: undefined,
       messageService: this.messageService,
       messageLoggingService: this.messageLoggingService
     });
@@ -152,7 +148,7 @@ export class TelegramBotWorker {
       this.messageService,
       //this.i18nService,
       {}, // Empty handlers object for now
-      this.defaultAdminChatId // Pass admin chat ID for topic flows
+      undefined // Admin chat ID for topic flows will be passed explicitly where needed
     );
     
     // Теперь создаем обработчики с доступом к flowEngine
@@ -232,70 +228,6 @@ export class TelegramBotWorker {
       console.error('Error processing update:', error);
     }
   }
-
-  // private async processMessage(message: TelegramMessage): Promise<void> {
-  //   const userId = message.from.id;
-  //   const chatId = message.chat.id;
-  //   const adminChatId = parseInt(this.env.ADMIN_CHAT_ID);
-
-  //   console.log(`Processing message from user ${userId} in chat ${chatId}`);
-  //   console.log(`Admin chat ID (hardcoded): ${adminChatId}`);
-  //   console.log(`Message thread ID: ${(message as any).message_thread_id}`);
-
-  //   // First process commands (including in topics)
-  //   if (message.text?.startsWith('/')) {
-  //     await this.handleCommand(message);
-  //     return;
-  //   }
-
-  //   // Check if message came to admin group (topic)
-  //   if (chatId === adminChatId && (message as any).message_thread_id) {
-  //     const topicId = (message as any).message_thread_id;
-  //     console.log(`✅ Entering topic handling block, topicId: ${topicId}`);
-      
-  //     // Check if this is a consultant topic
-  //     try {
-  //       const consultantThread = await this.d1Storage.execute(`
-  //         SELECT id 
-  //         FROM message_threads 
-  //         WHERE value = ? AND type = 'consultant' AND deleted_at IS NULL
-  //         LIMIT 1
-  //       `, [topicId.toString()]);
-
-  //       if (consultantThread && consultantThread.length > 0) {
-  //         // This is a consultant topic - handle with AI
-  //         console.log(`Processing message in consultant topic ${topicId}`);
-          
-  //         //if (message.text) {
-  //           // Get handlers and call handleConsultantTopicMessage
-  //           const handlers = this.flowEngine['customHandlers'] || {};
-  //           if (handlers.handleConsultantTopicMessage) {
-  //             await handlers.handleConsultantTopicMessage(message);
-  //           }
-  //         //}
-  //         return;
-  //       }
-  //     } catch (error) {
-  //       console.error('Error checking consultant topic:', error);
-  //     }
-
-  //     // Try to handle as user topic (old bot logic)
-  //     // Wrapped in try-catch to handle missing users table gracefully
-  //     try {
-  //       await this.topicService.handleMessageFromTopic(
-  //         message, 
-  //         this.d1Storage.getUserIdByTopic.bind(this.d1Storage),
-  //         this.getDbUserId.bind(this)
-  //       );
-  //     } catch (error) {
-  //       console.log(`Message in topic ${topicId} is not a user or consultant topic, ignoring`);
-  //     }
-  //     return;
-  //   }
-
-  //   // Skip all user-related logic for consultant bot
-  //   // Consultant bot only handles messages in topics
-  // }
 
   private async processMessage(message: TelegramMessage): Promise<void> {
     const userId = message.from.id;
@@ -561,9 +493,6 @@ export class TelegramBotWorker {
     }
 
     const ids = new Set<number>();
-    if (typeof this.defaultAdminChatId === 'number' && !Number.isNaN(this.defaultAdminChatId)) {
-      ids.add(this.defaultAdminChatId);
-    }
 
     try {
       const parentThreads = await this.messageThreadRepository.getParentThreadsByType(this.botType);

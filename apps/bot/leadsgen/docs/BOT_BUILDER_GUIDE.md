@@ -355,8 +355,7 @@ export const keyboards = {
   language_selection: {
     inline_keyboard: [
       [
-        { text: "🇷🇸 Srpski", callback_data: "lang_select_sr" },
-        { text: "🇷🇺 Русский", callback_data: "lang_select_ru" }
+        { text: "🇬🇧 English", callback_data: "lang_select_en" }
       ]
     ]
   }
@@ -369,16 +368,10 @@ export const keyboards = {
 // apps/bot/src/config/callbacks.ts
 export const callbackActions = {
   // Language selection handling
-  'lang_select_sr': {
+  'lang_select_en': {
     action: 'set_variable',
     variable: 'user.language',
-    value: 'sr',
-    nextFlow: 'onboarding'
-  },
-  'lang_select_ru': {
-    action: 'set_variable',
-    variable: 'user.language',
-    value: 'ru',
+    value: 'en',
     nextFlow: 'onboarding'
   },
 
@@ -1012,7 +1005,7 @@ binding = "DB"
 database_name = "my-bot-db"
 database_id = "your-database-id"
 
-# R2 Storage (optional)
+# R2 Storage (optional, used only in your custom extensions)
 [[r2_buckets]]
 binding = "BOT_STORAGE"
 bucket_name = "my-bot-storage"
@@ -1023,9 +1016,6 @@ bucket_name = "my-bot-storage"
 ```bash
 # Bot token
 wrangler secret put BOT_TOKEN
-
-# Admin chat ID
-wrangler secret put ADMIN_CHAT_ID
 
 # AI API (if using AI features)
 wrangler secret put AI_API_URL
@@ -1063,7 +1053,6 @@ cp env.example .env
 # Edit .env with your settings:
 # DATABASE_URL=postgresql://user:password@host:5432/database
 # BOT_TOKEN=your_bot_token
-# ADMIN_CHAT_ID=your_admin_chat_id
 # PORT=3100
 ```
 
@@ -1089,7 +1078,6 @@ docker build -t telegram-bot .
 docker run -p 3100:3100 \
   -e DATABASE_URL=postgresql://user:pass@host:5432/db \
   -e BOT_TOKEN=your_token \
-  -e ADMIN_CHAT_ID=your_chat_id \
   telegram-bot
 ```
 

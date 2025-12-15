@@ -146,45 +146,18 @@ npx wrangler r2 bucket create YOUR_BUCKET_NAME
 npx wrangler r2 bucket create my-bot-storage
 ```
 
-### 4.2 Configure in wrangler.toml
+### 4.2 Configure in wrangler.toml (optional)
 
-Add R2 configuration to your `wrangler.toml`:
+If you plan to use R2 storage in your own extensions, add configuration to your `wrangler.toml`:
 
 ```toml
-# R2 Storage
 [[r2_buckets]]
 binding = "BOT_STORAGE"
 bucket_name = "YOUR_BUCKET_NAME"
 ```
 
-**Example:**
-```toml
-# R2 Storage
-[[r2_buckets]]
-binding = "BOT_STORAGE"
-bucket_name = "my-bot-storage"
-```
-
-### 4.3 R2 Storage Features
-
-- **Store user files** (photos, documents, audio)
-- **Generate PDF documents** (invoices, contracts)
-- **Create backups** of the database
-- **Cache** generated files
-- **Static resources** (templates, images)
-
-### 4.4 Usage in code
-
-```typescript
-// Save a file
-await env.BOT_STORAGE.put(`users/${userId}/file.pdf`, fileData);
-
-// Get a file
-const file = await env.BOT_STORAGE.get(`users/${userId}/file.pdf`);
-
-// Create a public link
-const publicUrl = `https://pub-${bucketId}.r2.dev/users/${userId}/file.pdf`;
-```
+> **Note:** `BOT_STORAGE` is not used in the current version of the bot.  
+> You can configure and use it in your own code if you need R2 storage.
 
 ## 📦 Step 5: Install dependencies
 
@@ -205,33 +178,13 @@ Set the necessary secrets for the bot:
 ```bash
 # Bot token from @BotFather
 npx wrangler secret put BOT_TOKEN
-
-# Admin chat ID (where the bot will send notifications)
-npx wrangler secret put ADMIN_CHAT_ID
-
-# API token for transcription (optional)
-npx wrangler secret put TRANSCRIPTION_API_TOKEN
 ```
 
 ## Or access through the web interface: Compute (Workers) -> "YOUR_WORKER_NAME" -> Settings -> Variables and Secrets -> +Add
 
-Type: Secret
-Variable name: BOT_TOKEN
-Value: <YOUR_BOT_TOKEN>
-
-## and
-
-Type: Secret
-Variable name: ADMIN_CHAT_ID
-Value: <YOUR_ADMIN_CHAT_ID>
-
-**How to get ADMIN_CHAT_ID:**
-1. Add the bot to a group/channel
-2. Send a message in the group
-3. Change the group type to a topic-based group
-4. Grant the bot administrator rights
-5. Go to the link: `https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates`
-6. Find `chat.id` in the response
+Type: Secret  
+Variable name: BOT_TOKEN  
+Value: `<YOUR_BOT_TOKEN>`
 
 
 

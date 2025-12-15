@@ -123,20 +123,15 @@ export const createCustomHandlers = (worker: BotInterface) => {
       const group = await handlerWorker.messageThreadRepository.getAdminGroup(handlerWorker.env.BOT_TYPE || 'leadsgen');
       let groupChatId: number | null = null;
       
-      // Fallback to ADMIN_CHAT_ID from env if group not found
+      // If no admin group configured in message_threads — fail with config error
       if (!group) {
-        console.warn('⚠️ Using ADMIN_CHAT_ID from env as fallback');
-        const envAdminChatId = handlerWorker.env.ADMIN_CHAT_ID ? parseInt(handlerWorker.env.ADMIN_CHAT_ID) : null;
-        if (!envAdminChatId || Number.isNaN(envAdminChatId)) {
-          console.error('❌ No leadsgen group found and ADMIN_CHAT_ID is not set');
-          await handlerWorker.messageService.sendMessage(
-            chatId,
-            '❌ Configuration error: group not found. Please contact administrator.',
-            null
-          );
-          return;
-        }
-        groupChatId = envAdminChatId;
+        console.error('❌ No admin group found in message_threads for BOT_TYPE. Please configure message_threads.');
+        await handlerWorker.messageService.sendMessage(
+          chatId,
+          '❌ Configuration error: admin group not found. Please contact administrator.',
+          null
+        );
+        return;
       } else {
         groupChatId = group.chatId;
         console.log(`✅ Found leadsgen group: ${group.title} (chat_id: ${groupChatId})`);
@@ -294,13 +289,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
     handleEnableAICommand: async (message: any, bot: any) => {
       const userId = message.from.id;
       const chatId = message.chat.id;
-      const adminChatId = parseInt(handlerWorker.env.ADMIN_CHAT_ID);
-
-      // Check if command is executed in admin group
-      if (chatId !== adminChatId) {
-        console.log(`/enable_ai command ignored - not in admin group`);
-        return;
-      }
+      const adminChatId = chatId;
 
       // Check if command is executed in a topic
       const topicId = (message as any).message_thread_id;
@@ -379,13 +368,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
     handleDisableAICommand: async (message: any, bot: any) => {
       const userId = message.from.id;
       const chatId = message.chat.id;
-      const adminChatId = parseInt(handlerWorker.env.ADMIN_CHAT_ID);
-
-      // Check if command is executed in admin group
-      if (chatId !== adminChatId) {
-        console.log(`/disable_ai command ignored - not in admin group`);
-        return;
-      }
+      const adminChatId = chatId;
 
       // Check if command is executed in a topic
       const topicId = (message as any).message_thread_id;
@@ -482,13 +465,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
     handleSetStatusCommand: async (message: any, bot: any) => {
       const userId = message.from.id;
       const chatId = message.chat.id;
-      const adminChatId = parseInt(handlerWorker.env.ADMIN_CHAT_ID);
-
-      // Check if command is executed in admin group
-      if (chatId !== adminChatId) {
-        console.log(`/set_status command ignored - not in admin group`);
-        return;
-      }
+      const adminChatId = chatId;
 
       // Check if command is executed in a topic
       const topicId = (message as any).message_thread_id;
@@ -632,19 +609,16 @@ export const createCustomHandlers = (worker: BotInterface) => {
      */
     handleAssistantTopicMessage: async (message: any) => {
       try {
-        // Get admin group from message_threads (fallback to ADMIN_CHAT_ID from env)
+        // Get admin group from message_threads
         const group = await handlerWorker.messageThreadRepository.getAdminGroup(handlerWorker.env.BOT_TYPE || 'leadsgen');
         let adminChatId: number | null = null;
         
         if (group) {
           adminChatId = group.chatId;
-        } else {
-          // Fallback to ADMIN_CHAT_ID from env
-          adminChatId = handlerWorker.env.ADMIN_CHAT_ID ? parseInt(handlerWorker.env.ADMIN_CHAT_ID) : null;
         }
         
         if (!adminChatId || Number.isNaN(adminChatId)) {
-          console.error('❌ No leadsgen group found and ADMIN_CHAT_ID is not configured!');
+          console.error('❌ No admin group found in message_threads for BOT_TYPE. Please configure message_threads.');
           return;
         }
 
