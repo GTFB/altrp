@@ -1,6 +1,6 @@
 import { MessageService } from './message-service';
 import { MessageLoggingService } from './message-logging-service';
-import type { TelegramMessage, TelegramUser } from '../worker/bot';
+import type { TelegramMessage, TelegramUser } from './bot';
 
 export interface TopicServiceConfig {
   botToken: string;

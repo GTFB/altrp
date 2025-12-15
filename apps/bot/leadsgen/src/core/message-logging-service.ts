@@ -1,5 +1,5 @@
 import { D1StorageService } from '../worker/d1-storage-service';
-import type { TelegramMessage, TelegramCallbackQuery } from '../worker/bot';
+import type { TelegramMessage, TelegramCallbackQuery } from './bot';
 import { getMessageType } from '../helpers/getMessageType';
 import { generateUuidV4 } from '../helpers/generateUuidV4';
 import { generateAid } from '../helpers/generateAid';

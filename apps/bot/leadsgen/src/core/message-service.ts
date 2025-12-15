@@ -1,4 +1,4 @@
-import type { TelegramMessage, TelegramCallbackQuery } from '../worker/bot';
+import type { TelegramMessage, TelegramCallbackQuery } from './bot';
 import { MessageLoggingService } from './message-logging-service';
 
 export interface MessageServiceConfig {
