@@ -5,6 +5,12 @@ export const startConversationFlow: BotFlow = {
   description: 'Start conversation message',
   steps: [
     {
+      type: 'forwarding_control',
+      id: 'enable_forwarding',
+      action: 'enable',
+      nextStepId: 'show_message',
+    },
+    {
       type: 'message',
       id: 'show_message',
       text: 'Write your question.',

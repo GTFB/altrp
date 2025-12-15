@@ -80,6 +80,8 @@ export class FlowEngine {
 
     // Automatically enter flow mode when starting any flow
     await this.userContextManager.enterFlowMode(telegramId);
+    // When any flow starts, disable message forwarding so user talks only with flow
+    await this.userContextManager.disableMessageForwarding(telegramId);
 
     await this.userContextManager.updateContext(telegramId, {
       currentFlow: flowName,

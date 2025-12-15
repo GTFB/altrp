@@ -300,7 +300,6 @@ export class TelegramBotWorker {
   private async processMessage(message: TelegramMessage): Promise<void> {
     const userId = message.from.id;
     const chatId = message.chat.id;
-    const isAdminChat = await this.isAdminChat(chatId);
 
     console.log(`Processing message from user ${userId} in chat ${chatId}`);
 
@@ -310,26 +309,39 @@ export class TelegramBotWorker {
       return;
     }
 
-    // Check if message came to admin group (topic)
-    if (isAdminChat && (message as any).message_thread_id) {
-      const topicId = (message as any).message_thread_id;
-      
-      // Check if admin is in topic flow mode
-      const adminContext = await this.userContextManager.getContext(userId);
-      if (adminContext && adminContext.flowInTopic && adminContext.topicId === topicId && message.text) {
-        // Admin is managing flow in this topic - process through FlowEngine
-        console.log(`🎯 Admin ${userId} is in topic flow mode, processing message through FlowEngine`);
-        await this.flowEngine.handleTopicMessage(userId, message.text);
+    // Check if message came to a topic (message_thread_id present)
+    const topicId = (message as any).message_thread_id as number | undefined;
+    if (topicId) {
+      // Try to resolve user (Telegram ID) linked to this topic
+      const targetUserId = await this.resolveHumanTelegramIdByTopic(topicId);
+
+      if (targetUserId) {
+        // Check if admin is in topic flow mode (for admin flows in topic)
+        const adminContext = await this.userContextManager.getContext(userId);
+        if (adminContext && adminContext.flowInTopic && adminContext.topicId === topicId && message.text) {
+          console.log(`🎯 Admin ${userId} is in topic flow mode, processing message through FlowEngine`);
+          await this.flowEngine.handleTopicMessage(userId, message.text);
+          return;
+        }
+
+        // Check if message forwarding is enabled for this user
+        const forwardingEnabled = await this.userContextManager.isMessageForwardingEnabled(targetUserId);
+        if (!forwardingEnabled) {
+          console.log(`📪 Message forwarding disabled for user ${targetUserId} - not forwarding from topic`);
+          return;
+        }
+
+        // Forward message from topic to user using TopicService
+        await this.topicService.handleMessageFromTopic(
+          message,
+          async () => targetUserId,
+          this.getDbUserId.bind(this)
+        );
         return;
       }
-      
-      // Otherwise, forward message to human (normal topic behavior)
-      await this.topicService.handleMessageFromTopic(
-        message, 
-        this.resolveHumanTelegramIdByTopic.bind(this),
-        this.getDbUserId.bind(this)
-      );
-      return;
+
+      console.log(`📭 No user linked to topic ${topicId}, skipping topic-to-user forwarding`);
+      // Fall through to regular processing (logging, flows, etc.)
     }
 
     // Get dbHumanId for logging

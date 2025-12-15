@@ -68,7 +68,8 @@ export class UserContextManager {
         currentStep: savedData.currentStep || 0,
         data: savedData.data || {},
         stepHistory: savedData.stepHistory || [],
-        messageForwardingEnabled: savedData.messageForwardingEnabled ?? true,
+        // Forwarding is disabled by default unless explicitly enabled
+        messageForwardingEnabled: savedData.messageForwardingEnabled ?? false,
         flowMode: savedData.flowMode ?? false,
         flowInTopic: savedData.flowInTopic ?? false,
         topicId: savedData.topicId ?? null,
@@ -98,7 +99,8 @@ export class UserContextManager {
       currentStep: 0,
       data: {},
       stepHistory: [],
-      messageForwardingEnabled: true, // Enabled by default
+      // By default forwarding is disabled until explicitly enabled by flow/button
+      messageForwardingEnabled: false,
       flowMode: false, // By default not in flow
       flowInTopic: false, // By default not in topic flow
       topicId: null,
@@ -168,7 +170,7 @@ export class UserContextManager {
 
   async isMessageForwardingEnabled(telegramId: number): Promise<boolean> {
     const context = await this.getContext(telegramId);
-    const enabled = context?.messageForwardingEnabled ?? true;
+    const enabled = context?.messageForwardingEnabled ?? false;
     console.log(`📋 Message forwarding for user ${telegramId}: ${enabled ? 'ENABLED' : 'DISABLED'}`);
     return enabled;
   }
@@ -178,8 +180,7 @@ export class UserContextManager {
     const context = await this.getContext(telegramId);
     if (context) {
       context.flowMode = true;
-      context.messageForwardingEnabled = false; // Automatically disable forwarding
-      console.log(`🎯 User ${telegramId} ENTERED flow mode (forwarding auto-disabled)`);
+      console.log(`🎯 User ${telegramId} ENTERED flow mode`);
       await this.saveContextToDatabase(context);
     }
   }
@@ -188,8 +189,7 @@ export class UserContextManager {
     const context = await this.getContext(telegramId);
     if (context) {
       context.flowMode = false;
-      context.messageForwardingEnabled = true; // Automatically enable forwarding back
-      console.log(`🏁 User ${telegramId} EXITED flow mode (forwarding auto-enabled)`);
+      console.log(`🏁 User ${telegramId} EXITED flow mode`);
       await this.saveContextToDatabase(context);
     }
   }
