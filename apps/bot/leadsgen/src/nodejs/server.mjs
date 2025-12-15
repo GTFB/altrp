@@ -64,17 +64,17 @@ if (!process.env.BOT_TOKEN) {
   process.exit(1);
 }
 
-if (!process.env.ADMIN_CHAT_ID) {
-  console.error('❌ ADMIN_CHAT_ID not set');
-  process.exit(1);
-}
+// if (!process.env.ADMIN_CHAT_ID) {
+//   console.error('❌ ADMIN_CHAT_ID not set');
+//   process.exit(1);
+// }
 
 // Create environment object compatible with TelegramBotWorker
 const env = {
   DB: dbAdapter, // PostgreSQL adapter that mimics D1Database
   BOT_TOKEN: process.env.BOT_TOKEN,
-  ADMIN_CHAT_ID: process.env.ADMIN_CHAT_ID,
-  TRANSCRIPTION_API_TOKEN: process.env.TRANSCRIPTION_API_TOKEN || '',
+  //ADMIN_CHAT_ID: process.env.ADMIN_CHAT_ID,
+  //TRANSCRIPTION_API_TOKEN: process.env.TRANSCRIPTION_API_TOKEN || '',
   NODE_ENV: process.env.NODE_ENV || 'production',
   LOCALE: process.env.LOCALE || 'ru',
   AI_API_URL: process.env.AI_API_URL || '',
@@ -84,8 +84,8 @@ const env = {
 // Import bot worker (will be compiled from TypeScript)
 let TelegramBotWorker;
 const workerCandidates = [
-  '../../dist/nodejs/worker/bot.js',
-  '../../dist/nodejs/nodejs/worker/bot.js',
+  '../../dist/nodejs/core/bot.js',
+  '../../dist/nodejs/nodejs/core/bot.js',
 ];
 for (const candidate of workerCandidates) {
   try {

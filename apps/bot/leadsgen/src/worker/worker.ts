@@ -1,20 +1,16 @@
-import { TelegramBotWorker } from './bot';
+import { TelegramBotWorker } from '../core/bot';
 //import { KVStorageService } from './kv-storage-service';
 //import type { KVNamespace, D1Database, R2Bucket, ExecutionContext } from '@cloudflare/workers-types';
 import type { D1Database, R2Bucket, ExecutionContext } from '@cloudflare/workers-types';
+import type { Env } from '../core/env';
 
-export interface Env {
-  //BZN_BOT_KV: KVNamespace;
-  DB: D1Database;
-  BOT_STORAGE: R2Bucket;
-  BOT_TOKEN: string;
-  ADMIN_CHAT_ID?: string;
-  BOT_TYPE?: string;
-  TRANSCRIPTION_API_TOKEN: string;
-  NODE_ENV: string;
-  LOCALE: string;
-  AI_API_URL: string;
-  AI_API_TOKEN: string;
+/**
+ * Worker-specific environment interface
+ * Extends common Env with Worker-specific required fields
+ */
+export interface WorkerEnv extends Env {
+  DB: D1Database; // For Worker always D1Database
+  BOT_STORAGE: R2Bucket; // Required for Worker
 }
 
 export interface ScheduledEvent {
@@ -24,7 +20,7 @@ export interface ScheduledEvent {
 }
 
 export default {
-  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+  async fetch(request: Request, env: WorkerEnv, ctx: ExecutionContext): Promise<Response> {
     try {
       // Initialize services
       //const storageService = new KVStorageService(env.BZN_BOT_KV);
@@ -41,7 +37,7 @@ export default {
     }
   },
 
-  async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
+  async scheduled(event: ScheduledEvent, env: WorkerEnv, ctx: ExecutionContext): Promise<void> {
     try {
       console.log('Cron triggered:', event.cron);
       

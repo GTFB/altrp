@@ -1,9 +1,10 @@
-import { D1Database } from '@cloudflare/workers-types';
+import type { D1Database } from '@cloudflare/workers-types';
+import type { PostgresD1Adapter } from '../nodejs/postgres-d1-adapter';
 
 export class D1StorageService {
-  private db: D1Database;
+  private db: D1Database | PostgresD1Adapter;
 
-  constructor(db: D1Database) {
+  constructor(db: D1Database | PostgresD1Adapter) {
     this.db = db;
   }
 

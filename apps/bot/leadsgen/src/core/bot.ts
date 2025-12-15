@@ -1,10 +1,10 @@
-import type { Env } from './worker';
+import type { Env } from './env';
 import { HumanRepository } from '../repositories/HumanRepository';
 import { MessageRepository } from '../repositories/MessageRepository';
 import { MessageThreadRepository } from '../repositories/MessageThreadRepository';
 import { FlowEngine } from '../core/flow-engine';
 import { TopicService } from '../core/topic-service';
-import { D1StorageService } from './d1-storage-service';
+import { D1StorageService } from '../worker/d1-storage-service';
 import { MessageService } from '../core/message-service';
 import { createCustomHandlers } from '../config/handlers';
 import { commands, findCommand } from '../config/commands';
