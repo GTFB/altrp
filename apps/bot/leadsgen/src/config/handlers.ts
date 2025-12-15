@@ -979,29 +979,30 @@ export const createCustomHandlers = (worker: BotInterface) => {
 
       // Save AI response to database using MessageRepository
       // Use consultantMaid in maid field to link messages with message_threads
-      try {
-        if (!human.id) {
-          throw new Error(`Human ${chatId} has no id`);
-        }
+      // COMMENTED: Manual logging removed - now using unified MessageLoggingService via sendMessage
+      // try {
+      //   if (!human.id) {
+      //     throw new Error(`Human ${chatId} has no id`);
+      //   }
 
-        await handlerWorker.messageRepository.addMessage({
-          humanId: human.id,
-          messageType: 'bot_text',
-          direction: 'outgoing',
-          content: aiResponse,
-          statusName: 'text',
-          data: JSON.stringify({ 
-            consultant: consultantMaid, 
-            response: aiResponse, 
-            isAIResponse: true,
-            createdAt: new Date().toISOString() 
-          })
-        });
-        console.log(`✅ AI message saved (linked to consultant ${consultantMaid})`);
-      } catch (error) {
-        console.error('❌ Error saving AI response to database:', error);
-        // Continue execution to send response even if DB save fails
-      }
+      //   await handlerWorker.messageRepository.addMessage({
+      //     humanId: human.id,
+      //     messageType: 'bot_text',
+      //     direction: 'outgoing',
+      //     content: aiResponse,
+      //     statusName: 'text',
+      //     data: JSON.stringify({ 
+      //       consultant: consultantMaid, 
+      //       response: aiResponse, 
+      //       isAIResponse: true,
+      //       createdAt: new Date().toISOString() 
+      //     })
+      //   });
+      //   console.log(`✅ AI message saved (linked to consultant ${consultantMaid})`);
+      // } catch (error) {
+      //   console.error('❌ Error saving AI response to database:', error);
+      //   // Continue execution to send response even if DB save fails
+      // }
 
       // Send AI response to topic
       //TO DO disable logging this messages
