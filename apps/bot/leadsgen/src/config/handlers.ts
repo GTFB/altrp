@@ -50,6 +50,35 @@ export const createCustomHandlers = (worker: BotInterface) => {
   });
   
   /**
+   * Get AI settings from group data_in
+   * Returns prompt, model, and context_length from group's data_in, or default values if not found
+   */
+  const getAISettingsFromGroup = (group: any): { prompt: string; model: string; context_length: number } => {
+    const defaultSettings = {
+      prompt: "You are a technical support assistant providing troubleshooting help and technical guidance. Help users resolve technical issues, understand software functionality, and navigate system features. Always clarify that your assistance is for general troubleshooting and encourage users to contact official support channels for complex issues, account problems, or security concerns. Keep your answers brief and concise. Format your responses using HTML tags for Telegram only from this list: use <b> for bold, <i> for italics, <u> for underscores, <code> for code, and <a href=\"url\"> for links DO NOT use <br> tag. Respond clearly only to the user's message, taking into account the context, without unnecessary auxiliary information.",
+      model: "gemini-2.5-flash",
+      context_length: 6
+    };
+
+    if (!group || !group.dataIn) {
+      console.warn('⚠️ Group has no dataIn, using default AI settings');
+      return defaultSettings;
+    }
+
+    try {
+      const groupDataIn = JSON.parse(group.dataIn);
+      return {
+        prompt: groupDataIn.prompt || defaultSettings.prompt,
+        model: groupDataIn.model || defaultSettings.model,
+        context_length: groupDataIn.context_length || defaultSettings.context_length
+      };
+    } catch (error) {
+      console.warn('⚠️ Failed to parse group dataIn, using default AI settings:', error);
+      return defaultSettings;
+    }
+  };
+  
+  /**
    * Ensure topic exists for user in leadsgen group
    * Similar to ensureTopicForGroup in matcher, but simplified for single group
    */
@@ -86,12 +115,11 @@ export const createCustomHandlers = (worker: BotInterface) => {
         throw new Error('Failed to create Telegram topic');
       }
 
+      // Get AI settings from group data_in
+      const aiSettings = getAISettingsFromGroup(group);
+      
       // Create message_thread entry for the topic
-      const threadDataIn = JSON.stringify({
-        prompt: "You are a technical support assistant providing troubleshooting help and technical guidance. Help users resolve technical issues, understand software functionality, and navigate system features. Always clarify that your assistance is for general troubleshooting and encourage users to contact official support channels for complex issues, account problems, or security concerns. Keep your answers brief and concise. Format your responses using HTML tags for Telegram only from this list: use <b> for bold, <i> for italics, <u> for underscores, <code> for code, and <a href=\"url\"> for links DO NOT use <br> tag. Respond clearly only to the user's message, taking into account the context, without unnecessary auxiliary information.",
-        model: "gemini-2.5-flash",
-        context_length: 6
-      });
+      const threadDataIn = JSON.stringify(aiSettings);
 
       await handlerWorker.messageThreadRepository.addMessageThread({
         parentMaid: group.maid,
@@ -248,11 +276,9 @@ export const createCustomHandlers = (worker: BotInterface) => {
           
           // Create message_threads entry if human has haid
           if (existingHuman.haid) {
-            const threadDataIn = JSON.stringify({
-              prompt: "You are a technical support assistant providing troubleshooting help and technical guidance. Help users resolve technical issues, understand software functionality, and navigate system features. Always clarify that your assistance is for general troubleshooting and encourage users to contact official support channels for complex issues, account problems, or security concerns. Keep your answers brief and concise. Format your responses using HTML tags for Telegram only from this list: use <b> for bold, <i> for italics, <u> for underscores, <code> for code, and <a href=\"url\"> for links DO NOT use <br> tag. Respond clearly only to the user's message, taking into account the context, without unnecessary auxiliary information.",
-              model: "gemini-2.5-flash",
-              context_length: 6
-            });
+            // Get AI settings from group data_in (or defaults if group not found)
+            const aiSettings = group ? getAISettingsFromGroup(group) : getAISettingsFromGroup(null);
+            const threadDataIn = JSON.stringify(aiSettings);
             
             await handlerWorker.messageThreadRepository.addMessageThread({
               value: topicId.toString(),
@@ -708,10 +734,13 @@ export const createCustomHandlers = (worker: BotInterface) => {
       const human = await handlerWorker.humanRepository.getHumanByTelegramId(chatId);
       if (!human || !human.dataIn) {
         console.error(`❌ Human ${chatId} not found or has no dataIn`);
-        await handlerWorker.messageService.sendMessage(
-          chatId,
-          '❌ Human not found or has no configuration.'
-        );
+        if (human?.id) {
+          await handlerWorker.messageService.sendMessage(
+            chatId,
+            '❌ Human not found or has no configuration.',
+            human.id
+          );
+        }
         return;
       }
 
@@ -723,19 +752,25 @@ export const createCustomHandlers = (worker: BotInterface) => {
 
       } catch (e) {
         console.error(`Failed to parse human.dataIn for human ${chatId}:`, e);
-        await handlerWorker.messageService.sendMessage(
-          chatId,
-          '❌ Error parsing human configuration.'
-        );
+        if (human?.id) {
+          await handlerWorker.messageService.sendMessage(
+            chatId,
+            '❌ Error parsing human configuration.',
+            human.id
+          );
+        }
         return;
       }
 
       if (!humanTopicId) {
         console.error(`❌ No topic_id found for human ${chatId}`);
-        await handlerWorker.messageService.sendMessage(
-          chatId,
-          '❌ Topic ID not found for this human.'
-        );
+        if (human?.id) {
+          await handlerWorker.messageService.sendMessage(
+            chatId,
+            '❌ Topic ID not found for this human.',
+            human.id
+          );
+        }
         return;
       }
 
@@ -787,10 +822,13 @@ export const createCustomHandlers = (worker: BotInterface) => {
       // Check if message has no text
       if (!message.text) {
         console.log(`📭 No text in message in topic ${humanTopicId}`);
-        await handlerWorker.messageService.sendMessage(
-          chatId,
-          'Send a text or voice message.'
-        );
+        if (human?.id) {
+          await handlerWorker.messageService.sendMessage(
+            chatId,
+            'Send a text or voice message.',
+            human.id
+          );
+        }
         return;
       }
 
@@ -920,11 +958,16 @@ export const createCustomHandlers = (worker: BotInterface) => {
         // Send error message to user
         const errorMessage = 'Sorry, I encountered an error while processing your request. Please try again later.';
         try {
-          await handlerWorker.messageService.sendMessage(
-            chatId,
-            errorMessage
-          );
-          console.log(`⚠️ Error message sent to human ${chatId}`);
+          if (!human.id) {
+            console.error(`❌ Cannot send error message: human ${chatId} has no id`);
+          } else {
+            await handlerWorker.messageService.sendMessage(
+              chatId,
+              errorMessage,
+              human.id
+            );
+            console.log(`⚠️ Error message sent to human ${chatId}`);
+          }
         } catch (sendError) {
           console.error('❌ Failed to send error message to topic:', sendError);
         }
@@ -964,9 +1007,13 @@ export const createCustomHandlers = (worker: BotInterface) => {
       //TO DO disable logging this messages
       try {
         console.log(`📤 Sending AI response to topic ${humanTopicId}`);
+        if (!human.id) {
+          throw new Error(`Human ${chatId} has no id for sending message`);
+        }
         await handlerWorker.messageService.sendMessage(
           chatId,
-          aiResponse
+          aiResponse,
+          human.id
         );
 
         await handlerWorker.messageService.sendMessageToTopic(
