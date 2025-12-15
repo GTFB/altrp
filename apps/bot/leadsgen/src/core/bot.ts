@@ -283,12 +283,7 @@ export class TelegramBotWorker {
       return;
     }
 
-    // Log message
-    if (human.id) {
-      await this.messageLoggingService.logMessage(message, 'incoming', human.id);
-    }
-
-    // Get or create human context
+    // Get or create human context BEFORE logging (so we can check flowMode)
     if (human.id) {
       await this.userContextManager.getOrCreateContext(message.from.id, human.id);
     }
@@ -307,6 +302,11 @@ export class TelegramBotWorker {
 
     // Check if human is in flow mode
     const isInFlow = await this.userContextManager.isInFlowMode(message.from.id);
+    
+    // Log message AFTER checking flowMode (so logMessage can correctly determine status_name)
+    if (human.id) {
+      await this.messageLoggingService.logMessage(message, 'incoming', human.id);
+    }
     
     if (isInFlow && message.text) {
       // Human in flow - process through FlowEngine
