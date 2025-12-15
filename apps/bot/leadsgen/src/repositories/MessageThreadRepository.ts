@@ -145,6 +145,39 @@ export class MessageThreadRepository {
     }
   }
 
+  /**
+   * Get admin group (parent thread) for bot by type
+   * Type (e.g. 'leadsgen') should be passed from env.BOT_TYPE
+   * Returns the first (and should be only) parent thread with given type
+   * and parsed numeric chatId from value field.
+   */
+  async getAdminGroup(botType: string): Promise<(MessageThreadData & { chatId: number }) | null> {
+    try {
+      const groups = await this.getParentThreadsByType(botType);
+      if (!groups || groups.length === 0) {
+        console.warn(`⚠️ No admin group found in message_threads for type "${botType}".`);
+        return null;
+      }
+      
+      const group = groups[0];
+      if (!group.value) {
+        console.error('❌ Admin group found but has no value (chat_id)');
+        return null;
+      }
+      
+      const chatId = parseInt(group.value, 10);
+      if (Number.isNaN(chatId)) {
+        console.error(`❌ Invalid chat_id in admin group: ${group.value}`);
+        return null;
+      }
+      
+      return { ...group, chatId };
+    } catch (error) {
+      console.error('❌ Error getting admin group:', error);
+      return null;
+    }
+  }
+
   async getThreadByXaidAndStatus(xaid: string, statusName: string, type: string): Promise<MessageThreadData | null> {
     try {
       const result = await this.d1Storage.execute(`

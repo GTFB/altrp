@@ -50,38 +50,6 @@ export const createCustomHandlers = (worker: BotInterface) => {
   });
   
   /**
-   * Get leadsgen group from message_threads
-   * Returns the first (and should be only) group with type = 'leadsgen'
-   */
-  const getLeadsgenGroup = async () => {
-    try {
-      const groups = await handlerWorker.messageThreadRepository.getParentThreadsByType('leadsgen');
-      if (!groups || groups.length === 0) {
-        console.warn('⚠️ No leadsgen group found in message_threads. Falling back to ADMIN_CHAT_ID from env.');
-        return null;
-      }
-      
-      // Return first group (should be only one)
-      const group = groups[0];
-      if (!group.value) {
-        console.error('❌ Leadsgen group found but has no value (chat_id)');
-        return null;
-      }
-      
-      const chatId = parseInt(group.value, 10);
-      if (Number.isNaN(chatId)) {
-        console.error(`❌ Invalid chat_id in leadsgen group: ${group.value}`);
-        return null;
-      }
-      
-      return { ...group, chatId };
-    } catch (error) {
-      console.error('❌ Error getting leadsgen group:', error);
-      return null;
-    }
-  };
-
-  /**
    * Ensure topic exists for user in leadsgen group
    * Similar to ensureTopicForGroup in matcher, but simplified for single group
    */
@@ -152,7 +120,7 @@ export const createCustomHandlers = (worker: BotInterface) => {
       console.log(`🚀 Handling /start command via flow for human ${userId}`);
 
       // Get leadsgen group from message_threads
-      const group = await getLeadsgenGroup();
+      const group = await handlerWorker.messageThreadRepository.getAdminGroup(handlerWorker.env.BOT_TYPE || 'leadsgen');
       let groupChatId: number | null = null;
       
       // Fallback to ADMIN_CHAT_ID from env if group not found
@@ -664,8 +632,8 @@ export const createCustomHandlers = (worker: BotInterface) => {
      */
     handleAssistantTopicMessage: async (message: any) => {
       try {
-        // Get leadsgen group from message_threads (fallback to ADMIN_CHAT_ID from env)
-        const group = await getLeadsgenGroup();
+        // Get admin group from message_threads (fallback to ADMIN_CHAT_ID from env)
+        const group = await handlerWorker.messageThreadRepository.getAdminGroup(handlerWorker.env.BOT_TYPE || 'leadsgen');
         let adminChatId: number | null = null;
         
         if (group) {
