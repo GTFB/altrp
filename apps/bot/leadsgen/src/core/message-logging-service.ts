@@ -56,28 +56,12 @@ export class MessageLoggingService {
       // Determine status_name based on flowMode and message type
       let statusName: string;
       
-      // Check if user is in flow mode (only for incoming messages)
-      if (direction === 'incoming') {
-        const context = await this.userContextManager.getContext(userId);
-        if (context && context.flowMode) {
-          statusName = 'flow_mode';
-        } else {
-          // Determine status based on message type
-          // If title contains caption (text), status is 'text'
-          if (message.text || message.caption) {
-            statusName = 'text';
-          } else if (message.voice) {
-            statusName = 'voice';
-          } else if (message.photo && message.photo.length > 0) {
-            statusName = 'photo';
-          } else if (message.document) {
-            statusName = 'document';
-          } else {
-            statusName = 'text'; // Default fallback
-          }
-        }
+      // Check if user is in flow mode (for both incoming and outgoing messages)
+      const context = await this.userContextManager.getContext(userId);
+      if (context && context.flowMode) {
+        statusName = 'flow_mode';
       } else {
-        // For outgoing messages, determine status based on message type
+        // Determine status based on message type
         if (message.text || message.caption) {
           statusName = 'text';
         } else if (message.voice) {
