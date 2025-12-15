@@ -338,9 +338,19 @@ export const createCustomHandlers = (worker: BotInterface) => {
 
         // Save original icon if not already saved
         if (!dataInObj.original_topic_icon) {
+          let originalIconEmojiId: string | null = null;
+          try {
+            const ctxIcon = await bot.userContextManager.getVariable(humanTelegramId, 'leadsgen.topicIcon');
+            if (typeof ctxIcon === 'string' && ctxIcon.length > 0) {
+              originalIconEmojiId = ctxIcon;
+            }
+          } catch (e) {
+            console.warn(`Failed to read topicIcon from context for human ${humanTelegramId}`, e);
+          }
+
           dataInObj.original_topic_icon = {
             icon_color: 0x6FB9F0, // Default blue color
-            icon_custom_emoji_id: null
+            icon_custom_emoji_id: originalIconEmojiId
           };
         }
 
@@ -351,7 +361,12 @@ export const createCustomHandlers = (worker: BotInterface) => {
         await handlerWorker.humanRepository.updateHumanDataIn(humanTelegramId, JSON.stringify(dataInObj));
 
         // Change topic icon to AI emoji
-        const iconChanged = await handlerWorker.topicService.editTopicIcon(topicId, "5309832892262654231");
+        const iconChanged = await handlerWorker.topicService.editTopicIcon(
+          topicId,
+          "5309832892262654231",
+          undefined,
+          adminChatId
+        );
         if (!iconChanged) {
           console.warn(`⚠️ Failed to change topic icon for topic ${topicId}`);
         }
@@ -421,22 +436,59 @@ export const createCustomHandlers = (worker: BotInterface) => {
         // Update data_in
         await handlerWorker.humanRepository.updateHumanDataIn(humanTelegramId, JSON.stringify(dataInObj));
 
-        // Restore original topic icon
-        const originalIcon = dataInObj.original_topic_icon;
-        if (originalIcon) {
-          const iconRestored = await handlerWorker.topicService.editTopicIcon(
-            topicId, 
-            originalIcon.icon_custom_emoji_id, 
-            originalIcon.icon_color
-          );
-          if (!iconRestored) {
-            console.warn(`⚠️ Failed to restore topic icon for topic ${topicId}`);
+        // Restore topic icon:
+        // 1) Try to use icon saved in user context (leadsgen.topicIcon)
+        // 2) Fallback to original_topic_icon from data_in
+        // 3) Fallback to default (blue color, no emoji)
+        let restored = false;
+
+        try {
+          const ctxIcon = await bot.userContextManager.getVariable(humanTelegramId, 'leadsgen.topicIcon');
+          if (typeof ctxIcon === 'string' && ctxIcon.length > 0) {
+            const iconRestoredFromCtx = await handlerWorker.topicService.editTopicIcon(
+              topicId,
+              ctxIcon,
+              undefined,
+              adminChatId
+            );
+            if (iconRestoredFromCtx) {
+              console.log(`✅ Topic icon restored from context (${ctxIcon}) for topic ${topicId}`);
+              restored = true;
+            } else {
+              console.warn(`⚠️ Failed to restore topic icon from context for topic ${topicId}`);
+            }
           }
-        } else {
-          // If no original icon saved, use default (blue color, no emoji)
-          const iconRestored = await handlerWorker.topicService.editTopicIcon(topicId, null, 0x6FB9F0);
-          if (!iconRestored) {
-            console.warn(`⚠️ Failed to restore default topic icon for topic ${topicId}`);
+        } catch (e) {
+          console.warn(`⚠️ Failed to read topicIcon from context for human ${humanTelegramId}`, e);
+        }
+
+        if (!restored) {
+          const originalIcon = dataInObj.original_topic_icon;
+          if (originalIcon) {
+            const iconRestored = await handlerWorker.topicService.editTopicIcon(
+              topicId,
+              originalIcon.icon_custom_emoji_id,
+              originalIcon.icon_color,
+              adminChatId
+            );
+            if (!iconRestored) {
+              console.warn(`⚠️ Failed to restore topic icon from original_topic_icon for topic ${topicId}`);
+            } else {
+              console.log(`✅ Topic icon restored from original_topic_icon for topic ${topicId}`);
+            }
+          } else {
+            // If no original icon saved, use default (blue color, no emoji)
+            const iconRestored = await handlerWorker.topicService.editTopicIcon(
+              topicId,
+              null,
+              0x6FB9F0,
+              adminChatId
+            );
+            if (!iconRestored) {
+              console.warn(`⚠️ Failed to restore default topic icon for topic ${topicId}`);
+            } else {
+              console.log(`✅ Default topic icon restored for topic ${topicId}`);
+            }
           }
         }
 
@@ -570,14 +622,35 @@ export const createCustomHandlers = (worker: BotInterface) => {
             break;
         }
 
-        console.log(`🎨 Setting status ${statusName} icon ${icon} for topic ${topicId}`);
+        console.log(`🎨 Setting status ${statusName} icon ${icon} for topic ${topicId} in chat ${adminChatId}`);
 
         if (icon) {
-          const iconChanged = await handlerWorker.topicService.editTopicIcon(topicId, icon);
+          // Pass adminChatId explicitly so TopicService knows which chat the topic belongs to
+          const iconChanged = await handlerWorker.topicService.editTopicIcon(
+            topicId,
+            icon,
+            undefined,
+            adminChatId
+          );
           if (!iconChanged) {
             console.warn(`⚠️ Failed to change topic icon for topic ${topicId}`);
           } else {
             console.log(`✅ Topic icon updated to ${icon} for topic ${topicId}`);
+          }
+
+          // Save topic icon code in user's context for future usage
+          try {
+            const targetHuman = await handlerWorker.humanRepository.getHumanByTelegramId(targetUserId);
+            if (targetHuman?.id) {
+              // Ensure user context exists
+              await contextManager.getOrCreateContext(targetUserId, targetHuman.id);
+              await contextManager.setVariable(targetUserId, 'leadsgen.topicIcon', icon);
+              console.log(`🧠 Saved topic icon ${icon} to context for user ${targetUserId}`);
+            } else {
+              console.warn(`⚠️ Cannot save topic icon to context: human ${targetUserId} not found`);
+            }
+          } catch (ctxError) {
+            console.warn(`⚠️ Failed to save topic icon to user context for ${targetUserId}:`, ctxError);
           }
         } else {
           console.warn(`⚠️ No icon defined for status ${statusName}`);
