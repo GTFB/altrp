@@ -112,11 +112,11 @@ export class MessageLoggingService {
       if (context && context.flowMode) {
         statusName = 'flow_mode';
       } else {
-        statusName = 'text'; // Callback queries are treated as text interactions
+        statusName = 'text';
       }
       
       const messageLog = {
-        humanId: dbHumanId, // Use ID from humans table, not Telegram ID
+        humanId: dbHumanId,
         messageType: 'user_callback' as const,
         direction: 'incoming' as const,
         content: callbackQuery.data || '',
