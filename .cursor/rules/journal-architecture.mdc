@@ -1,0 +1,46 @@
+---
+description: Journal (J), journal_system (JS), journal_connections (JC) - separation of concerns and anti-duplication
+globs:
+  - "apps/app/src/shared/repositories/journals.repository.ts"
+  - "apps/app/src/shared/repositories/deals.repository.ts"
+  - "apps/app/src/shared/journal/**"
+  - "apps/app/src/app/(api)/**/route.ts"
+  - "packages/services/user-journal.service.ts"
+  - "packages/modules/shop/**/*.ts"
+  - "apps/app/src/shared/utils/push.ts"
+---
+# Journal architecture (J / JS / JC)
+
+When adding logging, auditing, or user-user relations, classify data first: **behavior**, **data audit**, or **relationship state**. Never duplicate the same payload in **J** and **JS**.
+
+## `journals` (J) - behavior / product analytics
+
+- Answers: *How does the user use the product?*
+- `action`: product-style identifiers (e.g. `user.login`, `page.view`, `deal.moved_to_won`, `GOAL_UPDATE` with **no** field-level old/new).
+- `details` / `payload`: context only (device, referer, filters, funnel timing, **names** of changed areas - not DB diffs).
+- **Do not** store DB audit diffs (old/new field values) or full entity JSON dumps for audit purposes.
+
+## `journal_system` (JS) - data audit (CRUD)
+
+- Answers: *What changed in the database, who, when?*
+- **Only** on successful **INSERT / UPDATE / DELETE** (including soft delete) of persisted entities.
+- `details` JSON shape: `{ "changed_fields": string[], "old": object | null, "new": object }` (only keys that changed; `old`/`new` hold values for those keys).
+- `entity_aid`: stable id of the mutated row (e.g. goal aid, deal daid, setting uuid).
+- **Do not** log reads (SELECT), logins, clicks, or server errors here.
+
+## `journal_connections` (JC) - user-user graph state
+
+- Answers: *Who is related to whom right now?* (manager, mentor, partner, etc.)
+- Stores **current** relationship rows (`relationship_name`, `status`, `details` for relationship-specific terms like commission %).
+- **Not** an action history table. If a manager edits a subordinate's data, that belongs in **JS** (and optionally **J** for product analytics), **not** in JC.
+- When a **JC row** is created or updated, also write **JS** for that JC row mutation (`entity_aid` = that connection's id / aid), per data-audit rules.
+
+## Anti-duplication checklist
+
+1. Same field-level diff must **not** appear in both J and JS; JS holds the diff, J holds product meaning without mirroring `old`/`new`.
+2. Do not store a **full** JSON dump of an entity in both J and JS.
+3. Page views / reads → **J** only (or nothing), never JS.
+
+## Code comments
+
+Before non-trivial writes to J, JS, or JC, add a **short English** comment stating why this write targets J, JS, or JC per this rule.

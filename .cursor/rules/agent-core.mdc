@@ -1,0 +1,30 @@
+---
+description: Token discipline — read limits, close thread, self-hosted CI only
+alwaysApply: true
+---
+
+# Agent core (token + ops)
+
+## Read limit
+
+- A file longer than ~400 lines: grep the symbol first, then Read with offset/limit around that function. Do not read the file from line 1 to the end.
+- Do not open `packages/seeds/src/taxonomy/isic-seed-data.ts` unless the task is the taxonomy seed.
+- Locale files `packages/content/locales/*.json`: grep the key. Do not read the file from the start.
+- Deploy and CI logs: keep the job status and the last error line. Do not paste the log into the reply.
+
+## Fresh chat after the task
+
+When the request is closed (the answer is given, or the code change is done and the reply includes the deploy URL):
+
+- End the turn. Do not propose the next feature, do not re-read files for later, do not recap the thread.
+- Last line: the task is closed; open the next one in a new chat. Add one line the user can paste there: the goal and the file paths, if they are already known.
+- Stay in this chat only when the user explicitly continues the same change ("bug in what you just did", "add this to the same diff").
+
+This rule cannot open a new chat and cannot drop history from the window. The next message in this thread still pays for the old turns. It only stops the thread from growing after done, and tells the user to press New Chat.
+
+## Self-hosted runners only
+
+- **All** CI builds, image pushes, and deploys MUST use self-hosted runners (label `repositop-builder` / project self-hosted fleet).
+- Do **NOT** suggest or use: GitHub-hosted `ubuntu-latest` (or any hosted runner), manual Dokploy "redeploy from UI" as a substitute for the runner pipeline, local `docker build`+push as the primary deploy path, or "just wait for billing on hosted Actions".
+- If runners are **offline** or jobs stay **queued**: report that fact; the fix is bring runners online — not an alternate deploy method.
+- Trigger deploy via existing self-hosted workflows only (`Build and Push Image`, `Deploy VPS`, `repository_dispatch` types they already use).

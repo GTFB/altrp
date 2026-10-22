@@ -1,0 +1,24 @@
+﻿---
+description: Scoped edits for DataTable DSL — minimize token context
+globs:
+  - "packages/components/blocks-app/admin/data-table/**"
+  - "packages/components/blocks-app/admin/private-config/**"
+  - "packages/components/blocks-app/admin/config-editor/**"
+  - "packages/components/blocks-app/admin/cabinet-constructor/**"
+---
+# Data-table / DSL scoped edit
+
+## Config-only changes
+Edit `private-config/**/*.settings.ts` and the relevant fragment under `cabinet-constructor/types/`. Do **not** open `DataTable.tsx` / `DataTableFormDialog.tsx`.
+
+## Column / filter DSL behavior
+Prefer `utils/column-dsl-*.ts`, `utils/dslToolbarFilter.ts`, `functions/column-factories/`, then a partial read of `generateColumns` — never the full file.
+
+## Collection-specific UI
+Add or edit `data-table/plugins/<collection>/`. Do not add `if (collection === …)` to `DataTable.tsx`.
+
+## Imports
+Use path imports (`…/data-table/RelationSelect`) — not the package barrel except `LazyDataTable` / shared types.
+
+## God files
+Never load entire `DataTable.tsx`, `DataTableFormDialog.tsx`, `useDataTableFormCallbacks.ts`, or `useDataTableFetchCallbacks.ts`. Grep first; Read with offset/limit.

@@ -10,8 +10,9 @@ alwaysApply: true
 2.  **Branch Integrity**
     - The `main` and `develop` branches are protected. They MUST NOT be deleted or force-pushed to. All merges into them must be via Pull Requests.
 
-3.  **Component Generation**
-    - ALL new React components MUST be scaffolded using the `bun hygen component new --name ComponentName` command. Do not create component files manually.
+3.  **Component structure**
+    - New React components MUST follow the existing folder layout and naming in the nearest module or `packages/components/`.
+    - Match surrounding file style (imports, exports, Tailwind + Shadcn/ui only).
 
 4.  **Styling Constraints**
     - Custom CSS files (`.css`), CSS Modules (`.module.css`), or inline `<style>` tags are STRICTLY FORBIDDEN.
@@ -20,3 +21,8 @@ alwaysApply: true
 5.  **Documentation Policy**
     - Code should be self-documenting. AVOID creating excessive documentation (e.g., long TSDoc blocks for simple functions).
     - Adhere strictly to the existing project folder structure for organization. Do not create new top-level directories without explicit permission.
+
+6.  **Next.js request boundary (no `middleware.ts`)**
+    - Do **NOT** add or restore `middleware.ts` (or the deprecated `middleware` file convention). Prefer **`proxy.ts`** with `export function proxy` when a request boundary is required.
+    - **Cloudflare Pages + `@cloudflare/next-on-pages`:** any `proxy.ts` emits `/_middleware`, which must run on Edge; a no-op proxy still fails the adapter. Omit `proxy.ts` unless it is truly needed and the deployment target supports it (or migrate to OpenNext / another adapter per Cloudflare docs).
+    - Do **NOT** suggest reintroducing `middleware.ts` for Edge workarounds unless the user explicitly overrides this rule.

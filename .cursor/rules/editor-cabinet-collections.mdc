@@ -1,0 +1,26 @@
+---
+description: Editor cabinet and role-based collection settings
+globs: 
+  - "apps/app/src/app/(private)/e/**"
+  - "apps/app/src/shared/collections/**"
+  - "packages/components/blocks-app/admin/app-sidebar.tsx"
+  - "packages/components/blocks-app/editor/**"
+---
+# Editor Cabinet & Collections
+
+## Settings storage
+- **Path:** `apps/app/src/shared/collections`
+- **Retrieval:** `getCollection(collectionName, role)` from `apps/app/src/shared/collections/getCollection.ts`
+
+## Role-specific config (non-Administrator)
+- Stored in `settings` table, attribute `role_schema_{roleName}` (e.g. `role_schema_Editor`)
+- Service: `RoleCollectionSchemaService` in `apps/app/src/shared/services/role-collection-schema.service.ts`
+- `getCollectionsForRole(roleName)` - list of collection names for role
+- `getCollectionConfigForRole(roleName, collectionName)` - collection instance with role overrides (__title, __defaultSort, etc.)
+
+## Editor cabinet (/e/)
+- Layout: `apps/app/src/app/(private)/e/layout.tsx`
+- Pages: `/e` (list), `/e/deals/[daid]` (detail)
+- Sidebar: uses `AppSidebar` from `blocks-app/admin/app-sidebar`
+- Base path for Editor: `/e` (links: `/e?c=deals`)
+- APIs: `/api/admin/collections`, `/api/admin/state` - must allow Editor role (withEditorGuard)

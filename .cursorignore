@@ -1,0 +1,38 @@
+# Build / deploy artifacts (agent noise)
+.open-next
+**/.open-next/**
+.deploy-stash
+**/.deploy-stash/**
+.next
+**/.next/**
+.wrangler
+**/.wrangler/**
+dist
+**/dist/**
+
+# Dependencies
+node_modules
+**/node_modules/**
+
+# Vendored UI (large; edit only when explicitly needed)
+vendor/
+
+# Caches / coverage
+.turbo
+**/.turbo/**
+coverage
+**/coverage/**
+*.tsbuildinfo
+
+# Generated worker and skill guide trees (open a named file when the task needs it)
+apps/app/public/sw.js
+**/.cursor/skills/**/guides/**
+**/.cursor/skills/**/references/**
+**/.agents/skills/**/guides/**
+
+# Large data dumps (import from code; do not Read)
+packages/content/blocks-catalog-manifest.json
+packages/content/blocks-catalog-index.json
+packages/seeds/**
+**/migrations/meta/**
+apps/bot/**/package-lock.json
